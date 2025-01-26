@@ -1,0 +1,37 @@
+Copyright (c) 2025 FINDERFEED
+
+All Rights Reserved.
+
+Mod code:
+-------------------------------------------------------------------------------------------------
+Anyone can use my code as educational material or for private usage.
+
+Unless given explicit permission no one can redistribute this source code.
+
+Any mods that use a part or all of the source code are extremely prohibited.
+
+No one is allowed to achieve a monetary gain from this code (except original author).
+
+Modification of the mod can be done for private usage, but it cannot be distributed.
+-------------------------------------------------------------------------------------------------
+
+Mod assets:
+-------------------------------------------------------------------------------------------------
+Anyone can use my assets as educational material or for private usage.
+
+Assets are the mod author property and cannot be distributed in any way.
+
+Any mods that use a part or all of the assets are extremely prohibited.
+
+No one is allowed to achieve a monetary gain from the assets (except original author).
+-------------------------------------------------------------------------------------------------
+
+Compiled mod:
+-------------------------------------------------------------------------------------------------
+Due to the Mojang and Minecraft Mod Terms of Service and Licensing Restrictions, compiled versions must be provided for free.
+
+You cannot re-host this mod on any platform for distribution. You can upload it for private sharing (amongst your friends).
+For all public purposes all downloads must come from official Curseforge page: TODO
+
+You can use this mod in any modpacks.
+-------------------------------------------------------------------------------------------------
