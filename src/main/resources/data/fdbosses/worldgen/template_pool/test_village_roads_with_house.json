@@ -1,0 +1,34 @@
+{
+  "elements": [
+    {
+      "weight": 4,
+      "element": {
+        "projection": "terrain_matching",
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "fdbosses:road_1",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 4,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "fdbosses:base_house",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "terrain_matching",
+        "element_type": "minecraft:legacy_single_pool_element",
+        "location": "fdbosses:road_2",
+        "processors": "minecraft:empty"
+      }
+    }
+
+
+  ],
+  "fallback": "minecraft:empty"
+}

@@ -1,0 +1,51 @@
+package com.finderfeed.fdbosses.init;
+
+import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdlib.systems.FDRegistries;
+import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+public class BossAnims {
+
+
+    public static DeferredRegister<Animation> ANIMATIONS = DeferredRegister.create(FDRegistries.ANIMATIONS, FDBosses.MOD_ID);
+
+    public static DeferredHolder<Animation,Animation> CHESED_IDLE = ANIMATIONS.register("chesed_idle", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
+    public static DeferredHolder<Animation,Animation> CHESED_ATTACK = ANIMATIONS.register("chesed_attack", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
+    public static DeferredHolder<Animation,Animation> CHESED_ROLL_UP = ANIMATIONS.register("chesed_roll_up", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
+    public static DeferredHolder<Animation,Animation> CHESED_ROLL_UP_END = ANIMATIONS.register("chesed_roll_up_end", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
+    public static DeferredHolder<Animation,Animation> CHESED_ROLL_UP_JUST_END /*_ALREADY YOU_ROLLING_BASTARD*/ = ANIMATIONS.register("chesed_roll_up_just_end", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
+    public static DeferredHolder<Animation,Animation> CHESED_ROLL = ANIMATIONS.register("chesed_roll", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
+    public static DeferredHolder<Animation,Animation> CHESED_ROLL_ROLL = ANIMATIONS.register("chesed_roll_roll", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
+    public static DeferredHolder<Animation,Animation> CHESED_CAST = ANIMATIONS.register("chesed_cast", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
+    public static DeferredHolder<Animation,Animation> CHESED_EARTHQUAKE_CAST = ANIMATIONS.register("chesed_earthquake_cast", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
+    public static DeferredHolder<Animation,Animation> CHESED_ROCKFALL_CAST = ANIMATIONS.register("chesed_rockfall_cast", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
+    public static DeferredHolder<Animation,Animation> ELECTRIC_ORB_IDLE = ANIMATIONS.register("electric_orb_idle", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"electric_orb"));
+    });
+    public static DeferredHolder<Animation,Animation> CHESED_CRYSTAL_SPAWN = ANIMATIONS.register("chesed_crystal_spawn", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_crystal_animations"));
+    });
+}

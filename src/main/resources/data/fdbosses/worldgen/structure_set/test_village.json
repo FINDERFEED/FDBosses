@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "salt": 30043232,
+    "separation": 20,
+    "spacing": 30
+  },
+  "structures": [
+    {
+      "structure": "fdbosses:test_village",
+      "weight": 1
+    }
+  ]
+}

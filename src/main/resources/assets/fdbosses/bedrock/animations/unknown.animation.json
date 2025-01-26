@@ -1,0 +1,13 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"test": {
+			"animation_length": 0.875,
+			"bones": {
+				"bone2": {
+					"position": [0, 0, 0]
+				}
+			}
+		}
+	}
+}

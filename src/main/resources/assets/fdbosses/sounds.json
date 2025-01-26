@@ -1,0 +1,14 @@
+{
+  "ray_attack": {
+    "sounds": [ "fdbosses:ray_attack" ]
+  },
+  "rockfall": {
+    "sounds": [ "fdbosses:rockfall" ]
+  },
+  "rumbling": {
+    "sounds": [ "fdbosses:rumbling" ]
+  },
+  "lightning_attack": {
+    "sounds": [ "fdbosses:lightning_attack" ]
+  }
+}
