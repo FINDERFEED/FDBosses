@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.init;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
+import com.finderfeed.fdbosses.entities.chesed_boss.chesed_vertical_ray.ChesedVerticalRayAttack;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.electric_sphere.ChesedElectricSphereEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.falling_block.ChesedFallingBlock;
@@ -79,11 +80,19 @@ public class BossEntities {
             .sized(2.5f,4f)
             .build("chesed_crystal"));
 
+    public static final Supplier<EntityType<ChesedVerticalRayAttack>> CHESED_VERTICAL_RAY_ATTACK = ENTITIES.register("chesed_vertical_ray_attack",()->EntityType.Builder.of(
+            ChesedVerticalRayAttack::new, MobCategory.MISC
+    )
+            .sized(0.25f,0.25f)
+            .updateInterval(1)
+            .build("chesed_crystal"));
+
 
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event){
         event.put(CHESED.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,10).build());
         event.put(CHESED_ELECTRIC_SPHERE.get(), LivingEntity.createLivingAttributes().build());
+        event.put(CHESED_VERTICAL_RAY_ATTACK.get(), LivingEntity.createLivingAttributes().build());
     }
 
 

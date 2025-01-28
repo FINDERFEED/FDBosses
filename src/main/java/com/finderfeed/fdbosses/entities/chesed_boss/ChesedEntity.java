@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptio
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
+import com.finderfeed.fdbosses.entities.chesed_boss.chesed_vertical_ray.ChesedVerticalRayAttack;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
 import com.finderfeed.fdbosses.entities.chesed_boss.electric_sphere.ChesedElectricSphereEntity;
@@ -132,7 +133,8 @@ public class ChesedEntity extends FDMob {
                     .registerAttack("equake",this::earthquakeAttack) // 1
                     .registerAttack("rockfall",this::rockfallAttack) // 1
                     .registerAttack("esphere",this::electricSphereAttack) // 1
-                    .addAttack(0, ray)
+                    .addAttack(1,"equake")
+//                    .addAttack(0, ray)
 //                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack("esphere")
 //                            .setNextAttack(rayOrBlocks)
@@ -876,6 +878,7 @@ public class ChesedEntity extends FDMob {
                         ((ServerLevel) level()).sendParticles((ServerPlayer) player, options, true, this.position().x, this.position().y + 0.01, this.position().z, 1, 0, 0, 0, 0);
                     }
                 }
+
             }else if (t == 21) {
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                         .frequency(10f)
@@ -884,11 +887,42 @@ public class ChesedEntity extends FDMob {
                         .outTime(5)
                         .amplitude(3.f)
                         .build(),this.position(),50);
+
+
+                this.summonVerticalRayAttacksRadial(random.nextFloat() * FDMathUtil.FPI * 2,
+                        FDMathUtil.FPI * (random.nextFloat() > 0.5 ? 1 : -1),
+                        radius + 5,
+                        1,
+                        90,
+                        8);
+
             }else if (t > 50){
                 instance.nextStage();
             }
         }
         return instance.stage > 4;
+    }
+
+    private void summonVerticalRayAttacksRadial(float offsetAngle,float finalRotationAngle,float radius,float damage,int time,int count){
+
+        float angleBetween = FDMathUtil.FPI * 2 / count;
+
+        for (int i = 0; i < count;i++){
+
+            ProjectileMovementPath path = new ProjectileMovementPath(time,false);
+
+            for (float x = 1; x <= radius;x++){
+                float p = x / radius;
+                float angle = angleBetween * i + offsetAngle + p * finalRotationAngle;
+                Vec3 offs = new Vec3(x,0,0).yRot(angle);
+                path.addPos(
+                        this.position().add(offs)
+                );
+            }
+
+            ChesedVerticalRayAttack.summon(level(),this.position(),path,damage,40);
+        }
+
     }
 
     private List<ChesedBlockProjectile> blockAttackProjectiles = new ArrayList<>();

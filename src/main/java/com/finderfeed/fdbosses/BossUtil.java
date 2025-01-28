@@ -3,10 +3,13 @@ package com.finderfeed.fdbosses;
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdlib.util.FDUtil;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.util.function.Predicate;
 
 public class BossUtil {
 
@@ -18,6 +21,14 @@ public class BossUtil {
     public static final int ROCKFALL_PARTICLES = 3;
     public static final int CHESED_RAY_EXPLOSION = 4;
     public static final int CHESED_RAY_ATTACK_SMOKE = 5;
+
+    public static Predicate<Entity> entityInVerticalRadiusPredicate(Vec3 pos,float radius){
+        return (entity)->{
+            double x = pos.x - entity.getX();
+            double z = pos.z - entity.getZ();
+            return x * x + z * z <= radius * radius;
+        };
+    }
 
     public static void chesedRaySmoke(ServerLevel level,Vec3 pos,Vec3 direction,double radius){
         posEvent(level,pos,CHESED_RAY_ATTACK_SMOKE, FDUtil.encodeDirection(direction),radius);

@@ -6,6 +6,8 @@ import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedAttackRa
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticle;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticle;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
+import com.finderfeed.fdbosses.entities.chesed_boss.chesed_vertical_ray.ChesedVerticalRayAttack;
+import com.finderfeed.fdbosses.entities.chesed_boss.chesed_vertical_ray.ChesedVerticalRayAttackRenderer;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterRenderer;
 import com.finderfeed.fdbosses.entities.chesed_boss.falling_block.ChesedFallingBlockRenderer;
 import com.finderfeed.fdbosses.entities.chesed_boss.flying_block_entity.FlyingBlockEntityRenderer;
@@ -81,5 +83,6 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.CHESED_FALLING_BLOCK.get(), ChesedFallingBlockRenderer::new);
         event.registerEntityRenderer(BossEntities.FLYING_BLOCK.get(), FlyingBlockEntityRenderer::new);
         event.registerEntityRenderer(BossEntities.RADIAL_EARTHQUAKE.get(), NullEntityRenderer::new);
+        event.registerEntityRenderer(BossEntities.CHESED_VERTICAL_RAY_ATTACK.get(), ChesedVerticalRayAttackRenderer::new);
     }
 }
