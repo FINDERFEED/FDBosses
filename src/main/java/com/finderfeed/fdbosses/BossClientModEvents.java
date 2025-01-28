@@ -12,14 +12,12 @@ import com.finderfeed.fdbosses.entities.chesed_boss.flying_block_entity.FlyingBl
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.projectiles.renderers.BlockProjectileRenderer;
-import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRenderLayerOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRendererBuilder;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDRenderLayerOptions;
 import com.finderfeed.fdlib.util.client.NullEntityRenderer;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -45,7 +43,7 @@ public class BossClientModEvents {
                         .shouldRender(((entity, frustum, x, y, z) -> {
                             return true;
                         }))
-                        .addLayer(FDRenderLayerOptions.builder()
+                        .addLayer(FDEntityRenderLayerOptions.builder()
                                 .model(BossModels.CHESED)
                                 .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")))
                                 .build()
@@ -53,7 +51,7 @@ public class BossClientModEvents {
                         .build()
         );
         event.registerEntityRenderer(BossEntities.CHESED_ELECTRIC_SPHERE.get(),FDEntityRendererBuilder.builder()
-                        .addLayer(FDRenderLayerOptions.builder()
+                        .addLayer(FDEntityRenderLayerOptions.builder()
                                 .model(BossModels.CHESED_ELECTRIC_SPHERE)
                                 .transformation((entity,matrices,pticks)->{
                                     float time = entity.tickCount + pticks;
@@ -66,7 +64,7 @@ public class BossClientModEvents {
                 .build());
         event.registerEntityRenderer(BossEntities.CHESED_CRYSTAL.get(),FDEntityRendererBuilder.builder()
                         .shouldRender(((entity, frustum, x, y, z) -> true))
-                        .addLayer(FDRenderLayerOptions.builder()
+                        .addLayer(FDEntityRenderLayerOptions.builder()
                                 .model(BossModels.CHESED_CRYSTAL)
                                 .renderCondition((entity -> true))
                                 .transformation(((entity, stack, partialTicks) -> {
