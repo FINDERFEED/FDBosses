@@ -352,11 +352,7 @@ public class ChesedEntity extends FDMob {
     }
 
     public boolean doNothing(AttackInstance instance){
-
-        if (instance.tick % 20 == 0) {
-            System.out.println("Idling... " + instance.tick);
-        }
-        return instance.tick >= 100;
+        return true;
     }
 
     public boolean summonCrystals(AttackInstance instance){
@@ -778,8 +774,8 @@ public class ChesedEntity extends FDMob {
 
             float duration = 400;
 
-            if (tick % 10 == 0){
-                for (int i = 0; i < 3;i++) this.summonDelayedVerticalRayOnFieldNearPlayers();
+            if (tick % 40 == 0){
+                this.summonDelayedVerticalRayOnFieldNearPlayers(4);
             }
 
             this.spawnStonesAround(4,rad, this.position().add(0,height,0),true,false,FDEasings::easeOut);
@@ -829,7 +825,7 @@ public class ChesedEntity extends FDMob {
             if (level().random.nextFloat() > 0.5){
                 state = Blocks.SCULK.defaultBlockState();
             }else{
-                state = Blocks.DEEPSLATE.defaultBlockState();
+                state = Blocks.BLACKSTONE.defaultBlockState();
             }
 
             ChesedFallingBlock.summon(level(), state,p);
@@ -1410,14 +1406,20 @@ public class ChesedEntity extends FDMob {
         return v >= (1 - accuracy);
     }
 
-    private void summonDelayedVerticalRayOnFieldNearPlayers(){
+    private void summonDelayedVerticalRayOnFieldNearPlayers(float radius){
 
-        //TODO: near players
-        Vec3 pos = this.position()
-                .add(new Vec3(2 + 38 * random.nextFloat(),0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat()));
+        for (Player player : this.getCombatants(false)) {
 
-        ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(),pos,1,40,30);
+            float r = random.nextFloat();
 
+            Vec3 pos = player.position()
+                    .add(
+                            new Vec3(radius * r,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat())
+                    );
+
+            ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(), pos, 1, 40, 30);
+
+        }
     }
 
     private void summonCirclingParticlesServerside(int count,float verticalSpeed,float offset,float size,int in,int stay){

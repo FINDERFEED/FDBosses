@@ -21,34 +21,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(GameRenderer.class)
 public class GameRendererMixin {
 
-    @Inject(method = "render",at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiGraphics;flush()V",shift = At.Shift.BEFORE))
-    public void render(DeltaTracker deltaTracker, boolean smth, CallbackInfo ci){
-        ClientMixinHandler.onGameRenderEnd(deltaTracker,smth);
-    }
-
-    @Inject(method = "bobHurt",at = @At("HEAD"))
-    public void bobHurt(PoseStack matrices, float pticks, CallbackInfo ci){
-        ClientMixinHandler.bobHurt(matrices,pticks);
-    }
-
-
-    @Inject(method = "renderItemInHand",at = @At("HEAD"))
-    public void renderItemInHand(Camera p_109122_, float p_109123_, Matrix4f p_333953_, CallbackInfo ci){
-        ClientMixinHandler.beforeHand();
-    }
-
-    @Inject(method = "renderLevel",at = @At("HEAD"))
-    public void renderLevel(DeltaTracker p_348589_, CallbackInfo ci){
-        ClientMixinHandler.beforeLevel();
-    }
-
     @Inject(method = "getNightVisionScale",at = @At("RETURN"), cancellable = true)
     private static void nightVisionScale(LivingEntity entity, float pticks, CallbackInfoReturnable<Float> cir){
         Player player = Minecraft.getInstance().player;
         if (player != null && player.hasEffect(MobEffects.NIGHT_VISION)) {
             float value = cir.getReturnValue();
 
-            float percent = 1 - BossClientEvents.getChesedGazePercent(pticks);
+            float percent = 1 - Math.max(BossClientEvents.getChesedGazePercent(pticks),BossClientEvents.getChesedDarkenPercent(pticks));
 
             cir.setReturnValue(value * percent);
         }

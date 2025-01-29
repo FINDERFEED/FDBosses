@@ -82,7 +82,7 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
     }
 
     private void boomParticles(Vec3 pos){
-        for (int i = 0; i < 100;i++){
+        for (int i = 0; i < 50;i++){
             BallParticleOptions options = BallParticleOptions.builder()
                     .color(0.3f, 1f, 1f,1f)
                     .scalingOptions(0,10,20 + random.nextInt(3))
@@ -100,9 +100,32 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
 
             level().addParticle(options,true,pos.x,pos.y,pos.z,speed.x,speed.y,speed.z);
         }
+
+        float sp = 2;
+
+        for (int c = 0; c < 4;c++) {
+            for (int i = 0; i < this.getHeight();i++){
+                Vec3 spawn = this.position().add(0,i + random.nextFloat() - 0.5,0);
+
+                Vec3 speed = new Vec3(sp * (random.nextFloat() * 0.5 + 0.5),0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat());
+
+
+                BallParticleOptions options = BallParticleOptions.builder()
+                        .size(0.5f)
+                        .color(0.3f, 1f, 1f,1f)
+                        .physics(false)
+                        .friction(0.4f)
+                        .scalingOptions(0,0,20 + random.nextInt(4))
+                        .build();
+                level().addParticle(options,true,spawn.x,spawn.y,spawn.z,speed.x,speed.y,speed.z);
+            }
+        }
+
     }
 
     private void prepareParticles(int lifetime){
+
+        float p = this.tickCount / (float) lifetime;
 
         for (int c = 0; c < 2;c++) {
             for (int i = 0; i < this.getHeight();i++){
@@ -111,8 +134,8 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
                 Vec3 spawn = center.add(spawnOffset);
 
                 BallParticleOptions options = BallParticleOptions.builder()
-                        .particleProcessor(new CircleParticleProcessor(center,true,true,2))
-                        .size(0.5f)
+                        .particleProcessor(new CircleParticleProcessor(center,true,true,1))
+                        .size(0.5f * Math.max(0.05f,p))
                         .color(0.3f, 1f, 1f,1f)
                         .physics(false)
                         .scalingOptions(lifetime,0,0)

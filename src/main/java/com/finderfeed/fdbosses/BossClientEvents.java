@@ -34,9 +34,18 @@ public class BossClientEvents {
     public static int chesedGazeEffectTickO = 0;
     public static int chesedGazeEffectTickMax = 20;
 
+    public static int chesedDarkenEffectTick = 0;
+    public static int chesedDarkenEffectTickO = 0;
+    public static int chesedDarkenEffectTickMax = 10;
+
     @SubscribeEvent
     public static void tickEvent(ClientTickEvent.Pre event){
         Player player = Minecraft.getInstance().player;
+        tickChesedGaze(player);
+        tickChesedDarken(player);
+    }
+
+    private static void tickChesedGaze(Player player){
         if (player != null){
             chesedGazeEffectTickO = chesedGazeEffectTick;
             if (player.hasEffect(BossEffects.CHESED_GAZE)){
@@ -46,6 +55,19 @@ public class BossClientEvents {
             }
         }else{
             chesedGazeEffectTick = 0;
+        }
+    }
+
+    private static void tickChesedDarken(Player player){
+        if (player != null){
+            chesedDarkenEffectTickO = chesedDarkenEffectTick;
+            if (player.hasEffect(BossEffects.CHESED_DARKEN)){
+                chesedDarkenEffectTick = Mth.clamp(chesedDarkenEffectTick + 1,0,chesedDarkenEffectTickMax);
+            }else{
+                chesedDarkenEffectTick = Mth.clamp(chesedDarkenEffectTick - chesedDarkenEffectTickMax / 2,0,chesedDarkenEffectTickMax);
+            }
+        }else{
+            chesedDarkenEffectTick = 0;
         }
     }
 
@@ -106,6 +128,12 @@ public class BossClientEvents {
     public static float getChesedGazePercent(double pticks){
         float time = (float) Mth.lerp(pticks,chesedGazeEffectTickO,chesedGazeEffectTick);
         float p = FDEasings.easeOut(time / chesedGazeEffectTickMax);
+        return p;
+    }
+
+    public static float getChesedDarkenPercent(double pticks){
+        float time = (float) Mth.lerp(pticks,chesedDarkenEffectTickO,chesedDarkenEffectTick);
+        float p = FDEasings.easeOut(time / chesedDarkenEffectTickMax);
         return p;
     }
 
