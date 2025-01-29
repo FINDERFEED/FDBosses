@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
+import com.finderfeed.fdbosses.client.particles.particle_processors.MoveOnACircleParticleProcessor;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
@@ -38,6 +39,7 @@ import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticle;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -134,7 +136,7 @@ public class ChesedEntity extends FDMob {
                     .registerAttack("equake",this::earthquakeAttack) // 1
                     .registerAttack("rockfall",this::rockfallAttack) // 1
                     .registerAttack("esphere",this::electricSphereAttack) // 1
-                    .addAttack(1,"rockfall")
+                    .addAttack(1,ray)
 //                    .addAttack(0, ray)
 //                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack("esphere")

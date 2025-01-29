@@ -50,13 +50,31 @@ public class ChesedAttackRayParticle extends Particle {
                 .addArea(options.rayOptions.stayTime,FDEasings::one)
                 .addArea(options.rayOptions.outTime,FDEasings::reversedEaseOut)
                 .build();
+        options.particleProcessor.init(this);
     }
 
     @Override
     public void tick() {
 
-        super.tick();
+        options.particleProcessor.processParticle(this);
 
+        this.xo = this.x;
+        this.yo = this.y;
+        this.zo = this.z;
+        if (this.age++ >= this.lifetime) {
+            this.remove();
+        } else {
+
+            this.x += xd;
+            this.y += yd;
+            this.z += zd;
+
+        }
+
+        this.setBoundingBox(new AABB(
+                x,y,z,
+                rayEnd.x,rayEnd.y,rayEnd.z
+        ));
     }
 
     @Override
@@ -66,8 +84,9 @@ public class ChesedAttackRayParticle extends Particle {
                 Mth.lerp(pticks,this.xo,this.x),
                 Mth.lerp(pticks,this.yo,this.y),
                 Mth.lerp(pticks,this.zo,this.z)
-        ).subtract(camera.getPosition());
-        Vec3 b = rayEnd.subtract(x,y,z);
+        );
+        Vec3 b = rayEnd.subtract(pos.x,pos.y,pos.z);
+        pos = pos.subtract(camera.getPosition());
         double len = b.length();
 
         Matrix4f mat = new Matrix4f();

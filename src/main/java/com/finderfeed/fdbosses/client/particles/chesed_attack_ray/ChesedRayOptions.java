@@ -1,6 +1,8 @@
 package com.finderfeed.fdbosses.client.particles.chesed_attack_ray;
 
 import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdlib.systems.particle.EmptyParticleProcessor;
+import com.finderfeed.fdlib.systems.particle.ParticleProcessor;
 import com.finderfeed.fdlib.util.client.particles.options.AlphaOptions;
 import com.finderfeed.fdlib.util.FDByteBufCodecs;
 import com.finderfeed.fdlib.util.FDCodecs;
@@ -18,13 +20,15 @@ import net.minecraft.world.phys.Vec3;
 public class ChesedRayOptions implements ParticleOptions {
 
     public static final Codec<ChesedRayOptions> CODEC = RecordCodecBuilder.create(p->p.group(
+            ParticleProcessor.CODEC.fieldOf("particleProcessor").forGetter(v->v.particleProcessor),
             FDCodecs.VEC3.fieldOf("rayEnd").forGetter(v->v.rayEnd),
             AlphaOptions.CODEC.fieldOf("alpha").forGetter(v->v.rayOptions),
             FDCodecs.COLOR.fieldOf("color").forGetter(v->v.color),
             FDCodecs.COLOR.fieldOf("lightningColor").forGetter(v->v.color),
             Codec.FLOAT.fieldOf("rayWidth").forGetter(v->v.rayWidth)
-    ).apply(p,(rayEnd,alpha,color,lcolor,width)->{
+    ).apply(p,(particleProcessor,rayEnd,alpha,color,lcolor,width)->{
         ChesedRayOptions ray = new ChesedRayOptions();
+        ray.particleProcessor = particleProcessor;
         ray.rayOptions = alpha;
         ray.color = color;
         ray.lightningColor = lcolor;
@@ -38,13 +42,15 @@ public class ChesedRayOptions implements ParticleOptions {
     }
 
     public static final StreamCodec<FriendlyByteBuf,ChesedRayOptions> STREAM_CODEC = StreamCodec.composite(
+            ParticleProcessor.STREAM_CODEC,v->v.particleProcessor,
             FDByteBufCodecs.VEC3,v->v.rayEnd,
             AlphaOptions.STREAM_CODEC,v->v.rayOptions,
             FDByteBufCodecs.COLOR,v->v.color,
             FDByteBufCodecs.COLOR,v->v.lightningColor,
             ByteBufCodecs.FLOAT,v->v.rayWidth,
-            (rayEnd,alpha,color,lcolor,width)->{
+            (particleProcessor,rayEnd,alpha,color,lcolor,width)->{
                 ChesedRayOptions ray = new ChesedRayOptions();
+                ray.particleProcessor = particleProcessor;
                 ray.rayOptions = alpha;
                 ray.color = color;
                 ray.lightningColor = lcolor;
@@ -54,7 +60,7 @@ public class ChesedRayOptions implements ParticleOptions {
             }
     );
 
-
+    public ParticleProcessor<?> particleProcessor = new EmptyParticleProcessor();
     public Vec3 rayEnd = Vec3.ZERO;
     public AlphaOptions rayOptions = AlphaOptions.builder()
             .in(3)
@@ -80,6 +86,11 @@ public class ChesedRayOptions implements ParticleOptions {
         private ChesedRayOptions rayOptions = new ChesedRayOptions();
 
         public Builder(){}
+
+        public Builder processor(ParticleProcessor<?> processor){
+            rayOptions.particleProcessor = processor;
+            return this;
+        }
 
         public Builder end(Vec3 rayEnd){
             rayOptions.rayEnd = rayEnd;
