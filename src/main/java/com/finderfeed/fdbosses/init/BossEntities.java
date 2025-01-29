@@ -3,14 +3,14 @@ package com.finderfeed.fdbosses.init;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
-import com.finderfeed.fdbosses.entities.chesed_boss.chesed_vertical_ray.ChesedVerticalRayAttack;
+import com.finderfeed.fdbosses.entities.chesed_boss.chesed_one_shot_vertical_ray.ChesedOneShotVerticalRayEntity;
+import com.finderfeed.fdbosses.entities.chesed_boss.chesed_vertical_ray.ChesedMovingVerticalRay;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.electric_sphere.ChesedElectricSphereEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.falling_block.ChesedFallingBlock;
 import com.finderfeed.fdbosses.entities.chesed_boss.flying_block_entity.FlyingBlockEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.projectiles.ChesedBlockProjectile;
-import com.finderfeed.fdbosses.FDBosses;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -80,12 +80,18 @@ public class BossEntities {
             .sized(2.5f,4f)
             .build("chesed_crystal"));
 
-    public static final Supplier<EntityType<ChesedVerticalRayAttack>> CHESED_VERTICAL_RAY_ATTACK = ENTITIES.register("chesed_vertical_ray_attack",()->EntityType.Builder.of(
-            ChesedVerticalRayAttack::new, MobCategory.MISC
+    public static final Supplier<EntityType<ChesedMovingVerticalRay>> CHESED_VERTICAL_RAY_ATTACK = ENTITIES.register("chesed_vertical_ray_attack",()->EntityType.Builder.of(
+            ChesedMovingVerticalRay::new, MobCategory.MISC
     )
             .sized(0.25f,0.25f)
             .updateInterval(1)
-            .build("chesed_crystal"));
+            .build("chesed_vertical_ray_attack"));
+
+    public static final Supplier<EntityType<ChesedOneShotVerticalRayEntity>> CHESED_ONE_SHOT_VERTICAL_RAY_ATTACK = ENTITIES.register("chesed_one_shot_vertical_ray_attack",()->EntityType.Builder.of(
+            ChesedOneShotVerticalRayEntity::new, MobCategory.MISC
+    )
+            .sized(0.25f,0.25f)
+            .build("chesed_one_shot_vertical_ray_attack"));
 
 
     @SubscribeEvent

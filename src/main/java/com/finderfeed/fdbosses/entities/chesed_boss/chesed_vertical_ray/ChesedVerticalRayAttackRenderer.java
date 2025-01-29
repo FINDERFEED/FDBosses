@@ -20,7 +20,7 @@ import org.joml.Matrix4f;
 
 import java.util.List;
 
-public class ChesedVerticalRayAttackRenderer extends EntityRenderer<ChesedVerticalRayAttack> {
+public class ChesedVerticalRayAttackRenderer extends EntityRenderer<ChesedMovingVerticalRay> {
 
     public ChesedVerticalRayAttackRenderer(EntityRendererProvider.Context ctx) {
         super(ctx);
@@ -28,7 +28,7 @@ public class ChesedVerticalRayAttackRenderer extends EntityRenderer<ChesedVertic
 
 
     @Override
-    public void render(ChesedVerticalRayAttack entity, float yaw, float partialTicks, PoseStack matrices, MultiBufferSource src, int light) {
+    public void render(ChesedMovingVerticalRay entity, float yaw, float partialTicks, PoseStack matrices, MultiBufferSource src, int light) {
         super.render(entity, yaw, partialTicks, matrices, src, light);
 
         matrices.pushPose();
@@ -95,12 +95,12 @@ public class ChesedVerticalRayAttackRenderer extends EntityRenderer<ChesedVertic
     }
 
     @Override
-    public ResourceLocation getTextureLocation(ChesedVerticalRayAttack rayAttack) {
+    public ResourceLocation getTextureLocation(ChesedMovingVerticalRay rayAttack) {
         return TextureAtlas.LOCATION_BLOCKS;
     }
 
     @Override
-    public boolean shouldRender(ChesedVerticalRayAttack p_114491_, Frustum p_114492_, double p_114493_, double p_114494_, double p_114495_) {
+    public boolean shouldRender(ChesedMovingVerticalRay p_114491_, Frustum p_114492_, double p_114493_, double p_114494_, double p_114495_) {
         return true;
     }
 

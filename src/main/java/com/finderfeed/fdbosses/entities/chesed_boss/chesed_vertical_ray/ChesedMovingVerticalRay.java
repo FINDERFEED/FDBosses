@@ -24,9 +24,9 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 
-public class ChesedVerticalRayAttack extends LivingEntity implements AutoSerializable {
+public class ChesedMovingVerticalRay extends LivingEntity implements AutoSerializable {
 
-    public static final EntityDataAccessor<Float> HEIGHT = SynchedEntityData.defineId(ChesedVerticalRayAttack.class, EntityDataSerializers.FLOAT);
+    public static final EntityDataAccessor<Float> HEIGHT = SynchedEntityData.defineId(ChesedMovingVerticalRay.class, EntityDataSerializers.FLOAT);
 
     @SerializableField
     private float height;
@@ -37,13 +37,13 @@ public class ChesedVerticalRayAttack extends LivingEntity implements AutoSeriali
     @SerializableField
     private float damage;
 
-    public ChesedVerticalRayAttack(EntityType<? extends LivingEntity> type, Level level) {
+    public ChesedMovingVerticalRay(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
         noPhysics = true;
     }
 
-    public static ChesedVerticalRayAttack summon(Level level, Vec3 pos, ProjectileMovementPath movePath,float damage,float height){
-        ChesedVerticalRayAttack attack = new ChesedVerticalRayAttack(BossEntities.CHESED_VERTICAL_RAY_ATTACK.get(),level);
+    public static ChesedMovingVerticalRay summon(Level level, Vec3 pos, ProjectileMovementPath movePath, float damage, float height){
+        ChesedMovingVerticalRay attack = new ChesedMovingVerticalRay(BossEntities.CHESED_VERTICAL_RAY_ATTACK.get(),level);
         attack.setPos(pos);
         attack.setDamage(damage);
         attack.setPath(movePath);
@@ -160,6 +160,7 @@ public class ChesedVerticalRayAttack extends LivingEntity implements AutoSeriali
 
     public void setHeight(float height){
         this.entityData.set(HEIGHT,height);
+        this.height = height;
     }
 
     public float getHeight(){

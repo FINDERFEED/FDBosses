@@ -7,7 +7,8 @@ import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptio
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
-import com.finderfeed.fdbosses.entities.chesed_boss.chesed_vertical_ray.ChesedVerticalRayAttack;
+import com.finderfeed.fdbosses.entities.chesed_boss.chesed_one_shot_vertical_ray.ChesedOneShotVerticalRayEntity;
+import com.finderfeed.fdbosses.entities.chesed_boss.chesed_vertical_ray.ChesedMovingVerticalRay;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
 import com.finderfeed.fdbosses.entities.chesed_boss.electric_sphere.ChesedElectricSphereEntity;
@@ -133,7 +134,7 @@ public class ChesedEntity extends FDMob {
                     .registerAttack("equake",this::earthquakeAttack) // 1
                     .registerAttack("rockfall",this::rockfallAttack) // 1
                     .registerAttack("esphere",this::electricSphereAttack) // 1
-                    .addAttack(1,"equake")
+                    .addAttack(1,"rockfall")
 //                    .addAttack(0, ray)
 //                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack("esphere")
@@ -777,6 +778,10 @@ public class ChesedEntity extends FDMob {
 
             float duration = 400;
 
+            if (tick % 10 == 0){
+                for (int i = 0; i < 3;i++) this.summonDelayedVerticalRayOnFieldNearPlayers();
+            }
+
             this.spawnStonesAround(4,rad, this.position().add(0,height,0),true,false,FDEasings::easeOut);
 
             if (tick % 2 == 0) {
@@ -834,51 +839,32 @@ public class ChesedEntity extends FDMob {
 
     public boolean earthquakeAttack(AttackInstance instance){
         lookingAtTarget = false;
-//        if (true) return true;
         int t = instance.tick;
         int radius = 40;
         if (t < 6) {
+
+            if (t > 3) {
+                this.summonCirclingParticlesServerside(4, 0.55f, 2, 0.5f, 6, 9);
+            }
+
             if (t == 0){
                 this.getSystem().startAnimation("earthquake", AnimationTicker.builder(CHESED_EARTHQUAKE_CAST)
                                 .setToNullTransitionTime(0)
                         .build());
             }
             if (t % 2 == 0) {
-                float p =1 -  t / 5f;
-                SonicParticleOptions options = SonicParticleOptions.builder()
-                        .facing(0, 1,0)
-                        .color(41 , 133 + (int)(p * 60), 175 + (int)(p * 60))
-
-                        .startSize(radius)
-                        .endSize(0)
-                        .resizeSpeed(-0.3f)
-                        .resizeAcceleration(-1f)
-                        .build();
+                SonicParticleOptions options = SonicParticleOptions.builder().facing(0, 1,0).color(0.3f, 1f, 1f).startSize(radius).endSize(0).resizeSpeed(-0.3f).resizeAcceleration(-1f).build();
                 for (Player player : this.level().getNearbyPlayers(BossUtil.ALL,this,this.getBoundingBox().inflate(100))) {
                     ((ServerLevel) level()).sendParticles((ServerPlayer) player, options, true, this.position().x, this.position().y + 0.01, this.position().z, 1, 0, 0, 0, 0);
                 }
             }
         }else{
+            if (t < 10){
+                this.summonCirclingParticlesServerside(4,0.55f,2,0.5f,6,9);
+            }
 
             if (t == 18){
-                RadialEarthquakeEntity radialEarthquakeEntity = RadialEarthquakeEntity.summon(level(),this.getOnPos(),1,radius,1f,10f);
-                for (int i = 0; i < 6;i++) {
-                    float p = 1 - i / 6f;
-                    SonicParticleOptions options = SonicParticleOptions.builder()
-                            .facing(0, 1, 0)
-                            .color(41 , 133 + (int)(p * 60), 175 + (int)(p * 60))
-
-                            .startSize(2)
-                            .endSize(radius)
-                            .resizeSpeed(-i * 2)
-                            .resizeAcceleration(0.75f + i)
-                            .lifetime(60)
-                            .build();
-                    for (Player player : this.level().getNearbyPlayers(BossUtil.ALL,this,this.getBoundingBox().inflate(100))) {
-                        ((ServerLevel) level()).sendParticles((ServerPlayer) player, options, true, this.position().x, this.position().y + 0.01, this.position().z, 1, 0, 0, 0, 0);
-                    }
-                }
-
+                this.summonRadialEarthquake(radius,true);
             }else if (t == 21) {
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                         .frequency(10f)
@@ -903,6 +889,29 @@ public class ChesedEntity extends FDMob {
         return instance.stage > 4;
     }
 
+    private void summonRadialEarthquake(int radius,boolean doSonicParticles){
+        RadialEarthquakeEntity radialEarthquakeEntity = RadialEarthquakeEntity.summon(level(),this.getOnPos(),1,radius,1f,10f);
+        if (doSonicParticles) {
+            for (int i = 0; i < 6; i++) {
+                SonicParticleOptions options = SonicParticleOptions.builder()
+                        .facing(0, 1, 0)
+                        .color(0.3f, 1f, 1f)
+
+                        .startSize(2)
+                        .endSize(radius)
+                        .resizeSpeed(-i * 2)
+                        .resizeAcceleration(0.75f + i)
+                        .lifetime(60)
+                        .build();
+                for (Player player : this.level().getNearbyPlayers(BossUtil.ALL, this, this.getBoundingBox().inflate(100))) {
+                    ((ServerLevel) level()).sendParticles((ServerPlayer) player, options, true, this.position().x, this.position().y + 0.01, this.position().z, 1, 0, 0, 0, 0);
+                }
+            }
+        }
+    }
+
+
+
     private void summonVerticalRayAttacksRadial(float offsetAngle,float finalRotationAngle,float radius,float damage,int time,int count){
 
         float angleBetween = FDMathUtil.FPI * 2 / count;
@@ -920,7 +929,7 @@ public class ChesedEntity extends FDMob {
                 );
             }
 
-            ChesedVerticalRayAttack.summon(level(),this.position(),path,damage,40);
+            ChesedMovingVerticalRay.summon(level(),this.position(),path,damage,40);
         }
 
     }
@@ -940,23 +949,8 @@ public class ChesedEntity extends FDMob {
                                 .setSpeed(1.2f)
                         .build());
                 attack.tick = 0;
-                int count = 10;
-                for (int i = 0; i < count; i++) {
-                    float angle = this.getInitProjectileRotation(i, count);
-                    ChesedBlockProjectile projectile = new ChesedBlockProjectile(BossEntities.BLOCK_PROJECTILE.get(), level());
-                    projectile.setBlockState(random.nextFloat() > 0.5 ? Blocks.SCULK.defaultBlockState() : Blocks.DEEPSLATE.defaultBlockState());
-                    projectile.setDropParticlesTime(blocksUpTime);
-                    var path = this.createRotationPath(angle, -2,height, 30, blocksUpTime, false);
-                    var next = this.createRotationPath(angle, height,height, 30, blocksCycleTime, true);
 
-                    path.setNext(next);
-                    projectile.noPhysics = true;
-                    projectile.setPos(path.getPositions().getFirst());
-                    projectile.movementPath = path;
-                    blockAttackProjectiles.add(projectile);
-                    level().addFreshEntity(projectile);
-                }
-
+                this.initiateBlockProjectiles(blocksUpTime,blocksCycleTime,height,10);
 
             }
             return false;
@@ -971,26 +965,48 @@ public class ChesedEntity extends FDMob {
             if (player == null) return false;
             if (blockAttackProjectiles.isEmpty()) return true;
             if (attack.tick >= timeTillAttack && attack.tick % 8 == 0){
-                ChesedBlockProjectile next = this.blockAttackProjectiles.removeLast();
-                next.noPhysics = false;
-                next.movementPath = null;
-                Vec3 tpos = this.targetGroundPosition(player);
-                Vec3 b = tpos.subtract(next.position());
-                Vec3 h = b.multiply(1,0,1);
-                Vec3 targetPos = tpos.add(h.normalize().reverse().multiply(1.5,0,1.5));
-
-                next.setRotationSpeed(10f);
-
-                Vec3 flyTo = this.position().add(0,height + 1.5,0);
-                ProjectileMovementPath path = new ProjectileMovementPath(8,false);
-                path.addPos(next.position());
-                path.addPos(flyTo);
-                path.addPos(flyTo.add(0,1,0));
-                path.setSpeedOnEnd(targetPos.subtract(flyTo).multiply(0.25,0.25,0.25));
-                next.movementPath = path;
+                this.throwBlock(player,height);
             }
             if (blockAttackProjectiles.isEmpty()) return true;
             return false;
+        }
+    }
+
+    private void throwBlock(LivingEntity player,float height){
+        ChesedBlockProjectile next = this.blockAttackProjectiles.removeLast();
+        next.noPhysics = false;
+        next.movementPath = null;
+        Vec3 tpos = this.targetGroundPosition(player);
+        Vec3 b = tpos.subtract(next.position());
+        Vec3 h = b.multiply(1,0,1);
+        Vec3 targetPos = tpos.add(h.normalize().reverse().multiply(1.5,0,1.5));
+
+        next.setRotationSpeed(10f);
+
+        Vec3 flyTo = this.position().add(0,height + 1.5,0);
+        ProjectileMovementPath path = new ProjectileMovementPath(8,false);
+        path.addPos(next.position());
+        path.addPos(flyTo);
+        path.addPos(flyTo.add(0,1,0));
+        path.setSpeedOnEnd(targetPos.subtract(flyTo).multiply(0.25,0.25,0.25));
+        next.movementPath = path;
+    }
+
+    private void initiateBlockProjectiles(int blocksUpTime,int blocksCycleTime,float height,int count){
+        for (int i = 0; i < count; i++) {
+            float angle = this.getInitProjectileRotation(i, count);
+            ChesedBlockProjectile projectile = new ChesedBlockProjectile(BossEntities.BLOCK_PROJECTILE.get(), level());
+            projectile.setBlockState(random.nextFloat() > 0.5 ? Blocks.SCULK.defaultBlockState() : Blocks.DEEPSLATE.defaultBlockState());
+            projectile.setDropParticlesTime(blocksUpTime);
+            var path = this.createRotationPath(angle, -2,height, 30, blocksUpTime, false);
+            var next = this.createRotationPath(angle, height,height, 30, blocksCycleTime, true);
+
+            path.setNext(next);
+            projectile.noPhysics = true;
+            projectile.setPos(path.getPositions().getFirst());
+            projectile.movementPath = path;
+            blockAttackProjectiles.add(projectile);
+            level().addFreshEntity(projectile);
         }
     }
 
@@ -1372,9 +1388,11 @@ public class ChesedEntity extends FDMob {
 
     private Vec3 getLookAtPos(LivingEntity target){
 
+        float lookAtPosMod = 4;
+
         Vec3 v = target.position().subtract(previousTargetPos)
                 .normalize()
-                .multiply(2,2,2);
+                .multiply(lookAtPosMod,lookAtPosMod,lookAtPosMod);
 
         Vec3 pos = target.position().add(0,target.getBbHeight() / 2,0)
                 .add(v);
@@ -1390,6 +1408,40 @@ public class ChesedEntity extends FDMob {
         Vec3 b = lookAt.subtract(center).normalize();
         double v = look.dot(b);
         return v >= (1 - accuracy);
+    }
+
+    private void summonDelayedVerticalRayOnFieldNearPlayers(){
+
+        //TODO: near players
+        Vec3 pos = this.position()
+                .add(new Vec3(2 + 38 * random.nextFloat(),0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat()));
+
+        ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(),pos,1,40,30);
+
+    }
+
+    private void summonCirclingParticlesServerside(int count,float verticalSpeed,float offset,float size,int in,int stay){
+
+        float angle = FDMathUtil.FPI * 2 / count;
+
+        Vec3 center = this.position();
+
+        for (int i = 0; i < count; i++) {
+            float a = angle * i;
+            Vec3 v = new Vec3(offset,0,0).yRot(a);
+            Vec3 ppos = this.position().add(v);
+            FDUtil.sendParticles(((ServerLevel) level()),BallParticleOptions.builder()
+                    .size(size)
+                    .color(100 + random.nextInt(50), 255, 255)
+                    .particleProcessor(new CompositeParticleProcessor(
+                            new CircleParticleProcessor(center,true,true,2),
+                            new SetParticleSpeedProcessor(new Vec3(0,verticalSpeed,0))
+                    ))
+                    .scalingOptions(in,stay,0)
+                    .build(),ppos,80);
+
+
+        }
     }
 
     private Vec3 getCenter(){
