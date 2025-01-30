@@ -214,7 +214,8 @@ public class ChesedEntity extends FDMob {
     public List<Player> getCombatants(boolean includeCreativeAndSpectator){
         float radius = this.enrageRadius();
         List<Player> combatants = level().getEntitiesOfClass(Player.class,new AABB(-radius,-2,-radius,radius,40,radius).move(this.position()),(player)->{
-            return player.position().distanceTo(this.position()) <= radius && (includeCreativeAndSpectator || !(player.isCreative() || player.isSpectator()));
+            return player.position().multiply(1,0,1).distanceTo(this.position().multiply(1,0,1)) <= radius
+                    && (includeCreativeAndSpectator || !(player.isCreative() || player.isSpectator()));
         });
         return combatants;
     }
@@ -419,21 +420,50 @@ public class ChesedEntity extends FDMob {
     }
 
     private void boomAttackAfterBlackout(){
-        int amount = 20;
+
+        BossUtil.chesedBoomParticles((ServerLevel) level(),this.position().add(0,2,0),38,120);
+
+
+        int amount = 60;
+        int amountPerAmount = 3;
         float angle = FDMathUtil.FPI * 2 / amount;
         for (int i = 0; i < amount;i++){
-            Vec3 v = new Vec3(36,0,0).yRot(angle * i);
-            Vec3 direction = v.reverse().normalize();
-            Vec3 pos = this.position().add(v.x,2,v.z);
-            this.summonStonesAfterRayAttack(
-                    10,
-                    direction,
-                    pos
-            );
-            if (i % 2 == 0) {
-                BossUtil.chesedRaySmoke((ServerLevel) level(), pos,direction, 120);
+            for (int c = 0; c < amountPerAmount;c++) {
+
+                float p = c / (float)(amountPerAmount - 1);
+
+                Vec3 v = new Vec3(36, 0, 0).yRot(angle * i + (random.nextFloat() * 2 - 1) * angle / 2);
+                Vec3 direction = v.reverse().normalize();
+                Vec3 pos = this.position().add(v.x, 1 + random.nextFloat() * 2, v.z);
+
+                BlockState state = level().random.nextFloat() > 0.5 ? Blocks.SCULK.defaultBlockState() : Blocks.DEEPSLATE.defaultBlockState();
+
+                float horizontalSpeed = 0.2f + random.nextFloat() * 0.05f + p * 0.2f;
+                float verticalSpeed = random.nextFloat() * 0.4f + 0.05f + 0.3f * p;
+                float randomRot = (random.nextFloat() * 2 - 1) * FDMathUtil.FPI / 4;
+
+                Vec3 speed = direction.multiply(horizontalSpeed, horizontalSpeed, horizontalSpeed)
+                        .yRot(randomRot)
+                        .add(0, verticalSpeed, 0);
+
+                ChesedFallingBlock block = ChesedFallingBlock.summon(level(), state, pos);
+                block.setDeltaMovement(speed);
+
+
+                float rnd = random.nextFloat() * 0.05f;
+                FDHelpers.addParticleEmitter(level(), 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+                                .color(0.35f - rnd, 0.35f - rnd, 0.35f - rnd)
+                                .lifetime(0, 0, 25)
+                                .size(1.5f)
+                                .build())
+                        .lifetime(200)
+                        .processor(new BoundToEntityProcessor(block.getId(), Vec3.ZERO))
+                        .position(this.position())
+                        .build());
             }
         }
+
+
     }
 
 

@@ -21,6 +21,7 @@ public class BossUtil {
     public static final int ROCKFALL_PARTICLES = 3;
     public static final int CHESED_RAY_EXPLOSION = 4;
     public static final int CHESED_RAY_ATTACK_SMOKE = 5;
+    public static final int CHESED_BOOM_PARTICLES = 6;
 
     public static Predicate<Entity> entityInVerticalRadiusPredicate(Vec3 pos,float radius){
         return (entity)->{
@@ -32,6 +33,10 @@ public class BossUtil {
 
     public static void chesedRaySmoke(ServerLevel level,Vec3 pos,Vec3 direction,double radius){
         posEvent(level,pos,CHESED_RAY_ATTACK_SMOKE, FDUtil.encodeDirection(direction),radius);
+    }
+
+    public static void chesedBoomParticles(ServerLevel level,Vec3 pos,int radiusFromCenter,double packetRadius){
+        posEvent(level,pos,CHESED_BOOM_PARTICLES, radiusFromCenter,packetRadius);
     }
 
     public static void chesedRayExplosion(ServerLevel level,Vec3 pos,Vec3 direction,double radius,int particlesCount,float sizeModifier){

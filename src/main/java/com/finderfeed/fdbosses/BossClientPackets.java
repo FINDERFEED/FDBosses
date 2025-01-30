@@ -31,21 +31,76 @@ public class BossClientPackets {
     public static void posEvent(Vec3 pos,int event,int data){
         switch (event) {
             case BossUtil.CHESED_GET_BLOCKS_FROM_EARTH_EVENT -> {
-                summonBlocksOutOfEarthParticles(pos,5);
+                summonBlocksOutOfEarthParticles(pos, 5);
             }
             case BossUtil.RADIAL_EARTHQUAKE_PARTICLES -> {
-                radialEarthquakeParticles(pos,data);
+                radialEarthquakeParticles(pos, data);
             }
             case BossUtil.ROCKFALL_PARTICLES -> {
-                rockfallParticles(pos,data);
+                rockfallParticles(pos, data);
             }
             case BossUtil.CHESED_RAY_EXPLOSION -> {
-                rayExplosion(pos,data);
+                rayExplosion(pos, data);
             }
             case BossUtil.CHESED_RAY_ATTACK_SMOKE -> {
-                rayAttackSmoke(pos,data);
+                rayAttackSmoke(pos, data);
+            }
+            case BossUtil.CHESED_BOOM_PARTICLES -> {
+                chesedBoomParticles(pos,data);
             }
         }
+    }
+
+    public static void chesedBoomParticles(Vec3 pos,int radiusFromCenter){
+        Level level = Minecraft.getInstance().level;
+        int amount = 30;
+        int amountPerAmount = 30;
+        float angle = FDMathUtil.FPI * 2 / amount;
+        for (int i = 0; i < amount;i++){
+            for (int c = 0; c < amountPerAmount;c++){
+
+                Vec3 v = new Vec3(36, 0, 0)
+                        .yRot(angle * i + (random.nextFloat() * 2 - 1) * angle / 2);
+
+
+                Vec3 direction = v.reverse().normalize();
+
+                float p = c / (float) (amountPerAmount - 1);
+
+
+                float verticalSpeed = 1.5f * (random.nextFloat() * 2 - 1);
+
+                float horizontalSpeed = p * 1.5f;
+
+                Vec3 speed = new Vec3(0,verticalSpeed,0)
+                        .add(direction.multiply(horizontalSpeed,horizontalSpeed,horizontalSpeed))
+                        .yRot(FDMathUtil.FPI / 4 * (random.nextFloat() * 2 - 1));
+
+                float friction = 0.8f;
+
+                int cr = random.nextInt(50);
+                BigSmokeParticleOptions options = BigSmokeParticleOptions.builder()
+                        .size(5f)
+                        .friction(friction)
+                        .minSpeed(0.025f)
+                        .color(50 + cr,50 + cr,50 + cr)
+                        .lifetime(0,20,50)
+                        .build();
+
+
+
+                level.addParticle(options,true,
+                        pos.x + v.x,
+                        pos.y + v.y,
+                        pos.z + v.z,
+                        speed.x,
+                        speed.y,
+                        speed.z
+                );
+
+            }
+        }
+
     }
 
     public static void rayAttackSmoke(Vec3 pos,int data){
