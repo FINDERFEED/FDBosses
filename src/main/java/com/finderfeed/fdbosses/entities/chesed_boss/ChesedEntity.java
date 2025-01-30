@@ -39,7 +39,6 @@ import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
-import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticle;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -367,24 +366,25 @@ public class ChesedEntity extends FDMob {
         }else if (instance.tick == 15){
 
             this.boomAttackRotatingRay(15);
-
-        }else if (instance.tick == 40){
+            ((ServerLevel)level()).playSound(null,this.position().x,this.position().y,this.position().z, BossSounds.CHESED_FINAL_ATTACK_RAY.get(), SoundSource.HOSTILE,100f,0.8f);
+        }else if (instance.tick == 60){
 
             this.boomAttackAfterBlackout();
             DefaultShakePacket.send((ServerLevel) level(),this.position(),60,FDShakeData.builder()
-                    .frequency(15)
-                    .amplitude(0.5f)
+                    .frequency(20)
+                    .amplitude(0.4f)
                     .inTime(0)
-                    .stayTime(10)
-                    .outTime(10)
+                    .stayTime(30)
+                    .outTime(100)
                     .build());
+            PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_BIGGER.get(),1,1));
 
-        }else if (instance.tick == 42){
+        }else if (instance.tick == 62){
             this.darkenCombatants(0,true);
         }
 
 
-        return instance.tick >= 100;
+        return instance.tick >= 200;
     }
 
     private void darkenCombatants(int duration,boolean clear){
@@ -438,7 +438,7 @@ public class ChesedEntity extends FDMob {
 
                 BlockState state = level().random.nextFloat() > 0.5 ? Blocks.SCULK.defaultBlockState() : Blocks.DEEPSLATE.defaultBlockState();
 
-                float horizontalSpeed = 0.2f + random.nextFloat() * 0.05f + p * 0.2f;
+                float horizontalSpeed = 0.2f + random.nextFloat() * 0.05f + p * 0.4f;
                 float verticalSpeed = random.nextFloat() * 0.4f + 0.05f + 0.3f * p;
                 float randomRot = (random.nextFloat() * 2 - 1) * FDMathUtil.FPI / 4;
 
@@ -853,8 +853,8 @@ public class ChesedEntity extends FDMob {
 
                 BossUtil.chesedRayExplosion((ServerLevel) level(),this.position().add(0,height,0),new Vec3(0,-1,0),120,10,1);
                 ((ServerLevel)level()).playSound(null,this.getX(),this.getY() + height,this.getZ(), BossSounds.CHESED_RAY.get(), SoundSource.HOSTILE,100f,1f);
-                PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.ROCKFALL.get()));
-                PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.RUMBLING.get()));
+                PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.ROCKFALL.get(),1,1));
+                PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.RUMBLING.get(),1,1));
 
                 int count = 10 + random.nextInt(10);
                 float angle = FDMathUtil.FPI * 2 / count;

@@ -10,5 +10,14 @@
   },
   "lightning_attack": {
     "sounds": [ "fdbosses:lightning_attack" ]
+  },
+  "chesed_boom_ray": {
+    "sounds": [ "fdbosses:chesed_boom_ray" ]
+  },
+  "chesed_boom_explosion": {
+    "sounds": [ "fdbosses:chesed_boom_explosion" ]
+  },
+  "chesed_boom_explosion_bigger": {
+    "sounds": [ "fdbosses:chesed_boom_explosion_bigger" ]
   }
 }

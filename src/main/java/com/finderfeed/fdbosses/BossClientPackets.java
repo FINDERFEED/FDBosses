@@ -70,21 +70,22 @@ public class BossClientPackets {
 
                 float verticalSpeed = 1.5f * (random.nextFloat() * 2 - 1);
 
-                float horizontalSpeed = p * 1.5f;
+
+                float horizontalSpeed = p * 2.5f;
 
                 Vec3 speed = new Vec3(0,verticalSpeed,0)
                         .add(direction.multiply(horizontalSpeed,horizontalSpeed,horizontalSpeed))
                         .yRot(FDMathUtil.FPI / 4 * (random.nextFloat() * 2 - 1));
 
-                float friction = 0.8f;
+                float friction = 0.85f;
 
                 int cr = random.nextInt(50);
                 BigSmokeParticleOptions options = BigSmokeParticleOptions.builder()
-                        .size(5f)
+                        .size(8f)
                         .friction(friction)
                         .minSpeed(0.025f)
                         .color(50 + cr,50 + cr,50 + cr)
-                        .lifetime(0,20,50)
+                        .lifetime(0,60,100 + random.nextInt(20))
                         .build();
 
 
