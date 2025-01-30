@@ -19,5 +19,8 @@
   },
   "chesed_boom_explosion_bigger": {
     "sounds": [ "fdbosses:chesed_boom_explosion_bigger" ]
+  },
+  "chesed_boom_explosion_prepare": {
+    "sounds": [ "fdbosses:chesed_boom_explosion_prepare" ]
   }
 }

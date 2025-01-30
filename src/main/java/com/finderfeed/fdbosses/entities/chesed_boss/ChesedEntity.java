@@ -367,19 +367,30 @@ public class ChesedEntity extends FDMob {
 
             this.boomAttackRotatingRay(15);
             ((ServerLevel)level()).playSound(null,this.position().x,this.position().y,this.position().z, BossSounds.CHESED_FINAL_ATTACK_RAY.get(), SoundSource.HOSTILE,100f,0.8f);
-        }else if (instance.tick == 60){
+        } else if (instance.tick == 54){
+            PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_PREPARE.get(),1f,1));
+        } else if (instance.tick == 60){
+            PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_BIGGER.get(),1f,1));
 
             this.boomAttackAfterBlackout();
+
             DefaultShakePacket.send((ServerLevel) level(),this.position(),60,FDShakeData.builder()
-                    .frequency(20)
-                    .amplitude(0.4f)
+                    .frequency(50)
+                    .amplitude(0.25f)
                     .inTime(0)
                     .stayTime(30)
                     .outTime(100)
                     .build());
-            PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_BIGGER.get(),1,1));
+            PositionedScreenShakePacket.send((ServerLevel) level(),FDShakeData.builder()
+                    .frequency(50)
+                    .amplitude(4f)
+                    .inTime(0)
+                    .stayTime(0)
+                    .outTime(50)
+                    .build(),this.position(),60);
 
-        }else if (instance.tick == 62){
+        }else if (instance.tick == 61){
+
             this.darkenCombatants(0,true);
         }
 
@@ -421,7 +432,7 @@ public class ChesedEntity extends FDMob {
 
     private void boomAttackAfterBlackout(){
 
-        BossUtil.chesedBoomParticles((ServerLevel) level(),this.position().add(0,2,0),38,120);
+        BossUtil.chesedBoomParticles((ServerLevel) level(),this.position().add(0,1,0),38,120);
 
 
         int amount = 60;

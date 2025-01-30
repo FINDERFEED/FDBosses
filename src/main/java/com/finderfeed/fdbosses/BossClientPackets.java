@@ -59,19 +59,41 @@ public class BossClientPackets {
         for (int i = 0; i < amount;i++){
             for (int c = 0; c < amountPerAmount;c++){
 
-                Vec3 v = new Vec3(36, 0, 0)
-                        .yRot(angle * i + (random.nextFloat() * 2 - 1) * angle / 2);
-
-
+                Vec3 v = new Vec3(36, 0, 0).yRot(angle * i + (random.nextFloat() * 2 - 1) * angle / 2);
                 Vec3 direction = v.reverse().normalize();
-
                 float p = c / (float) (amountPerAmount - 1);
 
 
-                float verticalSpeed = 1.5f * (random.nextFloat() * 2 - 1);
 
 
-                float horizontalSpeed = p * 2.5f;
+
+                float size = (1 - p) * 2 + 1f;
+                BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                        .friction(0.7f)
+                        .size(size)
+                        .color(100 + random.nextInt(50), 255, 255)
+                        .scalingOptions(3,0,100)
+                        .build();
+                Vec3 ballParticlePos = pos.add(v).add(0,random.nextFloat() * 6,0);
+
+                float power = 2;
+                float verticalBallParticleSpeed = power * p * 0.5f;
+                float ballParticleSpeedF = power * p * 2;
+
+                Vec3 ballParticleSpeed =
+                        new Vec3(direction.x,verticalBallParticleSpeed,direction.z)
+                                .multiply(ballParticleSpeedF,1,ballParticleSpeedF)
+                                .yRot(FDMathUtil.FPI / 4 * (random.nextFloat() * 2 - 1));
+                level.addParticle(ballParticleOptions,true,ballParticlePos.x,ballParticlePos.y,ballParticlePos.z,ballParticleSpeed.x,ballParticleSpeed.y,ballParticleSpeed.z);
+
+
+
+                float h = p * p * p * p * 8f;
+
+                float verticalSpeed = (random.nextFloat() * 2 - 1) * 0.1f;
+
+
+                float horizontalSpeed = (1 - p) * 1.5f;
 
                 Vec3 speed = new Vec3(0,verticalSpeed,0)
                         .add(direction.multiply(horizontalSpeed,horizontalSpeed,horizontalSpeed))
@@ -80,19 +102,19 @@ public class BossClientPackets {
                 float friction = 0.85f;
 
                 int cr = random.nextInt(50);
-                BigSmokeParticleOptions options = BigSmokeParticleOptions.builder()
+                BigSmokeParticleOptions smokeParticleOptions = BigSmokeParticleOptions.builder()
                         .size(8f)
                         .friction(friction)
-                        .minSpeed(0.025f)
+                        .minSpeed(0)
                         .color(50 + cr,50 + cr,50 + cr)
                         .lifetime(0,60,100 + random.nextInt(20))
                         .build();
 
 
 
-                level.addParticle(options,true,
+                level.addParticle(smokeParticleOptions,true,
                         pos.x + v.x,
-                        pos.y + v.y,
+                        pos.y + v.y + h,
                         pos.z + v.z,
                         speed.x,
                         speed.y,

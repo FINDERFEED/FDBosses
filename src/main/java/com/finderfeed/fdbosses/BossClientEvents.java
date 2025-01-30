@@ -76,7 +76,7 @@ public class BossClientEvents {
             if (player.hasEffect(BossEffects.CHESED_DARKEN)){
                 chesedDarkenEffectTick = Mth.clamp(chesedDarkenEffectTick + 1,0,chesedDarkenEffectTickMax);
             }else{
-                chesedDarkenEffectTick = Mth.clamp(chesedDarkenEffectTick - chesedDarkenEffectTickMax / 2,0,chesedDarkenEffectTickMax);
+                chesedDarkenEffectTick = Mth.clamp(chesedDarkenEffectTick - chesedDarkenEffectTickMax / 4,0,chesedDarkenEffectTickMax);
             }
         }else{
             chesedDarkenEffectTick = 0;

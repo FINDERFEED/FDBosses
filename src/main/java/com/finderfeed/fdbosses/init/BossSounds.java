@@ -19,6 +19,7 @@ public class BossSounds {
     public static final Supplier<SoundEvent> CHESED_LIGHTNING_RAY = SOUNDS.register("lightning_attack",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"lightning_attack")));
     public static final Supplier<SoundEvent> CHESED_FINAL_ATTACK_EXPLOSION = SOUNDS.register("chesed_boom_explosion",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_boom_explosion")));
     public static final Supplier<SoundEvent> CHESED_FINAL_ATTACK_EXPLOSION_BIGGER = SOUNDS.register("chesed_boom_explosion_bigger",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_boom_explosion_bigger")));
+    public static final Supplier<SoundEvent> CHESED_FINAL_ATTACK_EXPLOSION_PREPARE = SOUNDS.register("chesed_boom_explosion_prepare",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_boom_explosion_prepare")));
     public static final Supplier<SoundEvent> CHESED_FINAL_ATTACK_RAY = SOUNDS.register("chesed_boom_ray",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_boom_ray")));
 
 
