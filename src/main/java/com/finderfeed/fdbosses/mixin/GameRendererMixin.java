@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.mixin;
 
 
 import com.finderfeed.fdbosses.BossClientEvents;
+import com.finderfeed.fdbosses.client.BossClientMixinHandle;
 import com.finderfeed.fdlib.ClientMixinHandler;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
@@ -23,14 +24,7 @@ public class GameRendererMixin {
 
     @Inject(method = "getNightVisionScale",at = @At("RETURN"), cancellable = true)
     private static void nightVisionScale(LivingEntity entity, float pticks, CallbackInfoReturnable<Float> cir){
-        Player player = Minecraft.getInstance().player;
-        if (player != null && player.hasEffect(MobEffects.NIGHT_VISION)) {
-            float value = cir.getReturnValue();
-
-            float percent = 1 - Math.max(BossClientEvents.getChesedGazePercent(pticks),BossClientEvents.getChesedDarkenPercent(pticks));
-
-            cir.setReturnValue(value * percent);
-        }
+        BossClientMixinHandle.darknessCalculate(entity,pticks,cir);
     }
 
 

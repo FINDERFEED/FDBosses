@@ -122,4 +122,9 @@ public class ChesedFallingBlock extends FDProjectile {
     protected double getDefaultGravity() {
         return 0.025;
     }
+
+    @Override
+    public boolean shouldRenderAtSqrDistance(double dist) {
+        return dist < 120 * 120;
+    }
 }

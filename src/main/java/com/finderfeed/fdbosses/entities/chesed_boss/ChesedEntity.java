@@ -129,6 +129,7 @@ public class ChesedEntity extends FDMob {
 
             chain = new AttackChain(level.random)
                     .registerAttack("nothing",this::doNothing)
+                    .registerAttack("final",this::finalBOOMAttack)
                     .registerAttack("crystals",this::summonCrystals)
                     .registerAttack("ray",this::rayAttack) //0 and in the middle
                     .registerAttack("blocks",this::blockAttack) //in the middle
@@ -136,7 +137,7 @@ public class ChesedEntity extends FDMob {
                     .registerAttack("equake",this::earthquakeAttack) // 1
                     .registerAttack("rockfall",this::rockfallAttack) // 1
                     .registerAttack("esphere",this::electricSphereAttack) // 1
-                    .addAttack(1,ray)
+                    .addAttack(1,"final")
 //                    .addAttack(0, ray)
 //                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack("esphere")
@@ -353,8 +354,99 @@ public class ChesedEntity extends FDMob {
 
     }
 
+
+    public boolean finalBOOMAttack(AttackInstance instance){
+
+
+
+        if (instance.tick == 0){
+            this.killCrystals();
+            this.darkenCombatants(80,false);
+
+        }else if (instance.tick == 15){
+
+            this.boomAttackRotatingRay(15);
+
+        }else if (instance.tick == 40){
+
+            this.boomAttackAfterBlackout();
+            DefaultShakePacket.send((ServerLevel) level(),this.position(),60,FDShakeData.builder()
+                    .frequency(15)
+                    .amplitude(0.5f)
+                    .inTime(0)
+                    .stayTime(10)
+                    .outTime(10)
+                    .build());
+
+        }else if (instance.tick == 42){
+            this.darkenCombatants(0,true);
+        }
+
+
+        return instance.tick >= 100;
+    }
+
+    private void darkenCombatants(int duration,boolean clear){
+
+        for (Player player : this.getCombatants(true)){
+
+            if (clear){
+                player.removeEffect(BossEffects.CHESED_DARKEN);
+            }else{
+                player.addEffect(new MobEffectInstance(BossEffects.CHESED_DARKEN,duration,0,true,false));
+            }
+
+        }
+
+    }
+
+    private void boomAttackRotatingRay(int rotateDuration){
+
+        Vec3 look = this.getLookAngle();
+        Vec3 p = this.getCenter();
+        Vec3 end = p.add(look.multiply(38,38,38));
+
+        ChesedRayOptions options = ChesedRayOptions.builder()
+                .processor(new MoveOnACircleParticleProcessor(p,1,true))
+                .time(5,rotateDuration - 10,5)
+                .lightningColor(90, 180, 255)
+                .color(100, 255, 255)
+                .end(p)
+                .width(0.8f)
+                .build();
+        FDUtil.sendParticles((ServerLevel) level(),options,end,120);
+
+    }
+
+    private void boomAttackAfterBlackout(){
+        int amount = 20;
+        float angle = FDMathUtil.FPI * 2 / amount;
+        for (int i = 0; i < amount;i++){
+            Vec3 v = new Vec3(36,0,0).yRot(angle * i);
+            Vec3 direction = v.reverse().normalize();
+            Vec3 pos = this.position().add(v.x,2,v.z);
+            this.summonStonesAfterRayAttack(
+                    10,
+                    direction,
+                    pos
+            );
+            if (i % 2 == 0) {
+                BossUtil.chesedRaySmoke((ServerLevel) level(), pos,direction, 120);
+            }
+        }
+    }
+
+
     public boolean doNothing(AttackInstance instance){
         return true;
+    }
+
+    private void killCrystals(){
+        AABB box = new AABB(-40, -5, -40, 40, 5, 40).move(this.position());
+        var list = level().getEntitiesOfClass(ChesedCrystalEntity.class, box);
+        for (ChesedCrystalEntity chesedCrystal : list) {
+            chesedCrystal.kill();
+        }
     }
 
     public boolean summonCrystals(AttackInstance instance){
@@ -366,11 +458,8 @@ public class ChesedEntity extends FDMob {
             return false;
         }
 
-        AABB box = new AABB(-40, -5, -40, 40, 5, 40).move(this.position());
-        var list = level().getEntitiesOfClass(ChesedCrystalEntity.class, box);
-        for (ChesedCrystalEntity chesedCrystal : list) {
-            chesedCrystal.kill();
-        }
+        this.killCrystals();
+
         for (int i = 0; i < 4; i++) {
 
             ChesedCrystalEntity chesedCrystal = new ChesedCrystalEntity(BossEntities.CHESED_CRYSTAL.get(), level());
@@ -482,32 +571,8 @@ public class ChesedEntity extends FDMob {
                         .build(),end,120);
 
 
-                Vector3f v = new Vector3f(0,1,0).cross((float)reversedLook.x,(float)reversedLook.y,(float)reversedLook.z);
-                for (int i = 0; i < 30;i++){
 
-                    BlockState state = random.nextFloat() > 0.5 ? Blocks.DEEPSLATE.defaultBlockState() : Blocks.SCULK.defaultBlockState();
-
-                    Vector3f add = v.rotateAxis(FDMathUtil.FPI * 2 * random.nextFloat(),(float)reversedLook.x,(float)reversedLook.y,(float)reversedLook.z,new Vector3f());
-                    float rd = random.nextFloat() * 0.5f;
-                    ChesedFallingBlock block = ChesedFallingBlock.summon(level(),state,end,reversedLook.add(
-                            add.x * rd * 2,
-                            add.y * rd,
-                            add.z * rd * 2
-                    ).normalize().multiply(0.5,2.4 - rd,0.5));
-
-                    float rnd = random.nextFloat() * 0.05f;
-
-                    FDHelpers.addParticleEmitter(level(), 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
-                                    .color(0.35f - rnd, 0.35f - rnd, 0.35f - rnd)
-                                    .lifetime(0, 0, 25)
-                                    .size(1.5f)
-                                    .build())
-                            .lifetime(200)
-                            .processor(new BoundToEntityProcessor(block.getId(), Vec3.ZERO))
-                            .position(this.position())
-                            .build());
-
-                }
+                this.summonStonesAfterRayAttack(30,reversedLook,end);
                 BossUtil.chesedRayExplosion((ServerLevel) level(),end,reversedLook,100,15,0.75f);
             }else if (tick > rayAttackTick){
                 if (tick > rayAttackTick + 30){
@@ -536,6 +601,39 @@ public class ChesedEntity extends FDMob {
 
         return false;
     }
+
+    private void summonStonesAfterRayAttack(int count,Vec3 direction,Vec3 pos){
+
+        Vector3f v = new Vector3f(0,1,0).cross((float)direction.x,(float)direction.y,(float)direction.z);
+
+        for (int i = 0; i < count;i++){
+
+            BlockState state = random.nextFloat() > 0.5 ? Blocks.DEEPSLATE.defaultBlockState() : Blocks.SCULK.defaultBlockState();
+
+            Vector3f add = v.rotateAxis(FDMathUtil.FPI * 2 * random.nextFloat(),(float)direction.x,(float)direction.y,(float)direction.z,new Vector3f());
+            float rd = random.nextFloat() * 0.5f;
+            ChesedFallingBlock block = ChesedFallingBlock.summon(level(),state,pos,direction.add(
+                    add.x * rd * 2,
+                    add.y * rd,
+                    add.z * rd * 2
+            ).normalize().multiply(0.5,2.4 - rd,0.5));
+
+            float rnd = random.nextFloat() * 0.05f;
+
+            FDHelpers.addParticleEmitter(level(), 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+                            .color(0.35f - rnd, 0.35f - rnd, 0.35f - rnd)
+                            .lifetime(0, 0, 25)
+                            .size(1.5f)
+                            .build())
+                    .lifetime(200)
+                    .processor(new BoundToEntityProcessor(block.getId(), Vec3.ZERO))
+                    .position(this.position())
+                    .build());
+
+        }
+
+    }
+
 
     private void damageOnRay(Vec3 begin, Vec3 end){
 

@@ -7,6 +7,7 @@ import com.finderfeed.fdlib.systems.particle.ParticleProcessorType;
 import com.finderfeed.fdlib.util.FDByteBufCodecs;
 import com.finderfeed.fdlib.util.FDCodecs;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.client.Minecraft;
@@ -51,8 +52,12 @@ public class MoveOnACircleParticleProcessor implements ParticleProcessor<MoveOnA
 
     @Override
     public void processParticle(Particle particle) {
-        if (particle.age <= particle.lifetime) {
-            float p2 = ((float)particle.age + 1) / (float)particle.lifetime;
+        int lifetime = particle.lifetime - 2;
+        if (particle.age <= lifetime) {
+            float p2 = ((float)particle.age) / (float)lifetime;
+
+            p2 = FDEasings.easeInOut(p2);
+
             double len = this.initialPoint.subtract(this.circleAround).length();
 
 

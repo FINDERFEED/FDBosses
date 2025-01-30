@@ -6,29 +6,23 @@ import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.mojang.blaze3d.shaders.FogShape;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.InputEvent;
+
 import net.neoforged.neoforge.client.event.ViewportEvent;
-import org.lwjgl.glfw.GLFW;
+
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID,bus = EventBusSubscriber.Bus.GAME,value = Dist.CLIENT)
 public class BossClientEvents {
 
-
-    @SubscribeEvent
-    public static void inputEvent(InputEvent.Key event){
-        if (event.getKey() == GLFW.GLFW_KEY_I && Minecraft.getInstance().screen == null){
-//            Minecraft.getInstance().setScreen(new ComponentTestScreen());
-//            System.out.println(Minecraft.getInstance().font.getSplitter().splitLines("Test string to\nsplit",300, Style.EMPTY)
-//                    .stream().map(FormattedText::getString).toList());
-        }
-    }
+    public static Double cachedGamma = null;
 
     public static int chesedGazeEffectTick = 0;
     public static int chesedGazeEffectTickO = 0;
@@ -41,8 +35,26 @@ public class BossClientEvents {
     @SubscribeEvent
     public static void tickEvent(ClientTickEvent.Pre event){
         Player player = Minecraft.getInstance().player;
-        tickChesedGaze(player);
-        tickChesedDarken(player);
+        if (player != null) {
+            tickChesedGaze(player);
+            tickChesedDarken(player);
+            lowerGammaWhenAnyDarkenEffect(player);
+        }
+    }
+
+    private static void lowerGammaWhenAnyDarkenEffect(Player player){
+        Options options = Minecraft.getInstance().options;
+        if (player.hasEffect(MobEffects.NIGHT_VISION) && player.hasEffect(BossEffects.CHESED_DARKEN)){
+            if (cachedGamma == null){
+                cachedGamma = options.gamma().get();
+            }
+            options.gamma().set(0d);
+        }else{
+            if (cachedGamma != null){
+                options.gamma().set(cachedGamma);
+                cachedGamma = null;
+            }
+        }
     }
 
     private static void tickChesedGaze(Player player){
