@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossSounds;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
@@ -158,7 +159,7 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
                 .end(end)
                 .width(0.5f)
                 .build();
-        FDUtil.sendParticles((ServerLevel) level(), options, p, 60);
+        FDLibCalls.sendParticles((ServerLevel) level(), options, p, 60);
 
         PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                 .frequency(5)

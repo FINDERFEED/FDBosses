@@ -18,6 +18,7 @@ import com.finderfeed.fdbosses.entities.chesed_boss.radial_earthquake.RadialEart
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.projectiles.ChesedBlockProjectile;
 import com.finderfeed.fdlib.FDHelpers;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.network.lib_packets.PlaySoundInEarsPacket;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
@@ -28,6 +29,7 @@ import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
 import com.finderfeed.fdlib.systems.hud.bossbars.FDServerBossBar;
+import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
 import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
 import com.finderfeed.fdlib.systems.particle.CompositeParticleProcessor;
 import com.finderfeed.fdlib.systems.particle.SetParticleSpeedProcessor;
@@ -369,10 +371,21 @@ public class ChesedEntity extends FDMob {
             ((ServerLevel)level()).playSound(null,this.position().x,this.position().y,this.position().z, BossSounds.CHESED_FINAL_ATTACK_RAY.get(), SoundSource.HOSTILE,100f,0.8f);
         } else if (instance.tick == 54){
             PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_PREPARE.get(),1f,1));
-        } else if (instance.tick == 60){
-            PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_BIGGER.get(),1f,1));
+        } else if (instance.tick == 58){
+            ImpactFrame base = new ImpactFrame(0.5f,0.1f,4,false);
+            FDLibCalls.sendImpactFrames((ServerLevel) level(),this.position(),60,
+                    base,
+                    new ImpactFrame(base).setDuration(1).setInverted(true),
+                    new ImpactFrame(base).setDuration(1),
+                    new ImpactFrame(base).setDuration(1).setInverted(true)
+            );
+        }else if (instance.tick == 60){
+
+
+
 
             this.boomAttackAfterBlackout();
+            PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_BIGGER.get(),1f,1));
 
             DefaultShakePacket.send((ServerLevel) level(),this.position(),60,FDShakeData.builder()
                     .frequency(50)
@@ -426,7 +439,7 @@ public class ChesedEntity extends FDMob {
                 .end(p)
                 .width(0.8f)
                 .build();
-        FDUtil.sendParticles((ServerLevel) level(),options,end,120);
+        FDLibCalls.sendParticles((ServerLevel) level(),options,end,120);
 
     }
 
@@ -462,7 +475,7 @@ public class ChesedEntity extends FDMob {
 
 
                 float rnd = random.nextFloat() * 0.05f;
-                FDHelpers.addParticleEmitter(level(), 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+                FDLibCalls.addParticleEmitter(level(), 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
                                 .color(0.35f - rnd, 0.35f - rnd, 0.35f - rnd)
                                 .lifetime(0, 0, 25)
                                 .size(1.5f)
@@ -572,7 +585,7 @@ public class ChesedEntity extends FDMob {
                             .color(100 + random.nextInt(50), 255, 255)
                             .particleProcessor(new SetParticleSpeedProcessor(speed))
                             .build();
-                    FDUtil.sendParticles((ServerLevel) level(),options,pos,60);
+                    FDLibCalls.sendParticles((ServerLevel) level(),options,pos,60);
                 }
             } else if (tick == rayAttackTick) {
                 lookingAtTarget = false;
@@ -593,7 +606,7 @@ public class ChesedEntity extends FDMob {
                         .end(end)
                         .width(0.8f)
                         .build();
-                FDUtil.sendParticles((ServerLevel) level(),options,p,60);
+                FDLibCalls.sendParticles((ServerLevel) level(),options,p,60);
 
                 Vec3 reversedLook = look.reverse();
 
@@ -661,7 +674,7 @@ public class ChesedEntity extends FDMob {
 
             float rnd = random.nextFloat() * 0.05f;
 
-            FDHelpers.addParticleEmitter(level(), 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+            FDLibCalls.addParticleEmitter(level(), 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
                             .color(0.35f - rnd, 0.35f - rnd, 0.35f - rnd)
                             .lifetime(0, 0, 25)
                             .size(1.5f)
@@ -819,7 +832,7 @@ public class ChesedEntity extends FDMob {
                     float a = angle * i;
                     Vec3 v = new Vec3(2,0,0).yRot(a);
                     Vec3 ppos = this.position().add(v);
-                    FDUtil.sendParticles(((ServerLevel) level()),BallParticleOptions.builder()
+                    FDLibCalls.sendParticles(((ServerLevel) level()),BallParticleOptions.builder()
                             .size(0.5f)
                             .color(100 + random.nextInt(50), 255, 255)
                             .particleProcessor(new CompositeParticleProcessor(
@@ -834,7 +847,7 @@ public class ChesedEntity extends FDMob {
             }else if (tick == 45){
                 Vec3 pos = this.position();
 
-                FDUtil.sendParticles((ServerLevel) level(),ChesedRayOptions.builder()
+                FDLibCalls.sendParticles((ServerLevel) level(),ChesedRayOptions.builder()
                                 .width(1f)
                                 .end(pos.add(0,height,0))
                                 .lightningColor(90, 180, 255)
@@ -883,7 +896,7 @@ public class ChesedEntity extends FDMob {
 
                     float rnd = random.nextFloat() * 0.05f;
 
-                    FDHelpers.addParticleEmitter(level(), height * 2, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+                    FDLibCalls.addParticleEmitter(level(), height * 2, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
                                     .color(0.35f - rnd, 0.35f - rnd, 0.35f - rnd)
                                     .lifetime(0, 0, 50)
                                     .size(2f)
@@ -896,7 +909,7 @@ public class ChesedEntity extends FDMob {
 
                 }
 
-                FDHelpers.addParticleEmitter(level(), height * 2, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+                FDLibCalls.addParticleEmitter(level(), height * 2, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
                                 .color(0.25f, 0.25f, 0.25f)
                                 .lifetime(0, 0, 100)
                                 .size(1f)
@@ -1308,7 +1321,7 @@ public class ChesedEntity extends FDMob {
                     .multiply(3,0,3)
                     .add(0,1.5,0);
             if (livingEntity instanceof Player player){
-                FDHelpers.setServerPlayerSpeed((ServerPlayer) player,pushDirection);
+                FDLibCalls.setServerPlayerSpeed((ServerPlayer) player,pushDirection);
             }else{
                 livingEntity.setDeltaMovement(pushDirection);
             }
@@ -1573,7 +1586,7 @@ public class ChesedEntity extends FDMob {
             float a = angle * i;
             Vec3 v = new Vec3(offset,0,0).yRot(a);
             Vec3 ppos = this.position().add(v);
-            FDUtil.sendParticles(((ServerLevel) level()),BallParticleOptions.builder()
+            FDLibCalls.sendParticles(((ServerLevel) level()),BallParticleOptions.builder()
                     .size(size)
                     .color(100 + random.nextInt(50), 255, 255)
                     .particleProcessor(new CompositeParticleProcessor(

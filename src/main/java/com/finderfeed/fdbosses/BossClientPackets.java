@@ -76,8 +76,8 @@ public class BossClientPackets {
                         .build();
                 Vec3 ballParticlePos = pos.add(v).add(0,random.nextFloat() * 6,0);
 
-                float power = 2;
-                float verticalBallParticleSpeed = power * p * 0.5f;
+                float power = 4;
+                float verticalBallParticleSpeed = power/2 * p * 0.5f;
                 float ballParticleSpeedF = power * p * 2;
 
                 Vec3 ballParticleSpeed =
