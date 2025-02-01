@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.init;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
+import com.finderfeed.fdbosses.entities.chesed_boss.chesed_monolith.ChesedMonolith;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_one_shot_vertical_ray.ChesedOneShotVerticalRayEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_vertical_ray.ChesedMovingVerticalRay;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
@@ -36,6 +37,12 @@ public class BossEntities {
     )
             .sized(1f,1f)
             .build("chesed"));
+
+    public static final Supplier<EntityType<ChesedMonolith>> CHESED_MONOLITH = ENTITIES.register("chesed_monolith",()->EntityType.Builder.<ChesedMonolith>of(
+            ChesedMonolith::new, MobCategory.CREATURE
+    )
+            .sized(1f,3f)
+            .build("chesed_monolith"));
 
     public static final Supplier<EntityType<EarthShatterEntity>> EARTH_SHATTER = ENTITIES.register("earth_shatter",()->EntityType.Builder.<EarthShatterEntity>of(
             EarthShatterEntity::new, MobCategory.MISC
@@ -99,6 +106,7 @@ public class BossEntities {
         event.put(CHESED.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,10).build());
         event.put(CHESED_ELECTRIC_SPHERE.get(), LivingEntity.createLivingAttributes().build());
         event.put(CHESED_VERTICAL_RAY_ATTACK.get(), LivingEntity.createLivingAttributes().build());
+        event.put(CHESED_MONOLITH.get(), LivingEntity.createLivingAttributes().build());
     }
 
 

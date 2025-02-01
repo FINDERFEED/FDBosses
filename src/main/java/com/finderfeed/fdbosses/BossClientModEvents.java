@@ -76,6 +76,16 @@ public class BossClientModEvents {
                                 .renderType(RenderType.eyes(FDBosses.location("textures/entities/chesed_crystal.png")))
                                 .build())
                 .build());
+        event.registerEntityRenderer(BossEntities.CHESED_MONOLITH.get(),FDEntityRendererBuilder.builder()
+                        .addLayer(FDEntityRenderLayerOptions.builder()
+                                .model(BossModels.CHESED_MONOLITH)
+                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/chesed_monolith.png")))
+                                .build())
+                        .addLayer(FDEntityRenderLayerOptions.builder()
+                                .model(BossModels.CHESED_MONOLITH)
+                                .renderType(RenderType.eyes(FDBosses.location("textures/entities/chesed_monolith_emissive.png")))
+                                .build())
+                .build());
 
         event.registerEntityRenderer(BossEntities.EARTH_SHATTER.get(), EarthShatterRenderer::new);
         event.registerEntityRenderer(BossEntities.BLOCK_PROJECTILE.get(), BlockProjectileRenderer::new);

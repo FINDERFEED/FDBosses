@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.client.particles.particle_processors.MoveOnACircl
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
+import com.finderfeed.fdbosses.entities.chesed_boss.chesed_monolith.ChesedMonolith;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_one_shot_vertical_ray.ChesedOneShotVerticalRayEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_vertical_ray.ChesedMovingVerticalRay;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
@@ -39,7 +40,6 @@ import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.CircleS
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
-import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -86,7 +86,12 @@ import static com.finderfeed.fdbosses.init.BossAnims.*;
 
 public class ChesedEntity extends FDMob {
 
-
+    private static final Vec3[] MONOLITH_SPAWN_OFFSETS = {
+            new Vec3(10,0,10),
+            new Vec3(-10,0,10),
+            new Vec3(10,0,-10),
+            new Vec3(-10,0,-10)
+    };
 
     public static final EntityDataAccessor<Boolean> IS_ROLLING = SynchedEntityData.defineId(ChesedEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> IS_LAUNCHING_ORBS = SynchedEntityData.defineId(ChesedEntity.class, EntityDataSerializers.BOOLEAN);
@@ -155,6 +160,8 @@ public class ChesedEntity extends FDMob {
 //                    .addAttack(2,"roll")
             ;
             this.remainingHits = this.getBossMaxHits();
+
+
         }
     }
 
@@ -162,6 +169,8 @@ public class ChesedEntity extends FDMob {
     public boolean hurt(DamageSource src, float damage) {
 
         if (!src.is(DamageTypes.GENERIC_KILL) && !src.is(DamageTypes.FELL_OUT_OF_WORLD)) return false;
+
+
 
         return super.hurt(src,damage);
     }
@@ -177,6 +186,11 @@ public class ChesedEntity extends FDMob {
         system.setVariable("variable.radius",600);
         system.setVariable("variable.angle",270);
         if (!this.level().isClientSide){
+
+            if (tickCount == 5){
+                this.summonOrReviveMonoliths();
+            }
+
             this.chain.tick();
             if (playIdle) {
                 system.startAnimation("IDLE", AnimationTicker.builder(CHESED_IDLE).build());
@@ -208,6 +222,45 @@ public class ChesedEntity extends FDMob {
             }else{
                 this.idleParticles();
             }
+        }
+    }
+
+    @Override
+    public void onAddedToLevel() {
+        super.onAddedToLevel();
+    }
+
+    public void summonOrReviveMonoliths(){
+
+        AABB box = new AABB(-30,-10,-30,30,10,30).move(this.position());
+        var list = level().getEntitiesOfClass(ChesedMonolith.class,box);
+        if (list.size() != 4){
+            for (ChesedMonolith monolith : list){
+                monolith.remove(RemovalReason.DISCARDED);
+            }
+            this.summonMonoliths();
+        }else{
+
+            for (ChesedMonolith monolith : list) {
+                monolith.setDeactivated(false);
+            }
+
+        }
+    }
+
+    private void removeMonoliths(){
+        AABB box = new AABB(-30,-10,-30,30,10,30).move(this.position());
+        var list = level().getEntitiesOfClass(ChesedMonolith.class,box);
+        for (ChesedMonolith monolith : list){
+            monolith.remove(RemovalReason.DISCARDED);
+        }
+    }
+
+    private void summonMonoliths(){
+        for (Vec3 pos : MONOLITH_SPAWN_OFFSETS){
+            ChesedMonolith monolith = new ChesedMonolith(BossEntities.CHESED_MONOLITH.get(),level());
+            monolith.setPos(pos.add(this.position()));
+            level().addFreshEntity(monolith);
         }
     }
 
@@ -314,14 +367,14 @@ public class ChesedEntity extends FDMob {
         if (this.entityData.get(IS_LAUNCHING_ORBS)){
 
             for (int i = 0; i <= 30;i++){
-                this.spawnOrbLaunchingParticle();
+                this.summonOrbLaunchingParticle();
             }
 
         }
 
     }
 
-    private void spawnOrbLaunchingParticle(){
+    private void summonOrbLaunchingParticle(){
 
 
         Vec3 direction = new Vec3(1,0,0).yRot(random.nextFloat() * FDMathUtil.FPI * 2);
@@ -360,6 +413,7 @@ public class ChesedEntity extends FDMob {
     public boolean finalBOOMAttack(AttackInstance instance){
 
 
+        if (true) return true;
 
         if (instance.tick == 0){
             this.killCrystals();
@@ -523,7 +577,7 @@ public class ChesedEntity extends FDMob {
                     (float) this.position().z
             );
             Vector3f between = new Vector3f(37, 0, 0).rotateY(random.nextFloat() * FDMathUtil.FPI * 2);
-            Vector3f spawnPos = pos.add(between, new Vector3f());
+            Vector3f summonPos = pos.add(between, new Vector3f());
             Vector3f normalized = between.normalize(new Vector3f());
 
             Matrix4f mt = new Matrix4f();
@@ -532,7 +586,7 @@ public class ChesedEntity extends FDMob {
 
             Vector3f direction = mt.transformDirection(new Vector3f(0, 1, 0));
             chesedCrystal.setCrystalFacingDirection(new Vec3(direction.x, direction.y, direction.z));
-            chesedCrystal.setPos(spawnPos.x, spawnPos.y, spawnPos.z);
+            chesedCrystal.setPos(summonPos.x, summonPos.y, summonPos.z);
             level().addFreshEntity(chesedCrystal);
 
         }
@@ -766,7 +820,7 @@ public class ChesedEntity extends FDMob {
 
             if (tick < 200) {
                 if (tick % 10 == 0) {
-                    this.spawnSpheresAround(25, tick / 10f * FDMathUtil.FPI / 9);
+                    this.summonSpheresAround(25, tick / 10f * FDMathUtil.FPI / 9);
                 }
 
 
@@ -782,7 +836,7 @@ public class ChesedEntity extends FDMob {
     }
 
 
-    private void spawnSpheresAround(int count,float angleOffset){
+    private void summonSpheresAround(int count,float angleOffset){
 
         float angle = FDMathUtil.FPI * 2 / count;
 
@@ -932,7 +986,7 @@ public class ChesedEntity extends FDMob {
                 this.summonDelayedVerticalRayOnFieldNearPlayers(4);
             }
 
-            this.spawnStonesAround(4,rad, this.position().add(0,height,0),true,false,FDEasings::easeOut);
+            this.summonStonesAround(4,rad, this.position().add(0,height,0),true,false,FDEasings::easeOut);
 
             if (tick % 2 == 0) {
                 AABB box = new AABB(-rad, -2, -rad, rad, height, rad).move(this.position());
@@ -942,7 +996,7 @@ public class ChesedEntity extends FDMob {
 
                     if (p.subtract(this.position()).multiply(1, 0, 1).length() > rad) continue;
 
-                    this.spawnStonesAround(1, 5, p.multiply(1, 0, 1).add(0, this.position().y + height, 0), true, false, FDEasings::easeOut);
+                    this.summonStonesAround(1, 5, p.multiply(1, 0, 1).add(0, this.position().y + height, 0), true, false, FDEasings::easeOut);
 
                 }
             }
@@ -958,7 +1012,7 @@ public class ChesedEntity extends FDMob {
         return false;
     }
 
-    private void spawnStonesAround(int count, int rad, Vec3 center, boolean useEasing, boolean reverseEasing, Function<Float,Float> func){
+    private void summonStonesAround(int count, int rad, Vec3 center, boolean useEasing, boolean reverseEasing, Function<Float,Float> func){
         for (int i = 0; i < count;i++){
 
             float rnd = random.nextFloat();
@@ -1597,6 +1651,14 @@ public class ChesedEntity extends FDMob {
                     .build(),ppos,80);
 
 
+        }
+    }
+
+    @Override
+    public void die(DamageSource p_21014_) {
+        super.die(p_21014_);
+        if (!level().isClientSide){
+            this.removeMonoliths();
         }
     }
 

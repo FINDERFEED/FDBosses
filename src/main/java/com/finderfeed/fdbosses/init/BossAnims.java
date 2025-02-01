@@ -48,4 +48,10 @@ public class BossAnims {
     public static DeferredHolder<Animation,Animation> CHESED_CRYSTAL_SPAWN = ANIMATIONS.register("chesed_crystal_spawn", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_crystal_animations"));
     });
+    public static DeferredHolder<Animation,Animation> CHESED_MONOLITH_IDLE = ANIMATIONS.register("chesed_monolith_idle", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_monolith"));
+    });
+    public static DeferredHolder<Animation,Animation> CHESED_MONOLITH_TURN_OFF = ANIMATIONS.register("chesed_monolith_turn_off", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_monolith"));
+    });
 }
