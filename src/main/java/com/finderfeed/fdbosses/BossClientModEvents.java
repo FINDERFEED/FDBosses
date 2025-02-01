@@ -59,7 +59,7 @@ public class BossClientModEvents {
                                 })
                                 .color((entity,pticks)->{
                                     ChesedEntity e = (ChesedEntity) entity;
-                                    float alpha = FDMathUtil.lerp(e.drainPercentOld,e.getMonolithDrainPercent(),pticks) * 0.2f;
+                                    float alpha = FDMathUtil.lerp(e.drainPercentOld,e.getMonolithDrainPercent(),pticks) * 0.3f;
                                     return new FDColor(0.1f,1f,1f,alpha);
                                 })
                                 .renderCondition((entity -> {

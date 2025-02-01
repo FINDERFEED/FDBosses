@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.entities.chesed_boss.electric_sphere;
 
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
+import com.finderfeed.fdbosses.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossEntities;
@@ -17,7 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSerializable {
+public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSerializable, ChesedBossBuddy {
 
     @SerializableField
     private ProjectileMovementPath path;
@@ -90,7 +91,7 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
 
     private void detectEntitiesAndExplode(){
         var list = level().getEntitiesOfClass(LivingEntity.class,this.getBoundingBox(),living->{
-            return !(living instanceof ChesedElectricSphereEntity) && !(living instanceof ChesedEntity);
+            return !(living instanceof ChesedBossBuddy);
         });
         if (list.isEmpty()) return;
 

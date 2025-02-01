@@ -84,7 +84,7 @@ import java.util.function.Function;
 import static com.finderfeed.fdbosses.init.BossAnims.CHESED_ATTACK;
 import static com.finderfeed.fdbosses.init.BossAnims.*;
 
-public class ChesedEntity extends FDMob {
+public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
     private static final Vec3[] MONOLITH_SPAWN_OFFSETS = {
             new Vec3(10,0,10),
@@ -147,21 +147,19 @@ public class ChesedEntity extends FDMob {
                     .registerAttack("equake",this::earthquakeAttack) // 1
                     .registerAttack("rockfall",this::rockfallAttack) // 1
                     .registerAttack("esphere",this::electricSphereAttack) // 1
-                    .addAttack(1,"final")
 //                    .addAttack(0, ray)
 //                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack("esphere")
 //                            .setNextAttack(rayOrBlocks)
 //                            .build())
-//                    .addAttack(1,AttackOptions.builder()
+//                    .addAttack(2,AttackOptions.builder()
 //                            .addAttack("rockfall")
-//                            .setNextAttack(rayOrBlocks)
 //                            .build())
-//                    .addAttack(1,AttackOptions.builder()
+//                    .addAttack(3,AttackOptions.builder()
 //                            .addAttack("equake")
-//                            .setNextAttack(rayOrBlocks)
 //                            .build())
-//                    .addAttack(2,"roll")
+//                    .addAttack(4,"roll")
+                    .addAttack(5,"final")
             ;
             this.remainingHits = this.getBossMaxHits();
 
@@ -418,8 +416,8 @@ public class ChesedEntity extends FDMob {
     private void monolithEnergyDrainParticles(){
         for (Vec3 pos : MONOLITH_SPAWN_OFFSETS){
 
-            Vec3 ppos = this.position().add(pos.add(0,2,0));
-            Vec3 center = this.position().add(0,2,0);
+            Vec3 ppos = this.position().add(pos.add(0,2.5,0));
+            Vec3 center = this.position().add(0,2.5,0);
 
             BallParticleOptions options = BallParticleOptions.builder()
                     .particleProcessor(new CircleParticleProcessor(
@@ -432,7 +430,7 @@ public class ChesedEntity extends FDMob {
 
             float p = this.getMonolithDrainPercent();
 
-            level().addParticle(options,ppos.x,ppos.y,ppos.z,0,FDMathUtil.lerp(0.05,-0.05,p),0);
+            level().addParticle(options,ppos.x,ppos.y,ppos.z,0,FDMathUtil.lerp(0,-0.08,p),0);
 
 
 
@@ -613,7 +611,10 @@ public class ChesedEntity extends FDMob {
 
 
     public boolean doNothing(AttackInstance instance){
-        return true;
+        if (instance.tick > 100){
+            return true;
+        }
+        return false;
     }
 
     private void killCrystals(){
@@ -1429,7 +1430,7 @@ public class ChesedEntity extends FDMob {
 
     private void rollDamageEntities(Vec3 oldPos,Vec3 pos){
         var entities = FDHelpers.traceEntities(level(),oldPos,pos,2.1,entity->{
-            return entity instanceof LivingEntity living && entity != this;
+            return entity instanceof LivingEntity living && !(entity instanceof ChesedBossBuddy);
         });
 
         //TODO: damage

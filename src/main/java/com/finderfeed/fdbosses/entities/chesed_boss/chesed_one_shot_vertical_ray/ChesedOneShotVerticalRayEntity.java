@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.entities.chesed_boss.chesed_one_shot_vertical_ra
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
+import com.finderfeed.fdbosses.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDLibCalls;
@@ -181,7 +182,11 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
         var list = level().getEntitiesOfClass(LivingEntity.class,box, BossUtil.entityInVerticalRadiusPredicate(this.position(),damageRadius));
 
         for (LivingEntity entity : list){
+
+            if (entity instanceof ChesedBossBuddy) continue;
+
             entity.hurt(level().damageSources().magic(),this.getDamage());
+
         }
 
     }

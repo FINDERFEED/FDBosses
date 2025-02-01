@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.entities.chesed_boss.chesed_crystal;
 
+import com.finderfeed.fdbosses.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdlib.init.FDEDataSerializers;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
@@ -13,7 +14,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 
-public class ChesedCrystalEntity extends FDEntity {
+public class ChesedCrystalEntity extends FDEntity implements ChesedBossBuddy {
 
     public static final EntityDataAccessor<Vec3> DIRECTION = SynchedEntityData.defineId(ChesedCrystalEntity.class, FDEDataSerializers.VEC3.get());
 
