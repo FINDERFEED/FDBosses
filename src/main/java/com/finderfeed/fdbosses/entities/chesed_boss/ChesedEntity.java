@@ -95,6 +95,8 @@ public class ChesedEntity extends FDMob {
 
     public static final EntityDataAccessor<Boolean> IS_ROLLING = SynchedEntityData.defineId(ChesedEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> IS_LAUNCHING_ORBS = SynchedEntityData.defineId(ChesedEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> IS_DRAINING_MONOLITHS = SynchedEntityData.defineId(ChesedEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Float> DRAIN_PERCENT = SynchedEntityData.defineId(ChesedEntity.class,EntityDataSerializers.FLOAT);
 
     public FDServerBossBar bossBar = new FDServerBossBar(BossBars.CHESED_BOSS_BAR,this);
 
@@ -225,10 +227,6 @@ public class ChesedEntity extends FDMob {
         }
     }
 
-    @Override
-    public void onAddedToLevel() {
-        super.onAddedToLevel();
-    }
 
     public void summonOrReviveMonoliths(){
 
@@ -409,56 +407,64 @@ public class ChesedEntity extends FDMob {
 
     }
 
+    private void monolithEnergyDrainParticles(){
+
+    }
+
 
     public boolean finalBOOMAttack(AttackInstance instance){
 
-
-        if (true) return true;
-
-        if (instance.tick == 0){
-            this.killCrystals();
-            this.darkenCombatants(80,false);
-
-        }else if (instance.tick == 15){
-
-            this.boomAttackRotatingRay(15);
-            ((ServerLevel)level()).playSound(null,this.position().x,this.position().y,this.position().z, BossSounds.CHESED_FINAL_ATTACK_RAY.get(), SoundSource.HOSTILE,100f,0.8f);
-        } else if (instance.tick == 54){
-            PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_PREPARE.get(),1f,1));
-        } else if (instance.tick == 58){
-            ImpactFrame base = new ImpactFrame(0.5f,0.1f,4,false);
-            FDLibCalls.sendImpactFrames((ServerLevel) level(),this.position(),60,
-                    base,
-                    new ImpactFrame(base).setDuration(1).setInverted(true),
-                    new ImpactFrame(base).setDuration(1),
-                    new ImpactFrame(base).setDuration(1).setInverted(true)
-            );
-        }else if (instance.tick == 60){
+        if (instance.stage == 0) {
 
 
 
+        }else if (instance.stage == 1) {
+            if (instance.tick == 0) {
+                this.killCrystals();
+                this.darkenCombatants(80, false);
 
-            this.boomAttackAfterBlackout();
-            PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_BIGGER.get(),1f,1));
+            } else if (instance.tick == 15) {
 
-            DefaultShakePacket.send((ServerLevel) level(),this.position(),60,FDShakeData.builder()
-                    .frequency(50)
-                    .amplitude(0.25f)
-                    .inTime(0)
-                    .stayTime(30)
-                    .outTime(100)
-                    .build());
-            PositionedScreenShakePacket.send((ServerLevel) level(),FDShakeData.builder()
-                    .frequency(50)
-                    .amplitude(4f)
-                    .inTime(0)
-                    .stayTime(0)
-                    .outTime(50)
-                    .build(),this.position(),60);
+                this.boomAttackRotatingRay(15);
+                ((ServerLevel) level()).playSound(null, this.position().x, this.position().y, this.position().z, BossSounds.CHESED_FINAL_ATTACK_RAY.get(), SoundSource.HOSTILE, 100f, 0.8f);
+            } else if (instance.tick == 54) {
+                PacketDistributor.sendToPlayersTrackingEntity(this, new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_PREPARE.get(), 1f, 1));
+            } else if (instance.tick == 58) {
+                ImpactFrame base = new ImpactFrame(0.5f, 0.1f, 4, false);
+                FDLibCalls.sendImpactFrames((ServerLevel) level(), this.position(), 60,
+                        base,
+                        new ImpactFrame(base).setDuration(1).setInverted(true),
+                        new ImpactFrame(base).setDuration(1),
+                        new ImpactFrame(base).setDuration(1).setInverted(true)
+                );
+            } else if (instance.tick == 60) {
 
-        }else if (instance.tick == 61){
 
-            this.darkenCombatants(0,true);
+                this.boomAttackAfterBlackout();
+                PacketDistributor.sendToPlayersTrackingEntity(this, new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_BIGGER.get(), 1f, 1));
+
+                DefaultShakePacket.send((ServerLevel) level(), this.position(), 60, FDShakeData.builder()
+                        .frequency(50)
+                        .amplitude(0.25f)
+                        .inTime(0)
+                        .stayTime(30)
+                        .outTime(100)
+                        .build());
+                PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                        .frequency(50)
+                        .amplitude(4f)
+                        .inTime(0)
+                        .stayTime(0)
+                        .outTime(50)
+                        .build(), this.position(), 60);
+
+            } else if (instance.tick == 61) {
+
+                this.darkenCombatants(0, true);
+
+            }else if (instance.tick >= 62){
+                return true;
+            }
         }
 
 
@@ -1691,6 +1697,8 @@ public class ChesedEntity extends FDMob {
         super.defineSynchedData(builder);
         builder.define(IS_ROLLING,false);
         builder.define(IS_LAUNCHING_ORBS,false);
+        builder.define(IS_DRAINING_MONOLITHS,false);
+        builder.define(DRAIN_PERCENT,0f);
     }
 
     @Override
@@ -1735,6 +1743,14 @@ public class ChesedEntity extends FDMob {
 
     public boolean isRolling(){
         return this.entityData.get(IS_ROLLING);
+    }
+
+    public float getMonolithDrainPercent(){
+        return this.entityData.get(DRAIN_PERCENT);
+    }
+
+    public void setMonolithDrainPercent(float percent){
+        this.entityData.set(DRAIN_PERCENT,percent);
     }
 
     @Override

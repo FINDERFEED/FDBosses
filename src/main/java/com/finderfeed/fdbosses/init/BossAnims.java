@@ -15,6 +15,9 @@ public class BossAnims {
     public static DeferredHolder<Animation,Animation> CHESED_IDLE = ANIMATIONS.register("chesed_idle", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
     });
+    public static DeferredHolder<Animation,Animation> CHESED_BOOM_ATTACK = ANIMATIONS.register("chesed_boom_attack", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
     public static DeferredHolder<Animation,Animation> CHESED_ATTACK = ANIMATIONS.register("chesed_attack", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
     });
