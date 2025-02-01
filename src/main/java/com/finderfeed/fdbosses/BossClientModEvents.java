@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningPartic
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedAttackRayParticle;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticle;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticle;
+import com.finderfeed.fdbosses.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_vertical_ray.ChesedVerticalRayAttackRenderer;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterRenderer;
@@ -15,7 +16,9 @@ import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.projectiles.renderers.BlockProjectileRenderer;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRenderLayerOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRendererBuilder;
+import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.client.NullEntityRenderer;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
@@ -47,6 +50,21 @@ public class BossClientModEvents {
                         .addLayer(FDEntityRenderLayerOptions.builder()
                                 .model(BossModels.CHESED)
                                 .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")))
+                                .build()
+                        )
+                        .addLayer(FDEntityRenderLayerOptions.builder()
+                                .model(BossModels.CHESED_INFLATED)
+                                .renderType((entity,pticks)->{
+                                    return RenderType.entityTranslucentEmissive(FDBosses.location("textures/entities/chesed_white_tex.png"));
+                                })
+                                .color((entity,pticks)->{
+                                    ChesedEntity e = (ChesedEntity) entity;
+                                    float alpha = FDMathUtil.lerp(e.drainPercentOld,e.getMonolithDrainPercent(),pticks) * 0.2f;
+                                    return new FDColor(0.1f,1f,1f,alpha);
+                                })
+                                .renderCondition((entity -> {
+                                    return ((ChesedEntity)entity).getMonolithDrainPercent() != 0;
+                                }))
                                 .build()
                         )
                         .build()

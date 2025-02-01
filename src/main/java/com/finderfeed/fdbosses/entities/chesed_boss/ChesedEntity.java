@@ -4,7 +4,7 @@ import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
-import com.finderfeed.fdbosses.client.particles.particle_processors.MoveOnACircleParticleProcessor;
+import com.finderfeed.fdbosses.client.particles.particle_processors.ChesedRayCircleParticleProcessor;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
@@ -107,6 +107,8 @@ public class ChesedEntity extends FDMob {
     private boolean playIdle = true;
     private boolean lookingAtTarget = true;
 
+    public float drainPercentOld;
+
     private LivingEntity target;
     private Vec3 previousTargetPos;
 
@@ -182,6 +184,7 @@ public class ChesedEntity extends FDMob {
         if (!this.isRolling() && !level().isClientSide) {
             this.setYRot(yHeadRot);
         }
+        drainPercentOld = this.getMonolithDrainPercent();
         super.tick();
         this.bossBar.setPercentage(this.getRemainingHits() / (float) this.getBossMaxHits());
         AnimationSystem system = this.getSystem();
@@ -219,6 +222,11 @@ public class ChesedEntity extends FDMob {
                 }
             }
         }else{
+
+            if (this.isDrainingFromMonoliths()){
+                this.monolithEnergyDrainParticles();
+            }
+
             if (this.isRolling()){
                 this.handleClientRolling();
             }else{
@@ -408,28 +416,80 @@ public class ChesedEntity extends FDMob {
     }
 
     private void monolithEnergyDrainParticles(){
+        for (Vec3 pos : MONOLITH_SPAWN_OFFSETS){
 
+            Vec3 ppos = this.position().add(pos.add(0,2,0));
+            Vec3 center = this.position().add(0,2,0);
+
+            BallParticleOptions options = BallParticleOptions.builder()
+                    .particleProcessor(new CircleParticleProcessor(
+                            center,false,true,0.5f
+                    ))
+                    .color(1 + random.nextInt(40), 183 + random.nextInt(60), 165 + random.nextInt(60))
+                    .size(1f)
+                    .scalingOptions(2,15,0)
+                    .build();
+
+            float p = this.getMonolithDrainPercent();
+
+            level().addParticle(options,ppos.x,ppos.y,ppos.z,0,FDMathUtil.lerp(0.05,-0.05,p),0);
+
+
+
+        }
     }
 
 
     public boolean finalBOOMAttack(AttackInstance instance){
 
         if (instance.stage == 0) {
+            int chargeEndTime = 100;
+            int chargeStartTime = 20;
+            int afterChargeIdle = 30;
+            int chargeTime = chargeEndTime - chargeStartTime;
 
-
-
+            if (instance.tick == 0){
+                this.setMonolithDrainPercent(0);
+                this.getSystem().startAnimation("BOOM", AnimationTicker.builder(CHESED_BOOM_ATTACK)
+                                .setToNullTransitionTime(0)
+                        .build());
+            }else if (instance.tick == chargeStartTime){
+                this.setMonolithDrainPercent(0);
+                this.setDrainingMonoliths(true);
+            }else if (instance.tick < chargeEndTime){
+                int currentChargeTime = instance.tick - chargeStartTime;
+                this.setMonolithDrainPercent(currentChargeTime / (float) chargeTime);
+            }else if (instance.tick < chargeEndTime + afterChargeIdle){
+                this.setDrainingMonoliths(false);
+            }else{
+                instance.nextStage();
+            }
         }else if (instance.stage == 1) {
+
+            int rayStartTick = 15;
+            int rayDuration = 15;
+            int buildupSoundStart = 54;
+            int impactFramesStart = 58;
+            int damageAndEffectsStart = 60;
+
             if (instance.tick == 0) {
                 this.killCrystals();
                 this.darkenCombatants(80, false);
 
-            } else if (instance.tick == 15) {
+            } else if (instance.tick == rayStartTick) {
 
-                this.boomAttackRotatingRay(15);
+                this.boomAttackRotatingRay(rayDuration);
                 ((ServerLevel) level()).playSound(null, this.position().x, this.position().y, this.position().z, BossSounds.CHESED_FINAL_ATTACK_RAY.get(), SoundSource.HOSTILE, 100f, 0.8f);
-            } else if (instance.tick == 54) {
+            }else if (instance.tick > rayStartTick && instance.tick <= rayStartTick + rayDuration) {
+
+                float p = 1 - (instance.tick - rayStartTick) / (float) rayDuration;
+                this.setMonolithDrainPercent(p);
+
+            } else if (instance.tick == buildupSoundStart) {
+                this.setMonolithDrainPercent(0);
                 PacketDistributor.sendToPlayersTrackingEntity(this, new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_PREPARE.get(), 1f, 1));
-            } else if (instance.tick == 58) {
+            } else if (instance.tick == impactFramesStart) {
+                this.setMonolithDrainPercent(0);
                 ImpactFrame base = new ImpactFrame(0.5f, 0.1f, 4, false);
                 FDLibCalls.sendImpactFrames((ServerLevel) level(), this.position(), 60,
                         base,
@@ -437,8 +497,8 @@ public class ChesedEntity extends FDMob {
                         new ImpactFrame(base).setDuration(1),
                         new ImpactFrame(base).setDuration(1).setInverted(true)
                 );
-            } else if (instance.tick == 60) {
-
+            } else if (instance.tick == damageAndEffectsStart) {
+                this.setMonolithDrainPercent(0);
 
                 this.boomAttackAfterBlackout();
                 PacketDistributor.sendToPlayersTrackingEntity(this, new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_BIGGER.get(), 1f, 1));
@@ -458,17 +518,18 @@ public class ChesedEntity extends FDMob {
                         .outTime(50)
                         .build(), this.position(), 60);
 
-            } else if (instance.tick == 61) {
-
+            } else if (instance.tick == damageAndEffectsStart + 1) {
+                this.setMonolithDrainPercent(0);
                 this.darkenCombatants(0, true);
 
-            }else if (instance.tick >= 62){
+            }else if (instance.tick >= damageAndEffectsStart + 200){
+                this.setMonolithDrainPercent(0);
                 return true;
             }
         }
 
 
-        return instance.tick >= 200;
+        return false;
     }
 
     private void darkenCombatants(int duration,boolean clear){
@@ -492,7 +553,7 @@ public class ChesedEntity extends FDMob {
         Vec3 end = p.add(look.multiply(38,38,38));
 
         ChesedRayOptions options = ChesedRayOptions.builder()
-                .processor(new MoveOnACircleParticleProcessor(p,1,true))
+                .processor(new ChesedRayCircleParticleProcessor(p,1.15f,true))
                 .time(5,rotateDuration - 10,5)
                 .lightningColor(90, 180, 255)
                 .color(100, 255, 255)
@@ -1745,12 +1806,20 @@ public class ChesedEntity extends FDMob {
         return this.entityData.get(IS_ROLLING);
     }
 
+    public boolean isDrainingFromMonoliths(){
+        return this.entityData.get(IS_DRAINING_MONOLITHS);
+    }
+
+    public void setDrainingMonoliths(boolean state){
+        this.entityData.set(IS_DRAINING_MONOLITHS,state);
+    }
+
     public float getMonolithDrainPercent(){
         return this.entityData.get(DRAIN_PERCENT);
     }
 
     public void setMonolithDrainPercent(float percent){
-        this.entityData.set(DRAIN_PERCENT,percent);
+        this.entityData.set(DRAIN_PERCENT,Mth.clamp(percent,0,1));
     }
 
     @Override

@@ -23,7 +23,7 @@ import org.joml.Quaternionf;
 import org.joml.Vector3d;
 import org.joml.Vector3f;
 
-public class MoveOnACircleParticleProcessor implements ParticleProcessor<MoveOnACircleParticleProcessor> {
+public class ChesedRayCircleParticleProcessor implements ParticleProcessor<ChesedRayCircleParticleProcessor> {
 
 
     private Vec3 circleAround;
@@ -31,14 +31,14 @@ public class MoveOnACircleParticleProcessor implements ParticleProcessor<MoveOnA
 
 
     private boolean forward = true;
-    private int circleCount = 1;
+    private float circleCount = 1;
     private Vec3 previousPoint = null;
     private Vec3 initialPoint = null;
     private Vector3f axis = null;
     private Vec3 oldSpeed;
 
 
-    public MoveOnACircleParticleProcessor(Vec3 circleAround,int circleCount,boolean forward){
+    public ChesedRayCircleParticleProcessor(Vec3 circleAround, float circleCount, boolean forward){
         this.circleAround = circleAround;
         this.circleCount = circleCount;
         this.forward = forward;
@@ -46,8 +46,8 @@ public class MoveOnACircleParticleProcessor implements ParticleProcessor<MoveOnA
     }
 
     @Override
-    public ParticleProcessorType<MoveOnACircleParticleProcessor> type() {
-        return BossModEvents.MOVE_ON_A_CIRCLE_PARTICLE_PROCESSOR_PARTICLE_PROCESSOR_TYPE;
+    public ParticleProcessorType<ChesedRayCircleParticleProcessor> type() {
+        return BossModEvents.CHESED_CIRCLE_PARTICLE_PROCESSOR_PARTICLE_PROCESSOR_TYPE;
     }
 
     @Override
@@ -98,28 +98,28 @@ public class MoveOnACircleParticleProcessor implements ParticleProcessor<MoveOnA
         this.previousPoint = this.initialPoint;
     }
 
-    public static class Type implements ParticleProcessorType<MoveOnACircleParticleProcessor>{
+    public static class Type implements ParticleProcessorType<ChesedRayCircleParticleProcessor>{
 
-        public static final StreamCodec<FriendlyByteBuf,MoveOnACircleParticleProcessor> STREAM_CODEC = StreamCodec.composite(
+        public static final StreamCodec<FriendlyByteBuf, ChesedRayCircleParticleProcessor> STREAM_CODEC = StreamCodec.composite(
                 FDByteBufCodecs.VEC3,v->v.circleAround,
-                ByteBufCodecs.INT,v->v.circleCount,
+                ByteBufCodecs.FLOAT,v->v.circleCount,
                 ByteBufCodecs.BOOL,v->v.forward,
-                MoveOnACircleParticleProcessor::new
+                ChesedRayCircleParticleProcessor::new
         );
 
-        public static final Codec<MoveOnACircleParticleProcessor> CODEC = RecordCodecBuilder.create(p->p.group(
+        public static final Codec<ChesedRayCircleParticleProcessor> CODEC = RecordCodecBuilder.create(p->p.group(
                 FDCodecs.VEC3.fieldOf("circleAround").forGetter(v->v.circleAround),
-                Codec.INT.fieldOf("circleCount").forGetter(v->v.circleCount),
+                Codec.FLOAT.fieldOf("circleCount").forGetter(v->v.circleCount),
                 Codec.BOOL.fieldOf("forward").forGetter(v->v.forward)
-        ).apply(p,MoveOnACircleParticleProcessor::new));
+        ).apply(p, ChesedRayCircleParticleProcessor::new));
 
         @Override
-        public StreamCodec<FriendlyByteBuf, MoveOnACircleParticleProcessor> streamCodec() {
+        public StreamCodec<FriendlyByteBuf, ChesedRayCircleParticleProcessor> streamCodec() {
             return STREAM_CODEC;
         }
 
         @Override
-        public Codec<MoveOnACircleParticleProcessor> codec() {
+        public Codec<ChesedRayCircleParticleProcessor> codec() {
             return CODEC;
         }
 
