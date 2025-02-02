@@ -147,19 +147,19 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     .registerAttack("equake",this::earthquakeAttack) // 1
                     .registerAttack("rockfall",this::rockfallAttack) // 1
                     .registerAttack("esphere",this::electricSphereAttack) // 1
-//                    .addAttack(0, ray)
+                    .addAttack(0, ray)
 //                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack("esphere")
 //                            .setNextAttack(rayOrBlocks)
 //                            .build())
-//                    .addAttack(2,AttackOptions.builder()
+//                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack("rockfall")
 //                            .build())
-//                    .addAttack(3,AttackOptions.builder()
+//                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack("equake")
 //                            .build())
 //                    .addAttack(4,"roll")
-                    .addAttack(5,"final")
+//                    .addAttack(5,"final")
             ;
             this.remainingHits = this.getBossMaxHits();
 
@@ -685,7 +685,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
             }else if (tick > 10 && tick < rayAttackTick) {
 
-                if (tick < rayAttackTick - 6){
+                if (tick < rayAttackTick - 5){
                     lookingAtTarget = true;
                 }else{
                     lookingAtTarget = false;
@@ -828,6 +828,17 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
         if (crystalHit){
             this.decreaseHitCount(1);
+        }
+
+
+        list = FDHelpers.traceEntities(level(),begin,end,1,(entity)->{
+            return !(entity instanceof ChesedBossBuddy);
+        });
+
+        for (Entity entity : list){
+            if (entity instanceof LivingEntity living){
+                living.hurt(level().damageSources().magic(),2);
+            }
         }
 
     }
@@ -1660,14 +1671,22 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
     private Vec3 getLookAtPos(LivingEntity target){
 
-        float lookAtPosMod = 4;
 
-        Vec3 v = target.position().subtract(previousTargetPos)
-                .normalize()
-                .multiply(lookAtPosMod,lookAtPosMod,lookAtPosMod);
+        double dist = target.distanceTo(this);
+
+        double distMod = Mth.clamp(dist / 5,0,1);
+
+        double lookAtPosMod = 10 * FDEasings.easeIn((float)(distMod * distMod));
+
+        Vec3 v = target.position().subtract(previousTargetPos);
+
+
+
+
+        Vec3 lookAtMod = v.multiply(lookAtPosMod,lookAtPosMod,lookAtPosMod);
 
         Vec3 pos = target.position().add(0,target.getBbHeight() / 2,0)
-                .add(v);
+                .add(lookAtMod);
 
 
         return pos;
