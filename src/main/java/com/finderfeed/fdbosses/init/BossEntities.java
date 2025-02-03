@@ -84,7 +84,7 @@ public class BossEntities {
     public static final Supplier<EntityType<ChesedCrystalEntity>> CHESED_CRYSTAL = ENTITIES.register("chesed_crystal",()->EntityType.Builder.of(
             ChesedCrystalEntity::new, MobCategory.MISC
     )
-            .sized(2.5f,4f)
+            .sized(3.5f,4f)
             .build("chesed_crystal"));
 
     public static final Supplier<EntityType<ChesedMovingVerticalRay>> CHESED_VERTICAL_RAY_ATTACK = ENTITIES.register("chesed_vertical_ray_attack",()->EntityType.Builder.of(
@@ -106,7 +106,8 @@ public class BossEntities {
         event.put(CHESED.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,10).build());
         event.put(CHESED_ELECTRIC_SPHERE.get(), LivingEntity.createLivingAttributes().build());
         event.put(CHESED_VERTICAL_RAY_ATTACK.get(), LivingEntity.createLivingAttributes().build());
-        event.put(CHESED_MONOLITH.get(), LivingEntity.createLivingAttributes().build());
+        event.put(CHESED_MONOLITH.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,50).build());
+        event.put(CHESED_CRYSTAL.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
     }
 
 

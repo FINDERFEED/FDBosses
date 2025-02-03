@@ -57,6 +57,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -66,6 +67,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -134,7 +136,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
             AttackOptions rayOrBlocks = AttackOptions.builder()
                     .addAttack(ray)
-                    .addAttack("blocks")
+                    .addAttack(2,"blocks")
                     .build();
 
             chain = new AttackChain(level.random)
@@ -148,18 +150,23 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     .registerAttack("rockfall",this::rockfallAttack) // 1
                     .registerAttack("esphere",this::electricSphereAttack) // 1
                     .addAttack(0, ray)
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack("esphere")
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack("rockfall")
-//                            .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack("equake")
-//                            .build())
-//                    .addAttack(4,"roll")
-//                    .addAttack(5,"final")
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack("esphere")
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack("rockfall")
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack("equake")
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(4,AttackOptions.builder()
+                            .addAttack("roll")
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(5,"final")
             ;
             this.remainingHits = this.getBossMaxHits();
 
@@ -200,7 +207,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             }else{
                 system.stopAnimation("IDLE");
             }
-            if (level().getGameTime() % 10 == 0) {
+            if (level().getGameTime() % 5 == 0) {
                 this.blindCombatants();
             }
 
@@ -327,10 +334,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             Vec3 lookAngle = player.getLookAngle();
             Vec3 b = player.position().subtract(this.position()).normalize();
             player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION,400,0,true,false));
-//            if (true) continue;
             if (!(player.isCreative() || player.isSpectator())) {
                 if (doBlinding) {
-                    if (lookAngle.dot(b) > 0.05) {
+                    if (lookAngle.dot(b) > 0.05 && !player.hasEffect(BossEffects.CHESED_ENERGIZED)) {
                         player.addEffect(new MobEffectInstance(BossEffects.CHESED_GAZE, 200, 0, true, true));
                     } else {
                         player.removeEffect(BossEffects.CHESED_GAZE);
@@ -519,11 +525,17 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             } else if (instance.tick == damageAndEffectsStart + 1) {
                 this.setMonolithDrainPercent(0);
                 this.darkenCombatants(0, true);
-
-            }else if (instance.tick >= damageAndEffectsStart + 200){
+                this.summonOrReviveMonoliths();
+            }else if (instance.tick >= damageAndEffectsStart + 2){
                 this.setMonolithDrainPercent(0);
+                instance.nextStage();
+            }
+        }else if (instance.stage == 2){
+            if (instance.tick > 100){
+                this.summonOrReviveMonoliths();
                 return true;
             }
+            return false;
         }
 
 
@@ -623,6 +635,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         for (ChesedCrystalEntity chesedCrystal : list) {
             chesedCrystal.kill();
         }
+        for (Player player : this.getCombatants(true)){
+            player.removeEffect(BossEffects.CHESED_ENERGIZED);
+        }
     }
 
     public boolean summonCrystals(AttackInstance instance){
@@ -644,13 +659,16 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     (float) this.position().y,
                     (float) this.position().z
             );
-            Vector3f between = new Vector3f(37, 0, 0).rotateY(random.nextFloat() * FDMathUtil.FPI * 2);
+
+
+
+            Vector3f between = new Vector3f(37, 0, 0).rotateY(FDMathUtil.FPI / 4 + FDMathUtil.FPI / 2 * i + (random.nextFloat() * 2 - 1) * FDMathUtil.FPI / 5f);
             Vector3f summonPos = pos.add(between, new Vector3f());
             Vector3f normalized = between.normalize(new Vector3f());
 
             Matrix4f mt = new Matrix4f();
             FDRenderUtil.applyMovementMatrixRotations(mt, new Vec3(-normalized.x, 0, -normalized.z));
-            mt.rotateX(-FDMathUtil.FPI / 4);
+            mt.rotateX(-FDMathUtil.FPI / 3);
 
             Vector3f direction = mt.transformDirection(new Vector3f(0, 1, 0));
             chesedCrystal.setCrystalFacingDirection(new Vec3(direction.x, direction.y, direction.z));
@@ -765,12 +783,15 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                 }
             }
         }else if (localStage == 2){
-            float rnd = random.nextFloat();
-            float p = stage / (6f * 3);
-            float ch = FDMathUtil.normalDistribution(p,0,0.43f);
-            if (rnd > ch){
-                lookingAtTarget = true;
-                return true;
+            if (instance.stage / 3 > 6) { //at least four guaranteed attacks
+                float rnd = random.nextFloat();
+                float p = stage / (6f * 3);
+                float ch = FDMathUtil.normalDistribution(p, 0, 0.43f);
+                if (rnd > ch) {
+                    lookingAtTarget = true;
+                    this.killCrystals();
+                    return true;
+                }
             }
             instance.nextStage();
         }
@@ -813,31 +834,27 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
     private void damageOnRay(Vec3 begin, Vec3 end){
 
-        var list = FDHelpers.traceEntities(level(),begin,end,0,(entity)->{
-            return entity != this;
-        });
-
-        boolean crystalHit = false;
-
-        for (Entity entity : list){
-            if (entity instanceof ChesedCrystalEntity chesedCrystal){
-                entity.kill();
-                crystalHit = true;
-            }
-        }
-
-        if (crystalHit){
-            this.decreaseHitCount(1);
-        }
-
-
-        list = FDHelpers.traceEntities(level(),begin,end,1,(entity)->{
+        var list = FDHelpers.traceEntities(level(),begin,end,1,(entity)->{
             return !(entity instanceof ChesedBossBuddy);
         });
 
         for (Entity entity : list){
             if (entity instanceof LivingEntity living){
-                living.hurt(level().damageSources().magic(),2);
+                boolean shouldHit = true;
+                if (living.hasEffect(BossEffects.CHESED_ENERGIZED)){
+                    if (living.getUseItem().getItem() instanceof ShieldItem shield){
+                        Vec3 v = this.getLookAngle().normalize();
+                        Vec3 b = living.getLookAngle().normalize();
+                        if (b.dot(v) < -0.5) {
+                            this.killCrystals();
+                            this.decreaseHitCount(1);
+                            shouldHit = false;
+                        }
+                    }
+                }
+                if (shouldHit){
+                    living.hurt(level().damageSources().magic(), 2);
+                }
             }
         }
 
@@ -1083,8 +1100,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             if (tick >= duration) {
                 instance.nextStage();
             }
-        }else {
-            return true;
+        }else if (stage == 2){
+            return instance.tick > 80;
         }
 
 
@@ -1124,52 +1141,56 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         lookingAtTarget = false;
         int t = instance.tick;
         int radius = 40;
-        if (t < 6) {
+        if (instance.stage <= 4) {
+            if (t < 6) {
 
-            if (t > 3) {
-                this.summonCirclingParticlesServerside(4, 0.55f, 2, 0.5f, 6, 9);
-            }
+                if (t > 3) {
+                    this.summonCirclingParticlesServerside(4, 0.55f, 2, 0.5f, 6, 9);
+                }
 
-            if (t == 0){
-                this.getSystem().startAnimation("earthquake", AnimationTicker.builder(CHESED_EARTHQUAKE_CAST)
-                                .setToNullTransitionTime(0)
-                        .build());
-            }
-            if (t % 2 == 0) {
-                SonicParticleOptions options = SonicParticleOptions.builder().facing(0, 1,0).color(0.3f, 1f, 1f).startSize(radius).endSize(0).resizeSpeed(-0.3f).resizeAcceleration(-1f).build();
-                for (Player player : this.level().getNearbyPlayers(BossUtil.ALL,this,this.getBoundingBox().inflate(100))) {
-                    ((ServerLevel) level()).sendParticles((ServerPlayer) player, options, true, this.position().x, this.position().y + 0.01, this.position().z, 1, 0, 0, 0, 0);
+                if (t == 0) {
+                    this.getSystem().startAnimation("earthquake", AnimationTicker.builder(CHESED_EARTHQUAKE_CAST)
+                            .setToNullTransitionTime(0)
+                            .build());
+                }
+                if (t % 2 == 0) {
+                    SonicParticleOptions options = SonicParticleOptions.builder().facing(0, 1, 0).color(0.3f, 1f, 1f).startSize(radius).endSize(0).resizeSpeed(-0.3f).resizeAcceleration(-1f).build();
+                    for (Player player : this.level().getNearbyPlayers(BossUtil.ALL, this, this.getBoundingBox().inflate(100))) {
+                        ((ServerLevel) level()).sendParticles((ServerPlayer) player, options, true, this.position().x, this.position().y + 0.01, this.position().z, 1, 0, 0, 0, 0);
+                    }
+                }
+            } else {
+                if (t < 10) {
+                    this.summonCirclingParticlesServerside(4, 0.55f, 2, 0.5f, 6, 9);
+                }
+
+                if (t == 18) {
+                    this.summonRadialEarthquake(radius, true);
+                } else if (t == 21) {
+                    PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                            .frequency(10f)
+                            .stayTime(0)
+                            .inTime(5)
+                            .outTime(5)
+                            .amplitude(3.f)
+                            .build(), this.position(), 50);
+
+
+                    this.summonVerticalRayAttacksRadial(random.nextFloat() * FDMathUtil.FPI * 2,
+                            FDMathUtil.FPI * (random.nextFloat() > 0.5 ? 1 : -1),
+                            radius + 5,
+                            1,
+                            90,
+                            8);
+
+                } else if (t > 50) {
+                    instance.nextStage();
                 }
             }
         }else{
-            if (t < 10){
-                this.summonCirclingParticlesServerside(4,0.55f,2,0.5f,6,9);
-            }
-
-            if (t == 18){
-                this.summonRadialEarthquake(radius,true);
-            }else if (t == 21) {
-                PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
-                        .frequency(10f)
-                        .stayTime(0)
-                        .inTime(5)
-                        .outTime(5)
-                        .amplitude(3.f)
-                        .build(),this.position(),50);
-
-
-                this.summonVerticalRayAttacksRadial(random.nextFloat() * FDMathUtil.FPI * 2,
-                        FDMathUtil.FPI * (random.nextFloat() > 0.5 ? 1 : -1),
-                        radius + 5,
-                        1,
-                        90,
-                        8);
-
-            }else if (t > 50){
-                instance.nextStage();
-            }
+            return instance.tick > 40;
         }
-        return instance.stage > 4;
+        return false;
     }
 
     private void summonRadialEarthquake(int radius,boolean doSonicParticles){
@@ -1746,6 +1767,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         super.die(p_21014_);
         if (!level().isClientSide){
             this.removeMonoliths();
+            this.killCrystals();
         }
     }
 
