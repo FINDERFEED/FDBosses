@@ -17,5 +17,6 @@ public class BossModels {
     public static final Supplier<FDModelInfo> CHESED_ELECTRIC_SPHERE = INFOS.register("chesed_electric_sphere",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"electric_orb"),1f));
     public static final Supplier<FDModelInfo> CHESED_CRYSTAL = INFOS.register("chesed_crystal",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_crystal"),1f));
     public static final Supplier<FDModelInfo> CHESED_MONOLITH = INFOS.register("chesed_monolith",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_monolith"),1f));
+    public static final Supplier<FDModelInfo> CHESED_KINETIC_FIELD = INFOS.register("chesed_kinetic_field",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_kinetic_field"),1f));
 
 }

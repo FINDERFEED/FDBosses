@@ -20,6 +20,8 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
     @SerializableField
     private boolean deactivated = false;
 
+    private boolean immuneToAttacks = false;
+
     public ChesedMonolith(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
     }
@@ -56,6 +58,9 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
 
     @Override
     public boolean hurt(DamageSource src, float damage) {
+
+        if (this.isImmuneToAttacks() && !src.is(DamageTypes.GENERIC_KILL) && !src.is(DamageTypes.FELL_OUT_OF_WORLD)) return false;
+
         return super.hurt(src, damage);
     }
 
@@ -69,6 +74,14 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
                 this.setDeactivated(true);
             }
         }
+    }
+
+    public boolean isImmuneToAttacks() {
+        return immuneToAttacks;
+    }
+
+    public void setImmuneToAttacks(boolean immuneToAttacks) {
+        this.immuneToAttacks = immuneToAttacks;
     }
 
     @Override

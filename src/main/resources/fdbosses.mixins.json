@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "fdbosses.refmap.json",
   "mixins": [
+    "EntityMixin"
   ],
   "minVersion": "0.8",
   "client": [

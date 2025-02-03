@@ -57,4 +57,7 @@ public class BossAnims {
     public static DeferredHolder<Animation,Animation> CHESED_MONOLITH_TURN_OFF = ANIMATIONS.register("chesed_monolith_turn_off", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_monolith"));
     });
+    public static DeferredHolder<Animation,Animation> CHESED_KINETIC_FIELD_SPAWN = ANIMATIONS.register("kinetic_field_spawn", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"kinetic_field"));
+    });
 }

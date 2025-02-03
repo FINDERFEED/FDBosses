@@ -5,28 +5,40 @@ import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningPartic
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedAttackRayParticle;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticle;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticle;
+import com.finderfeed.fdbosses.client.util.BossRenderTypes;
+import com.finderfeed.fdbosses.entities.chesed_boss.kinetic_field.ChesedKineticFieldEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_vertical_ray.ChesedVerticalRayAttackRenderer;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterRenderer;
 import com.finderfeed.fdbosses.entities.chesed_boss.falling_block.ChesedFallingBlockRenderer;
 import com.finderfeed.fdbosses.entities.chesed_boss.flying_block_entity.FlyingBlockEntityRenderer;
+import com.finderfeed.fdbosses.entities.chesed_boss.kinetic_field.ChesedKineticFieldRenderer;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.projectiles.renderers.BlockProjectileRenderer;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimatedObject;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRenderLayerOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRendererBuilder;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDFreeEntityRenderer;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.client.NullEntityRenderer;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import org.joml.Matrix4f;
+
+import java.util.List;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD,value = Dist.CLIENT,modid = FDBosses.MOD_ID)
 public class BossClientModEvents {
@@ -104,6 +116,21 @@ public class BossClientModEvents {
                                 .renderType(RenderType.eyes(FDBosses.location("textures/entities/chesed_monolith_emissive.png")))
                                 .build())
                 .build());
+
+
+
+        event.registerEntityRenderer(BossEntities.CHESED_KINETIC_FIELD.get(), FDEntityRendererBuilder.builder()
+                .addLayer(FDEntityRenderLayerOptions.builder()
+                        .model(BossModels.CHESED_KINETIC_FIELD)
+                        .renderType(RenderType.eyes(FDBosses.location("textures/entities/kinetic_field_spear.png")))
+                        .build())
+                        .shouldRender(((entity, frustum, v, v1, v2) -> {
+                            return true;
+                        }))
+                        .freeRender(ChesedKineticFieldRenderer::render)
+                .build());
+
+
 
         event.registerEntityRenderer(BossEntities.EARTH_SHATTER.get(), EarthShatterRenderer::new);
         event.registerEntityRenderer(BossEntities.BLOCK_PROJECTILE.get(), BlockProjectileRenderer::new);
