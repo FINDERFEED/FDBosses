@@ -40,6 +40,7 @@ import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.CircleS
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
+import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -57,7 +58,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -135,8 +135,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     .build();
 
             AttackOptions rayOrBlocks = AttackOptions.builder()
-                    .addAttack(ray)
-                    .addAttack(2,"blocks")
+                    .addAttack(2,ray)
+                    .addAttack(3,"blocks")
                     .build();
 
             chain = new AttackChain(level.random)
@@ -149,26 +149,26 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     .registerAttack("equake",this::earthquakeAttack) // 1
                     .registerAttack("rockfall",this::rockfallAttack) // 1
                     .registerAttack("esphere",this::electricSphereAttack) // 1
-                    .addAttack(0, ray)
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack("esphere")
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack("rockfall")
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack("equake")
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(4,AttackOptions.builder()
-                            .addAttack("roll")
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(5,"final")
+                    .addAttack(0, "roll")
+//                    .addAttack(0, ray)
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack("esphere")
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack("rockfall")
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack("equake")
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(4,AttackOptions.builder()
+//                            .addAttack("roll")
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(5,"final")
             ;
-            this.remainingHits = this.getBossMaxHits();
 
 
         }
@@ -191,11 +191,11 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         }
         drainPercentOld = this.getMonolithDrainPercent();
         super.tick();
-        this.bossBar.setPercentage(this.getRemainingHits() / (float) this.getBossMaxHits());
         AnimationSystem system = this.getSystem();
         system.setVariable("variable.radius",600);
         system.setVariable("variable.angle",270);
         if (!this.level().isClientSide){
+            this.bossBar.setPercentage(this.getRemainingHits() / (float) this.getBossMaxHits());
 
             if (tickCount == 5){
                 this.summonOrReviveMonoliths();
@@ -694,11 +694,23 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
         if (localStage == 1) {
 
+
+
+            float animationSpeed = 1;
             int rayAttackTick = 35;
+            int rayAttackReloadTime = 30;
+
+            if (this.isBelowHalfHP()){
+                rayAttackTick = 25;
+                animationSpeed = 1.5f;
+                rayAttackReloadTime = 20;
+            }
+
             if (tick == 0) {
 
                 this.getSystem().startAnimation("ATTACK", AnimationTicker.builder(CHESED_ATTACK)
                                 .setToNullTransitionTime(0)
+                                .setSpeed(animationSpeed)
                         .build());
 
             }else if (tick > 10 && tick < rayAttackTick) {
@@ -769,7 +781,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                 this.summonStonesAfterRayAttack(30,reversedLook,end);
                 BossUtil.chesedRayExplosion((ServerLevel) level(),end,reversedLook,100,15,0.75f);
             }else if (tick > rayAttackTick){
-                if (tick > rayAttackTick + 30){
+                if (tick > rayAttackTick + rayAttackReloadTime){
                     instance.nextStage();
                     return false;
                 }
@@ -878,10 +890,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         }else if (stage == 1) {
 
             if (tick % 10 == 0) {
-                for (int i = 0; i < 4; i++) {
-                    Vec3 v = new Vec3(1, 0, 0).yRot(i * FDMathUtil.FPI / 2 + tick / 2f * FDMathUtil.FPI / 8);
-                    this.shootSphere(v);
-                }
+                this.summonLessSpheresAround(this.position(),tick);
             }
 
             if (tick > 200){
@@ -901,8 +910,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     Vec3 v = new Vec3(1,0,0)
                             .yRot(i / (float) amountOnArc * FDMathUtil.FPI / 8 + rndOffs * FDMathUtil.FPI);
 
-                    this.shootSphere(v,80);
-                    this.shootSphere(v.reverse(),80);
+                    this.shootSphere(this.position(),v,80);
+                    this.shootSphere(this.position(),v.reverse(),80);
 
                 }
 
@@ -931,6 +940,13 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         return false;
     }
 
+    private void summonLessSpheresAround(Vec3 pos,int tick){
+        for (int i = 0; i < 4; i++) {
+            Vec3 v = new Vec3(1, 0, 0).yRot(i * FDMathUtil.FPI / 2 + tick / 2f * FDMathUtil.FPI / 8);
+            this.shootSphere(pos,v);
+        }
+    }
+
 
     private void summonSpheresAround(int count,float angleOffset){
 
@@ -940,17 +956,17 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
             Vec3 dir = new Vec3(1,0,0).yRot(i * angle + angleOffset);
 
-            this.shootSphere(dir,150);
+            this.shootSphere(this.position(),dir,150);
         }
     }
 
-    private void shootSphere(Vec3 direction){
-        this.shootSphere(direction,100);
+    private void shootSphere(Vec3 pos,Vec3 direction){
+        this.shootSphere(pos,direction,100);
     }
 
-    private void shootSphere(Vec3 direction,int time){
+    private void shootSphere(Vec3 pos,Vec3 direction,int time){
         direction = direction.normalize();
-        Vec3 sppos = this.position().add(0,1,0).add(direction);
+        Vec3 sppos = pos.add(0,1,0).add(direction);
         Vec3 endPos = sppos.add(direction.multiply(37,37,37));
         ProjectileMovementPath path = new ProjectileMovementPath(time,false)
                 .addPos(sppos)
@@ -1078,7 +1094,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
             float duration = 400;
 
-            if (tick % 40 == 0){
+
+            if (tick % (this.isBelowHalfHP() ? 20 : 40) == 0){
+                this.summonDelayedVerticalRayOnFieldNearPlayers(4);
                 this.summonDelayedVerticalRayOnFieldNearPlayers(4);
             }
 
@@ -1364,7 +1382,6 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
     public boolean roll(AttackInstance instance){
         lookingAtTarget = false;
         doBlinding = false;
-//        if (true) return true;
         int tick = instance.tick;
         var stage = instance.stage;
         if (tick == 0 && stage == 0){
@@ -1387,6 +1404,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             }
         }else if (stage == 1){
             this.playIdle = false;
+
             PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                     .frequency(5f)
                     .stayTime(0)
@@ -1410,6 +1428,16 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                 instance.nextStage();
                 return false;
             }else{
+                if (this.isBelowHalfHP()){
+                    if (oldRollPos == null){
+                        oldRollPos = pos;
+                    }
+                    Vec3 b = oldRollPos.subtract(pos);
+                    int amount = (int) Math.ceil(b.length());
+                    for (int i = 0; i < amount;i++) {
+                        ChesedFireTrailEntity fireTrailEntity = ChesedFireTrailEntity.summon(level(), pos.add(0, -0.5, 0).add(b.normalize().multiply(i,i,i)), 2, 80);
+                    }
+                }
                 this.handleRollEarthShatters(tick, pos);
             }
         }else if (stage == 2){
@@ -1697,7 +1725,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
         double distMod = Mth.clamp(dist / 5,0,1);
 
-        double lookAtPosMod = 10 * FDEasings.easeIn((float)(distMod * distMod));
+        double baseLookAtDist = this.isBelowHalfHP() ? 5 : 10;
+
+        double lookAtPosMod = baseLookAtDist * FDEasings.easeIn((float)(distMod * distMod));
 
         Vec3 v = target.position().subtract(previousTargetPos);
 
@@ -1775,6 +1805,10 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         return this.position().add(0,1.3,0);
     }
 
+    public boolean isBelowHalfHP(){
+        return this.getRemainingHits() < this.getBossMaxHits() / 2f;
+    }
+
     private float enrageRadius(){
         return 39;
     }
@@ -1823,7 +1857,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         if (tag.contains("bossHealth")) {
             this.remainingHits = tag.getInt("bossHealth");
         }else{
-            this.remainingHits = this.getBossMaxHits();
+//            this.remainingHits = this.getBossMaxHits();
+            this.remainingHits = 2; //TODO: remove!
         }
         super.load(tag);
     }

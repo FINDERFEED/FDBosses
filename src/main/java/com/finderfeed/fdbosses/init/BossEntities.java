@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.init;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.entities.chesed_boss.ChesedEntity;
+import com.finderfeed.fdbosses.entities.chesed_boss.ChesedFireTrailEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_monolith.ChesedMonolith;
 import com.finderfeed.fdbosses.entities.chesed_boss.chesed_one_shot_vertical_ray.ChesedOneShotVerticalRayEntity;
@@ -93,6 +94,12 @@ public class BossEntities {
             .sized(0.25f,0.25f)
             .updateInterval(1)
             .build("chesed_vertical_ray_attack"));
+
+    public static final Supplier<EntityType<ChesedFireTrailEntity>> CHESED_FIRE_TRAIL = ENTITIES.register("chesed_fire_trail",()->EntityType.Builder.of(
+            ChesedFireTrailEntity::new, MobCategory.MISC
+    )
+            .sized(0.25f,0.25f)
+            .build("chesed_fire_trail"));
 
     public static final Supplier<EntityType<ChesedOneShotVerticalRayEntity>> CHESED_ONE_SHOT_VERTICAL_RAY_ATTACK = ENTITIES.register("chesed_one_shot_vertical_ray_attack",()->EntityType.Builder.of(
             ChesedOneShotVerticalRayEntity::new, MobCategory.MISC
