@@ -116,7 +116,7 @@ public class ChesedKineticFieldEntity extends FDEntity {
     }
 
     public double getSquareRadius(){
-        return 8;
+        return 5;
     }
 
 

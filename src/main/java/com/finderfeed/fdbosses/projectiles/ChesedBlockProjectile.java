@@ -1,10 +1,14 @@
 package com.finderfeed.fdbosses.projectiles;
 
+import com.finderfeed.fdbosses.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
 import com.finderfeed.fdbosses.entities.chesed_boss.flying_block_entity.FlyingBlockEntity;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
+import com.finderfeed.fdlib.FDLibCalls;
+import com.finderfeed.fdlib.nbt.AutoSerializable;
+import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
@@ -12,6 +16,7 @@ import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.client.particles.FDBlockParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -21,10 +26,12 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -34,11 +41,14 @@ import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChesedBlockProjectile extends FDProjectile {
+public class ChesedBlockProjectile extends FDProjectile implements AutoSerializable {
 
     public static final EntityDataAccessor<Float> ROTATION_SPEED = SynchedEntityData.defineId(ChesedBlockProjectile.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<BlockState> STATE = SynchedEntityData.defineId(ChesedBlockProjectile.class, EntityDataSerializers.BLOCK_STATE);
     public static final EntityDataAccessor<Boolean> DROP_PARTICLES = SynchedEntityData.defineId(ChesedBlockProjectile.class, EntityDataSerializers.BOOLEAN);
+
+    @SerializableField
+    private float damage;
 
     public ProjectileMovementPath movementPath = null;
     private int dropParticlesTime = 0;
@@ -72,6 +82,14 @@ public class ChesedBlockProjectile extends FDProjectile {
             }
         }
 
+    }
+
+    public void setDamage(float damage) {
+        this.damage = damage;
+    }
+
+    public float getDamage() {
+        return damage;
     }
 
     private void dropParticles(){
@@ -155,6 +173,7 @@ public class ChesedBlockProjectile extends FDProjectile {
     protected void onHitBlock(BlockHitResult blockHitResult) {
         super.onHitBlock(blockHitResult);
         if (!level().isClientSide && !this.noPhysics){
+            this.damageEntities(blockHitResult.getLocation(),7f);
             SlamParticlesPacket packet = new SlamParticlesPacket(
                     new SlamParticlesPacket.SlamData(blockHitResult.getBlockPos(),blockHitResult.getLocation(),this.getDeltaMovement())
             );
@@ -168,8 +187,37 @@ public class ChesedBlockProjectile extends FDProjectile {
                     .build(),blockHitResult.getLocation().add(this.getDeltaMovement().multiply(1,0,1).normalize().multiply(2,2,2)),5);
             this.shatter(blockHitResult,FDMathUtil.FPI / 6);
             this.launchBlocks(blockHitResult,FDMathUtil.FPI / 6);
+
+
             this.remove(RemovalReason.DISCARDED);
         }
+    }
+
+    private void damageEntities(Vec3 pos,float radius){
+        AABB box = new AABB(-radius,-1,-radius,radius,4,radius);
+
+        Vec3 movement = this.getDeltaMovement().normalize();
+
+
+        Vec3 pos2 = pos.add(movement.reverse());
+
+        FDLibCalls.sendParticles((ServerLevel) level(), ParticleTypes.ANGRY_VILLAGER,pos2,20);
+
+        var list = level().getEntitiesOfClass(LivingEntity.class,box.move(pos2.add(movement)),(entity)->{
+            return !(entity instanceof ChesedBossBuddy) && entity.position().multiply(1,0,1).distanceTo(pos2.multiply(1,0,1)) <= radius;
+        });
+
+        for (LivingEntity entity : list){
+
+            Vec3 b = entity.position().subtract(pos2).normalize();
+
+            double dot = b.dot(movement);
+            if (dot > 0.85) {
+                entity.hurt(level().damageSources().magic(),damage);
+                entity.invulnerableTime = 0;
+            }
+        }
+
     }
 
 
@@ -286,7 +334,7 @@ public class ChesedBlockProjectile extends FDProjectile {
         super.defineSynchedData(builder);
         builder
                 .define(ROTATION_SPEED,20f)
-                .define(STATE, Blocks.STONE.defaultBlockState())
+                .define(STATE, Blocks.DEEPSLATE.defaultBlockState())
                 .define(DROP_PARTICLES,false);
     }
 
@@ -298,6 +346,7 @@ public class ChesedBlockProjectile extends FDProjectile {
         }
         tag.putFloat("rotationSpeed",this.getRotationSpeed());
         tag.put("state", NbtUtils.writeBlockState(this.getBlockState()));
+        this.autoSave(tag);
         return super.save(tag);
     }
 
@@ -309,6 +358,7 @@ public class ChesedBlockProjectile extends FDProjectile {
         }
         this.setRotationSpeed(tag.getFloat("rotationSpeed"));
         this.setBlockState(NbtUtils.readBlockState(level().holderLookup(Registries.BLOCK),tag.getCompound("state")));
+        this.autoLoad(tag);
         super.load(tag);
     }
 }

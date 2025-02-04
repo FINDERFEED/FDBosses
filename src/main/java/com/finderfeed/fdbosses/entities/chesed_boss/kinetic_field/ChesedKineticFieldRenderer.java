@@ -29,8 +29,8 @@ public class ChesedKineticFieldRenderer {
         float alpha = entity.tickCount > 3 ? 1 : 0;
 
         List<Vec3> positions = List.of(
-                new Vec3(-radius,1.5,0),
-                new Vec3(radius,1.5,0)
+                new Vec3(-radius,1,0),
+                new Vec3(radius,1,0)
         );
 
         for (int g = 0; g < 4;g++) {
@@ -41,13 +41,13 @@ public class ChesedKineticFieldRenderer {
 
             int seed = 2345 * e.getId() + g * 543;
 
-            ArcLightningParticle.fullLightningDraw(e.level().getGameTime(), seed, breakCount,t,vertex,positions,0.25f,0.8f,0.3f, 1f, 1f,alpha);
+            ArcLightningParticle.fullLightningDraw(e.level().getGameTime(), seed, breakCount,t,vertex,positions,0.15f,0.5f,0.3f, 1f, 1f,alpha);
 
             poseStack.translate(0,0,0.05);
-            ArcLightningParticle.fullLightningDraw(e.level().getGameTime(), seed, breakCount,t,vertex,positions,0.05f,0.8f,1f, 1f, 1f,alpha);
+            ArcLightningParticle.fullLightningDraw(e.level().getGameTime(), seed, breakCount,t,vertex,positions,0.025f,0.5f,1f, 1f, 1f,alpha);
 
             poseStack.translate(0,0,-0.1);
-            ArcLightningParticle.fullLightningDraw(e.level().getGameTime(), seed, breakCount,t,vertex,positions,0.05f,0.8f,1f, 1f, 1f,alpha);
+            ArcLightningParticle.fullLightningDraw(e.level().getGameTime(), seed, breakCount,t,vertex,positions,0.025f,0.5f,1f, 1f, 1f,alpha);
 
             poseStack.popPose();
         }
