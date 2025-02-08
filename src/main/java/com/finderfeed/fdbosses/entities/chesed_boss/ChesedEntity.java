@@ -150,7 +150,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     .registerAttack("equake",this::earthquakeAttack) // 1
                     .registerAttack("rockfall",this::rockfallAttack) // 1
                     .registerAttack("esphere",this::electricSphereAttack) // 1
-                    .addAttack(0, "blocks")
+                    .addAttack(0, "final")
 //                    .addAttack(0, ray)
 //                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack("esphere")
@@ -532,7 +532,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                 instance.nextStage();
             }
         }else if (instance.stage == 2){
-            if (instance.tick > 100){
+            if (instance.tick > 300){
                 this.summonOrReviveMonoliths();
                 return true;
             }
