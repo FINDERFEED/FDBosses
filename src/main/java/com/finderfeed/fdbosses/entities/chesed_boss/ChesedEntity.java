@@ -27,6 +27,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.Animatio
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
@@ -89,6 +90,16 @@ import static com.finderfeed.fdbosses.init.BossAnims.*;
 
 public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
+
+    public static final String FINAL_ATTACK = "final";
+    public static final String CRYSTALS_ATTACK = "crystals";
+    public static final String RAY_ATTACK = "ray";
+    public static final String BLOCKS_ATTACK = "blocks";
+    public static final String ROLL_ATTACK = "roll";
+    public static final String EARTHQUAKE_ATTACK = "equake";
+    public static final String ROCKFALL_ATTACK = "rockfall";
+    public static final String ELECTRIC_SPHERE_ATTACK = "esphere";
+
     private static final Vec3[] MONOLITH_SPAWN_OFFSETS = {
             new Vec3(10,0,10),
             new Vec3(-10,0,10),
@@ -142,16 +153,16 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
             chain = new AttackChain(level.random)
                     .registerAttack("nothing",this::doNothing)
-                    .registerAttack("final",this::finalBOOMAttack)
-                    .registerAttack("crystals",this::summonCrystals)
-                    .registerAttack("ray",this::rayAttack) //0 and in the middle
-                    .registerAttack("blocks",this::blockAttack) //in the middle
-                    .registerAttack("roll",this::roll) //after all
-                    .registerAttack("equake",this::earthquakeAttack) // 1
-                    .registerAttack("rockfall",this::rockfallAttack) // 1
-                    .registerAttack("esphere",this::electricSphereAttack) // 1
-                    .addAttack(0, "roll")
-//                    .addAttack(0, ray)
+                    .registerAttack(FINAL_ATTACK,this::finalBOOMAttack)
+                    .registerAttack(CRYSTALS_ATTACK,this::summonCrystals)
+                    .registerAttack(RAY_ATTACK,this::rayAttack) //0 and in the middle
+                    .registerAttack(BLOCKS_ATTACK,this::blockAttack) //in the middle
+                    .registerAttack(ROLL_ATTACK,this::roll) //after all
+                    .registerAttack(EARTHQUAKE_ATTACK,this::earthquakeAttack) // 1
+                    .registerAttack(ROCKFALL_ATTACK,this::rockfallAttack) // 1
+                    .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
+                    .attackListener(this::attackListener)
+                    .addAttack(0, ray)
 //                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack("esphere")
 //                            .setNextAttack(rayOrBlocks)
@@ -239,6 +250,13 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                 this.idleParticles();
             }
         }
+    }
+
+    public AttackAction attackListener(String attackName){
+        if (this.getTarget() == null){
+            return AttackAction.WAIT;
+        }
+        return AttackAction.PROCEED;
     }
 
 
@@ -1786,7 +1804,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
         double distMod = Mth.clamp(dist / 5,0,1);
 
-        double baseLookAtDist = this.isBelowHalfHP() ? 5 : 10;
+        double baseLookAtDist = this.isBelowHalfHP() ? 8 : 10;
 
         double lookAtPosMod = baseLookAtDist * FDEasings.easeIn((float)(distMod * distMod));
 
@@ -1973,6 +1991,6 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
     @Override
     public int getHeadRotSpeed() {
-        return 10;
+        return 5;
     }
 }

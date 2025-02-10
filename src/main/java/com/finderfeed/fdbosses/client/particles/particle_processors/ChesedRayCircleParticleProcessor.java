@@ -72,10 +72,6 @@ public class ChesedRayCircleParticleProcessor implements ParticleProcessor<Chese
 
             Vec3 targetPoint = this.circleAround.add(p.x * len, p.y * len, p.z * len);
 
-            Minecraft.getInstance().level.addParticle(ParticleTypes.FLAME,true,previousPoint.x,previousPoint.y,previousPoint.z,0,0,0);
-            Minecraft.getInstance().level.addParticle(ParticleTypes.END_ROD,true,targetPoint.x,targetPoint.y,targetPoint.z,0,0,0);
-            Minecraft.getInstance().level.addParticle(ParticleTypes.ANGRY_VILLAGER,true,particle.x,particle.y,particle.z,0,0,0);
-
             Vec3 speed = targetPoint.subtract(this.previousPoint);
             this.previousPoint = targetPoint;
             particle.xd -= this.oldSpeed.x;

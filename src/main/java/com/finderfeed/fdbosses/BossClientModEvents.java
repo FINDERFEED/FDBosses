@@ -65,6 +65,15 @@ public class BossClientModEvents {
                                 .build()
                         )
                         .addLayer(FDEntityRenderLayerOptions.builder()
+                                .model(BossModels.CHESED_CRYSTAL_LAYER)
+                                .renderType((entity,pticks)->{
+                                    return RenderType.entityTranslucentEmissive(FDBosses.location("textures/entities/chesed_crystal_layer.png"));
+                                })
+                                .color((entity,pticks)->{
+                                    return new FDColor(0.1f,1f,1f,0.2f);
+                                })
+                                .build())
+                        .addLayer(FDEntityRenderLayerOptions.builder()
                                 .model(BossModels.CHESED_INFLATED)
                                 .renderType((entity,pticks)->{
                                     return RenderType.entityTranslucentEmissive(FDBosses.location("textures/entities/chesed_white_tex.png"));

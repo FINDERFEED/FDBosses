@@ -201,8 +201,6 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
 
         Vec3 pos2 = pos.add(movement.reverse());
 
-        FDLibCalls.sendParticles((ServerLevel) level(), ParticleTypes.ANGRY_VILLAGER,pos2,20);
-
         var list = level().getEntitiesOfClass(LivingEntity.class,box.move(pos2.add(movement)),(entity)->{
             return !(entity instanceof ChesedBossBuddy) && entity.position().multiply(1,0,1).distanceTo(pos2.multiply(1,0,1)) <= radius;
         });
