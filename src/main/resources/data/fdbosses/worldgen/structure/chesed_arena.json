@@ -1,14 +1,19 @@
 {
   "type": "minecraft:jigsaw",
-  "biomes": "minecraft:plains",
+  "biomes": "#minecraft:is_overworld",
   "size": 4,
   "start_height": {
-    "absolute": 1
+    "type": "minecraft:uniform",
+    "max_inclusive": {
+      "absolute": -20
+    },
+    "min_inclusive": {
+      "absolute": -40
+    }
   },
-  "project_start_to_heightmap": "MOTION_BLOCKING_NO_LEAVES",
   "start_pool": "fdbosses:chesed_arena",
-  "step": "underground_decoration",
-  "terrain_adaptation": "beard_box",
+  "step": "top_layer_modification",
+  "terrain_adaptation": "encapsulate",
   "max_distance_from_center": 115,
   "use_expansion_hack": false,
   "spawn_overrides": {}
