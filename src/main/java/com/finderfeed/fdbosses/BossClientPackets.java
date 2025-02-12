@@ -5,12 +5,17 @@ import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleO
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
+import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
+import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
 import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.client.particles.FDBlockParticleOptions;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticle;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
+import com.finderfeed.fdlib.util.math.ComplexEasingFunction;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -49,6 +54,63 @@ public class BossClientPackets {
                 chesedBoomParticles(pos,data);
             }
         }
+    }
+
+    public static void chesedRayReflectParticles(){
+
+        Window window = Minecraft.getInstance().getWindow();
+
+        float w = window.getGuiScaledWidth();
+        float h = window.getGuiScaledHeight();
+
+
+
+        float spx = 10f;
+        float spy = 40f;
+        float friction = 0.4f;
+        reflectParticlesPart(400,0,0,spx,spy,250,2,friction,20f);
+        reflectParticlesPart(400,w,0,-spx,spy,250,2,friction,20f);
+        reflectParticlesPart(400,w,h,-spx,-spy,250,2,friction,20f);
+        reflectParticlesPart(400,0,h,spx,-spy,250,2,friction,20f);
+
+    }
+
+    public static void reflectParticlesPart(int count, float x,float y, float xd, float yd,float maxOffset,float maxSpeedMod,float friction,float size){
+
+        Vec3 offsetVector = new Vec3(xd,yd,0).normalize().zRot(FDMathUtil.FPI / 2);
+
+        for (int i = 0; i < count;i++){
+
+            float offset = (random.nextFloat() * 2 - 1) * maxOffset;
+            float xoff = offset * (float) offsetVector.x;
+            float yoff = offset * (float) offsetVector.y;
+
+            Vec3 sp = new Vec3(xd,yd,0).zRot(FDMathUtil.FPI / 8 * (random.nextFloat() * 2 - 1));
+
+            float speedMod = maxSpeedMod * random.nextFloat();
+
+            float sizeP = (1 - speedMod / maxSpeedMod);
+
+            float frictionP = speedMod / maxSpeedMod; frictionP = frictionP * friction + 0.3f;
+
+            FDTexturedSParticle.create(FDRenderUtil.ParticleRenderTypesS.TEXTURES_BLUR_ADDITIVE, BallParticle.LOCATION)
+                    .setPos(x + xoff, y + yoff, true)
+                    .setMaxQuadSize(size * sizeP)
+                    .setSpeed(sp.x * speedMod,sp.y * speedMod)
+                    .setFriction(frictionP)
+                    .setColor(
+                            0.1f + random.nextFloat() * 0.1f - 0.05f,
+                            0.8f + random.nextFloat() * 0.1f - 0.05f,
+                            0.8f + random.nextFloat() * 0.1f - 0.05f,
+                            0.8f
+                    )
+                    .setLifetime(15 + random.nextInt(5))
+                    .setQuadScaleOptions(ComplexEasingFunction.builder()
+                            .addArea(1,FDEasings::reversedEaseOut)
+                            .build())
+                    .sendToOverlay();
+        }
+
     }
 
     public static void chesedBoomParticles(Vec3 pos,int radiusFromCenter){

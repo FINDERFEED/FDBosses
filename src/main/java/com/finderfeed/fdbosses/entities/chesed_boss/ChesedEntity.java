@@ -18,6 +18,7 @@ import com.finderfeed.fdbosses.entities.chesed_boss.falling_block.ChesedFallingB
 import com.finderfeed.fdbosses.entities.chesed_boss.kinetic_field.ChesedKineticFieldEntity;
 import com.finderfeed.fdbosses.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.init.*;
+import com.finderfeed.fdbosses.packets.ChesedRayReflectPacket;
 import com.finderfeed.fdbosses.projectiles.ChesedBlockProjectile;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
@@ -256,6 +257,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         if (this.getTarget() == null){
             return AttackAction.WAIT;
         }
+        this.doBlinding = true;
         return AttackAction.PROCEED;
     }
 
@@ -360,6 +362,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     } else {
                         player.removeEffect(BossEffects.CHESED_GAZE);
                     }
+                }else{
+                    player.removeEffect(BossEffects.CHESED_GAZE);
                 }
             }
 
@@ -702,6 +706,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
     public boolean rayAttack(AttackInstance instance){
 
+        this.doBlinding = false;
+
         int tick = instance.tick;
         int stage = instance.stage;
 
@@ -821,6 +827,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                 if (rnd > ch) {
                     lookingAtTarget = true;
                     this.killCrystals();
+                    this.doBlinding = true;
                     return true;
                 }
             }
@@ -877,6 +884,11 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                         Vec3 v = this.getLookAngle().normalize();
                         Vec3 b = living.getLookAngle().normalize();
                         if (b.dot(v) < -0.5) {
+
+                            if (living instanceof ServerPlayer player){
+                                PacketDistributor.sendToPlayer(player,new ChesedRayReflectPacket());
+                            }
+
                             this.killCrystals();
                             this.decreaseHitCount(1);
                             shouldHit = false;

@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdbosses.client.overlay.ElectrifiedOverlay;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningParticle;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedAttackRayParticle;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticle;
@@ -28,6 +29,7 @@ import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.phys.Vec3;
@@ -35,13 +37,21 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import org.joml.Matrix4f;
 
 import java.util.List;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD,value = Dist.CLIENT,modid = FDBosses.MOD_ID)
 public class BossClientModEvents {
+
+
+    @SubscribeEvent
+    public static void registerOverlays(RegisterGuiLayersEvent event){
+        event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("electrified"),new ElectrifiedOverlay());
+    }
 
 
     @SubscribeEvent

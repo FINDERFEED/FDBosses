@@ -16,7 +16,9 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
+import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
+import org.lwjgl.glfw.GLFW;
 
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID,bus = EventBusSubscriber.Bus.GAME,value = Dist.CLIENT)
@@ -31,6 +33,15 @@ public class BossClientEvents {
     public static int chesedDarkenEffectTick = 0;
     public static int chesedDarkenEffectTickO = 0;
     public static int chesedDarkenEffectTickMax = 10;
+
+//    @SubscribeEvent
+//    public static void test(InputEvent.Key event){
+//        if (Minecraft.getInstance().level == null) return;
+//
+//        if (event.getKey() == GLFW.GLFW_KEY_K){
+//            BossClientPackets.chesedRayReflectParticles();
+//        }
+//    }
 
     @SubscribeEvent
     public static void tickEvent(ClientTickEvent.Pre event){
