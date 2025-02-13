@@ -2,8 +2,8 @@ package com.finderfeed.fdbosses;
 
 
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
-import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
-import com.finderfeed.fdbosses.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;

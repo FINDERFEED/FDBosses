@@ -1,6 +1,6 @@
 package com.finderfeed.fdbosses.client;
 
-import com.finderfeed.fdbosses.entities.chesed_boss.kinetic_field.ChesedKineticFieldEntity;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.ChesedKineticFieldEntity;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;

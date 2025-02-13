@@ -1,6 +1,6 @@
 package com.finderfeed.fdbosses.init;
 
-import com.finderfeed.fdbosses.entities.chesed_boss.ChesedBossBar;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossBar;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdlib.systems.FDRegistries;
 import com.finderfeed.fdlib.systems.hud.bossbars.FDBossBarFactory;
