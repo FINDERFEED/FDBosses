@@ -19,6 +19,7 @@ import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -488,6 +489,10 @@ public class BossClientPackets {
         if (Minecraft.getInstance().level.getEntity(entityId) instanceof EarthShatterEntity entity){
             entity.settings = settings;
         }
+    }
+
+    public static Player getClientPlayer(){
+        return Minecraft.getInstance().player;
     }
 
 }

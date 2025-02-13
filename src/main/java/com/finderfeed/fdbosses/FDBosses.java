@@ -24,6 +24,7 @@ public class FDBosses {
     public FDBosses(IEventBus bus, ModContainer container) {
         BossItems.ITEMS.register(bus);
         BossModels.INFOS.register(bus);
+        BossBlocks.BLOCKS.register(bus);
         BossSounds.SOUNDS.register(bus);
         BossBars.BOSS_BARS.register(bus);
         BossAnims.ANIMATIONS.register(bus);
