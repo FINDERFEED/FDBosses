@@ -28,6 +28,10 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.Animatio
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
+import com.finderfeed.fdlib.systems.cutscenes.CurveType;
+import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
+import com.finderfeed.fdlib.systems.cutscenes.EasingType;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
@@ -167,23 +171,43 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 //                            .addAttack("esphere")
 //                            .setNextAttack(rayOrBlocks)
 //                            .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack("rockfall")
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack("rockfall")
 //                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack("equake")
+                            .build())
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack("equake")
 //                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(4,AttackOptions.builder()
-//                            .addAttack("roll")
+                            .build())
+                    .addAttack(4,AttackOptions.builder()
+                            .addAttack("roll")
 //                            .setNextAttack(rayOrBlocks)
-//                            .build())
+                            .build())
 //                    .addAttack(5,"final")
             ;
 
-
+            this.remainingHits = this.getBossMaxHits() / 2 - 1;
         }
+    }
+
+    @Override
+    public void onAddedToLevel() {
+        super.onAddedToLevel();
+
+        if (level() instanceof ServerLevel serverLevel) {
+            Vec3 pos = this.position().add(0, 1.5, 0);
+            Vec3 offs = new Vec3(26, 15, 26);
+            Vec3 camPos = pos.add(offs);
+
+
+            CutsceneData cutsceneData = CutsceneData.create()
+                    .addCameraPos(new CameraPos(camPos, pos.subtract(camPos).add(0,5,0)))
+                    .time(1)
+                    .stopMode(CutsceneData.StopMode.UNSTOPPABLE);
+
+            FDLibCalls.startCutsceneForPlayers(serverLevel,pos,40,cutsceneData);
+        }
+
     }
 
     @Override
@@ -1224,13 +1248,15 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                             .amplitude(3.f)
                             .build(), this.position(), 50);
 
+                    int count = this.isBelowHalfHP() ? 12 : 8;
+
 
                     this.summonVerticalRayAttacksRadial(random.nextFloat() * FDMathUtil.FPI * 2,
                             FDMathUtil.FPI * (random.nextFloat() > 0.5 ? 1 : -1),
                             radius + 5,
                             1,
-                            90,
-                            8);
+                            90 - (this.isBelowHalfHP() ? 10 : 0),
+                            count);
 
                 } else if (t > 50) {
                     instance.nextStage();
@@ -1948,7 +1974,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             this.remainingHits = tag.getInt("bossHealth");
         }else{
 //            this.remainingHits = this.getBossMaxHits();
-            this.remainingHits = 2; //TODO: remove!
+//            this.remainingHits = 2; //TODO: remove!
         }
         super.load(tag);
     }
