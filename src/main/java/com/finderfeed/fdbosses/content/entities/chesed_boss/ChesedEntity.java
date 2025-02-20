@@ -167,26 +167,25 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .attackListener(this::attackListener)
                     .addAttack(0, ray)
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack("esphere")
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack("esphere")
+                            .setNextAttack(rayOrBlocks)
+                            .build())
                     .addAttack(1,AttackOptions.builder()
                             .addAttack("rockfall")
-//                            .setNextAttack(rayOrBlocks)
+                            .setNextAttack(rayOrBlocks)
                             .build())
                     .addAttack(1,AttackOptions.builder()
                             .addAttack("equake")
-//                            .setNextAttack(rayOrBlocks)
+                            .setNextAttack(rayOrBlocks)
                             .build())
                     .addAttack(4,AttackOptions.builder()
                             .addAttack("roll")
-//                            .setNextAttack(rayOrBlocks)
+                            .setNextAttack(rayOrBlocks)
                             .build())
-//                    .addAttack(5,"final")
+                    .addAttack(5,"final")
             ;
 
-            this.remainingHits = this.getBossMaxHits() / 2 - 1;
         }
     }
 
