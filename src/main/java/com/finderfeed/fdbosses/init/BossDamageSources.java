@@ -17,12 +17,20 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 public class BossDamageSources {
 
     public static final ResourceKey<DamageType> CHESED_ATTACK = key("chesed_attack");
+    public static final ResourceKey<DamageType> CHESED_ELECTRIC_SPHERE = key("electric_sphere");
+    public static final ResourceKey<DamageType> CHESED_FALLING_BLOCK = key("chesed_falling_block");
 
 
     private static EntityDamageSource CHESED_ATTACK_SOURCE;
+    private static EntityDamageSource CHESED_ELECTRIC_SPHERE_SOURCE;
+    public static DamageSource CHESED_FALLING_BLOCK_SOURCE;
 
     public static DamageSource chesedAttack(Entity attacker){
         return CHESED_ATTACK_SOURCE.create(attacker);
+    }
+
+    public static DamageSource electricSphere(Entity attacker){
+        return CHESED_ELECTRIC_SPHERE_SOURCE.create(attacker);
     }
 
     @SubscribeEvent
@@ -30,7 +38,8 @@ public class BossDamageSources {
         RegistryAccess access = event.getServer().registryAccess();
 
         CHESED_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_ATTACK));
-
+        CHESED_ELECTRIC_SPHERE_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_ELECTRIC_SPHERE));
+        CHESED_FALLING_BLOCK_SOURCE = new DamageSource(access.holderOrThrow(CHESED_FALLING_BLOCK));
     }
 
 

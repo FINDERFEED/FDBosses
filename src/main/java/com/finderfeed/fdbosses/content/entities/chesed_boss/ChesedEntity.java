@@ -29,9 +29,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.Animatio
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
-import com.finderfeed.fdlib.systems.cutscenes.CurveType;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
-import com.finderfeed.fdlib.systems.cutscenes.EasingType;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
@@ -284,10 +282,21 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
     }
 
 
-    public void summonOrReviveMonoliths(){
-
+    public List<ChesedMonolith> getMonoliths(){
         AABB box = new AABB(-30,-10,-30,30,10,30).move(this.position());
         var list = level().getEntitiesOfClass(ChesedMonolith.class,box);
+        return list;
+    }
+
+    public void setMonolithsImmunity(boolean immune){
+        List<ChesedMonolith> monoliths = this.getMonoliths();
+        for (ChesedMonolith monolith : monoliths){
+            monolith.setImmuneToAttacks(immune);
+        }
+    }
+
+    public void summonOrReviveMonoliths(){
+        List<ChesedMonolith> list = this.getMonoliths();
         if (list.size() != 4){
             for (ChesedMonolith monolith : list){
                 monolith.remove(RemovalReason.DISCARDED);
@@ -318,6 +327,34 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         }
     }
 
+    public int getAliveMonolithsCount(){
+        var monoliths = this.getMonoliths();
+        if (monoliths.isEmpty()) return 0;
+        int count = 0;
+        for (ChesedMonolith monolith : monoliths){
+            if (!monolith.isDeactivated()){
+                count++;
+            }
+        }
+        return count;
+    }
+
+    public List<LivingEntity> getAffectedEntities(boolean includeCreativeAndSpectator){
+        float radius = this.enrageRadius();
+        List<LivingEntity> combatants = level().getEntitiesOfClass(LivingEntity.class,new AABB(-radius,-2,-radius,radius,40,radius).move(this.position()),(entity)->{
+
+            if (entity instanceof ChesedBossBuddy) return false;
+
+            boolean result = entity.position().multiply(1,0,1).distanceTo(this.position().multiply(1,0,1)) <= radius;
+
+            if (entity instanceof Player player){
+                result = result && (includeCreativeAndSpectator || (!player.isCreative() && !player.isSpectator()));
+            }
+
+            return result;
+        });
+        return combatants;
+    }
 
     public List<Player> getCombatants(boolean includeCreativeAndSpectator){
         float radius = this.enrageRadius();
@@ -498,6 +535,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             int chargeTime = chargeEndTime - chargeStartTime;
 
             if (instance.tick == 0){
+                this.setMonolithsImmunity(true);
                 this.setMonolithDrainPercent(0);
                 this.getSystem().startAnimation("BOOM", AnimationTicker.builder(CHESED_BOOM_ATTACK)
                                 .setToNullTransitionTime(0)
@@ -522,6 +560,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             int damageAndEffectsStart = 60;
 
             if (instance.tick == 0) {
+                this.setMonolithsImmunity(true);
                 this.killCrystals();
                 this.darkenCombatants(80, false);
 
@@ -567,6 +606,21 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                         .outTime(50)
                         .build(), this.position(), 60);
 
+
+                int aliveMonoliths = this.getAliveMonolithsCount();
+                if (aliveMonoliths != 0){
+
+                    float damagePercent = BossConfigs.BOSS_CONFIG.get().chesedConfig.finalAttackDamagePercentPerMonolith;
+
+                    var affectedEntities = this.getAffectedEntities(false);
+
+                    DamageSource source = BossDamageSources.chesedAttack(this);
+
+                    for (LivingEntity livingEntity : affectedEntities){
+                        livingEntity.hurt(source, livingEntity.getMaxHealth() * damagePercent);
+                    }
+
+                }
             } else if (instance.tick == damageAndEffectsStart + 1) {
                 this.setMonolithDrainPercent(0);
                 this.darkenCombatants(0, true);
@@ -578,6 +632,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         }else if (instance.stage == 2){
             if (instance.tick > 100){
                 this.summonOrReviveMonoliths();
+                this.setMonolithsImmunity(false);
                 return true;
             }
             return false;
@@ -646,7 +701,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                         .yRot(randomRot)
                         .add(0, verticalSpeed, 0);
 
-                ChesedFallingBlock block = ChesedFallingBlock.summon(level(), state, pos);
+                ChesedFallingBlock block = ChesedFallingBlock.summon(level(), state, pos,0);
                 block.setDeltaMovement(speed);
 
 
@@ -873,7 +928,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     add.x * rd * 2,
                     add.y * rd,
                     add.z * rd * 2
-            ).normalize().multiply(0.5,2.4 - rd,0.5));
+            ).normalize().multiply(0.5,2.4 - rd,0.5),0);
 
             float rnd = random.nextFloat() * 0.05f;
 
@@ -898,6 +953,10 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             return !(entity instanceof ChesedBossBuddy);
         });
 
+        DamageSource source = BossDamageSources.chesedAttack(this);
+
+        float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.rayDamage;
+
         for (Entity entity : list){
             if (entity instanceof LivingEntity living){
                 boolean shouldHit = true;
@@ -918,7 +977,10 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     }
                 }
                 if (shouldHit){
-                    living.hurt(level().damageSources().magic(), 2);
+
+
+                    living.hurt(source, damage);
+
                 }
             }
         }
@@ -1024,7 +1086,10 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         ProjectileMovementPath path = new ProjectileMovementPath(time,false)
                 .addPos(sppos)
                 .addPos(endPos);
-        ChesedElectricSphereEntity sphereEntity = ChesedElectricSphereEntity.summon(level(),10,path);
+
+        float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.electricSphereDamage;
+
+        ChesedElectricSphereEntity sphereEntity = ChesedElectricSphereEntity.summon(level(),damage,path);
     }
 
 
@@ -1102,12 +1167,13 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                 int count = 10 + random.nextInt(10);
                 float angle = FDMathUtil.FPI * 2 / count;
 
+
                 for (int i = 0; i < count;i++) {
 
 
                     BlockState state = random.nextFloat() > 0.5f ? Blocks.DEEPSLATE.defaultBlockState() : Blocks.SCULK.defaultBlockState();
 
-                    ChesedFallingBlock block = ChesedFallingBlock.summon(level(), state, this.position().add(0, height, 0));
+                    ChesedFallingBlock block = ChesedFallingBlock.summon(level(), state, this.position().add(0, height, 0),0);
 
                     Vec3 v = new Vec3(random.nextFloat() * 0.025 + 0.2,0,0).yRot(angle * i + (random.nextFloat() * 2 - 1) * angle);
 
@@ -1180,6 +1246,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
     }
 
     private void summonStonesAround(int count, int rad, Vec3 center, boolean useEasing, boolean reverseEasing, Function<Float,Float> func){
+
+        float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRockDamage;
+
         for (int i = 0; i < count;i++){
 
             float rnd = random.nextFloat();
@@ -1203,7 +1272,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                 state = Blocks.BLACKSTONE.defaultBlockState();
             }
 
-            ChesedFallingBlock.summon(level(), state,p);
+            ChesedFallingBlock.summon(level(), state,p,damage);
         }
     }
 

@@ -20,6 +20,7 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
     @SerializableField
     private boolean deactivated = false;
 
+    @SerializableField
     private boolean immuneToAttacks = false;
 
     public ChesedMonolith(EntityType<? extends LivingEntity> type, Level level) {

@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOption
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
@@ -12,6 +13,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.Animatio
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -110,12 +112,15 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
 
     private void explode(){
         var list = level().getEntitiesOfClass(LivingEntity.class,this.getBoundingBox().inflate(0.2,0.2,0.2),living->{
-            return !(living instanceof ChesedElectricSphereEntity) && !(living instanceof ChesedEntity);
+            if (living instanceof ChesedBossBuddy) return false;
+            return true;
         });
+
+        DamageSource source = BossDamageSources.electricSphere(this);
 
         for (LivingEntity entity : list){
 
-            //TODO: damage
+            entity.hurt(source,damage);
 
         }
 
