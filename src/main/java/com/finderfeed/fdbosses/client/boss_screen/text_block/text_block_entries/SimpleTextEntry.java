@@ -4,7 +4,7 @@ import com.finderfeed.fdbosses.client.boss_screen.TEstScreen;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlock;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockCursor;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockEntry;
-import com.finderfeed.fdbosses.client.boss_screen.text_block.interactions.Interaction;
+import com.finderfeed.fdbosses.client.boss_screen.text_block.interactions.TextBlockEntryInteraction;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.interactions.InteractionBox;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
@@ -22,15 +22,15 @@ public class SimpleTextEntry implements TextBlockEntry {
 
     private Component component;
     private float textScale;
-    private Interaction interaction;
+    private TextBlockEntryInteraction interaction;
 
-    public SimpleTextEntry(Component component, float textScale, Interaction interaction){
+    public SimpleTextEntry(Component component, float textScale, TextBlockEntryInteraction interaction){
         this.component = component;
         this.textScale = textScale;
         this.interaction = interaction;
     }
     public SimpleTextEntry(Component component, float textScale){
-        this(component,textScale,Interaction.empty());
+        this(component,textScale, TextBlockEntryInteraction.empty());
     }
 
     @Override
@@ -68,12 +68,16 @@ public class SimpleTextEntry implements TextBlockEntry {
 
     private void renderNormalText(FormattedText text,GuiGraphics graphics, TextBlock textBlock, TextBlockCursor cursor,float scale){
         Font font = Minecraft.getInstance().font;
+
+        float lineHeight = font.lineHeight * textScale;
+
         List<FormattedCharSequence> sequences = font.split(text,Math.round(textBlock.width / scale));
         for (FormattedCharSequence sequence : sequences){
             FDRenderUtil.renderScaledText(graphics, sequence,cursor.x,cursor.y,textScale,true,0xffffff);
-            cursor.nextLine(font.lineHeight * textScale);
+            textBlock.addInteractionBox(new InteractionBox(cursor.x,cursor.y,font.width(sequence) * textScale,lineHeight,interaction));
+            cursor.nextLine(lineHeight);
         }
-        cursor.nextLine(-font.lineHeight * textScale);
+        cursor.nextLine(-lineHeight);
         cursor.addX(font.width(sequences.getLast()) * scale);
     }
 }

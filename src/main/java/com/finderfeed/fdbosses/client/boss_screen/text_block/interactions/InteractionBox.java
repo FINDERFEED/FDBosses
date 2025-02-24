@@ -9,9 +9,9 @@ public class InteractionBox {
     public float width;
     public float height;
 
-    public Interaction interaction;
+    public TextBlockEntryInteraction interaction;
 
-    public InteractionBox(float x, float y, float width, float height, Interaction interaction) {
+    public InteractionBox(float x, float y, float width, float height, TextBlockEntryInteraction interaction) {
         this.x = x;
         this.y = y;
         this.width = width;
