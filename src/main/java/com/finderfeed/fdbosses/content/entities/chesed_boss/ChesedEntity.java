@@ -202,7 +202,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     .time(1)
                     .stopMode(CutsceneData.StopMode.UNSTOPPABLE);
 
-            FDLibCalls.startCutsceneForPlayers(serverLevel,pos,40,cutsceneData);
+//            FDLibCalls.startCutsceneForPlayers(serverLevel,pos,40,cutsceneData);
         }
 
     }

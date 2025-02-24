@@ -1,36 +1,37 @@
 package com.finderfeed.fdbosses.config;
 
-import com.finderfeed.fdlib.systems.config.ReflectiveSerializable;
-import com.mojang.serialization.Codec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
+import com.finderfeed.fdlib.systems.config.ConfigValue;
 
-public class ChesedConfig implements ReflectiveSerializable<ChesedConfig> {
+public class ChesedConfig  {
 
-
+    @ConfigValue
     public float electricSphereDamage = 10f;
 
+    @ConfigValue
     public float rockfallRayDamage = 10f;
 
+    @ConfigValue
     public float rockfallRockDamage = 5f;
 
+    @ConfigValue
     public float earthquakeRayDamage = 5f;
 
+    @ConfigValue
     public float eartquakeDamage = 5f;
 
+    @ConfigValue
     public float rollAttackDamage = 10f;
 
+    @ConfigValue
     public float blockAttackDamage = 10;
 
+    @ConfigValue
     public float rayDamage = 10;
 
+    @ConfigValue
     public boolean finalAttackHeals = true;
 
+    @ConfigValue
     public float finalAttackDamagePercentPerMonolith = 0.25f;
 
-
-
-    @Override
-    public Codec<ChesedConfig> reflectiveCodec() {
-        return null;
-    }
 }
