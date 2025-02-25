@@ -146,7 +146,7 @@ public class TEstScreen extends Screen {
     public static void key(InputEvent.Key event){
         if (Minecraft.getInstance().level == null) return;
         if (event.getKey() == GLFW.GLFW_KEY_M){
-            Minecraft.getInstance().setScreen(new TEstScreen());
+//            Minecraft.getInstance().setScreen(new TEstScreen());
         }
     }
 }
