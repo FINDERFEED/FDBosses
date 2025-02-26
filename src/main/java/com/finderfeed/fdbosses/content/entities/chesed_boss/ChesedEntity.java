@@ -164,24 +164,24 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     .registerAttack(ROCKFALL_ATTACK,this::rockfallAttack) // 1
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .attackListener(this::attackListener)
-                    .addAttack(0, ray)
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack("esphere")
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack("rockfall")
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack("equake")
-                            .setNextAttack(rayOrBlocks)
-                            .build())
+//                    .addAttack(0, ray)
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack("esphere")
+////                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack("rockfall")
+////                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack("equake")
+////                            .setNextAttack(rayOrBlocks)
+//                            .build())
                     .addAttack(4,AttackOptions.builder()
                             .addAttack("roll")
-                            .setNextAttack(rayOrBlocks)
+//                            .setNextAttack(rayOrBlocks)
                             .build())
-                    .addAttack(5,"final")
+//                    .addAttack(5,"final")
             ;
 
         }
@@ -225,8 +225,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         drainPercentOld = this.getMonolithDrainPercent();
         super.tick();
         AnimationSystem system = this.getSystem();
-        system.setVariable("variable.radius",600);
-        system.setVariable("variable.angle",270);
+        system.setVariable("variable.radius",580);
+        system.setVariable("variable.angle",270 + 90);
+        //270
         if (!this.level().isClientSide){
             this.bossBar.setPercentage(this.getRemainingHits() / (float) this.getBossMaxHits());
 
@@ -762,7 +763,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
 
 
-            Vector3f between = new Vector3f(37, 0, 0).rotateY(FDMathUtil.FPI / 4 + FDMathUtil.FPI / 2 * i + (random.nextFloat() * 2 - 1) * FDMathUtil.FPI / 5f);
+            Vector3f between = new Vector3f(36, 0, 0).rotateY(FDMathUtil.FPI / 4 + FDMathUtil.FPI / 2 * i + (random.nextFloat() * 2 - 1) * FDMathUtil.FPI / 5f);
             Vector3f summonPos = pos.add(between, new Vector3f());
             Vector3f normalized = between.normalize(new Vector3f());
 
@@ -920,7 +921,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
         for (int i = 0; i < count;i++){
 
-            BlockState state = random.nextFloat() > 0.5 ? Blocks.DEEPSLATE.defaultBlockState() : Blocks.SCULK.defaultBlockState();
+            BlockState state = random.nextFloat() > 0.5 ? Blocks.BLACKSTONE.defaultBlockState() : Blocks.SCULK.defaultBlockState();
 
             Vector3f add = v.rotateAxis(FDMathUtil.FPI * 2 * random.nextFloat(),(float)direction.x,(float)direction.y,(float)direction.z,new Vector3f());
             float rd = random.nextFloat() * 0.5f;
@@ -1280,7 +1281,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
     public boolean earthquakeAttack(AttackInstance instance){
         lookingAtTarget = false;
         int t = instance.tick;
-        int radius = 40;
+        int radius = 38;
         if (instance.stage <= 4) {
 
             if (t < 6) {
@@ -1321,7 +1322,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
                     this.summonVerticalRayAttacksRadial(random.nextFloat() * FDMathUtil.FPI * 2,
                             FDMathUtil.FPI * (random.nextFloat() > 0.5 ? 1 : -1),
-                            radius + 5,
+                            radius + 2,
                             1,
                             90 - (this.isBelowHalfHP() ? 10 : 0),
                             count);
@@ -1785,11 +1786,18 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     (int)l1.z
             );
 
-            EarthShatterEntity.summon(level(),mainpos, settingsMain);
+            int tries = 0;
 
-            EarthShatterEntity.summon(level(),lpos, settingsLeft);
+            while (EarthShatterEntity.summon(level(),mainpos.below(tries), settingsMain) == null && tries++ < 5);
 
-            EarthShatterEntity.summon(level(),rpos, settingsRight);
+            tries = 0;
+
+            while (EarthShatterEntity.summon(level(),lpos.below(tries), settingsLeft) == null && tries++ < 5);
+
+            tries = 0;
+
+            while (EarthShatterEntity.summon(level(),rpos.below(tries), settingsRight) == null && tries++ < 5);
+
 
         }
 
