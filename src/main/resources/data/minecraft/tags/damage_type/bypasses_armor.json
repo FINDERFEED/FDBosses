@@ -2,7 +2,11 @@
   "values": [
     "fdbosses:chesed_attack",
     "fdbosses:electric_sphere",
-    "fdbosses:chesed_falling_block"
+    "fdbosses:chesed_falling_block",
+    "fdbosses:chesed_vertical_ray",
+    "fdbosses:chesed_earthquake",
+    "fdbosses:chesed_roll_attack",
+    "fdbosses:chesed_rock_attack"
 
   ],
   "replace": false

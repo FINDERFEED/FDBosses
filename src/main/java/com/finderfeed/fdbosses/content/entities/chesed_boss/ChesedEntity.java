@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.chesed_boss;
 
 import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
@@ -618,6 +619,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     DamageSource source = BossDamageSources.chesedAttack(this);
 
                     for (LivingEntity livingEntity : affectedEntities){
+                        livingEntity.invulnerableTime = 0;
                         livingEntity.hurt(source, livingEntity.getMaxHealth() * damagePercent);
                     }
 
@@ -1216,8 +1218,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
 
             if (tick % (this.isBelowHalfHP() ? 20 : 40) == 0){
-                this.summonDelayedVerticalRayOnFieldNearPlayers(4);
-                this.summonDelayedVerticalRayOnFieldNearPlayers(4);
+                this.summonDelayedVerticalRayOnFieldNearPlayers(4,this.isBelowHalfHP() ? 3 : 2);
             }
 
             this.summonStonesAround(4,rad, this.position().add(0,height,0),true,false,FDEasings::easeOut);
@@ -1323,7 +1324,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     this.summonVerticalRayAttacksRadial(random.nextFloat() * FDMathUtil.FPI * 2,
                             FDMathUtil.FPI * (random.nextFloat() > 0.5 ? 1 : -1),
                             radius + 2,
-                            1,
+                            BossConfigs.BOSS_CONFIG.get().chesedConfig.earthquakeRayDamage,
                             90 - (this.isBelowHalfHP() ? 10 : 0),
                             count);
 
@@ -1367,7 +1368,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
     }
 
     private void summonRadialEarthquake(int radius,boolean doSonicParticles){
-        RadialEarthquakeEntity radialEarthquakeEntity = RadialEarthquakeEntity.summon(level(),this.getOnPos(),1,radius,1f,10f);
+        RadialEarthquakeEntity radialEarthquakeEntity = RadialEarthquakeEntity.summon(level(),this.getOnPos(),1,radius,1f,
+                BossConfigs.BOSS_CONFIG.get().chesedConfig.eartquakeDamage
+        );
         if (doSonicParticles) {
             for (int i = 0; i < 6; i++) {
                 SonicParticleOptions options = SonicParticleOptions.builder()
@@ -1498,6 +1501,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             var next = this.createRotationPath(angle, height,height, 30, blocksCycleTime, true);
 
             path.setNext(next);
+            projectile.setDamage(BossConfigs.BOSS_CONFIG.get().chesedConfig.blockAttackDamage);
             projectile.noPhysics = true;
             projectile.setPos(path.getPositions().getFirst());
             projectile.movementPath = path;
@@ -1623,7 +1627,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                         ChesedFireTrailEntity fireTrailEntity = ChesedFireTrailEntity.summon(level(), pos.add(0, -0.5, 0).add(b.normalize().multiply(i,i,i)), 2, 80);
                     }
                 }
-                this.handleRollEarthShatters(tick, pos);
+                this.handleRoll(tick, pos);
             }
         }else if (stage == 2){
             doBlinding = true;
@@ -1651,7 +1655,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         return false;
     }
 
-    private void handleRollEarthShatters(int attackTime,Vec3 pos){
+    private void handleRoll(int attackTime, Vec3 pos){
         if (attackTime == 0){
             this.oldRollPos = this.position();
         }
@@ -1678,8 +1682,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             return entity instanceof LivingEntity living && !(entity instanceof ChesedBossBuddy);
         });
 
-        //TODO: damage
-        float damage = 10;
+        float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.rollAttackDamage;
 
         for (Entity entity : entities){
             LivingEntity livingEntity = (LivingEntity) entity;
@@ -1687,6 +1690,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     .normalize()
                     .multiply(3,0,3)
                     .add(0,1.5,0);
+            livingEntity.hurt(BossDamageSources.CHESED_ROLL_SOURCE,damage);
             if (livingEntity instanceof Player player){
                 FDLibCalls.setServerPlayerSpeed((ServerPlayer) player,pushDirection);
             }else{
@@ -1944,18 +1948,25 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         return v >= (1 - accuracy);
     }
 
-    private void summonDelayedVerticalRayOnFieldNearPlayers(float radius){
+    private void summonDelayedVerticalRayOnFieldNearPlayers(float radius, int count){
+
+
+        float angle = FDMathUtil.FPI * 2 / count;
 
         for (Player player : this.getCombatants(false)) {
 
             float r = random.nextFloat();
 
-            Vec3 pos = player.position()
-                    .add(
-                            new Vec3(radius * r,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat())
-                    );
+            Vec3 pos = new Vec3(radius * r,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat());
 
-            ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(), pos, 1, 40, 30);
+            for (int i = 0; i < count;i++){
+
+                Vec3 resultingPos = pos.yRot(angle * i).add(player.position());
+
+                ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(), resultingPos,
+                        BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRayDamage, 40, 30);
+
+            }
 
         }
     }

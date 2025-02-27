@@ -20,7 +20,7 @@ public class ChesedConfig  {
     public float eartquakeDamage = 5f;
 
     @ConfigValue
-    public float rollAttackDamage = 10f;
+    public float rollAttackDamage = 8f;
 
     @ConfigValue
     public float blockAttackDamage = 10;

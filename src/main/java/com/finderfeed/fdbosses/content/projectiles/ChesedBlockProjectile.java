@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.flying_block_entity.FlyingBlockEntity;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
@@ -209,7 +210,7 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
 
             double dot = b.dot(movement);
             if (dot > 0.85) {
-                entity.hurt(level().damageSources().magic(),damage);
+                entity.hurt(BossDamageSources.CHESED_BLOCK_ATTACK_SOURCE,damage);
                 entity.invulnerableTime = 0;
             }
         }

@@ -19,11 +19,19 @@ public class BossDamageSources {
     public static final ResourceKey<DamageType> CHESED_ATTACK = key("chesed_attack");
     public static final ResourceKey<DamageType> CHESED_ELECTRIC_SPHERE = key("electric_sphere");
     public static final ResourceKey<DamageType> CHESED_FALLING_BLOCK = key("chesed_falling_block");
+    public static final ResourceKey<DamageType> CHESED_VERTICAL_RAY = key("chesed_vertical_ray");
+    public static final ResourceKey<DamageType> CHESED_EARTHQUAKE = key("chesed_earthquake");
+    public static final ResourceKey<DamageType> CHESED_ROLL = key("chesed_roll_attack");
+    public static final ResourceKey<DamageType> CHESED_BLOCK_ATTACK = key("chesed_rock_attack");
 
 
     private static EntityDamageSource CHESED_ATTACK_SOURCE;
     private static EntityDamageSource CHESED_ELECTRIC_SPHERE_SOURCE;
     public static DamageSource CHESED_FALLING_BLOCK_SOURCE;
+    public static DamageSource CHESED_VERTICAL_RAY_SOURCE;
+    public static DamageSource CHESED_EARTHQUAKE_SOURCE;
+    public static DamageSource CHESED_ROLL_SOURCE;
+    public static DamageSource CHESED_BLOCK_ATTACK_SOURCE;
 
     public static DamageSource chesedAttack(Entity attacker){
         return CHESED_ATTACK_SOURCE.create(attacker);
@@ -40,6 +48,10 @@ public class BossDamageSources {
         CHESED_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_ATTACK));
         CHESED_ELECTRIC_SPHERE_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_ELECTRIC_SPHERE));
         CHESED_FALLING_BLOCK_SOURCE = new DamageSource(access.holderOrThrow(CHESED_FALLING_BLOCK));
+        CHESED_VERTICAL_RAY_SOURCE = new DamageSource(access.holderOrThrow(CHESED_VERTICAL_RAY));
+        CHESED_EARTHQUAKE_SOURCE = new DamageSource(access.holderOrThrow(CHESED_EARTHQUAKE));
+        CHESED_ROLL_SOURCE = new DamageSource(access.holderOrThrow(CHESED_ROLL));
+        CHESED_BLOCK_ATTACK_SOURCE = new DamageSource(access.holderOrThrow(CHESED_BLOCK_ATTACK));
     }
 
 

@@ -1,8 +1,10 @@
 package com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake;
 
 import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
@@ -13,8 +15,13 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.List;
+import java.util.function.Predicate;
 
 public class RadialEarthquakeEntity extends Entity implements AutoSerializable {
 
@@ -70,7 +77,19 @@ public class RadialEarthquakeEntity extends Entity implements AutoSerializable {
 
     public void spawnAndDamageWithRadius(int rad){
 
-        //todo damage
+        AABB box = new AABB(-rad,-rad,-rad,rad,rad,rad).move(this.position());
+
+        Predicate<LivingEntity> predicate = (entity)->{
+            return !(entity instanceof ChesedBossBuddy);
+        };
+
+        List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, box, predicate);
+
+        for (LivingEntity entity : entities){
+            entity.hurt(BossDamageSources.CHESED_EARTHQUAKE_SOURCE,this.damage);
+        }
+
+
         Vec3 b = new Vec3(rad,0,0);
         float angle;
         if (rad != 0){
