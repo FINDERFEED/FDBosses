@@ -26,7 +26,7 @@ public class BossDamageSources {
 
 
     private static EntityDamageSource CHESED_ATTACK_SOURCE;
-    private static EntityDamageSource CHESED_ELECTRIC_SPHERE_SOURCE;
+    public static DamageSource CHESED_ELECTRIC_SPHERE_SOURCE;
     public static DamageSource CHESED_FALLING_BLOCK_SOURCE;
     public static DamageSource CHESED_VERTICAL_RAY_SOURCE;
     public static DamageSource CHESED_EARTHQUAKE_SOURCE;
@@ -37,16 +37,12 @@ public class BossDamageSources {
         return CHESED_ATTACK_SOURCE.create(attacker);
     }
 
-    public static DamageSource electricSphere(Entity attacker){
-        return CHESED_ELECTRIC_SPHERE_SOURCE.create(attacker);
-    }
-
     @SubscribeEvent
     public static void registerDamageTypes(ServerStartedEvent event){
         RegistryAccess access = event.getServer().registryAccess();
 
         CHESED_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_ATTACK));
-        CHESED_ELECTRIC_SPHERE_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_ELECTRIC_SPHERE));
+        CHESED_ELECTRIC_SPHERE_SOURCE = new DamageSource(access.holderOrThrow(CHESED_ELECTRIC_SPHERE));
         CHESED_FALLING_BLOCK_SOURCE = new DamageSource(access.holderOrThrow(CHESED_FALLING_BLOCK));
         CHESED_VERTICAL_RAY_SOURCE = new DamageSource(access.holderOrThrow(CHESED_VERTICAL_RAY));
         CHESED_EARTHQUAKE_SOURCE = new DamageSource(access.holderOrThrow(CHESED_EARTHQUAKE));

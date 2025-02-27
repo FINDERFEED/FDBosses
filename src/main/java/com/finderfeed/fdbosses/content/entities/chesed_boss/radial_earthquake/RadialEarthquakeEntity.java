@@ -77,10 +77,15 @@ public class RadialEarthquakeEntity extends Entity implements AutoSerializable {
 
     public void spawnAndDamageWithRadius(int rad){
 
-        AABB box = new AABB(-rad,-rad,-rad,rad,rad,rad).move(this.position());
+        AABB box = new AABB(-rad,-0.1,-rad,rad,1,rad).move(this.position());
 
         Predicate<LivingEntity> predicate = (entity)->{
-            return !(entity instanceof ChesedBossBuddy);
+
+            double dist = entity.position().multiply(1,0,1)
+                    .distanceTo(this.position().multiply(1,0,1));
+
+
+            return !(entity instanceof ChesedBossBuddy) && Math.abs(dist - rad) <= 1.5;
         };
 
         List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, box, predicate);

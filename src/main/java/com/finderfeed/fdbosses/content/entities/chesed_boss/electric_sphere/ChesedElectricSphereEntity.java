@@ -116,7 +116,7 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
             return true;
         });
 
-        DamageSource source = BossDamageSources.electricSphere(this);
+        DamageSource source = BossDamageSources.CHESED_ELECTRIC_SPHERE_SOURCE;
 
         for (LivingEntity entity : list){
 

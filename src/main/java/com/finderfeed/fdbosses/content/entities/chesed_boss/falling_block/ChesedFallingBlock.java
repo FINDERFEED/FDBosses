@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block;
 
+import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
@@ -69,7 +70,7 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
         if (!level().isClientSide){
             float rd = 1.5f;
             AABB box = new AABB(-rd,-rd,-rd,rd,rd,rd).move(pos);
-            for (LivingEntity entity : level().getEntitiesOfClass(LivingEntity.class,box,pr->{return !(pr instanceof ChesedEntity);})){
+            for (LivingEntity entity : level().getEntitiesOfClass(LivingEntity.class,box,pr->{return !(pr instanceof ChesedBossBuddy);})){
 
                 if (damage != 0) {
                     entity.hurt(BossDamageSources.CHESED_FALLING_BLOCK_SOURCE, damage);

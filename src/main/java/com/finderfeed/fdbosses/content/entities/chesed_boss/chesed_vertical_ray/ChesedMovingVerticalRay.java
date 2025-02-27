@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_vertical_ray
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossBuddy;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
@@ -132,7 +133,7 @@ public class ChesedMovingVerticalRay extends LivingEntity implements AutoSeriali
 
             if (entity instanceof ChesedBossBuddy) continue;
 
-            entity.hurt(level().damageSources().magic(),this.getDamage());
+            entity.hurt(BossDamageSources.CHESED_VERTICAL_RAY_SOURCE,this.getDamage());
 
         }
 
