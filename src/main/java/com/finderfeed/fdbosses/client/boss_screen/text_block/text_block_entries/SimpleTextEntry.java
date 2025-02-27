@@ -9,14 +9,18 @@ import com.finderfeed.fdbosses.client.boss_screen.text_block.interactions.Intera
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class SimpleTextEntry implements TextBlockEntry {
 
@@ -44,7 +48,7 @@ public class SimpleTextEntry implements TextBlockEntry {
         int remainingWidth = (int) cursor.remainingWidth(textBlock.getBorderX());
 
         if (remainingWidth > 0) {
-            Pair<FormattedText, FormattedText> texts = TEstScreen.splitOneTime(component, Math.round(remainingWidth / textScale));
+            Pair<FormattedText, FormattedText> texts = splitOneTime(component, Math.round(remainingWidth / textScale));
             FormattedText first = texts.first;
 
             FDRenderUtil.renderScaledText(graphics, Language.getInstance().getVisualOrder(first),cursor.x,cursor.y,textScale,true,0xffffff);
@@ -79,5 +83,75 @@ public class SimpleTextEntry implements TextBlockEntry {
         }
         cursor.nextLine(-lineHeight);
         cursor.addX(font.width(sequences.getLast()) * scale);
+    }
+
+    public static Pair<FormattedText,FormattedText> splitOneTime(FormattedText text, int pixels){
+
+        StringSplitter splitter = Minecraft.getInstance().font.getSplitter();
+
+        String str = text.getString();
+
+        int lineBreak = splitter.findLineBreak(str,pixels, Style.EMPTY);
+
+        if (lineBreak >= str.length()){
+            return new Pair<>(text,null);
+        }
+
+        List<Pair<Style, String>> styleString = new ArrayList<>();
+
+        text.visit((string, style) -> {
+            styleString.add(new Pair<>(string, style));
+            return Optional.empty();
+        }, Style.EMPTY);
+
+        int currentIndex = 0;
+
+        FormattedText before = FormattedText.EMPTY;
+        FormattedText after = FormattedText.EMPTY;
+        boolean wasSplit = false;
+        boolean shouldDeleteSpace = false;
+
+        for (var pair : styleString) {
+
+            Style style = pair.first;
+            String s = pair.second;
+
+            int stringLength = s.length();
+
+            if (wasSplit) {
+                if (shouldDeleteSpace) {
+                    if (s.charAt(0) == ' ' || s.charAt(0) == '\n') {
+                        s = s.substring(1);
+                    }
+                    shouldDeleteSpace = false;
+                }
+                after = FormattedText.composite(after, FormattedText.of(s, style));
+            } else {
+                if (stringLength + currentIndex < lineBreak) {
+                    currentIndex += stringLength;
+                    before = FormattedText.composite(before, FormattedText.of(s, style));
+                } else {
+
+                    int substrlength = lineBreak - currentIndex;
+
+                    String first = s.substring(0, substrlength);
+                    String second = s.substring(substrlength);
+
+                    before = FormattedText.composite(before, FormattedText.of(first, style));
+
+                    if (!second.isEmpty()) {
+                        if (second.charAt(0) == ' ' || second.charAt(0) == '\n') {
+                            second = second.substring(1);
+                        }
+                        after = FormattedText.composite(after, FormattedText.of(second, style));
+                    }else{
+                        shouldDeleteSpace = true;
+                    }
+                    wasSplit = true;
+                }
+            }
+        }
+
+        return new Pair<>(before,after);
     }
 }

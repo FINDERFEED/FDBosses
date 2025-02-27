@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class TEstScreen extends Screen {
     public TEstScreen() {
         super(Component.empty());
@@ -69,75 +68,7 @@ public class TEstScreen extends Screen {
         return false;
     }
 
-    public static Pair<FormattedText,FormattedText> splitOneTime(FormattedText text, int pixels){
 
-        StringSplitter splitter = Minecraft.getInstance().font.getSplitter();
-
-        String str = text.getString();
-
-        int lineBreak = splitter.findLineBreak(str,pixels, Style.EMPTY);
-
-        if (lineBreak >= str.length()){
-            return new Pair<>(text,null);
-        }
-
-        List<Pair<Style, String>> styleString = new ArrayList<>();
-
-        text.visit((string, style) -> {
-            styleString.add(new Pair<>(string, style));
-            return Optional.empty();
-        }, Style.EMPTY);
-
-        int currentIndex = 0;
-
-        FormattedText before = FormattedText.EMPTY;
-        FormattedText after = FormattedText.EMPTY;
-        boolean wasSplit = false;
-        boolean shouldDeleteSpace = false;
-
-        for (var pair : styleString) {
-
-            Style style = pair.first;
-            String s = pair.second;
-
-            int stringLength = s.length();
-
-            if (wasSplit) {
-                if (shouldDeleteSpace) {
-                    if (s.charAt(0) == ' ' || s.charAt(0) == '\n') {
-                        s = s.substring(1);
-                    }
-                    shouldDeleteSpace = false;
-                }
-                after = FormattedText.composite(after, FormattedText.of(s, style));
-            } else {
-                if (stringLength + currentIndex < lineBreak) {
-                    currentIndex += stringLength;
-                    before = FormattedText.composite(before, FormattedText.of(s, style));
-                } else {
-
-                    int substrlength = lineBreak - currentIndex;
-
-                    String first = s.substring(0, substrlength);
-                    String second = s.substring(substrlength);
-
-                    before = FormattedText.composite(before, FormattedText.of(first, style));
-
-                    if (!second.isEmpty()) {
-                        if (second.charAt(0) == ' ' || second.charAt(0) == '\n') {
-                            second = second.substring(1);
-                        }
-                        after = FormattedText.composite(after, FormattedText.of(second, style));
-                    }else{
-                        shouldDeleteSpace = true;
-                    }
-                    wasSplit = true;
-                }
-            }
-        }
-
-        return new Pair<>(before,after);
-    }
 
 
 
