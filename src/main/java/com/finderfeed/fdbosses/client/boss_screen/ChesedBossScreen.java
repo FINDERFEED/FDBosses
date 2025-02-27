@@ -116,9 +116,8 @@ public class ChesedBossScreen extends Screen {
         matrices.pushPose();
 
 
-        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS,DefaultVertexFormat.NEW_ENTITY);
 
-        float time = (int)(System.currentTimeMillis() % Integer.MAX_VALUE) / 50f + pticks;
+        VertexConsumer builder = Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")));
 
         matrices.translate(relX + 100,relY + 100,0);
 
@@ -126,21 +125,14 @@ public class ChesedBossScreen extends Screen {
 
         matrices.scale(-30f,-30f,-30f);
 
+        Lighting.setupForEntityInInventory();
+
         animationSystem.applyAnimations(chesed,pticks);
         chesed.render(matrices,builder,LightTexture.FULL_BRIGHT,OverlayTexture.NO_OVERLAY,1f,1f,1f,1f);
 
-        Lighting.setupForEntityInInventory();
-
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.enableDepthTest();
-        RenderSystem.setShader(GameRenderer::getPositionColorTexLightmapShader);
 
 
-        RenderSystem.setShaderColor(1f,1f,1f,1f);
-        FDRenderUtil.bindTexture(FDBosses.location("textures/entities/chesed.png"));
-
-
-        BufferUploader.drawWithShader(builder.build());
+        Minecraft.getInstance().renderBuffers().bufferSource().endLastBatch();
 
 
         Lighting.setupFor3DItems();
