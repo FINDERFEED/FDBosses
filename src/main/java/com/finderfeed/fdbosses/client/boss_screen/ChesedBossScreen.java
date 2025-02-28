@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.client.boss_screen;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.BossRenderUtil;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossModels;
@@ -9,6 +10,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.Animatio
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.ClientsideEntityAnimationSystem;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.EntityAnimationSystem;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.platform.Window;
@@ -28,14 +30,13 @@ import net.minecraft.world.level.block.RenderShape;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
+import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class ChesedBossScreen extends Screen {
-
-    private ChesedEntity chesedEntity;
 
     private static FDModel chesed;
 
@@ -103,45 +104,52 @@ public class ChesedBossScreen extends Screen {
 
         PoseStack matrices = graphics.pose();
 
-//        FDRenderUtil.fill(matrices,relX,relY,this.getScreenWidth(),this.getScreenHeight(),0,0,0,1f);
+        var anchor = this.getAnchor(0.5f,0);
+        var w = this.getDownRightAnchor().sub(anchor);
+        float offs = 5;
 
-        float offs = 3;
-
-//        FDRenderUtil.fill(matrices, relX + offs, relY + offs,this.getScreenWidth() / 2 - offs,this.getScreenHeight() / 2 - offs * 1.5f,1f,0f,0f,1f);
-//        FDRenderUtil.fill(matrices, relX + offs, relY  + this.getScreenHeight() / 2f + 0.5f * offs,this.getScreenWidth() / 2 - offs,this.getScreenHeight() / 2 - offs * 1.5f,0f,0f,1f,1f);
-
+        FDRenderUtil.fill(matrices,anchor.x + offs,anchor.y + offs,w.x - offs * 2,w.y - offs * 2,1,1,1,1f);
 
 
-
-        matrices.pushPose();
-
-
-
-        VertexConsumer builder = Minecraft.getInstance().renderBuffers().bufferSource().getBuffer(RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")));
-
-        matrices.translate(relX + 100,relY + 100,0);
-
-        matrices.mulPose(Axis.YN.rotationDegrees(160));
-
-        matrices.scale(-30f,-30f,-30f);
-
-        Lighting.setupForEntityInInventory();
-
-        animationSystem.applyAnimations(chesed,pticks);
-        chesed.render(matrices,builder,LightTexture.FULL_BRIGHT,OverlayTexture.NO_OVERLAY,1f,1f,1f,1f);
-
-
-
-        Minecraft.getInstance().renderBuffers().bufferSource().endLastBatch();
-
-
-        Lighting.setupFor3DItems();
-
-        matrices.popPose();
-
-
+        this.renderBoss(graphics, mx, my, pticks);
     }
 
+    protected void renderBoss(GuiGraphics graphics,float mx,float my,float pticks){
+        PoseStack matrices = graphics.pose();
+
+        this.animationSystem.applyAnimations(chesed,pticks);
+
+        var anchor = this.getAnchor(0.25f,0.5f);
+
+        float offsetX = 0;
+        float offsetY = 100;
+
+        BossRenderUtil.renderFDModelInScreen(matrices,chesed,anchor.x + offsetX,anchor.y + offsetY,
+                0, FDMathUtil.FPI + FDMathUtil.FPI / 8,0,50);
+    }
+
+    public Vector2f getAnchor(float wMod,float hMod){
+        Window window = Minecraft.getInstance().getWindow();
+        float height = window.getGuiScaledHeight();
+        float width = window.getGuiScaledWidth();
+        return new Vector2f(width * wMod,height * hMod);
+    }
+
+    public Vector2f getCenterAnchor(){
+        return this.getAnchor(0.5f,0.5f);
+    }
+
+    public Vector2f getUpRightAnchor(){
+        return this.getAnchor(1,0);
+    }
+
+    public Vector2f getDownRightAnchor(){
+        return this.getAnchor(1,1);
+    }
+
+    public Vector2f getDownLeftAnchor(){
+        return this.getAnchor(0,1);
+    }
 
     public float getScreenWidth(){
         return 300;
