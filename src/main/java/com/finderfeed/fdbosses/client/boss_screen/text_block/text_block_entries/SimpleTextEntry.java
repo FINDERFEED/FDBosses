@@ -1,6 +1,5 @@
 package com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_entries;
 
-import com.finderfeed.fdbosses.client.boss_screen.TEstScreen;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlock;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockCursor;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockEntry;
@@ -13,7 +12,6 @@ import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.locale.Language;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
@@ -24,16 +22,16 @@ import java.util.Optional;
 
 public class SimpleTextEntry implements TextBlockEntry {
 
-    private Component component;
+    private FormattedText component;
     private float textScale;
     private TextBlockEntryInteraction interaction;
 
-    public SimpleTextEntry(Component component, float textScale, TextBlockEntryInteraction interaction){
+    public SimpleTextEntry(FormattedText component, float textScale, TextBlockEntryInteraction interaction){
         this.component = component;
         this.textScale = textScale;
         this.interaction = interaction;
     }
-    public SimpleTextEntry(Component component, float textScale){
+    public SimpleTextEntry(FormattedText component, float textScale){
         this(component,textScale, TextBlockEntryInteraction.empty());
     }
 
@@ -75,7 +73,7 @@ public class SimpleTextEntry implements TextBlockEntry {
 
         float lineHeight = font.lineHeight * textScale;
 
-        List<FormattedCharSequence> sequences = font.split(text,Math.round(textBlock.width / scale));
+        List<FormattedCharSequence> sequences = font.split(text,Math.round(textBlock.getWidth() / scale));
         for (FormattedCharSequence sequence : sequences){
             FDRenderUtil.renderScaledText(graphics, sequence,cursor.x,cursor.y,textScale,true,0xffffff);
             textBlock.addInteractionBox(new InteractionBox(cursor.x,cursor.y,font.width(sequence) * textScale,lineHeight,interaction));

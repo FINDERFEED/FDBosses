@@ -7,5 +7,6 @@
   "death.attack.chesed_block_attack": "%s couldn't handle flying 100 kilograms",
   "death.attack.chesed_vertical_ray": "%s got electrified",
   "death.attack.electric_sphere": "%s tried to touch the lightning",
-  "entity.fdbosses.chesed": "Chesed"
+  "entity.fdbosses.chesed": "Chesed",
+  "skill.crystal.main_description": "Inflict {{(fdlib:reference) id = entity.fdbosses.chesed}} on player that destroyed the crystal."
 }

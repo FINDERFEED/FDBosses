@@ -1,42 +1,39 @@
 package com.finderfeed.fdbosses.client.boss_screen.text_block;
 
 import com.finderfeed.fdbosses.client.boss_screen.text_block.interactions.InteractionBox;
+import com.finderfeed.fdlib.systems.simple_screen.FDWidget;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.layouts.LayoutElement;
 import net.minecraft.client.gui.narration.NarratableEntry;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.screens.Screen;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class TextBlock implements GuiEventListener, Renderable, NarratableEntry {
-
-    public float x;
-    public float y;
-    public float width;
-    public float height;
-
-    public boolean isFocused;
+public class TextBlock extends FDWidget {
 
     private List<TextBlockEntry> textBlockEntries = new ArrayList<>();
 
     private List<InteractionBox> interactionBoxes = new ArrayList<>();
 
-    public TextBlock(float x,float y,float width,float height){
-        this.x = x;
-        this.y = y;
-        this.width = width;
-        this.height = height;
+    public TextBlock(Screen owner,float x, float y, float width, float height){
+        super(owner,x,y,width,height);
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mx, int my, float pticks) {
-        TextBlockCursor cursor = new TextBlockCursor(x,y);
+    public void renderWidget(GuiGraphics graphics, float mx, float my, float pticks) {
+        TextBlockCursor cursor = new TextBlockCursor(this.getX(),this.getY());
 
-        FDRenderUtil.fill(graphics.pose(),x,y,width,height,1f,1f,1f,0.25f);
+        FDRenderUtil.fill(graphics.pose(),this.getX(),this.getY(),this.getWidth(),this.getHeight(),1f,1f,1f,0.25f);
 
         this.clearInteractions();
 
@@ -50,6 +47,7 @@ public class TextBlock implements GuiEventListener, Renderable, NarratableEntry 
         }
 
     }
+
 
     public InteractionBox getHoverOverInteractionBoxUnderMouse(float mx,float my){
         return this.getInteractionBoxUnderMouse(mx,my,(box)->box.interaction.isHoverOver());
@@ -80,8 +78,18 @@ public class TextBlock implements GuiEventListener, Renderable, NarratableEntry 
         this.interactionBoxes.add(box);
     }
 
+    public void removeTextEntries(){
+        this.textBlockEntries.clear();
+        this.clearInteractions();
+    }
+
     public TextBlock addTextBlockEntry(TextBlockEntry entry){
         this.textBlockEntries.add(entry);
+        return this;
+    }
+
+    public TextBlock addTextBlockEntries(Collection<TextBlockEntry> entry){
+        this.textBlockEntries.addAll(entry);
         return this;
     }
 
@@ -90,51 +98,52 @@ public class TextBlock implements GuiEventListener, Renderable, NarratableEntry 
     }
 
     public float getBorderX(){
-        return x + width;
+        return this.getX() + this.getWidth();
     }
 
 
-
     @Override
-    public boolean mouseClicked(double mx, double my, int button) {
-
+    public boolean onMouseClick(float mx, float my, int key) {
         InteractionBox box = this.getClickInteractionBoxUnderMouse((float)mx,(float)my);
         if (box != null){
-            box.interaction.getOnClick().click(this,(float)mx,(float)my,button);
+            box.interaction.getOnClick().click(this,(float)mx,(float)my,key);
         }
-
-        return GuiEventListener.super.mouseClicked(mx, my, button);
+        return true;
     }
 
     @Override
-    public boolean mouseScrolled(double mx, double my, double scrollX, double scrollY) {
+    public boolean onMouseRelease(float v, float v1, int i) {
+        return false;
+    }
 
+    @Override
+    public boolean onMouseScroll(float mx, float my, float scrollX, float scrollY) {
         InteractionBox box = this.getScrollInteractionBoxUnderMouse((float)mx,(float)my);
         if (box != null){
             box.interaction.getOnScroll().scroll(this,(float)mx,(float)my,(float)scrollX,(float)scrollY);
         }
-
-        return GuiEventListener.super.mouseScrolled(mx, my, scrollX, scrollY);
+        return true;
     }
 
     @Override
-    public void setFocused(boolean state) {
-        isFocused = state;
+    public boolean onCharTyped(char c, int i) {
+        return false;
     }
 
     @Override
-    public boolean isFocused() {
-        return isFocused;
-    }
-
-
-    @Override
-    public NarrationPriority narrationPriority() {
-        return NarrationPriority.NONE;
+    public boolean onKeyPress(int i, int i1, int i2) {
+        return false;
     }
 
     @Override
-    public void updateNarration(NarrationElementOutput p_169152_) {
-
+    public boolean onKeyRelease(int i, int i1, int i2) {
+        return false;
     }
+
+    @Override
+    public ScreenRectangle getRectangle() {
+        return ScreenRectangle.empty();
+    }
+
+
 }
