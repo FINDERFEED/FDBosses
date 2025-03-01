@@ -8,5 +8,7 @@
   "death.attack.chesed_vertical_ray": "%s got electrified",
   "death.attack.electric_sphere": "%s tried to touch the lightning",
   "entity.fdbosses.chesed": "Chesed",
-  "skill.crystal.main_description": "Inflict {{(fdlib:reference) id = entity.fdbosses.chesed}} on player that destroyed the crystal."
+  "effect.fdbosses.chesed_energized": "Energized",
+  "effect_description.fdbosses.chesed_energized": "While player has this effect it cannot be damaged with Chesed's ray attack. Chesed will be damaged instead and effect will be cleared from player.",
+  "skill.crystal.main_description": "Inflict {{(fdbosses:effect) id = fdbosses:chesed_energized }} on player that destroyed the crystal."
 }

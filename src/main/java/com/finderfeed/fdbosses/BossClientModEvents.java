@@ -1,6 +1,8 @@
 package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser.TextBlockProcessors;
+import com.finderfeed.fdbosses.client.boss_screen.text_block_processors.MobEffectTextProcessor;
 import com.finderfeed.fdbosses.client.overlay.ElectrifiedOverlay;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningParticle;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedAttackRayParticle;
@@ -27,6 +29,7 @@ import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
@@ -35,6 +38,13 @@ import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD,value = Dist.CLIENT,modid = FDBosses.MOD_ID)
 public class BossClientModEvents {
 
+
+    @SubscribeEvent
+    public static void clientSetup(FMLClientSetupEvent event){
+        event.enqueueWork(()->{
+            TextBlockProcessors.register(FDBosses.location("effect"),new MobEffectTextProcessor());
+        });
+    }
 
     @SubscribeEvent
     public static void registerOverlays(RegisterGuiLayersEvent event){

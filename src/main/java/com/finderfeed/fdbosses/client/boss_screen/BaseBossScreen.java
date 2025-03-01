@@ -34,7 +34,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         this.renderBack(graphics,mx,my,pticks);
 
         for (Renderable renderable : this.renderables) {
-            renderable.render(graphics, mx, mx, pticks);
+            renderable.render(graphics, mx, my, pticks);
         }
 
         this.renderFront(graphics,mx,my,pticks);

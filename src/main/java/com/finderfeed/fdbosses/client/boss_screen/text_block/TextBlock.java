@@ -41,6 +41,7 @@ public class TextBlock extends FDWidget {
             entry.render(graphics,this,cursor,mx,my,pticks);
         }
 
+
         InteractionBox box = this.getHoverOverInteractionBoxUnderMouse(mx,my);
         if (box != null){
             box.interaction.getOnHover().onHoverOver(this,graphics,mx,my);
