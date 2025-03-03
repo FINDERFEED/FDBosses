@@ -11,7 +11,7 @@ import java.util.List;
 
 public class ReferenceTextBlockProcessor extends TextBlockProcessor {
     @Override
-    public List<TextBlockEntry> parse(float textScale, HashMap<String, String> arguments) {
+    public List<TextBlockEntry> parse(float textScale, boolean renderShadow, int textColor, HashMap<String, String> arguments) {
 
         List<TextBlockEntry> entries = new ArrayList<>();
 
@@ -21,7 +21,7 @@ public class ReferenceTextBlockProcessor extends TextBlockProcessor {
 
         String translationId = arguments.get("id");
 
-        entries.add(new SimpleTextEntry(Component.translatable(translationId),textScale));
+        entries.add(new SimpleTextEntry(Component.translatable(translationId),textScale,renderShadow,textColor));
 
         return entries;
     }

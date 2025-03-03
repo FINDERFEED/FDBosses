@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlock;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser.TextBlockParser;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
@@ -53,12 +54,12 @@ public class ChesedBossScreen extends BaseBossScreen {
         super.init();
 
 
-        var components = TextBlockParser.parseComponent(Component.translatable("skill.crystal.main_description"),1f);
+        var components = TextBlockParser.parseComponent(Component.translatable("skill.crystal.main_description"),1f,false,this.getBaseStringColor());
 
         TextBlock textBlock = new TextBlock(this,10,10,400,100)
                 .addTextBlockEntries(components);
 
-        this.addRenderableWidget(textBlock);
+//        this.addRenderableWidget(textBlock);
         
 
         if (chesed == null){
@@ -92,6 +93,15 @@ public class ChesedBossScreen extends BaseBossScreen {
 
     }
 
+    @Override
+    public Component getBossName() {
+        return BossEntities.CHESED.get().getDescription();
+    }
+
+    @Override
+    public int getBaseStringColor() {
+        return 0xffffff;
+    }
 
 
     @Override
@@ -112,15 +122,6 @@ public class ChesedBossScreen extends BaseBossScreen {
                 0, FDMathUtil.FPI + FDMathUtil.FPI / 8,0,50);
     }
 
-    @Override
-    protected void renderBack(GuiGraphics graphics, float mx, float my, float pticks) {
-
-    }
-
-    @Override
-    protected void renderFront(GuiGraphics graphics, float mx, float my, float pticks) {
-
-    }
 
 
     @Override

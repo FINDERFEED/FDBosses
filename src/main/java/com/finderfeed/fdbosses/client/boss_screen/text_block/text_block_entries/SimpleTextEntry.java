@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.client.boss_screen.text_block.interactions.TextBl
 import com.finderfeed.fdbosses.client.boss_screen.text_block.interactions.InteractionBox;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
@@ -25,14 +26,25 @@ public class SimpleTextEntry implements TextBlockEntry {
     private FormattedText component;
     private float textScale;
     private TextBlockEntryInteraction interaction;
+    private Style styleOverride;
+    private boolean renderShadow;
+    private int textColor;
 
-    public SimpleTextEntry(FormattedText component, float textScale, TextBlockEntryInteraction interaction){
+    public SimpleTextEntry(FormattedText component, float textScale, boolean renderShadow, int textColor, TextBlockEntryInteraction interaction){
         this.component = component;
         this.textScale = textScale;
+        this.renderShadow = renderShadow;
         this.interaction = interaction;
+        this.textColor = textColor;
     }
-    public SimpleTextEntry(FormattedText component, float textScale){
-        this(component,textScale, TextBlockEntryInteraction.empty());
+
+    public SimpleTextEntry(FormattedText component, float textScale, boolean renderShadow, int textColor){
+        this(component,textScale,renderShadow, textColor, TextBlockEntryInteraction.empty());
+    }
+
+    public SimpleTextEntry chatFormattingOverride(Style chatFormatting){
+        this.styleOverride = chatFormatting;
+        return this;
     }
 
     @Override
@@ -49,7 +61,11 @@ public class SimpleTextEntry implements TextBlockEntry {
             Pair<FormattedText, FormattedText> texts = splitOneTime(component, Math.round(remainingWidth / textScale));
             FormattedText first = texts.first;
 
-            FDRenderUtil.renderScaledText(graphics, Language.getInstance().getVisualOrder(first),cursor.x,cursor.y,textScale,true,0xffffff);
+            if (styleOverride != null){
+                first = FormattedText.of(first.getString(),styleOverride);
+            }
+
+            FDRenderUtil.renderScaledText(graphics, Language.getInstance().getVisualOrder(first),cursor.x,cursor.y,textScale,renderShadow,textColor);
 
             float width = font.width(first) * textScale;
 
@@ -59,8 +75,15 @@ public class SimpleTextEntry implements TextBlockEntry {
 
 
             if (texts.second != null){
+
+                FormattedText second = texts.second;
+
+                if (styleOverride != null){
+                    second = FormattedText.of(second.getString(),styleOverride);
+                }
+
                 cursor.nextLine(font.lineHeight * textScale);
-                this.renderNormalText(texts.second,graphics,textBlock,cursor,textScale);
+                this.renderNormalText(second,graphics,textBlock,cursor,textScale);
             }
         }else{
             cursor.nextLine(font.lineHeight * textScale);
@@ -73,10 +96,19 @@ public class SimpleTextEntry implements TextBlockEntry {
 
         float lineHeight = font.lineHeight * textScale;
 
-        List<FormattedCharSequence> sequences = font.split(text,Math.round(textBlock.getWidth() / scale));
-        for (FormattedCharSequence sequence : sequences){
-            FDRenderUtil.renderScaledText(graphics, sequence,cursor.x,cursor.y,textScale,true,0xffffff);
-            textBlock.addInteractionBox(new InteractionBox(cursor.x,cursor.y,font.width(sequence) * textScale,lineHeight,interaction));
+        StringSplitter splitter = font.getSplitter();
+
+
+
+        List<FormattedText> sequences = splitter.splitLines(text,Math.round(textBlock.getWidth() / scale),Style.EMPTY);
+        for (FormattedText formattedText : sequences){
+
+            if (styleOverride != null){
+                formattedText = FormattedText.of(formattedText.getString(),styleOverride);
+            }
+
+            FDRenderUtil.renderScaledText(graphics, Language.getInstance().getVisualOrder(formattedText),cursor.x,cursor.y,textScale,renderShadow,textColor);
+            textBlock.addInteractionBox(new InteractionBox(cursor.x,cursor.y,font.width(formattedText) * textScale,lineHeight,interaction));
             cursor.nextLine(lineHeight);
         }
         cursor.nextLine(-lineHeight);

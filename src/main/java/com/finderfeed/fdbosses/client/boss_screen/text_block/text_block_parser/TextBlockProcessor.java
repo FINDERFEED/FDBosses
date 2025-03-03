@@ -7,6 +7,6 @@ import java.util.List;
 
 public abstract class TextBlockProcessor {
 
-    public abstract List<TextBlockEntry> parse(float textScale, HashMap<String,String> arguments);
+    public abstract List<TextBlockEntry> parse(float textScale, boolean renderShadow, int textColor, HashMap<String,String> arguments);
 
 }

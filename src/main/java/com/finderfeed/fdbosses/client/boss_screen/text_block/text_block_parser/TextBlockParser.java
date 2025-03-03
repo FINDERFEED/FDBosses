@@ -16,7 +16,7 @@ import java.util.Optional;
 
 public class TextBlockParser {
 
-    public static List<TextBlockEntry> parseComponent(Component component,float textScale){
+    public static List<TextBlockEntry> parseComponent(Component component,float textScale,boolean renderShadow, int textColor){
 
         List<TextBlockEntry> textBlockEntries = new ArrayList<>();
 
@@ -31,14 +31,14 @@ public class TextBlockParser {
         for (int i = 0; i < strings.size();i++){
             String str = strings.get(i);
             Style style = correspondingStyles.get(i);
-            parseString(str,style,textScale,textBlockEntries);
+            parseString(str,style,textScale,renderShadow, textColor, textBlockEntries);
         }
 
         return textBlockEntries;
     }
 
 
-    private static void parseString(String s,Style stringStyle,float textScale, List<TextBlockEntry> entries){
+    private static void parseString(String s,Style stringStyle,float textScale,boolean renderShadow, int textColor, List<TextBlockEntry> entries){
 
         StringBuilder reading = new StringBuilder();
 
@@ -61,14 +61,14 @@ public class TextBlockParser {
                     }
                     i = -1;
 
-                    entries.add(new SimpleTextEntry(FormattedText.of(reading.toString(),stringStyle),textScale));
+                    entries.add(new SimpleTextEntry(FormattedText.of(reading.toString(),stringStyle),textScale,renderShadow,textColor));
 
                     reading = new StringBuilder();
 
                     FDString string = pair.first;
                     TextBlockProcessor textBlockProcessor = string.getProcessor();
                     var args = string.getArguments();
-                    var entriesToAdd = textBlockProcessor.parse(textScale,args);
+                    var entriesToAdd = textBlockProcessor.parse(textScale,renderShadow,textColor, args);
                     entries.addAll(entriesToAdd);
 
 
@@ -82,7 +82,7 @@ public class TextBlockParser {
 
 
         if (!reading.isEmpty()){
-            entries.add(new SimpleTextEntry(FormattedText.of(reading.toString(),stringStyle),textScale));
+            entries.add(new SimpleTextEntry(FormattedText.of(reading.toString(),stringStyle),textScale,renderShadow,textColor));
         }
     }
 

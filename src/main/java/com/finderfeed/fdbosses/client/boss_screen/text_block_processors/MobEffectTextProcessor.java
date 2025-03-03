@@ -23,7 +23,7 @@ import java.util.List;
 public class MobEffectTextProcessor extends TextBlockProcessor {
 
     @Override
-    public List<TextBlockEntry> parse(float textScale, HashMap<String, String> arguments) {
+    public List<TextBlockEntry> parse(float textScale,boolean renderShadow, int textColor, HashMap<String, String> arguments) {
 
         if (!arguments.containsKey("id")) throw new RuntimeException("Couldn't find 'id' on mob effect text processor");
 
@@ -55,7 +55,7 @@ public class MobEffectTextProcessor extends TextBlockProcessor {
 
         ImageTextEntry imageTextEntry = new ImageTextEntry(imageInText,textScale,interaction);
 
-        SimpleTextEntry text = new SimpleTextEntry(effect.getDisplayName().copy().withStyle(Style.EMPTY.withColor(color).withUnderlined(true)),textScale,interaction);
+        SimpleTextEntry text = new SimpleTextEntry(effect.getDisplayName().copy().withStyle(Style.EMPTY.withColor(color).withUnderlined(true)),textScale,renderShadow,textColor, interaction);
 
         return List.of(imageTextEntry,text);
     }
