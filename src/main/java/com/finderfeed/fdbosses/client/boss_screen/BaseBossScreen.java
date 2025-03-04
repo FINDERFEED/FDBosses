@@ -35,7 +35,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     protected void init() {
         super.init();
 
-        OPEN_TIME = 8;
+        OPEN_TIME = 15;
         skillOpened = false;
         openTicker = 0;
 
@@ -145,8 +145,12 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         PoseStack matrices = graphics.pose();
         matrices.pushPose();
         matrices.translate(0,0,100);
-
-        float a = FDEasings.easeOut(FDEasings.easeOut(this.openTicker / (float) OPEN_TIME));
+        float a = this.openTicker / (float) OPEN_TIME;
+        if (skillOpened) {
+            a = FDEasings.easeOut(FDEasings.easeOut(a));
+        }else{
+            a = FDEasings.easeOut(a);
+        }
         FDRenderUtil.fill(matrices,0,0,anchorEnd.x,anchorEnd.y,0f,0f,0f,a * 0.9f);
         this.skillInfoWidget.render(graphics,mx,my,pticks);
         matrices.popPose();
