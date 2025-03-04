@@ -41,6 +41,9 @@ public class BossAbilitesWidget extends FDScrollableWidget {
         FDRenderUtil.renderScaledText(guiGraphics,abilities, bossAbilitiesXs + this.getWidth() / 2 - abilitieswidth / 2 - 3,bossAbilitiesYs + 7,1f,true,stringColor);
 
         float p = this.getCurrentScroll() / this.getMaxScroll();
+        if (Float.isNaN(p)){
+            p = 0;
+        }
 
         //5 8
         FDRenderUtil.bindTexture(FDBosses.location("textures/gui/scroller.png"));

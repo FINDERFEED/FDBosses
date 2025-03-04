@@ -22,7 +22,7 @@ import org.lwjgl.glfw.GLFW;
 
 public abstract class BaseBossScreen extends SimpleFDScreen {
 
-    private static int OPEN_TIME = 9;
+    private static int OPEN_TIME = 8;
     private boolean skillOpened = false;
     private int openTicker = 0;
     private SkillInfoWidget skillInfoWidget;
@@ -35,13 +35,11 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     protected void init() {
         super.init();
 
+        OPEN_TIME = 8;
         skillOpened = false;
         openTicker = 0;
 
         Window window = Minecraft.getInstance().getWindow();
-
-        float height = window.getGuiScaledHeight();
-        //12 offset 187 kind of width
 
 
         this.initSkillInfoWidget();
@@ -99,7 +97,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
             this.skillInfoWidget.moveWidgetTo(OPEN_TIME,0,0, FDEasings::easeOutBounce);
             skillOpened = true;
         }else if (skillOpened && !state){
-            this.skillInfoWidget.moveWidgetTo(OPEN_TIME,-this.skillInfoWidget.getWidth(),0, FDEasings::easeIn);
+            this.skillInfoWidget.moveWidgetTo(OPEN_TIME / 2,-this.skillInfoWidget.getWidth(),0, FDEasings::easeIn);
             skillOpened = false;
         }
     }
@@ -148,7 +146,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         matrices.pushPose();
         matrices.translate(0,0,100);
 
-        float a = FDEasings.easeOut(this.openTicker / (float) OPEN_TIME);
+        float a = FDEasings.easeOut(FDEasings.easeOut(this.openTicker / (float) OPEN_TIME));
         FDRenderUtil.fill(matrices,0,0,anchorEnd.x,anchorEnd.y,0f,0f,0f,a * 0.9f);
         this.skillInfoWidget.render(graphics,mx,my,pticks);
         matrices.popPose();
