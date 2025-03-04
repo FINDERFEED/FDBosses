@@ -119,6 +119,7 @@ public class ChesedBossScreen extends BaseBossScreen {
         float offsetX = 0;
         float offsetY = 100;
         matrices.pushPose();
+        matrices.translate(0,0,-100);
         FDRenderUtil.renderFDModelInScreen(matrices,chesed,anchor.x + offsetX,anchor.y + offsetY,
                 0, FDMathUtil.FPI + FDMathUtil.FPI / 8,0,50,RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")));
         matrices.popPose();

@@ -1,21 +1,31 @@
 package com.finderfeed.fdbosses.client.boss_screen;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.boss_screen.widget.BossAbilitesWidget;
+import com.finderfeed.fdbosses.client.boss_screen.widget.SkillInfoWidget;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
-import com.finderfeed.fdlib.util.FDUtil;
-import com.finderfeed.fdlib.util.InterpolatedValue;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDButton;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDImage;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.util.FDButtonTextures;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.util.WidgetTexture;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
+import net.minecraft.util.Mth;
 import org.joml.Vector2f;
+import org.lwjgl.glfw.GLFW;
 
 public abstract class BaseBossScreen extends SimpleFDScreen {
+
+    private static int OPEN_TIME = 9;
+    private boolean skillOpened = false;
+    private int openTicker = 0;
+    private SkillInfoWidget skillInfoWidget;
 
     public BaseBossScreen() {
         super();
@@ -25,8 +35,83 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     protected void init() {
         super.init();
 
+        skillOpened = false;
+        openTicker = 0;
+
+        Window window = Minecraft.getInstance().getWindow();
+
+        float height = window.getGuiScaledHeight();
+        //12 offset 187 kind of width
 
 
+        this.initSkillInfoWidget();
+
+        this.initAbilitiesWidget();
+
+    }
+
+    private void initSkillInfoWidget(){
+        SkillInfoWidget widget = new SkillInfoWidget(this,-200,0,200,height - 2);
+        FDImage image = new FDImage(this,12 + 187 / 2f - 16,20,32,32, new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png")));
+        widget.addChild("abilityImage", image);
+        this.skillInfoWidget = widget;
+        this.addRenderableWidget(widget);
+    }
+
+    private void initAbilitiesWidget(){
+
+        Vector2f anchorEnd = this.getAnchor(1f,1f);
+
+        BossAbilitesWidget bossAbilitesWidget = new BossAbilitesWidget(this,anchorEnd.x - 237, anchorEnd.y - 120,this.getBaseStringColor());
+
+        float offsx = 19;
+        float offsy = 30;
+
+        for (int  i = 0; i < 4;i++) {
+
+            float x = offsx + (i % 5) * 39;
+            float y = offsy + (i / 5) * 35;
+
+            FDButton skill = new FDButton(this,x,y,32,32)
+                    .setTexture(new FDButtonTextures(
+                            new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),
+                            new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),1,1)
+                    ))
+                    .setOnClickAction(((fdWidget, mx, my, button) -> {
+                        if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT) return false;
+
+                        this.openSkillInfo(true);
+
+                        return true;
+                    }));
+
+            bossAbilitesWidget.addChild("skill" + i, skill);
+
+        }
+
+        this.addRenderableWidget(bossAbilitesWidget);
+
+
+    }
+
+    public void openSkillInfo(boolean state){
+        if (!skillOpened && state){
+            this.skillInfoWidget.moveWidgetTo(OPEN_TIME,0,0, FDEasings::easeOutBounce);
+            skillOpened = true;
+        }else if (skillOpened && !state){
+            this.skillInfoWidget.moveWidgetTo(OPEN_TIME,-this.skillInfoWidget.getWidth(),0, FDEasings::easeIn);
+            skillOpened = false;
+        }
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (skillOpened){
+            this.openTicker = Mth.clamp(this.openTicker + 1,0,OPEN_TIME);
+        }else{
+            this.openTicker = Mth.clamp(this.openTicker - 1,0,OPEN_TIME);
+        }
     }
 
     @Override
@@ -47,10 +132,26 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         this.renderBack(graphics,mx,my,pticks);
 
         for (Renderable renderable : this.renderables) {
-            renderable.render(graphics, mx, my, pticks);
+            if (renderable != this.skillInfoWidget) {
+                renderable.render(graphics, mx, my, pticks);
+            }
         }
 
-        this.renderFront(graphics,mx,my,pticks);
+        this.renderSkillInfo(graphics,mx,my,pticks);
+
+    }
+
+    private void renderSkillInfo(GuiGraphics graphics, int mx, int my, float pticks){
+        Vector2f anchorEnd = this.getAnchor(1f,1f);
+
+        PoseStack matrices = graphics.pose();
+        matrices.pushPose();
+        matrices.translate(0,0,100);
+
+        float a = FDEasings.easeOut(this.openTicker / (float) OPEN_TIME);
+        FDRenderUtil.fill(matrices,0,0,anchorEnd.x,anchorEnd.y,0f,0f,0f,a * 0.9f);
+        this.skillInfoWidget.render(graphics,mx,my,pticks);
+        matrices.popPose();
     }
 
 
@@ -112,30 +213,23 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
 
 
-
-        //----------------------------abilities-----------------------------------------------
-
-        float bossAbilitiesHeight = 114;
-        float bossAbilitiesWidth = 237;
-
-
-        float bossAbilitiesXs = anchor.x - bossInfoWidth;
-        float bossAbilitiesYs = anchorEnd.y - bossAbilitiesHeight - 10;
-
-        FDRenderUtil.bindTexture(FDBosses.location("textures/gui/boss_abilities.png"));
-        FDRenderUtil.blitWithBlend(matrices, bossAbilitiesXs,bossAbilitiesYs,bossAbilitiesWidth,bossAbilitiesHeight,0,0,1f,1f,1f,1f,0,1f);
-
-        Component abilities = Component.literal("Abilities");
-        float abilitieswidth = font.width(abilities);
-
-        FDRenderUtil.renderScaledText(graphics,abilities, bossAbilitiesXs + bossAbilitiesWidth / 2 - abilitieswidth / 2 - 3,bossAbilitiesYs + 7,1f,true,this.getBaseStringColor());
-
     }
 
-
-
-    protected void renderFront(GuiGraphics graphics, float mx, float my, float pticks){
-
+    @Override
+    public boolean mouseClicked(double mx, double my, int button) {
+        if (this.skillOpened) {
+            float xBorder = this.skillInfoWidget.getX() + this.skillInfoWidget.getWidth();
+            if (mx > xBorder) {
+                this.openSkillInfo(false);
+                return false;
+            } else {
+                if (FDRenderUtil.isMouseInBounds((float)mx,(float)my,this.skillInfoWidget.getX(),this.skillInfoWidget.getY(),this.skillInfoWidget.getWidth(),this.skillInfoWidget.getY())) {
+                    return this.skillInfoWidget.mouseClicked(mx, my, button);
+                }
+                return false;
+            }
+        }
+        return super.mouseClicked(mx, my, button);
     }
 
     public abstract Component getBossName();
