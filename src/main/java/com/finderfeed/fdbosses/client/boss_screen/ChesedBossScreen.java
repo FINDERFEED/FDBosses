@@ -100,7 +100,7 @@ public class ChesedBossScreen extends BaseBossScreen {
 
     @Override
     public int getBaseStringColor() {
-        return 0xffffff;
+        return 0x55ccff;
     }
 
 
@@ -118,8 +118,10 @@ public class ChesedBossScreen extends BaseBossScreen {
         var anchor = this.getAnchor(0.25f,0.5f);
         float offsetX = 0;
         float offsetY = 100;
-        BossRenderUtil.renderFDModelInScreen(matrices,chesed,anchor.x + offsetX,anchor.y + offsetY,
-                0, FDMathUtil.FPI + FDMathUtil.FPI / 8,0,50);
+        matrices.pushPose();
+        FDRenderUtil.renderFDModelInScreen(matrices,chesed,anchor.x + offsetX,anchor.y + offsetY,
+                0, FDMathUtil.FPI + FDMathUtil.FPI / 8,0,50,RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")));
+        matrices.popPose();
     }
 
 
