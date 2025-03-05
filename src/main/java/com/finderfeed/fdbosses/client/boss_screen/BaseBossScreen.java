@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.client.boss_screen;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockWidget;
 import com.finderfeed.fdbosses.client.boss_screen.widget.BossAbilitesWidget;
 import com.finderfeed.fdbosses.client.boss_screen.widget.SkillInfoWidget;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
@@ -26,6 +27,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     private boolean skillOpened = false;
     private int openTicker = 0;
     private SkillInfoWidget skillInfoWidget;
+    private TextBlockWidget skillInfoText;
 
     public BaseBossScreen() {
         super();
@@ -49,11 +51,23 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     }
 
     private void initSkillInfoWidget(){
-        SkillInfoWidget widget = new SkillInfoWidget(this,-200,0,200,height - 2);
+
+        Vector2f anchor = this.getAnchor(1,1);
+
+
+        SkillInfoWidget widget = new SkillInfoWidget(this,-200,2,200,anchor.y - 4,Component.literal("TTT"),this.getBaseStringColor());
         FDImage image = new FDImage(this,12 + 187 / 2f - 16,20,32,32, new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png")));
         widget.addChild("abilityImage", image);
+
+
+
+        TextBlockWidget textBlockWidget = new TextBlockWidget(this,30,75,151,widget.getHeight() - 99);
+        widget.addChild("text",textBlockWidget);
+
         this.skillInfoWidget = widget;
+        this.skillInfoText = textBlockWidget;
         this.addRenderableWidget(widget);
+
     }
 
     private void initAbilitiesWidget(){
@@ -94,10 +108,15 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
     public void openSkillInfo(boolean state){
         if (!skillOpened && state){
-            this.skillInfoWidget.moveWidgetTo(OPEN_TIME,0,0, FDEasings::easeOutBounce);
+
+            this.skillInfoText.setText(Component.translatable("test.test"),1f,this.getBaseStringColor(),true);
+
+            this.skillInfoWidget.setSkillName(Component.literal("Pisya Popa"),this.getBaseStringColor());
+
+            this.skillInfoWidget.moveWidgetTo(OPEN_TIME,0,2, FDEasings::easeOutBounce);
             skillOpened = true;
         }else if (skillOpened && !state){
-            this.skillInfoWidget.moveWidgetTo(OPEN_TIME / 2,-this.skillInfoWidget.getWidth(),0, FDEasings::easeIn);
+            this.skillInfoWidget.moveWidgetTo(OPEN_TIME / 2,-this.skillInfoWidget.getWidth(),2, FDEasings::easeIn);
             skillOpened = false;
         }
     }

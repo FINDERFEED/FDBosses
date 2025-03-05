@@ -1,6 +1,6 @@
 package com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_entries.image_entry;
 
-import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlock;
+import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockWidget;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockCursor;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockEntry;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.interactions.InteractionBox;
@@ -29,7 +29,7 @@ public class ImageTextEntry implements TextBlockEntry {
     }
 
     @Override
-    public void render(GuiGraphics graphics, TextBlock textBlock, TextBlockCursor cursor, float mouseX, float mouseY, float pticks) {
+    public void render(GuiGraphics graphics, TextBlockWidget textBlock, TextBlockCursor cursor, float mouseX, float mouseY, float pticks, boolean last) {
 
         float widthheight = Minecraft.getInstance().font.lineHeight;
 
@@ -50,5 +50,9 @@ public class ImageTextEntry implements TextBlockEntry {
         textBlock.addInteractionBox(new InteractionBox(x,y,addX,widthheight,interaction));
 
         cursor.addX(addX);
+
+        if (last){
+            cursor.nextLine(widthheight);
+        }
     }
 }

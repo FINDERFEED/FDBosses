@@ -1,45 +1,50 @@
 package com.finderfeed.fdbosses.client.boss_screen.text_block;
 
 import com.finderfeed.fdbosses.client.boss_screen.text_block.interactions.InteractionBox;
+import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser.TextBlockParser;
+import com.finderfeed.fdlib.systems.simple_screen.FDScrollableWidget;
 import com.finderfeed.fdlib.systems.simple_screen.FDWidget;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.gui.components.events.GuiEventListener;
-import net.minecraft.client.gui.layouts.LayoutElement;
-import net.minecraft.client.gui.narration.NarratableEntry;
-import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public class TextBlock extends FDWidget {
+public class TextBlockWidget extends FDScrollableWidget {
 
     private List<TextBlockEntry> textBlockEntries = new ArrayList<>();
 
     private List<InteractionBox> interactionBoxes = new ArrayList<>();
 
-    public TextBlock(Screen owner,float x, float y, float width, float height){
+    private float maxScroll;
+
+    public TextBlockWidget(Screen owner, float x, float y, float width, float height){
         super(owner,x,y,width,height);
     }
 
     @Override
     public void renderWidget(GuiGraphics graphics, float mx, float my, float pticks) {
-        TextBlockCursor cursor = new TextBlockCursor(this.getX(),this.getY());
+        TextBlockCursor cursor = new TextBlockCursor(this.getX(),this.getY() - this.getCurrentScroll());
 
         FDRenderUtil.fill(graphics.pose(),this.getX(),this.getY(),this.getWidth(),this.getHeight(),1f,1f,1f,0.25f);
 
         this.clearInteractions();
 
-        for (TextBlockEntry entry : textBlockEntries){
-            entry.render(graphics,this,cursor,mx,my,pticks);
+        FDRenderUtil.Scissor.pushScissors(this.getX(),this.getY(),this.getWidth(),this.getHeight());
+        for (int i = 0; i < textBlockEntries.size();i++){
+            var entry = this.textBlockEntries.get(i);
+            boolean last = i == textBlockEntries.size() - 1;
+            entry.render(graphics,this,cursor,mx,my,pticks,last);
         }
+        FDRenderUtil.Scissor.popScissors();
+
+        maxScroll = Math.max(0,Math.max(maxScroll,cursor.y - this.getY() - this.getHeight()));
 
 
         InteractionBox box = this.getHoverOverInteractionBoxUnderMouse(mx,my);
@@ -63,6 +68,7 @@ public class TextBlock extends FDWidget {
     }
 
     public InteractionBox getInteractionBoxUnderMouse(float mx, float my, Predicate<InteractionBox> boxPredicate){
+        if (!FDRenderUtil.isMouseInBounds(mx,my,this.getX(),this.getY(),this.getWidth(),this.getHeight())) return null;
         for (InteractionBox box : interactionBoxes){
             if (box.isMouseInside(mx,my) && boxPredicate.test(box)){
                 return box;
@@ -82,16 +88,29 @@ public class TextBlock extends FDWidget {
     public void removeTextEntries(){
         this.textBlockEntries.clear();
         this.clearInteractions();
+        this.setCurrentScroll(0);
+        this.maxScroll = 0;
     }
 
-    public TextBlock addTextBlockEntry(TextBlockEntry entry){
+    public TextBlockWidget addTextBlockEntry(TextBlockEntry entry){
         this.textBlockEntries.add(entry);
+        this.setCurrentScroll(0);
+        this.maxScroll = 0;
         return this;
     }
 
-    public TextBlock addTextBlockEntries(Collection<TextBlockEntry> entry){
+    public TextBlockWidget addTextBlockEntries(Collection<TextBlockEntry> entry){
         this.textBlockEntries.addAll(entry);
+        this.setCurrentScroll(0);
+        this.maxScroll = 0;
         return this;
+    }
+
+    public void setText(Component component, float textScale, int color, boolean renderShadow){
+        this.clearInteractions();
+        this.textBlockEntries = TextBlockParser.parseComponent(component,textScale,renderShadow,color);
+        this.setCurrentScroll(0);
+        this.maxScroll = 0;
     }
 
     public List<TextBlockEntry> getTextBlockEntries() {
@@ -101,7 +120,6 @@ public class TextBlock extends FDWidget {
     public float getBorderX(){
         return this.getX() + this.getWidth();
     }
-
 
     @Override
     public boolean onMouseClick(float mx, float my, int key) {
@@ -122,8 +140,25 @@ public class TextBlock extends FDWidget {
         InteractionBox box = this.getScrollInteractionBoxUnderMouse((float)mx,(float)my);
         if (box != null){
             box.interaction.getOnScroll().scroll(this,(float)mx,(float)my,(float)scrollX,(float)scrollY);
+        }else{
+            return super.onMouseScroll(mx,my,scrollX,scrollY);
         }
         return true;
+    }
+
+    @Override
+    public float getMaxScroll() {
+        return maxScroll;
+    }
+
+    @Override
+    public void onScroll(float v) {
+
+    }
+
+    @Override
+    public float scrollAmount() {
+        return 4;
     }
 
     @Override

@@ -1,13 +1,12 @@
 package com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_entries;
 
-import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlock;
+import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockWidget;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockCursor;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockEntry;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.interactions.TextBlockEntryInteraction;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.interactions.InteractionBox;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.StringSplitter;
 import net.minecraft.client.gui.Font;
@@ -15,7 +14,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
-import net.minecraft.util.FormattedCharSequence;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +46,7 @@ public class SimpleTextEntry implements TextBlockEntry {
     }
 
     @Override
-    public void render(GuiGraphics graphics, TextBlock textBlock, TextBlockCursor cursor,float mx,float my,float pticks) {
+    public void render(GuiGraphics graphics, TextBlockWidget textBlock, TextBlockCursor cursor, float mx, float my, float pticks,boolean last) {
         if (component.getString().isEmpty()) return;
 
         Font font = Minecraft.getInstance().font;
@@ -83,15 +81,19 @@ public class SimpleTextEntry implements TextBlockEntry {
                 }
 
                 cursor.nextLine(font.lineHeight * textScale);
-                this.renderNormalText(second,graphics,textBlock,cursor,textScale);
+                this.renderNormalText(second, graphics, textBlock, cursor, textScale, last);
+            }else{
+                if (last){
+                    cursor.nextLine(lineHeight);
+                }
             }
         }else{
             cursor.nextLine(font.lineHeight * textScale);
-            renderNormalText(component,graphics,textBlock,cursor,textScale);
+            renderNormalText(component, graphics, textBlock, cursor, textScale, last);
         }
     }
 
-    private void renderNormalText(FormattedText text,GuiGraphics graphics, TextBlock textBlock, TextBlockCursor cursor,float scale){
+    private void renderNormalText(FormattedText text, GuiGraphics graphics, TextBlockWidget textBlock, TextBlockCursor cursor, float scale, boolean last){
         Font font = Minecraft.getInstance().font;
 
         float lineHeight = font.lineHeight * textScale;
@@ -111,7 +113,9 @@ public class SimpleTextEntry implements TextBlockEntry {
             textBlock.addInteractionBox(new InteractionBox(cursor.x,cursor.y,font.width(formattedText) * textScale,lineHeight,interaction));
             cursor.nextLine(lineHeight);
         }
-        cursor.nextLine(-lineHeight);
+        if (!last) {
+            cursor.nextLine(-lineHeight);
+        }
         cursor.addX(font.width(sequences.getLast()) * scale);
     }
 
