@@ -50,7 +50,7 @@ public class MobEffectTextProcessor extends TextBlockProcessor {
         String key = Util.makeDescriptionId("effect_description",location);
 
         TextBlockEntryInteraction interaction = TextBlockEntryInteraction.hoverOver(((textBlock, graphics, mx, my) -> {
-            graphics.renderTooltip(Minecraft.getInstance().font, Minecraft.getInstance().font.split(Component.translatable(key),100),(int)mx,(int)my);
+            graphics.renderTooltip(Minecraft.getInstance().font, Minecraft.getInstance().font.split(Component.translatable(key).withStyle(Style.EMPTY.withColor(textColor)),100),(int)mx,(int)my);
         }));
 
         ImageTextEntry imageTextEntry = new ImageTextEntry(imageInText,textScale,interaction);

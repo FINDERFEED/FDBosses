@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.client.boss_screen.widget;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossSkill;
 import com.finderfeed.fdlib.systems.simple_screen.FDWidget;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -19,6 +20,7 @@ public class SkillInfoWidget extends FDWidget {
 
     private Component skillName = Component.empty();
     private int color = 0xffffff;
+    private ResourceLocation skillImage;
 
     public SkillInfoWidget(Screen screen, float x, float y, float width, float height, Component skillName, int color) {
         super(screen, x, y, width, height);
@@ -49,10 +51,10 @@ public class SkillInfoWidget extends FDWidget {
         FDRenderUtil.bindTexture(DOWN);
         FDRenderUtil.blitWithBlend(matrices,this.getX(),this.getY() + 52 + middleHeight,this.getWidth(),53,0,0,1,1,1,1,0,1f);
 
+        //skill name
         float scale = 1.5f;
         Font font = Minecraft.getInstance().font;
         float textWidth = font.width(skillName) * scale;
-
         float textX = this.getX() + this.getWidth() / 2 + 7f - textWidth / 2;
         float textY = 58;
 
@@ -76,12 +78,37 @@ public class SkillInfoWidget extends FDWidget {
 
         FDRenderUtil.renderScaledText(guiGraphics,skillName,textX, textY, scale, true, color);
 
+
+        //skill image
+        if (skillImage != null) {
+            FDRenderUtil.bindTexture(FDBosses.location("textures/gui/ability_button_unselected.png"));
+            FDRenderUtil.blitWithBlend(matrices,this.getX() + 89.5f,this.getY() + 20,32,32,
+                    0,0,1,1,1,1,0,1f);
+
+            FDRenderUtil.bindTexture(skillImage);
+            FDRenderUtil.blitWithBlend(matrices,this.getX() + 97.5f,this.getY() + 28,16,16,
+                    0,0,1,1,1,1,0,1f);
+        }
+
+        Component close = Component.translatable("fdbosses.close_skill_info");
+        FDRenderUtil.renderScaledText(guiGraphics,close,
+                this.getX() + this.getWidth() / 2 - font.width(close) * 0.25f + 6,
+                this.getY() + this.getHeight() - 21,
+                0.5f,
+                true,
+                color
+        );
+
     }
 
 
     public void setSkillName(Component skillName, int color) {
         this.skillName = skillName;
         this.color = color;
+    }
+
+    public void setSkillImage(ResourceLocation location){
+        this.skillImage = location;
     }
 
     @Override

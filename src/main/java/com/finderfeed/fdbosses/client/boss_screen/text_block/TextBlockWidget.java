@@ -24,6 +24,8 @@ public class TextBlockWidget extends FDScrollableWidget {
 
     private float maxScroll;
 
+    private int textColor = 0xffffff;
+
     public TextBlockWidget(Screen owner, float x, float y, float width, float height){
         super(owner,x,y,width,height);
     }
@@ -32,7 +34,7 @@ public class TextBlockWidget extends FDScrollableWidget {
     public void renderWidget(GuiGraphics graphics, float mx, float my, float pticks) {
         TextBlockCursor cursor = new TextBlockCursor(this.getX(),this.getY() - this.getCurrentScroll());
 
-        FDRenderUtil.fill(graphics.pose(),this.getX(),this.getY(),this.getWidth(),this.getHeight(),1f,1f,1f,0.25f);
+//        FDRenderUtil.fill(graphics.pose(),this.getX(),this.getY(),this.getWidth(),this.getHeight(),1f,1f,1f,0.25f);
 
         this.clearInteractions();
 
@@ -46,6 +48,19 @@ public class TextBlockWidget extends FDScrollableWidget {
 
         maxScroll = Math.max(0,Math.max(maxScroll,cursor.y - this.getY() - this.getHeight()));
 
+
+        if (maxScroll != 0){
+
+            float r = ((this.textColor & 0xff0000) >> 16) / 255f;
+            float g = ((this.textColor & 0x00ff00) >> 8) / 255f;
+            float b = ((this.textColor & 0x0000ff)) / 255f;
+
+            FDRenderUtil.renderScrollBar(graphics.pose(),this.getX() + this.getWidth() + 1, this.getY(),
+                    2,this.getHeight(), this.getCurrentScroll(), maxScroll,
+                    Math.max(r - 0.2f,0), Math.max(g - 0.2f,0), Math.max(b - 0.2f,0), 1f,
+                    Math.min(r + 0.1f,1), Math.min(g + 0.1f,1), Math.min(b + 0.1f,1), 1f
+            );
+        }
 
         InteractionBox box = this.getHoverOverInteractionBoxUnderMouse(mx,my);
         if (box != null){
@@ -111,6 +126,7 @@ public class TextBlockWidget extends FDScrollableWidget {
         this.textBlockEntries = TextBlockParser.parseComponent(component,textScale,renderShadow,color);
         this.setCurrentScroll(0);
         this.maxScroll = 0;
+        this.textColor = color;
     }
 
     public List<TextBlockEntry> getTextBlockEntries() {
