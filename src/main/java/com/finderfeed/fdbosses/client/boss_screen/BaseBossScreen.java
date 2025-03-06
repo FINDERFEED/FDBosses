@@ -6,9 +6,11 @@ import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossSkill;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockWidget;
 import com.finderfeed.fdbosses.client.boss_screen.widget.BossAbilitesWidget;
 import com.finderfeed.fdbosses.client.boss_screen.widget.BossDetailsWidget;
+import com.finderfeed.fdbosses.client.boss_screen.widget.FDSkillButton;
 import com.finderfeed.fdbosses.client.boss_screen.widget.SkillInfoWidget;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDButton;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDImage;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.util.FDButtonTextures;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.util.WidgetTexture;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -67,13 +69,19 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         float bossInfoWidth = 237;
         float bossInfoHeight = 125;
 
-        float bossInfoXs = anchor.x - bossInfoWidth;
         float bossInfoYs = 5;
 
         BossDetailsWidget widget = new BossDetailsWidget(this,  anchor.x, bossInfoYs, bossInfoWidth, bossInfoHeight);
         widget.setBossName(this.options.getEntityType().getDescription(),this.getBaseStringColor());
+
+        TextBlockWidget bossDescription = new TextBlockWidget(this, 18,60,195, 40);
+        bossDescription.setText(options.getBossDescription(),1f,this.getBaseStringColor(),true);
+
+        widget.addChild("bossDescription",bossDescription);
+
         this.addRenderableWidget(widget);
-         bossDetailsWidget = widget;
+        bossDetailsWidget = widget;
+
     }
 
     private void initSkillInfoWidget(){
@@ -110,7 +118,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
             float x = offsx + (i % 5) * 39;
             float y = offsy + (i / 5) * 35;
 
-            FDButton skill = new FDButton(this,x,y,32,32)
+            FDButton skill = new FDSkillButton(this,x,y,32,32, bossSkill)
                     .setTexture(new FDButtonTextures(
                             new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),
                             new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),1,1)
@@ -122,6 +130,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
                         return true;
                     }));
+
 
             bossAbilitesWidget.addChild("skill" + i, skill);
 
