@@ -32,6 +32,6 @@ public class ChesedConfig  {
     public boolean finalAttackHeals = true;
 
     @ConfigValue
-    public float finalAttackDamagePercentPerMonolith = 0.25f;
+    public float finalAttackDamagePercentPerMonolith = 25f;
 
 }

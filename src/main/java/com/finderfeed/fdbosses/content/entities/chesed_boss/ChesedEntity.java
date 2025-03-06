@@ -614,7 +614,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                 int aliveMonoliths = this.getAliveMonolithsCount();
                 if (aliveMonoliths != 0){
 
-                    float damagePercent = BossConfigs.BOSS_CONFIG.get().chesedConfig.finalAttackDamagePercentPerMonolith
+                    float damagePercent = (BossConfigs.BOSS_CONFIG.get().chesedConfig.finalAttackDamagePercentPerMonolith / 100f)
                             * aliveMonoliths;
 
                     var affectedEntities = this.getAffectedEntities(false);
