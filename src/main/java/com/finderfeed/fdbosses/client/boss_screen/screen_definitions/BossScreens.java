@@ -15,7 +15,7 @@ public class BossScreens {
             new BossScreenOptions()
                     .setBossDescription(Component.translatable("fdbosses.bosses.description.chesed"))
                     .addSkill(new BossSkill(
-                            FDBosses.location("textures/gui/skills/chesed_crystal.png"),
+                            FDBosses.location("textures/gui/skills/chesed/crystals.png"),
                             Component.translatable("fdbosses.skills.chesed.crystals"),
                             Component.translatable("fdbosses.skills.chesed.crystals_description")
                     ))
