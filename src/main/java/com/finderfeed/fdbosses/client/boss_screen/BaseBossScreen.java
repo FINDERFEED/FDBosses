@@ -34,7 +34,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     private BossDetailsWidget bossDetailsWidget;
     private BossAbilitesWidget bossAbilitesWidget;
 
-    private boolean moveThings =  true;
+    private int moveThings = 0;
 
     public BaseBossScreen(BossScreenOptions options) {
         super();
@@ -45,7 +45,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     protected void init() {
         super.init();
 
-        moveThings = true;
+        moveThings = 0;
         OPEN_TIME = 15;
         skillOpened = false;
         openTicker = 0;
@@ -158,10 +158,9 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
             this.openTicker = Mth.clamp(this.openTicker - 1,0,OPEN_TIME);
         }
 
-        if (moveThings){
-            this.bossDetailsWidget.moveWidgetTo(10,this.bossDetailsWidget.getX() - this.bossDetailsWidget.getWidth(), this.bossDetailsWidget.getY(),FDEasings::easeOut);
-            this.bossAbilitesWidget.moveWidgetTo(10,this.bossAbilitesWidget.getX(),this.bossAbilitesWidget.getY() - this.bossAbilitesWidget.getHeight() - 5,FDEasings::easeOut);
-            moveThings = false;
+        if (moveThings++ == 1){
+            this.bossDetailsWidget.moveWidgetTo(9,this.bossDetailsWidget.getX() - this.bossDetailsWidget.getWidth(), this.bossDetailsWidget.getY(),FDEasings::easeOut);
+            this.bossAbilitesWidget.moveWidgetTo(9,this.bossAbilitesWidget.getX(),this.bossAbilitesWidget.getY() - this.bossAbilitesWidget.getHeight() - 5,FDEasings::easeOut);
         }
     }
 
