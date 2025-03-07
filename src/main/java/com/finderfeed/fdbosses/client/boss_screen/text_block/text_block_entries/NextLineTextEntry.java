@@ -7,9 +7,9 @@ import net.minecraft.client.gui.GuiGraphics;
 
 public class NextLineTextEntry implements TextBlockEntry {
 
-    private int lineHeight;
+    private float lineHeight;
 
-    public NextLineTextEntry(int lineHeight){
+    public NextLineTextEntry(float lineHeight){
         this.lineHeight = lineHeight;
     }
 

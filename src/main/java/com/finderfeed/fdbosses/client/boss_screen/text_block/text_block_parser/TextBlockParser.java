@@ -1,9 +1,11 @@
 package com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser;
 
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockEntry;
+import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_entries.NextLineTextEntry;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_entries.SimpleTextEntry;
 import com.finderfeed.fdlib.data_structures.Pair;
 import net.minecraft.ResourceLocationException;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;

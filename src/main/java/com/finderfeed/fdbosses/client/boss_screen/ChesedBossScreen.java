@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.client.boss_screen;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreenOptions;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreens;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockWidget;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser.TextBlockParser;
@@ -30,8 +31,8 @@ public class ChesedBossScreen extends BaseBossScreen {
 
     private AnimationSystem animationSystem;
 
-    public ChesedBossScreen() {
-        super(BossScreens.CHESED);
+    public ChesedBossScreen(BossScreenOptions options) {
+        super(options);
     }
 
     @Override
@@ -126,7 +127,7 @@ public class ChesedBossScreen extends BaseBossScreen {
     public static void key(InputEvent.Key event){
         if (Minecraft.getInstance().level == null) return;
         if (event.getKey() == GLFW.GLFW_KEY_M){
-            Minecraft.getInstance().setScreen(new ChesedBossScreen());
+            Minecraft.getInstance().setScreen(BossScreens.CHESED.get());
         }
     }
 }

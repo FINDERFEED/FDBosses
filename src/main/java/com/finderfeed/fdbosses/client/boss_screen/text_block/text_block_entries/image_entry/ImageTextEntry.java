@@ -33,6 +33,8 @@ public class ImageTextEntry implements TextBlockEntry {
 
         float widthheight = Minecraft.getInstance().font.lineHeight;
 
+//        cursor.addX(-2 * textScale);
+
         if (cursor.shouldGoToNextLine(widthheight,textBlock.getBorderX())){
             cursor.nextLine(widthheight);
         }
