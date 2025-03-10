@@ -10,7 +10,7 @@
   "entity.fdbosses.chesed": "Chesed",
   "effect.fdbosses.chesed_energized": "Energized",
   "effect_description.fdbosses.chesed_energized": "While player has this effect it cannot be damaged with Chesed's ray attack. Chesed will be damaged instead and effect will be removed from player.",
-  "fdbosses.skills.chesed.crystals_description": "Casts this skill before the ray attack. Destroys all crystals and then summons 1 crystal on each side of the battlefield. If the crystal is destroyed inflict {{(fdbosses:effect)id=fdbosses:chesed_energized}} on player that destroyed it, then destroys all crystals on the battlefield. ",
+  "fdbosses.skills.chesed.crystals_description": "Casts this skill before the ray attack. Destroys all crystals and then summons 1 crystal on each side of the battlefield. If the crystal is destroyed inflict {{(fdbosses:effect)id=fdbosses:chesed_energized}} on player that destroyed it, then destroys all crystals on the battlefield. \n\nEffective weapons:\n{{(fdlib:item)item=minecraft:diamond_axe}} \n\nIneffective weapons:\n{{(fdlib:item)item=minecraft:diamond_sword}}{{(fdlib:item)item=minecraft:diamond_pickaxe}}{{(fdlib:item)item=minecraft:diamond_shovel}}",
   "fdbosses.skills.chesed.crystals": "Crystals",
   "fdbosses.close_skill_info": "Click empty space to close",
   "fdbosses.bosses.description.chesed": "A creature born out of rocks corroded by skulk. Wields enormous magic power.",

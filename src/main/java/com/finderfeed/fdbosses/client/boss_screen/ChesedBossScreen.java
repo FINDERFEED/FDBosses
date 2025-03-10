@@ -39,15 +39,6 @@ public class ChesedBossScreen extends BaseBossScreen {
     protected void init() {
         super.init();
 
-
-        var components = TextBlockParser.parseComponent(Component.translatable("skill.crystal.main_description"),1f,false,this.getBaseStringColor());
-
-        TextBlockWidget textBlock = new TextBlockWidget(this,10,10,400,100)
-                .addTextBlockEntries(components);
-
-//        this.addRenderableWidget(textBlock);
-        
-
         if (chesed == null){
             chesed = new FDModel(BossModels.CHESED.get());
         }
@@ -101,8 +92,8 @@ public class ChesedBossScreen extends BaseBossScreen {
     protected void renderBoss(GuiGraphics graphics,float mx,float my,float pticks){
         PoseStack matrices = graphics.pose();
         this.animationSystem.applyAnimations(chesed,pticks);
-        var anchor = this.getAnchor(0.25f,0.5f);
-        float offsetX = 0;
+        var anchor = this.getAnchor(0,0.5f);
+        float offsetX = this.getBossMenuXStart() / 2;
         float offsetY = 100;
         matrices.pushPose();
         matrices.translate(0,0,-100);

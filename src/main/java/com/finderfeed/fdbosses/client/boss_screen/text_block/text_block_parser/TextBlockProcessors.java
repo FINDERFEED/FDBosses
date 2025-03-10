@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser;
 
+import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser.processors.ItemTextBlockProcessor;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser.processors.ReferenceTextBlockProcessor;
 import com.finderfeed.fdlib.FDLib;
 import net.minecraft.resources.ResourceLocation;
@@ -12,6 +13,7 @@ public class TextBlockProcessors {
     private static final HashMap<String,TextBlockProcessor> TEXT_PROCESSORS = new HashMap<>();
 
     public static final ReferenceTextBlockProcessor REFERENCE_TEXT_BLOCK_PROCESSOR = register(FDLib.location("reference"),new ReferenceTextBlockProcessor());
+    public static final ItemTextBlockProcessor ITEM_TEXT_BLOCK_PROCESSOR = register(FDLib.location("item"),new ItemTextBlockProcessor());
 
     public static <T extends TextBlockProcessor> T register(ResourceLocation name, T textBlockProcessor){
         TEXT_PROCESSORS.put(name.toString(),textBlockProcessor);

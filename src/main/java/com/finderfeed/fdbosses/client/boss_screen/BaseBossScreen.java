@@ -35,6 +35,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     private BossScreenOptions options;
     private BossDetailsWidget bossDetailsWidget;
     private BossAbilitesWidget bossAbilitesWidget;
+    private float bossMenuXStart = 0;
 
     private int moveThings = 0;
 
@@ -73,6 +74,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         BossDetailsWidget widget = new BossDetailsWidget(this,  anchor.x, bossInfoYs, bossInfoWidth, bossInfoHeight);
         widget.setBossName(this.options.getEntityType().getDescription(),this.getBaseStringColor());
+        this.bossMenuXStart = anchor.x - bossInfoWidth;
 
         TextBlockWidget bossDescription = new TextBlockWidget(this, 18,60,195, 40);
         bossDescription.setText(options.getBossDescription(),1f,this.getBaseStringColor(),true);
@@ -265,6 +267,10 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     public abstract int getBaseStringColor();
 
     protected abstract void renderBoss(GuiGraphics graphics, float mx, float my, float pticks);
+
+    public float getBossMenuXStart() {
+        return bossMenuXStart;
+    }
 
     @Override
     public boolean isPauseScreen() {
