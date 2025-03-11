@@ -170,7 +170,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         if (moveThings++ == 1){
             this.bossDetailsWidget.moveWidgetTo(9,this.bossDetailsWidget.getX() - this.bossDetailsWidget.getWidth(), this.bossDetailsWidget.getY(),FDEasings::easeOut);
-            this.bossAbilitesWidget.moveWidgetTo(9,this.bossAbilitesWidget.getX(),this.bossAbilitesWidget.getY() - this.bossAbilitesWidget.getHeight() - 5,FDEasings::easeOut);
+            this.bossAbilitesWidget.moveWidgetTo(9,this.bossAbilitesWidget.getX(),this.bossAbilitesWidget.getY() - this.bossAbilitesWidget.getHeight(),FDEasings::easeOut);
         }
     }
 

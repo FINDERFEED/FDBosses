@@ -17,7 +17,7 @@ public class BossAbilitesWidget extends FDScrollableWidget {
     private float maxScroll = 0;
 
     public BossAbilitesWidget(Screen screen, float x, float y, int stringColor) {
-        super(screen, x, y, 237,114);
+        super(screen, x, y, 231,120);
         this.stringColor = stringColor;
     }
 
