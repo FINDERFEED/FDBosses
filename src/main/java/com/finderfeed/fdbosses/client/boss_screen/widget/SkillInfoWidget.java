@@ -56,7 +56,7 @@ public class SkillInfoWidget extends FDWidget {
         Font font = Minecraft.getInstance().font;
         float textWidth = font.width(skillName) * scale;
         float textX = this.getX() + this.getWidth() / 2 + 7f - textWidth / 2;
-        float textY = 58;
+        float textY = 61;
 
         float r = (color & 0xff0000) >> 16; r /= 255f;
         float g = (color & 0x00ff00) >> 8; g /= 255f;
@@ -81,12 +81,13 @@ public class SkillInfoWidget extends FDWidget {
 
         //skill image
         if (skillImage != null) {
+            float offs = 20;
             FDRenderUtil.bindTexture(FDBosses.location("textures/gui/ability_button_unselected.png"));
-            FDRenderUtil.blitWithBlend(matrices,this.getX() + 89.5f,this.getY() + 20,32,32,
+            FDRenderUtil.blitWithBlend(matrices,this.getX() + 89.5f,this.getY() + offs,32,32,
                     0,0,1,1,1,1,0,1f);
 
             FDRenderUtil.bindTexture(skillImage);
-            FDRenderUtil.blitWithBlend(matrices,this.getX() + 97.5f,this.getY() + 28,16,16,
+            FDRenderUtil.blitWithBlend(matrices,this.getX() + 97.5f,this.getY() + offs + 8,16,16,
                     0,0,1,1,1,1,0,1f);
         }
 

@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreens
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockWidget;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser.TextBlockParser;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
@@ -78,6 +79,11 @@ public class ChesedBossScreen extends BaseBossScreen {
     @Override
     public int getBaseStringColor() {
         return 0x55ccff;
+    }
+
+    @Override
+    public float getBossHealth() {
+        return BossConfigs.BOSS_CONFIG.get().chesedConfig.chesedMaxHits;
     }
 
 

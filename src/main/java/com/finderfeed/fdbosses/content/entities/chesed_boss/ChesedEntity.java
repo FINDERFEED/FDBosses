@@ -2025,7 +2025,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
     }
 
     public int getBossMaxHits(){
-        return 10;
+        return BossConfigs.BOSS_CONFIG.get().chesedConfig.chesedMaxHits;
     }
 
     public int getRemainingHits(){

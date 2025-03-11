@@ -17,7 +17,7 @@
   "fdbosses.skills.chesed.mightiness": "Mightiness",
   "fdbosses.skills.chesed.mightiness_description": "Chesed cannot be hurt directly. All damage inflicted by Chesed cannot be lowered by any resistances.",
   "fdbosses.skills.chesed.blocks": "Block Barrage",
-  "fdbosses.skills.chesed.blocks_description": "Tears out blocks from the earth and hurls them onto target.\n\nDuring second phase creates static field around all players that doesn't allow them to escape.",
+  "fdbosses.skills.chesed.blocks_description": "Tears out blocks from the earth and hurls them onto target.\n\nDuring second phase creates static field around all players that doesn't allow them to escape. \n\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=blockAttackDamage}}",
   "fdbosses.skills.chesed.earthquake": "Earthquake",
   "fdbosses.skills.chesed.earthquake_description": "Slams the earth emitting a shockwave with lightnings that travel out from Chesed position.\n\nDuring second phase more lightnings are summoned and their movement speed is increased.",
   "fdbosses.skills.chesed.espheres": "Tempest Core",
@@ -31,5 +31,16 @@
   "fdbosses.skills.chesed.lightning_ray": "Lightning Ray",
   "fdbosses.skills.chesed.lightning_ray_description": "Casts Crystals ability before this ability and then begins to fire lightning rays with tremendous power at target. \n\nLightning ray can be blocked with shield if player is affected by {{(fdbosses:effect)id=fdbosses:chesed_energized}}. \n\nDuring second phase the frequency of attacks is increased.",
   "fdbosses.skills.chesed.final": "Tenebrae Aeternae",
-  "fdbosses.skills.chesed.final_description": "Drains power from monoliths and then unleashes a lightning beam that damage everyone on the battlefield. \n\nDamage depends on how many monoliths are in active state. \n\nWhile Chesed casts this ability monoliths are invulnerable. \n\nDeactivated monoliths become activated again after this ability ends."
+  "fdbosses.skills.chesed.final_description": "Drains power from monoliths and then unleashes a lightning beam that damage everyone on the battlefield. \n\nDamage depends on how many monoliths are in active state. \n\nWhile Chesed casts this ability monoliths are invulnerable. \n\nDeactivated monoliths become activated again after this ability ends.",
+  "fdbosses.word.abilities": "Abilities",
+  "fdbosses.skills.chesed.final_stats": "",
+  "fdbosses.skills.chesed.rockfall_stats": "",
+  "fdbosses.skills.chesed.roll_stats": "",
+  "fdbosses.skills.chesed.espheres_stats": "",
+  "fdbosses.skills.chesed.earthquake_stats": "",
+  "fdbosses.skills.chesed.blocks_stats": "",
+  "fdbosses.skills.chesed.lightning_ray_stats": "",
+  "fdbosses.skills.chesed.crystals_stats": "",
+  "fdbosses.skills.chesed.monoliths_stats": "",
+  "fdbosses.skills.chesed.mightiness_stats": ""
 }

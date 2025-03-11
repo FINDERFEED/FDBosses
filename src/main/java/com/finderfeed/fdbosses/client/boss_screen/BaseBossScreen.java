@@ -10,7 +10,6 @@ import com.finderfeed.fdbosses.client.boss_screen.widget.FDSkillButton;
 import com.finderfeed.fdbosses.client.boss_screen.widget.SkillInfoWidget;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDButton;
-import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDImage;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.util.FDButtonTextures;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.util.WidgetTexture;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -68,15 +67,15 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         Vector2f anchor = this.getAnchor(1f,0f);
 
         float bossInfoWidth = 237;
-        float bossInfoHeight = 125;
+        float bossInfoHeight = 140;
 
-        float bossInfoYs = 5;
+        float bossInfoYs = 0;
 
         BossDetailsWidget widget = new BossDetailsWidget(this,  anchor.x, bossInfoYs, bossInfoWidth, bossInfoHeight);
-        widget.setBossName(this.options.getEntityType().getDescription(),this.getBaseStringColor());
+        widget.setBossInfo(this.options.getEntityType().getDescription(),this.getBaseStringColor(), this.getBossHealth());
         this.bossMenuXStart = anchor.x - bossInfoWidth;
 
-        TextBlockWidget bossDescription = new TextBlockWidget(this, 18,60,195, 40);
+        TextBlockWidget bossDescription = new TextBlockWidget(this, 18,60,150, 40);
         bossDescription.setText(options.getBossDescription(),1f,this.getBaseStringColor(),true);
 
         widget.addChild("bossDescription",bossDescription);
@@ -93,7 +92,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         SkillInfoWidget widget = new SkillInfoWidget(this,-200,2,200,anchor.y - 4,Component.literal("TTT"),this.getBaseStringColor());
 
-        TextBlockWidget textBlockWidget = new TextBlockWidget(this,30,75,151,widget.getHeight() - 99);
+        TextBlockWidget textBlockWidget = new TextBlockWidget(this,30,80,151,widget.getHeight() - 99);
         widget.addChild("text",textBlockWidget);
 
         this.skillInfoWidget = widget;
@@ -223,24 +222,6 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
     protected void renderBack(GuiGraphics graphics, float mx, float my, float pticks){
 
-        PoseStack matrices = graphics.pose();
-
-        Vector2f anchorEnd = this.getAnchor(1f,1f);
-
-        //----------------------------backgrounds------------------------------------------
-        Vector2f anchor = this.getAnchor(1f,0f);
-
-        float bossInfoWidth = 237;
-        float bossInfoHeight = 125;
-
-        float bossInfoXs = anchor.x - bossInfoWidth;
-        float bossInfoYs = 10;
-
-
-
-
-        //----------------------------boss name-----------------------------------------------
-
 
 
     }
@@ -265,6 +246,8 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     public abstract Component getBossName();
 
     public abstract int getBaseStringColor();
+
+    public abstract float getBossHealth();
 
     protected abstract void renderBoss(GuiGraphics graphics, float mx, float my, float pticks);
 

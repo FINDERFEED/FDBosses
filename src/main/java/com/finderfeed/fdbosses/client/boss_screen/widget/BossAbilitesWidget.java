@@ -35,7 +35,7 @@ public class BossAbilitesWidget extends FDScrollableWidget {
         FDRenderUtil.bindTexture(FDBosses.location("textures/gui/boss_abilities.png"));
         FDRenderUtil.blitWithBlend(matrices, bossAbilitiesXs,bossAbilitiesYs,this.getWidth(),this.getHeight(),0,0,1f,1f,1f,1f,0,1f);
 
-        Component abilities = Component.literal("Abilities");
+        Component abilities = Component.translatable("fdbosses.word.abilities");
         float abilitieswidth = font.width(abilities);
 
         FDRenderUtil.renderScaledText(guiGraphics,abilities, bossAbilitiesXs + this.getWidth() / 2 - abilitieswidth / 2 - 3,bossAbilitiesYs + 7,1f,true,stringColor);

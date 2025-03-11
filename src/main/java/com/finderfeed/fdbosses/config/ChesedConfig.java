@@ -5,6 +5,9 @@ import com.finderfeed.fdlib.systems.config.ConfigValue;
 public class ChesedConfig  {
 
     @ConfigValue
+    public int chesedMaxHits = 10;
+
+    @ConfigValue
     public float electricSphereDamage = 10f;
 
     @ConfigValue
@@ -27,9 +30,6 @@ public class ChesedConfig  {
 
     @ConfigValue
     public float rayDamage = 10;
-
-    @ConfigValue
-    public boolean finalAttackHeals = true;
 
     @ConfigValue
     public float finalAttackDamagePercentPerMonolith = 25f;

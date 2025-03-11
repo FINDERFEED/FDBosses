@@ -9,12 +9,19 @@ public class BossSkill {
 
     private Component skillName;
 
+    private Component skillStats;
+
     private Component skillDescription;
 
-    public BossSkill(ResourceLocation skillIcon, Component skillName, Component skillDescription) {
+    public BossSkill(ResourceLocation skillIcon, Component skillName, Component skillStats, Component skillDescription) {
         this.skillIcon = skillIcon;
         this.skillName = skillName;
+        this.skillStats = skillStats;
         this.skillDescription = skillDescription;
+    }
+
+    public Component getSkillStats() {
+        return skillStats;
     }
 
     public Component getSkillDescription() {

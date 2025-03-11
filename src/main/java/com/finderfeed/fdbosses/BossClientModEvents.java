@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser.TextBlockProcessors;
+import com.finderfeed.fdbosses.client.boss_screen.text_block_processors.BossConfigFloatValueProcessor;
 import com.finderfeed.fdbosses.client.boss_screen.text_block_processors.MobEffectTextProcessor;
 import com.finderfeed.fdbosses.client.overlay.ElectrifiedOverlay;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningParticle;
@@ -43,6 +44,7 @@ public class BossClientModEvents {
     public static void clientSetup(FMLClientSetupEvent event){
         event.enqueueWork(()->{
             TextBlockProcessors.register(FDBosses.location("effect"),new MobEffectTextProcessor());
+            TextBlockProcessors.register(FDBosses.location("config_float"),new BossConfigFloatValueProcessor());
         });
     }
 
