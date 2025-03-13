@@ -96,7 +96,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         SkillInfoWidget widget = new SkillInfoWidget(this,-200,2,200,anchor.y - 4,Component.literal("TTT"),this.getBaseStringColor());
 
 
-        FDButton fdButtonStats = new FDButton(this,30,79,73,24)
+        FDButton fdButtonStats = new FDButton(this,108,79,73,24)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
@@ -104,7 +104,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                 .setText(Component.translatable("fdbosses.word.stats").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         61,1f,true,0,1);
 
-        FDButton fdButtonInfo = new FDButton(this,108,79,73,24)
+        FDButton fdButtonInfo = new FDButton(this,30,79,73,24)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
@@ -180,7 +180,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                 skillInfoButton.setActive(false);
                 skillStatsButton.setActive(false);
             }else{
-                this.skillInfoText.setText(skill.getSkillStats(), 1f, this.getBaseStringColor(), true);
+                this.skillInfoText.setText(skill.getSkillDescription(), 1f, this.getBaseStringColor(), true);
                 this.skillInfoButton.setOnClickAction(((fdWidget, v, v1, i) -> {
                     this.skillInfoText.setText(skill.getSkillDescription(), 1f, this.getBaseStringColor(), true);
                     return true;

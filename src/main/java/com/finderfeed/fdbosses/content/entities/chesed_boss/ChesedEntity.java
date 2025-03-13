@@ -1632,7 +1632,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     Vec3 b = oldRollPos.subtract(pos);
                     int amount = (int) Math.ceil(b.length());
                     for (int i = 0; i < amount;i++) {
-                        ChesedFireTrailEntity fireTrailEntity = ChesedFireTrailEntity.summon(level(), pos.add(0, -0.5, 0).add(b.normalize().multiply(i,i,i)), 2, 80);
+                        ChesedFireTrailEntity fireTrailEntity =
+                                ChesedFireTrailEntity.summon(level(), pos.add(0, -0.5, 0).add(b.normalize().multiply(i,i,i)),
+                                        BossConfigs.BOSS_CONFIG.get().chesedConfig.fireTrailDamage, 80);
                     }
                 }
                 this.handleRoll(tick, pos);

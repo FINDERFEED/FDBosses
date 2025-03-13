@@ -32,6 +32,9 @@ public class ChesedConfig  {
     public float rayDamage = 10;
 
     @ConfigValue
+    public float fireTrailDamage = 2;
+
+    @ConfigValue
     public float finalAttackDamagePercentPerMonolith = 25f;
 
 }

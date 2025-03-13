@@ -35,7 +35,7 @@
   "fdbosses.word.abilities": "Abilities",
   "fdbosses.skills.chesed.final_stats": "Attack: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=finalAttackDamagePercentPerMonolith}}% Max HP per active monolith.",
   "fdbosses.skills.chesed.rockfall_stats": "Rocks: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=rockfallRockDamage}}\n\nLightnings: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=rockfallRayDamage}}",
-  "fdbosses.skills.chesed.roll_stats": "Chesed Impact: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=rollAttackDamage}}",
+  "fdbosses.skills.chesed.roll_stats": "Chesed Impact: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=rollAttackDamage}} \n\nFire trail: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=fireTrailDamage}}",
   "fdbosses.skills.chesed.espheres_stats": "Electric Sphere: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=electricSphereDamage}}",
   "fdbosses.skills.chesed.earthquake_stats": "Earthquake: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=eartquakeDamage}} \n\nLightnings: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=earthquakeRayDamage}}",
   "fdbosses.skills.chesed.blocks_stats": "Blocks: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=blockAttackDamage}}",
