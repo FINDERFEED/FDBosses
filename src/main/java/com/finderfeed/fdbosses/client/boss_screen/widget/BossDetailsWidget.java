@@ -16,8 +16,6 @@ public class BossDetailsWidget extends FDWidget {
 
     private int textColor = 0xffffff;
 
-    private float bossHealth;
-
     public BossDetailsWidget(Screen screen, float x, float y, float width, float height) {
         super(screen, x, y, width, height);
     }
@@ -59,27 +57,13 @@ public class BossDetailsWidget extends FDWidget {
 
         FDRenderUtil.renderScaledText(guiGraphics,bossName,this.getX() + bossNameOffsetX,this.getY() + bossNameOffsetY,bossNameScale,true,textColor);
 
-        float xHealthOffset = 170;
-        float yHealthOffset = 60;
-        FDRenderUtil.bindTexture(FDBosses.location("textures/gui/boss_health_heart.png"));
-        FDRenderUtil.blitWithBlend(matrices, this.getX() + xHealthOffset, this.getY() + yHealthOffset, 9,9,0,0,1,1,1,1,0,1f);
-
-        FDRenderUtil.renderScaledText(guiGraphics,Component.literal("" + this.bossHealth),
-                this.getX() + xHealthOffset + 12,
-                this.getY() + yHealthOffset,
-                1f,
-                true,
-                textColor
-        );
-
 
 
     }
 
-    public BossDetailsWidget setBossInfo(Component bossName, int textColor, float bossHealth){
+    public BossDetailsWidget setBossInfo(Component bossName, int textColor){
         this.bossName = bossName;
         this.textColor = textColor;
-        this.bossHealth = bossHealth;
         return this;
     }
 

@@ -42,5 +42,7 @@
   "fdbosses.skills.chesed.lightning_ray_stats": "",
   "fdbosses.skills.chesed.crystals_stats": "",
   "fdbosses.skills.chesed.monoliths_stats": "",
-  "fdbosses.skills.chesed.mightiness_stats": ""
+  "fdbosses.skills.chesed.mightiness_stats": "",
+  "fdbosses.word.stats": "Stats",
+  "fdbosses.word.info": "Info"
 }

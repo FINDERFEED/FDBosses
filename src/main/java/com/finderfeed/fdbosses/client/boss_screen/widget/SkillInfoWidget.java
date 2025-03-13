@@ -34,22 +34,22 @@ public class SkillInfoWidget extends FDWidget {
         PoseStack matrices = guiGraphics.pose();
 
         //up + down
-        float cumulativeWidth = 52 + 53;
+        float cumulativeHeight = 103 + 53;
 
         FDRenderUtil.bindTexture(UP);
-        FDRenderUtil.blitWithBlend(matrices,this.getX(),this.getY(),this.getWidth(),52,0,0,1,1,1,1,0,1f);
+        FDRenderUtil.blitWithBlend(matrices,this.getX(),this.getY(),this.getWidth(),103,0,0,1,1,1,1,0,1f);
 
-        float middleHeight = Math.max(0,this.getHeight() - cumulativeWidth);
+        float middleHeight = Math.max(0,this.getHeight() - cumulativeHeight);
 
 
         if (middleHeight != 0){
             FDRenderUtil.bindTexture(MIDDLE);
-            FDRenderUtil.blitWithBlend(matrices,this.getX(),this.getY() + 52,this.getWidth(),middleHeight,0,0,1,1,1,1,0,1f);
+            FDRenderUtil.blitWithBlend(matrices,this.getX(),this.getY() + 103,this.getWidth(),middleHeight,0,0,1,1,1,1,0,1f);
         }
 
 
         FDRenderUtil.bindTexture(DOWN);
-        FDRenderUtil.blitWithBlend(matrices,this.getX(),this.getY() + 52 + middleHeight,this.getWidth(),53,0,0,1,1,1,1,0,1f);
+        FDRenderUtil.blitWithBlend(matrices,this.getX(),this.getY() + 103 + middleHeight,this.getWidth(),53,0,0,1,1,1,1,0,1f);
 
         //skill name
         float scale = 1.5f;
@@ -82,10 +82,6 @@ public class SkillInfoWidget extends FDWidget {
         //skill image
         if (skillImage != null) {
             float offs = 20;
-            FDRenderUtil.bindTexture(FDBosses.location("textures/gui/ability_button_unselected.png"));
-            FDRenderUtil.blitWithBlend(matrices,this.getX() + 89.5f,this.getY() + offs,32,32,
-                    0,0,1,1,1,1,0,1f);
-
             FDRenderUtil.bindTexture(skillImage);
             FDRenderUtil.blitWithBlend(matrices,this.getX() + 97.5f,this.getY() + offs + 8,16,16,
                     0,0,1,1,1,1,0,1f);

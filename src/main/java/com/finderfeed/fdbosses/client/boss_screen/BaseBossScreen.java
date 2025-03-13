@@ -20,6 +20,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.Mth;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
@@ -72,10 +73,10 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         float bossInfoYs = 0;
 
         BossDetailsWidget widget = new BossDetailsWidget(this,  anchor.x, bossInfoYs, bossInfoWidth, bossInfoHeight);
-        widget.setBossInfo(this.options.getEntityType().getDescription(),this.getBaseStringColor(), this.getBossHealth());
+        widget.setBossInfo(this.options.getEntityType().getDescription(),this.getBaseStringColor());
         this.bossMenuXStart = anchor.x - bossInfoWidth;
 
-        TextBlockWidget bossDescription = new TextBlockWidget(this, 18,60,150, 40);
+        TextBlockWidget bossDescription = new TextBlockWidget(this, 18,60,195, 40);
         bossDescription.setText(options.getBossDescription(),1f,this.getBaseStringColor(),true);
 
         widget.addChild("bossDescription",bossDescription);
@@ -92,7 +93,26 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         SkillInfoWidget widget = new SkillInfoWidget(this,-200,2,200,anchor.y - 4,Component.literal("TTT"),this.getBaseStringColor());
 
-        TextBlockWidget textBlockWidget = new TextBlockWidget(this,30,80,151,widget.getHeight() - 99);
+        FDButton fdButtonStats = new FDButton(this,30,79,73,24)
+                .setTexture(new FDButtonTextures(
+                        new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
+                        new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
+                ))
+                .setText(Component.translatable("fdbosses.word.stats").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
+                        61,1f,true);
+
+        FDButton fdButtonInfo = new FDButton(this,108,79,73,24)
+                .setTexture(new FDButtonTextures(
+                        new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
+                        new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
+                ))
+                .setText(Component.translatable("fdbosses.word.info").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
+                        61,1f,true);
+
+        widget.addChild("statsButton",fdButtonStats);
+        widget.addChild("infoButton",fdButtonInfo);
+
+        TextBlockWidget textBlockWidget = new TextBlockWidget(this,30,107,151,widget.getHeight() - 130);
         widget.addChild("text",textBlockWidget);
 
         this.skillInfoWidget = widget;
@@ -246,8 +266,6 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     public abstract Component getBossName();
 
     public abstract int getBaseStringColor();
-
-    public abstract float getBossHealth();
 
     protected abstract void renderBoss(GuiGraphics graphics, float mx, float my, float pticks);
 

@@ -81,10 +81,6 @@ public class ChesedBossScreen extends BaseBossScreen {
         return 0x55ccff;
     }
 
-    @Override
-    public float getBossHealth() {
-        return BossConfigs.BOSS_CONFIG.get().chesedConfig.chesedMaxHits;
-    }
 
 
     @Override
