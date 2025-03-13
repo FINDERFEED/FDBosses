@@ -35,6 +35,8 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     private BossScreenOptions options;
     private BossDetailsWidget bossDetailsWidget;
     private BossAbilitesWidget bossAbilitesWidget;
+    private FDButton skillStatsButton;
+    private FDButton skillInfoButton;
     private float bossMenuXStart = 0;
 
     private int moveThings = 0;
@@ -93,13 +95,14 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         SkillInfoWidget widget = new SkillInfoWidget(this,-200,2,200,anchor.y - 4,Component.literal("TTT"),this.getBaseStringColor());
 
+
         FDButton fdButtonStats = new FDButton(this,30,79,73,24)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
                 ))
                 .setText(Component.translatable("fdbosses.word.stats").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
-                        61,1f,true);
+                        61,1f,true,0,1);
 
         FDButton fdButtonInfo = new FDButton(this,108,79,73,24)
                 .setTexture(new FDButtonTextures(
@@ -107,13 +110,19 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                         new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
                 ))
                 .setText(Component.translatable("fdbosses.word.info").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
-                        61,1f,true);
+                        61,1f,true,0,1);
 
-        widget.addChild("statsButton",fdButtonStats);
-        widget.addChild("infoButton",fdButtonInfo);
+
+        skillInfoButton = fdButtonInfo;
+        skillStatsButton = fdButtonStats;
+
+
 
         TextBlockWidget textBlockWidget = new TextBlockWidget(this,30,107,151,widget.getHeight() - 130);
         widget.addChild("text",textBlockWidget);
+
+        widget.addChild("statsButton",fdButtonStats);
+        widget.addChild("infoButton",fdButtonInfo);
 
         this.skillInfoWidget = widget;
         this.skillInfoText = textBlockWidget;
@@ -164,9 +173,26 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
     public void openSkillInfo(BossSkill skill, boolean state){
         if (!skillOpened && state){
+            if (skill.getSkillStats() == null) {
+                this.skillInfoText.setText(skill.getSkillDescription(), 1f, this.getBaseStringColor(), true);
+                this.skillInfoButton.setOnClickAction(null);
+                this.skillStatsButton.setOnClickAction(null);
+                skillInfoButton.setActive(false);
+                skillStatsButton.setActive(false);
+            }else{
+                this.skillInfoText.setText(skill.getSkillStats(), 1f, this.getBaseStringColor(), true);
+                this.skillInfoButton.setOnClickAction(((fdWidget, v, v1, i) -> {
+                    this.skillInfoText.setText(skill.getSkillDescription(), 1f, this.getBaseStringColor(), true);
+                    return true;
+                }));
+                this.skillStatsButton.setOnClickAction(((fdWidget, v, v1, i) -> {
+                    this.skillInfoText.setText(skill.getSkillStats(), 1f, this.getBaseStringColor(), true);
+                    return true;
+                }));
+                skillInfoButton.setActive(true);
+                skillStatsButton.setActive(true);
 
-            this.skillInfoText.setText(skill.getSkillDescription(),1f,this.getBaseStringColor(),true);
-
+            }
             this.skillInfoWidget.setSkillName(skill.getSkillName(),this.getBaseStringColor());
 
             this.skillInfoWidget.setSkillImage(skill.getSkillIcon());
@@ -254,7 +280,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                 this.openSkillInfo(null,false);
                 return false;
             } else {
-                if (FDRenderUtil.isMouseInBounds((float)mx,(float)my,this.skillInfoWidget.getX(),this.skillInfoWidget.getY(),this.skillInfoWidget.getWidth(),this.skillInfoWidget.getY())) {
+                if (FDRenderUtil.isMouseInBounds((float)mx,(float)my,this.skillInfoWidget.getX(),this.skillInfoWidget.getY(),this.skillInfoWidget.getWidth(),this.skillInfoWidget.getHeight())) {
                     return this.skillInfoWidget.mouseClicked(mx, my, button);
                 }
                 return false;

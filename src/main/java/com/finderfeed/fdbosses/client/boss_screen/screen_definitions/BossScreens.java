@@ -21,19 +21,19 @@ public class BossScreens {
                 .addSkill(new BossSkill(
                         FDBosses.location("textures/gui/skills/chesed/mightiness.png"),
                         Component.translatable("fdbosses.skills.chesed.mightiness"),
-                        Component.translatable("fdbosses.skills.chesed.mightiness_stats"),
+                        null,
                         Component.translatable("fdbosses.skills.chesed.mightiness_description")
                 ))
                 .addSkill(new BossSkill(
                         FDBosses.location("textures/gui/skills/chesed/monoliths.png"),
                         Component.translatable("fdbosses.skills.chesed.monoliths"),
-                        Component.translatable("fdbosses.skills.chesed.monoliths_stats"),
+                        null,
                         Component.translatable("fdbosses.skills.chesed.monoliths_description")
                 ))
                 .addSkill(new BossSkill(
                         FDBosses.location("textures/gui/skills/chesed/crystals.png"),
                         Component.translatable("fdbosses.skills.chesed.crystals"),
-                        Component.translatable("fdbosses.skills.chesed.crystals_stats"),
+                        null,
                         Component.translatable("fdbosses.skills.chesed.crystals_description")
                 ))
                 .addSkill(new BossSkill(

@@ -103,6 +103,7 @@ public class SimpleTextEntry implements TextBlockEntry {
 
 
         List<FormattedText> sequences = splitter.splitLines(text,Math.round(textBlock.getWidth() / scale),Style.EMPTY);
+        if (sequences.isEmpty()) return;
         for (FormattedText formattedText : sequences){
 
             if (styleOverride != null){

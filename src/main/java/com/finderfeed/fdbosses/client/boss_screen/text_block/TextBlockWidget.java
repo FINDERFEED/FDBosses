@@ -142,8 +142,9 @@ public class TextBlockWidget extends FDScrollableWidget {
         InteractionBox box = this.getClickInteractionBoxUnderMouse((float)mx,(float)my);
         if (box != null){
             box.interaction.getOnClick().click(this,(float)mx,(float)my,key);
+            return true;
         }
-        return true;
+        return false;
     }
 
     @Override
@@ -156,10 +157,10 @@ public class TextBlockWidget extends FDScrollableWidget {
         InteractionBox box = this.getScrollInteractionBoxUnderMouse((float)mx,(float)my);
         if (box != null){
             box.interaction.getOnScroll().scroll(this,(float)mx,(float)my,(float)scrollX,(float)scrollY);
+            return true;
         }else{
             return super.onMouseScroll(mx,my,scrollX,scrollY);
         }
-        return true;
     }
 
     @Override
