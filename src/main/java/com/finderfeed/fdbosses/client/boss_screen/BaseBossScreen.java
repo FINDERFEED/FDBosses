@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.client.boss_screen;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.BossRenderUtil;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreenOptions;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossSkill;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockWidget;
@@ -244,7 +245,6 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         }
 
         this.renderSkillInfo(graphics,mx,my,pticks);
-
     }
 
     private void renderSkillInfo(GuiGraphics graphics, int mx, int my, float pticks){

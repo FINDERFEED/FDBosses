@@ -26,6 +26,8 @@ public class TextBlockWidget extends FDScrollableWidget {
 
     private int textColor = 0xffffff;
 
+    private boolean debug = false;
+
     public TextBlockWidget(Screen owner, float x, float y, float width, float height){
         super(owner,x,y,width,height);
     }
@@ -34,8 +36,9 @@ public class TextBlockWidget extends FDScrollableWidget {
     public void renderWidget(GuiGraphics graphics, float mx, float my, float pticks) {
         TextBlockCursor cursor = new TextBlockCursor(this.getX(),this.getY() - this.getCurrentScroll());
 
-//        FDRenderUtil.fill(graphics.pose(),this.getX(),this.getY(),this.getWidth(),this.getHeight(),1f,1f,1f,0.25f);
-
+        if (debug) {
+            FDRenderUtil.fill(graphics.pose(), this.getX(), this.getY(), this.getWidth(), this.getHeight(), 1f, 1f, 1f, 0.25f);
+        }
         this.clearInteractions();
 
         FDRenderUtil.Scissor.pushScissors(this.getX(),this.getY(),this.getWidth(),this.getHeight());
@@ -198,5 +201,9 @@ public class TextBlockWidget extends FDScrollableWidget {
         return ScreenRectangle.empty();
     }
 
+    public TextBlockWidget setDebug(boolean debug){
+        this.debug = debug;
+        return this;
+    }
 
 }
