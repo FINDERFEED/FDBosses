@@ -13,7 +13,7 @@
   "fdbosses.skills.chesed.crystals_description": "Casts this ability before the lightning ray attack.\n\nDestroys all crystals and then summons 1 crystal on each side of the battlefield.\n\nIf the crystal is destroyed inflict {{(fdbosses:effect)id=fdbosses:chesed_energized}} on player that destroyed it, then all other crystals on the battlefield are destroyed.",
   "fdbosses.skills.chesed.crystals": "Crystals",
   "fdbosses.close_skill_info": "Click empty space to close",
-  "fdbosses.bosses.description.chesed": "A creature born out of rocks corroded by skulk. Wields enormous magic power.",
+  "fdbosses.bosses.description.chesed": "A creature born out of rocks corroded by sculk. Wields enormous magic power.",
   "fdbosses.skills.chesed.mightiness": "Mightiness",
   "fdbosses.skills.chesed.mightiness_description": "Chesed cannot be hurt directly.\n\nAll damage inflicted by Chesed cannot be lowered by any resistances.",
   "fdbosses.skills.chesed.blocks": "Block Barrage",
