@@ -27,13 +27,13 @@ public class BossScreens {
                 .addSkill(new BossSkill(
                         FDBosses.location("textures/gui/skills/chesed/monoliths.png"),
                         Component.translatable("fdbosses.skills.chesed.monoliths"),
-                        null,
+                        Component.translatable("fdbosses.skills.chesed.monoliths_stats"),
                         Component.translatable("fdbosses.skills.chesed.monoliths_description")
                 ))
                 .addSkill(new BossSkill(
                         FDBosses.location("textures/gui/skills/chesed/crystals.png"),
                         Component.translatable("fdbosses.skills.chesed.crystals"),
-                        null,
+                        Component.translatable("fdbosses.skills.chesed.crystals_stats"),
                         Component.translatable("fdbosses.skills.chesed.crystals_description")
                 ))
                 .addSkill(new BossSkill(
