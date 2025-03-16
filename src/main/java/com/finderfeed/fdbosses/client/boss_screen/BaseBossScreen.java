@@ -245,6 +245,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         }
 
         this.renderSkillInfo(graphics,mx,my,pticks);
+
     }
 
     private void renderSkillInfo(GuiGraphics graphics, int mx, int my, float pticks){

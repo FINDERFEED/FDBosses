@@ -1,11 +1,14 @@
 package com.finderfeed.fdbosses.client.boss_screen.text_block_processors;
 
+import com.finderfeed.fdbosses.client.BossRenderUtil;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockEntry;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.interactions.TextBlockEntryInteraction;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_entries.image_entry.ImageInText;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_entries.image_entry.ImageTextEntry;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_entries.SimpleTextEntry;
 import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser.TextBlockProcessor;
+import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlas;
@@ -50,7 +53,11 @@ public class MobEffectTextProcessor extends TextBlockProcessor {
         String key = Util.makeDescriptionId("effect_description",location);
 
         TextBlockEntryInteraction interaction = TextBlockEntryInteraction.hoverOver(((textBlock, graphics, mx, my) -> {
-            graphics.renderTooltip(Minecraft.getInstance().font, Minecraft.getInstance().font.split(Component.translatable(key).withStyle(Style.EMPTY.withColor(textColor)),100),(int)mx,(int)my);
+            PoseStack matrices = graphics.pose();
+            matrices.pushPose();
+            matrices.translate(0,0,100);
+            BossRenderUtil.renderBossScreenTooltip(graphics,Component.translatable(key),mx,my,200,textColor,1f);
+            matrices.popPose();
         }));
 
         ImageTextEntry imageTextEntry = new ImageTextEntry(imageInText,textScale,interaction);
