@@ -1,10 +1,10 @@
 package com.finderfeed.fdbosses.client.boss_screen.text_block_processors;
 
-import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockEntry;
-import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_entries.SimpleTextEntry;
-import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser.TextBlockProcessor;
 import com.finderfeed.fdbosses.config.BossConfig;
 import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.TextBlockEntry;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.text_block_entries.SimpleTextEntry;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.text_block_parser.TextBlockProcessor;
 import net.minecraft.network.chat.Component;
 
 import java.lang.reflect.Field;

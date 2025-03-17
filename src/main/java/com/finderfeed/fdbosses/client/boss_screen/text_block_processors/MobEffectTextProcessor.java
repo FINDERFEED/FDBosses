@@ -1,12 +1,12 @@
 package com.finderfeed.fdbosses.client.boss_screen.text_block_processors;
 
 import com.finderfeed.fdbosses.client.BossRenderUtil;
-import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockEntry;
-import com.finderfeed.fdbosses.client.boss_screen.text_block.interactions.TextBlockEntryInteraction;
-import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_entries.image_entry.ImageInText;
-import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_entries.image_entry.ImageTextEntry;
-import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_entries.SimpleTextEntry;
-import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser.TextBlockProcessor;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.TextBlockEntry;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.interactions.TextBlockEntryInteraction;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.text_block_entries.SimpleTextEntry;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.text_block_entries.image_entry.ImageInText;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.text_block_entries.image_entry.ImageTextEntry;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.text_block_parser.TextBlockProcessor;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.Util;
@@ -26,7 +26,7 @@ import java.util.List;
 public class MobEffectTextProcessor extends TextBlockProcessor {
 
     @Override
-    public List<TextBlockEntry> parse(float textScale,boolean renderShadow, int textColor, HashMap<String, String> arguments) {
+    public List<TextBlockEntry> parse(float textScale, boolean renderShadow, int textColor, HashMap<String, String> arguments) {
 
         if (!arguments.containsKey("id")) throw new RuntimeException("Couldn't find 'id' on mob effect text processor");
 

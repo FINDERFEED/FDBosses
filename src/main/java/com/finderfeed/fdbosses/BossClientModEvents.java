@@ -1,7 +1,6 @@
 package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.client.BossParticles;
-import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser.TextBlockProcessors;
 import com.finderfeed.fdbosses.client.boss_screen.text_block_processors.BossConfigFloatValueProcessor;
 import com.finderfeed.fdbosses.client.boss_screen.text_block_processors.MobEffectTextProcessor;
 import com.finderfeed.fdbosses.client.overlay.ElectrifiedOverlay;
@@ -21,6 +20,7 @@ import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.content.projectiles.renderers.BlockProjectileRenderer;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRenderLayerOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRendererBuilder;
+import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.text_block_parser.TextBlockProcessors;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.client.NullEntityRenderer;
 import com.finderfeed.fdlib.util.math.FDMathUtil;

@@ -3,8 +3,6 @@ package com.finderfeed.fdbosses.client.boss_screen;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreenOptions;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreens;
-import com.finderfeed.fdbosses.client.boss_screen.text_block.TextBlockWidget;
-import com.finderfeed.fdbosses.client.boss_screen.text_block.text_block_parser.TextBlockParser;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossEntities;

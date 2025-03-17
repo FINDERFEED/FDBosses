@@ -83,7 +83,7 @@ public class SkillInfoWidget extends FDWidget {
         if (skillImage != null) {
             float offs = 20;
             FDRenderUtil.bindTexture(skillImage);
-            FDRenderUtil.blitWithBlend(matrices,this.getX() + 97.5f,this.getY() + offs + 8,16,16,
+            FDRenderUtil.blitWithBlend(matrices,this.getX() + 97f,this.getY() + offs + 7,16,16,
                     0,0,1,1,1,1,0,1f);
         }
 
