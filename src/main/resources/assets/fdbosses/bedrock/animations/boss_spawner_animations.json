@@ -1,0 +1,38 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"boss_spawner_pose": {
+			"loop": "hold_on_last_frame",
+			"bones": {
+				"p4": {
+					"rotation": [-45, -45, -180]
+				},
+				"p5": {
+					"rotation": [-45, 45, -180]
+				},
+				"p6": {
+					"rotation": [135, 45, 0]
+				},
+				"p3": {
+					"rotation": [135, -45, 0]
+				},
+				"p7": {
+					"rotation": [-45, 45, 0]
+				},
+				"p8": {
+					"rotation": [-45, -45, 0]
+				},
+				"p9": {
+					"rotation": [135, -45, -180]
+				},
+				"p10": {
+					"rotation": [135, 45, -180]
+				}
+			}
+		},
+		"boss_spawner_idle": {
+			"loop": true,
+			"animation_length": 2
+		}
+	}
+}

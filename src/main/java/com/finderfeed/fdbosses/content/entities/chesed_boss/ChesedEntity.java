@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptio
 import com.finderfeed.fdbosses.client.particles.particle_processors.ChesedRayCircleParticleProcessor;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
+import com.finderfeed.fdbosses.content.entities.BossInitializer;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_monolith.ChesedMonolith;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_one_shot_vertical_ray.ChesedOneShotVerticalRayEntity;
@@ -133,6 +134,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
 
     private int remainingHits = 10;
 
+    private BossInitializer<ChesedEntity> bossInitializer = new ChesedBossInitializer(this);
+
     public ChesedEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
         if (serverModel == null) {
@@ -230,35 +233,42 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         system.setVariable("variable.angle",270 + 90);
         //270
         if (!this.level().isClientSide){
+
             this.bossBar.setPercentage(this.getRemainingHits() / (float) this.getBossMaxHits());
+
+            bossInitializer.tick();
+
 
             if (tickCount == 5){
                 this.summonOrReviveMonoliths();
             }
 
-            this.chain.tick();
             if (playIdle) {
                 system.startAnimation("IDLE", AnimationTicker.builder(CHESED_IDLE).build());
-            }else{
+            } else {
                 system.stopAnimation("IDLE");
             }
-            if (level().getGameTime() % 5 == 0) {
-                this.blindCombatants();
-            }
 
-            if (this.getTarget() != null) {
-                this.checkTarget(this.getTarget());
-                if (this.getTarget() != null) {
-                    if (this.lookingAtTarget) {
-                        this.lookAtTarget(this.getTarget());
-                    } else {
-                        this.lookAt(EntityAnchorArgument.Anchor.EYES, this.getEyePosition().add(this.getLookAngle()));
-                    }
-                    previousTargetPos = target.position();
+            if (bossInitializer.isFinished()) {
+                this.chain.tick();
+                if (level().getGameTime() % 5 == 0) {
+                    this.blindCombatants();
                 }
-            }else{
-                if (level().getGameTime() % 20 == 0){
-                    this.changeTarget();
+
+                if (this.getTarget() != null) {
+                    this.checkTarget(this.getTarget());
+                    if (this.getTarget() != null) {
+                        if (this.lookingAtTarget) {
+                            this.lookAtTarget(this.getTarget());
+                        } else {
+                            this.lookAt(EntityAnchorArgument.Anchor.EYES, this.getEyePosition().add(this.getLookAngle()));
+                        }
+                        previousTargetPos = target.position();
+                    }
+                } else {
+                    if (level().getGameTime() % 20 == 0) {
+                        this.changeTarget();
+                    }
                 }
             }
         }else{
