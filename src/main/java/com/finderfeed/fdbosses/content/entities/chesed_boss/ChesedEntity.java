@@ -182,32 +182,19 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                             .setNextAttack(rayOrBlocks)
                             .build())
                     .addAttack(4,AttackOptions.builder()
-                            .addAttack("roll")
+                            .addAttack(ROLL_ATTACK)
                             .setNextAttack(rayOrBlocks)
                             .build())
                     .addAttack(5,FINAL_ATTACK)
             ;
 
+            bossInitializer.setFinished();
         }
     }
 
     @Override
     public void onAddedToLevel() {
         super.onAddedToLevel();
-
-        if (level() instanceof ServerLevel serverLevel) {
-            Vec3 pos = this.position().add(0, 1.5, 0);
-            Vec3 offs = new Vec3(26, 15, 26);
-            Vec3 camPos = pos.add(offs);
-
-
-            CutsceneData cutsceneData = CutsceneData.create()
-                    .addCameraPos(new CameraPos(camPos, pos.subtract(camPos).add(0,5,0)))
-                    .time(1)
-                    .stopMode(CutsceneData.StopMode.UNSTOPPABLE);
-
-//            FDLibCalls.startCutsceneForPlayers(serverLevel,pos,40,cutsceneData);
-        }
 
     }
 
@@ -230,6 +217,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         super.tick();
         AnimationSystem system = this.getSystem();
         system.setVariable("variable.radius",580);
+        system.setVariable("variable.appear_height",400);
         system.setVariable("variable.angle",270 + 90);
         //270
         if (!this.level().isClientSide){
@@ -450,11 +438,14 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             if (this.entityData.get(IS_LAUNCHING_ORBS)){
                 rad = 5;
             }
-            var pos = this.getModelPartPosition(this,"core", clientModel).add((float) this.getX(), (float) this.getY(), (float) this.getZ());
+            var bonePos = this.getModelPartPosition(this,"core", clientModel);
+            Vec3 basePos = new Vec3(bonePos.x,bonePos.y,bonePos.z).add(this.getX(),this.getY(),this.getZ());
             float baseAngle = -(float)Math.toRadians(this.yBodyRot) + FDMathUtil.FPI / 4;
             float randomRange = FDMathUtil.FPI * 2 - FDMathUtil.FPI / 2;
             for (int i = 0; i < 2;i++) {
-                var end = pos.add(new Vector3f(0, 0, rad).rotateY(baseAngle + randomRange * random.nextFloat()), new Vector3f()).add(0, -(pos.y - (float) this.getY()), 0);
+                var endOffset = new Vector3f(0, 0, rad).rotateY(baseAngle + randomRange * random.nextFloat()).add(0, -bonePos.y, 0);
+                Vec3 end = basePos.add(endOffset.x,endOffset.y,endOffset.z);
+
                 level().addParticle(ArcLightningOptions.builder(BossParticles.ARC_LIGHTNING.get())
                                 .end(end.x, end.y, end.z)
                                 .lifetime(2)
@@ -464,7 +455,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                                 .segments(6)
                                 .circleOffset(random.nextFloat() * 2 - 2)
                                 .build(),
-                        true, pos.x, pos.y, pos.z, 0, 0, 0
+                        true, basePos.x, basePos.y, basePos.z, 0, 0, 0
                 );
             }
         }
@@ -2069,11 +2060,13 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             tag.put("chain",t);
         }
         tag.putInt("bossHealth",this.remainingHits);
+        this.bossInitializer.autoSave("initializer",tag);
         return super.save(tag);
     }
 
     @Override
     public void load(CompoundTag tag) {
+        this.bossInitializer.autoLoad("initializer",tag);
         if (chain != null){
             this.chain.load(tag.getCompound("chain"));
         }

@@ -118,7 +118,7 @@ public class ChesedBossScreen extends BaseBossScreen {
     public static void key(InputEvent.Key event){
         if (Minecraft.getInstance().level == null) return;
         if (event.getKey() == GLFW.GLFW_KEY_M){
-            Minecraft.getInstance().setScreen(BossScreens.CHESED.get());
+//            Minecraft.getInstance().setScreen(BossScreens.CHESED.get());
         }
     }
 }
