@@ -188,7 +188,6 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     .addAttack(5,FINAL_ATTACK)
             ;
 
-            bossInitializer.setFinished();
         }
     }
 
@@ -218,7 +217,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         AnimationSystem system = this.getSystem();
         system.setVariable("variable.radius",580);
         system.setVariable("variable.appear_height",400);
-        system.setVariable("variable.angle",270 + 90);
+        system.setVariable("variable.angle",360);
         //270
         if (!this.level().isClientSide){
 

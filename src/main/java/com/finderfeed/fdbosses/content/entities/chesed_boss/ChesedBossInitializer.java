@@ -80,7 +80,7 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
     private CutsceneData startCutsceneData(Vec3 bossPosition, Vec3 forwardVector){
 
         CutsceneData data = new CutsceneData()
-                .moveCurveType(CurveType.LINEAR)
+                .moveCurveType(CurveType.CATMULLROM)
                 .timeEasing(EasingType.EASE_OUT)
                 .time(100)
                 .stopMode(CutsceneData.StopMode.UNSTOPPABLE);

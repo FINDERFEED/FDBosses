@@ -85,11 +85,14 @@
 							"math.atan2(   math.sin(query.anim_time * variable.angle) * variable.radius,math.cos(query.anim_time * variable.angle) * variable.radius) + (90 * (1 - math.clamp(1 - query.anim_time,0,1)))",
 							0
 						],
-						"12.0": {"pre": [
+						"12.0": {
+							"pre": [
 								0,
 								"math.atan2(   math.sin(query.anim_time * variable.angle) * variable.radius,math.cos(query.anim_time * variable.angle) * variable.radius) + (150 * (1 - math.clamp(1 - query.anim_time,0,1)))",
 								0
-							], "post": [0, 150, 0]},
+							],
+							"post": [0, 150, 0]
+						},
 						"12.375": [-40, 180, 0],
 						"13.1667": {
 							"pre": [-60, 180, 0],
@@ -107,16 +110,22 @@
 					},
 					"position": {
 						"0.0": [0, 0, 0],
-						"6.0": {"pre": ["math.sin(query.anim_time * variable.angle) * variable.radius", 0, "math.cos(query.anim_time * variable.angle) * variable.radius"], "post": [
+						"6.0": {
+							"pre": ["math.sin(query.anim_time * variable.angle) * variable.radius", 0, "math.cos(query.anim_time * variable.angle) * variable.radius"],
+							"post": [
 								"math.sin(query.anim_time * variable.angle) * (variable.radius * (12 - query.anim_time) / 6)",
 								0,
 								"math.cos(query.anim_time * variable.angle) * (variable.radius * (12 - query.anim_time) / 6)"
-							]},
-						"12.0": {"pre": [
+							]
+						},
+						"12.0": {
+							"pre": [
 								"math.sin(query.anim_time * variable.angle) * (variable.radius * (12 - query.anim_time) / 6)",
 								0,
 								"math.cos(query.anim_time * variable.angle) * (variable.radius * (12 - query.anim_time) / 6)"
-							], "post": [0, 0, 0]},
+							],
+							"post": [0, 0, 0]
+						},
 						"12.375": [0, 0, -20],
 						"13.1667": {
 							"pre": [0, 0, -30],
@@ -265,11 +274,14 @@
 							"math.atan2(   math.sin(query.anim_time * variable.angle) * variable.radius,math.cos(query.anim_time * variable.angle) * variable.radius) + (90 * (1 - math.clamp(1 - query.anim_time,0,1)))",
 							0
 						],
-						"12.0": {"pre": [
+						"12.0": {
+							"pre": [
 								0,
 								"math.atan2(   math.sin(query.anim_time * variable.angle) * variable.radius,math.cos(query.anim_time * variable.angle) * variable.radius) + (150 * (1 - math.clamp(1 - query.anim_time,0,1)))",
 								0
-							], "post": [0, 150, 0]},
+							],
+							"post": [0, 150, 0]
+						},
 						"12.625": [-5, 200, 0],
 						"13.1667": {
 							"pre": [-10, 200, 0],
@@ -287,16 +299,22 @@
 					},
 					"position": {
 						"0.0": [0, 0, 0],
-						"6.0": {"pre": ["math.sin(query.anim_time * variable.angle) * variable.radius", 0, "math.cos(query.anim_time * variable.angle) * variable.radius"], "post": [
+						"6.0": {
+							"pre": ["math.sin(query.anim_time * variable.angle) * variable.radius", 0, "math.cos(query.anim_time * variable.angle) * variable.radius"],
+							"post": [
 								"math.sin(query.anim_time * variable.angle) * (variable.radius * (12 - query.anim_time) / 6)",
 								0,
 								"math.cos(query.anim_time * variable.angle) * (variable.radius * (12 - query.anim_time) / 6)"
-							]},
-						"12.0": {"pre": [
+							]
+						},
+						"12.0": {
+							"pre": [
 								"math.sin(query.anim_time * variable.angle) * (variable.radius * (12 - query.anim_time) / 6)",
 								0,
 								"math.cos(query.anim_time * variable.angle) * (variable.radius * (12 - query.anim_time) / 6)"
-							], "post": [0, 0, 0]},
+							],
+							"post": [0, 0, 0]
+						},
 						"12.375": [0, 0, -20],
 						"13.1667": {
 							"pre": [0, 0, -30],
@@ -3251,6 +3269,20 @@
 							"post": [0, 0, 0],
 							"lerp_mode": "catmullrom"
 						}
+					}
+				}
+			}
+		},
+		"chesed_appear": {
+			"animation_length": 1,
+			"bones": {
+				"crown": {
+					"position": [0, -55, 0]
+				},
+				"base_base": {
+					"position": {
+						"0.0": [0, "variable.appear_height", 0],
+						"0.25": [0, 0, 0]
 					}
 				}
 			}
