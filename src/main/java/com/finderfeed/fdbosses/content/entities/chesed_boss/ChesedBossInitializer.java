@@ -1,9 +1,12 @@
 package com.finderfeed.fdbosses.content.entities.chesed_boss;
 
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
+import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdlib.FDLib;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDScreenEffects;
+import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.cutscenes.CurveType;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
@@ -56,7 +59,7 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
         for (Player player : players){
             ServerPlayer serverPlayer = (ServerPlayer) player;
 
-            FDLibCalls.sendScreenEffect(serverPlayer, FDScreenEffects.SCREEN_COLOR.get(),new ScreenColorData(0f,0f,0f,1f),0,20,30);
+            FDLibCalls.sendScreenEffect(serverPlayer, FDScreenEffects.SCREEN_COLOR.get(),new ScreenColorData(0f,0f,0f,1f),0,10,20);
 
             double dist = i * distBetweenPlayers;
 
@@ -72,7 +75,10 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
 
             FDLibCalls.startCutsceneForPlayer(serverPlayer,cutsceneData);
         }
-
+        chesedEntity.getSystem().startAnimation("APPEAR", AnimationTicker.builder(BossAnims.CHESED_APPEAR)
+                .setLoopMode(Animation.LoopMode.ONCE)
+                .setToNullTransitionTime(0)
+                .build());
 
     }
 
@@ -85,7 +91,7 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
                 .time(100)
                 .stopMode(CutsceneData.StopMode.UNSTOPPABLE);
 
-        Vec3 firstPos = bossPosition.add(0,4,0).add(forwardVector.multiply(30,30,30));
+        Vec3 firstPos = bossPosition.add(0,4,0).add(forwardVector.multiply(40,40,40));
         Vec3 secondPos = bossPosition.add(0,1.5,0).add(forwardVector.multiply(3,3,3));
 
         data.addCameraPos(new CameraPos(firstPos,forwardVector.reverse()));
@@ -102,7 +108,6 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
 
         for (Player player : players){
             ServerPlayer serverPlayer = (ServerPlayer) player;
-            FDLibCalls.sendScreenEffect(serverPlayer, FDScreenEffects.SCREEN_COLOR.get(),new ScreenColorData(0f,0f,0f,1f),0,20,20);
             FDLibCalls.stopCutsceneForPlayer(serverPlayer);
         }
 
@@ -110,8 +115,16 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
 
     @Override
     public void onTick() {
-        if (this.getTick() >= 200){
+        int endTick = 120;
+        ChesedEntity entity = this.getBoss();
+        if (this.getTick() >= endTick){
             this.setFinished();
+        }else if (this.getTick() == endTick - 1){
+            List<Player> players = entity.getCombatants(true);
+            for (Player player : players){
+                ServerPlayer serverPlayer = (ServerPlayer) player;
+                FDLibCalls.sendScreenEffect(serverPlayer, FDScreenEffects.SCREEN_COLOR.get(),new ScreenColorData(0f,0f,0f,1f),0,20,20);
+            }
         }
     }
 

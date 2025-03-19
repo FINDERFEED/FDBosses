@@ -267,7 +267,14 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             if (this.isRolling()){
                 this.handleClientRolling();
             }else{
-                this.idleParticles();
+                AnimationTicker ticker = this.getSystem().getTicker("APPEAR");
+                if (ticker != null) {
+                    if (this.tickCount > 80) {
+                        this.idleParticles();
+                    }
+                }else{
+                    this.idleParticles();
+                }
             }
         }
     }

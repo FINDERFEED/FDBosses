@@ -60,4 +60,7 @@ public class BossAnims {
     public static DeferredHolder<Animation,Animation> CHESED_KINETIC_FIELD_SPAWN = ANIMATIONS.register("kinetic_field_spawn", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"kinetic_field"));
     });
+    public static DeferredHolder<Animation,Animation> CHESED_APPEAR = ANIMATIONS.register("chesed_appear", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
 }
