@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.chesed_boss;
 
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDLib;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDScreenEffects;
@@ -12,12 +13,15 @@ import com.finderfeed.fdlib.systems.cutscenes.CurveType;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
 import com.finderfeed.fdlib.systems.cutscenes.EasingType;
 import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
+import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -125,6 +129,28 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
                 ServerPlayer serverPlayer = (ServerPlayer) player;
                 FDLibCalls.sendScreenEffect(serverPlayer, FDScreenEffects.SCREEN_COLOR.get(),new ScreenColorData(0f,0f,0f,1f),0,20,20);
             }
+        }else if (this.getTick() == 48){
+            SlamParticlesPacket packet = new SlamParticlesPacket(
+                    new SlamParticlesPacket.SlamData(entity.getOnPos(),entity.position().add(0,0.5,0),new Vec3(1,0,0))
+                            .maxAngle(FDMathUtil.FPI * 2)
+                            .maxSpeed(0.3f)
+                            .collectRadius(2)
+                            .maxParticleLifetime(30)
+                            .count(200)
+                            .maxVerticalSpeedEdges(0.15f)
+                            .maxVerticalSpeedCenter(0.15f)
+            );
+            PacketDistributor.sendToPlayersTrackingEntity(entity,packet);
+
+            DefaultShakePacket defaultShakePacket = new DefaultShakePacket(FDShakeData.builder()
+                    .inTime(2)
+                    .stayTime(5)
+                    .outTime(5)
+
+                    .amplitude(0.2f)
+                    .frequency(50f)
+                    .build());
+            PacketDistributor.sendToPlayersTrackingEntity(entity,defaultShakePacket);
         }
     }
 

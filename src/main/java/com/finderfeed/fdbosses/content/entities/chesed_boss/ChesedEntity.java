@@ -22,6 +22,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.Ra
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.packets.ChesedRayReflectPacket;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
+import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.network.lib_packets.PlaySoundInEarsPacket;
@@ -168,24 +169,24 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
                     .registerAttack(ROCKFALL_ATTACK,this::rockfallAttack) // 1
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .attackListener(this::attackListener)
-                    .addAttack(0, ray)
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack(ELECTRIC_SPHERE_ATTACK)
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack(ROCKFALL_ATTACK)
-                            .setNextAttack(rayOrBlocks)
-                            .build())
+//                    .addAttack(0, ray)
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack(ELECTRIC_SPHERE_ATTACK)
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack(ROCKFALL_ATTACK)
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
                     .addAttack(1,AttackOptions.builder()
                             .addAttack(EARTHQUAKE_ATTACK)
-                            .setNextAttack(rayOrBlocks)
+//                            .setNextAttack(rayOrBlocks)
                             .build())
-                    .addAttack(4,AttackOptions.builder()
-                            .addAttack(ROLL_ATTACK)
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(5,FINAL_ATTACK)
+//                    .addAttack(4,AttackOptions.builder()
+//                            .addAttack(ROLL_ATTACK)
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(5,FINAL_ATTACK)
             ;
 
         }
@@ -269,7 +270,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
             }else{
                 AnimationTicker ticker = this.getSystem().getTicker("APPEAR");
                 if (ticker != null) {
-                    if (this.tickCount > 80) {
+                    if (this.tickCount > 60) {
                         this.idleParticles();
                     }
                 }else{
@@ -1379,6 +1380,18 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
     }
 
     private void summonRadialEarthquake(int radius,boolean doSonicParticles){
+        SlamParticlesPacket packet = new SlamParticlesPacket(
+                new SlamParticlesPacket.SlamData(this.getOnPos(),this.position().add(0,0.5,0),new Vec3(1,0,0))
+                        .maxAngle(FDMathUtil.FPI * 2)
+                        .maxSpeed(0.15f)
+                        .collectRadius(2)
+                        .maxParticleLifetime(30)
+                        .count(200)
+                        .maxVerticalSpeedEdges(0.2f)
+                        .maxVerticalSpeedCenter(0.2f)
+        );
+        PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+
         RadialEarthquakeEntity radialEarthquakeEntity = RadialEarthquakeEntity.summon(level(),this.getOnPos(),1,radius,1f,
                 BossConfigs.BOSS_CONFIG.get().chesedConfig.eartquakeDamage
         );
