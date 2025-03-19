@@ -90,11 +90,12 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
             SlamParticlesPacket packet = new SlamParticlesPacket(
                     new SlamParticlesPacket.SlamData(result.getBlockPos(),pos.add(0,0.5,0),new Vec3(1,0,0))
                             .maxAngle(FDMathUtil.FPI * 2)
-                            .maxSpeed(0.15f)
+                            .maxSpeed(0.3f)
                             .collectRadius(2)
                             .maxParticleLifetime(30)
-                            .maxVerticalSpeedEdges(0.07f)
-                            .maxVerticalSpeedCenter(0.07f)
+                            .count(200)
+                            .maxVerticalSpeedEdges(0.15f)
+                            .maxVerticalSpeedCenter(0.15f)
             );
             PacketDistributor.sendToPlayersTrackingEntity(this,packet);
             this.remove(RemovalReason.DISCARDED);
