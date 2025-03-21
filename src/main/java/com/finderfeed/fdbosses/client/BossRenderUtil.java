@@ -58,7 +58,7 @@ public class BossRenderUtil {
         int index = 0;
         for (FormattedText sequence : charSequences) {
 
-            FDRenderUtil.renderScaledText(graphics, Language.getInstance().getVisualOrder(sequence), v.x + lineHeight / 2, v.y + index * lineHeight + lineHeight / 2, textScale, true, textColor);
+            FDRenderUtil.renderScaledText(graphics, Language.getInstance().getVisualOrder(sequence), v.x + lineHeight / 2, v.y + index * lineHeight + lineHeight / 2, textScale, false, textColor);
 
             index++;
         }

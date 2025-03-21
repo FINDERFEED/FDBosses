@@ -38,7 +38,7 @@ public class BossAbilitesWidget extends FDScrollableWidget {
         Component abilities = Component.translatable("fdbosses.word.abilities");
         float abilitieswidth = font.width(abilities);
 
-        FDRenderUtil.renderScaledText(guiGraphics,abilities, bossAbilitiesXs + this.getWidth() / 2 - abilitieswidth / 2 - 3,bossAbilitiesYs + 7,1f,true,stringColor);
+        FDRenderUtil.renderScaledText(guiGraphics,abilities, bossAbilitiesXs + this.getWidth() / 2 - abilitieswidth / 2,bossAbilitiesYs + 7,1f,true,stringColor);
 
         float p = this.getCurrentScroll() / this.getMaxScroll();
         if (Float.isNaN(p)){
@@ -63,7 +63,7 @@ public class BossAbilitesWidget extends FDScrollableWidget {
 
     @Override
     public void useScissor() {
-        FDRenderUtil.Scissor.pushScissors(this.getX(),this.getY() + 26,this.getWidth(),this.getHeight() - 40);
+        FDRenderUtil.Scissor.pushScissors(this.getX(),this.getY() + 26,this.getWidth() + 100,this.getHeight() - 40);
     }
 
     @Override

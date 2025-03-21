@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossModels;
+import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
@@ -30,6 +31,9 @@ public class ChesedBossScreen extends BaseBossScreen {
 
     private AnimationSystem animationSystem;
 
+
+    private boolean renderBoss = false;
+
     public ChesedBossScreen(BossScreenOptions options) {
         super(options);
     }
@@ -37,7 +41,6 @@ public class ChesedBossScreen extends BaseBossScreen {
     @Override
     protected void init() {
         super.init();
-
         if (chesed == null){
             chesed = new FDModel(BossModels.CHESED.get());
         }
@@ -63,6 +66,10 @@ public class ChesedBossScreen extends BaseBossScreen {
 
             }
         };
+        animationSystem.startAnimation("APPEAR", AnimationTicker.builder(BossAnims.CHESED_SCREEN_APPEAR)
+                        .setLoopMode(Animation.LoopMode.ONCE)
+                        .setToNullTransitionTime(0)
+                .build());
 
 
 
@@ -80,25 +87,25 @@ public class ChesedBossScreen extends BaseBossScreen {
     }
 
 
-
     @Override
     public void tick() {
         super.tick();
         animationSystem.tick();
         animationSystem.startAnimation("IDLE", AnimationTicker.builder(BossAnims.CHESED_IDLE).build());
+
     }
 
     @Override
     protected void renderBoss(GuiGraphics graphics,float mx,float my,float pticks){
         PoseStack matrices = graphics.pose();
-        this.animationSystem.applyAnimations(chesed,pticks);
-        var anchor = this.getAnchor(0,0.5f);
+        this.animationSystem.applyAnimations(chesed, FDRenderUtil.tryGetPartialTickIgnorePause());
+        var anchor = this.getAnchor(0, 0.5f);
         float offsetX = this.getBossMenuXStart() / 2;
         float offsetY = 100;
         matrices.pushPose();
-        matrices.translate(0,0,-100);
-        FDRenderUtil.renderFDModelInScreen(matrices,chesed,anchor.x + offsetX,anchor.y + offsetY,
-                0, FDMathUtil.FPI + FDMathUtil.FPI / 8,0,50,RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")));
+        matrices.translate(0, 0, -100);
+        FDRenderUtil.renderFDModelInScreen(matrices, chesed, anchor.x + offsetX, anchor.y + offsetY,
+                0, FDMathUtil.FPI + FDMathUtil.FPI / 16, 0, 50, RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")));
         matrices.popPose();
     }
 
@@ -118,7 +125,7 @@ public class ChesedBossScreen extends BaseBossScreen {
     public static void key(InputEvent.Key event){
         if (Minecraft.getInstance().level == null) return;
         if (event.getKey() == GLFW.GLFW_KEY_M){
-//            Minecraft.getInstance().setScreen(BossScreens.CHESED.get());
+            Minecraft.getInstance().setScreen(BossScreens.CHESED.get());
         }
     }
 }

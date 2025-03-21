@@ -154,6 +154,20 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                             new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),
                             new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),1,1)
                     ))
+                    .setOnHoverAction(((fdWidget, guiGraphics, v, v1, v2) -> {
+                        if (!this.skillOpened) {
+                            PoseStack matrices = guiGraphics.pose();
+                            matrices.pushPose();
+                            matrices.translate(0, 0, 100);
+                            BossRenderUtil.renderBossScreenTooltip(guiGraphics, Component.translatable("fdbosses.skills.skill_button"), v, v1, 200, this.getBaseStringColor(), 1f,
+                                    this.bossAbilitesWidget.getX(),
+                                    this.bossAbilitesWidget.getY(),
+                                    this.bossAbilitesWidget.getX() + this.bossAbilitesWidget.getWidth(),
+                                    this.bossAbilitesWidget.getY() + this.bossAbilitesWidget.getHeight() - 15
+                            );
+                            matrices.popPose();
+                        }
+                    }))
                     .setOnClickAction(((fdWidget, mx, my, button) -> {
                         if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT) return false;
 
