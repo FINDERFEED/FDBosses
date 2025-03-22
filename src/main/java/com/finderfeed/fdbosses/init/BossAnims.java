@@ -66,4 +66,7 @@ public class BossAnims {
     public static DeferredHolder<Animation,Animation> CHESED_SCREEN_APPEAR = ANIMATIONS.register("chesed_screen_appear", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
     });
+    public static DeferredHolder<Animation,Animation> CHESED_DEATH = ANIMATIONS.register("chesed_death", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
 }

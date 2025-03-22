@@ -133,6 +133,7 @@ public class ChesedBossScreen extends BaseBossScreen {
                         remainingHealth = Mth.clamp(remainingHealth - 1, 0, Integer.MAX_VALUE);
                         if (remainingHealth == 0){
                             this.removeWidget(fdWidget);
+                            this.animationSystem.startAnimation("IDLE", AnimationTicker.builder(BossAnims.CHESED_DEATH).build());
                             FDButton crashButton = new FDButton(this,bossX - 55,bossY - 40,110,24)
                                     .setTexture(new FDButtonTextures(
                                             new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
@@ -142,7 +143,7 @@ public class ChesedBossScreen extends BaseBossScreen {
                                             110,1f,true,0,1)
                                     .setOnClickAction(((fdWidget1, v2, v11, i1) -> {
                                         if (true) {
-                                            throw new KilledASefirotException("That's what you get for messing with Chesed! I said that there would be consequences!");
+                                            throw new KilledASefirotException("That's what you get for messing with Chesed! I warned you!");
                                         }
                                         return true;
                                     }));
@@ -170,7 +171,10 @@ public class ChesedBossScreen extends BaseBossScreen {
     public void tick() {
         super.tick();
         animationSystem.tick();
-        animationSystem.startAnimation("IDLE", AnimationTicker.builder(BossAnims.CHESED_IDLE).build());
+        AnimationTicker ticker = animationSystem.getTicker("IDLE");
+        if (ticker == null) {
+            animationSystem.startAnimation("IDLE", AnimationTicker.builder(BossAnims.CHESED_IDLE).build());
+        }
         this.hurtTime = Mth.clamp(hurtTime - 1, 0, Integer.MAX_VALUE);
         hurtText.tick();
     }
