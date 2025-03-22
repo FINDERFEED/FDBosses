@@ -31,7 +31,7 @@ public class ChesedBossBar extends FDBossBarInterpolated {
 
     private static final Random r = new Random();
 
-    public static final ResourceLocation TEXTURE = ResourceLocation.tryBuild(FDBosses.MOD_ID,"textures/boss_bars/chesed_boss_bar.png");
+    public static final ResourceLocation TEXTURE = ResourceLocation.tryBuild(FDBosses.MOD_ID,"textures/boss_bars/chesed_boss_bar2.png");
 
     private int previousHitStrength = 0;
     private int time = 0;

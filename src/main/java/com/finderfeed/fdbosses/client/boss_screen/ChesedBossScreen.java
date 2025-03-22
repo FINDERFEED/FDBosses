@@ -188,6 +188,9 @@ public class ChesedBossScreen extends BaseBossScreen {
         int overlay = hurtTime > 0 ? OverlayTexture.RED_OVERLAY_V : OverlayTexture.NO_OVERLAY;
         FDRenderUtil.renderFDModelInScreen(matrices, chesed, this.bossX, this.bossY,
                 0, FDMathUtil.FPI + FDMathUtil.FPI / 16, 0, 50, LightTexture.FULL_BRIGHT, overlay, RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")));
+
+        FDRenderUtil.renderFDModelInScreen(matrices, chesed, this.bossX, this.bossY,
+                0, FDMathUtil.FPI + FDMathUtil.FPI / 16, 0, 50, LightTexture.FULL_BRIGHT, overlay, RenderType.eyes(FDBosses.location("textures/entities/chesed_crystals.png")));
         matrices.popPose();
 
         Component text = hurtText.text;
