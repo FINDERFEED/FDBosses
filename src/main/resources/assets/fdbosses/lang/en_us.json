@@ -45,5 +45,16 @@
   "fdbosses.skills.chesed.mightiness_stats": "",
   "fdbosses.word.stats": "Stats",
   "fdbosses.word.info": "Info",
-  "fdbosses.skills.skill_button": "Click to see ability details"
+  "fdbosses.skills.skill_button": "Click to see ability details",
+  "fdbosses.word.ouch": "Ouch!",
+  "fdbosses.word.that_hurts": "That hurts",
+  "fdbosses.word.stop_it": "Stop it. Bosses do have feelings too, you know.",
+  "fdbosses.word.you_are_getting_on_my_nerves": "You are starting to get on my nerves.",
+  "fdbosses.word.i_said_stop": "I. Said. Stop.",
+  "fdbosses.word.consequences": "You will soon face the consequences of your own actions.",
+  "fdbosses.word.does_that_not_scare_you": "Does that not scare you?",
+  "fdbosses.word.ok_listen": "Ok, listen.",
+  "fdbosses.word.no_wait": "No wait!",
+  "fdbosses.word.killed_chesed_in_screen": "Well, you killed him. Congratulations! I hope you feel bad about yourself for killing an innocent creature! You know, i wanted to crash the game but that would be a bad game design, so i will leave that decision to you. Here, press that button.",
+  "fdbosses.word.crash_game": "Crash the game"
 }
