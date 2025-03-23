@@ -163,7 +163,7 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.CHESED_BOSS_SPAWNER.get(), FDEntityRendererBuilder.builder()
                         .addLayer(FDEntityRenderLayerOptions.builder()
                                 .model(BossModels.BOSS_SPAWNER)
-                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entity/boss_spawner.png")))
+                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/boss_spawner.png")))
                                 .renderCondition((entity -> {
                                     return ((BossSpawnerEntity)entity).isActive();
                                 }))

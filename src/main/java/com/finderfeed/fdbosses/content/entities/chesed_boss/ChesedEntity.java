@@ -27,6 +27,7 @@ import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
+import com.finderfeed.fdlib.init.FDScreenEffects;
 import com.finderfeed.fdlib.network.lib_packets.PlaySoundInEarsPacket;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
@@ -47,6 +48,7 @@ import com.finderfeed.fdlib.systems.particle.SetParticleSpeedProcessor;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.BoundToEntityProcessor;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.CircleSpawnProcessor;
+import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
@@ -444,6 +446,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     }
 
     private void idleParticles(){
+        if (deathTime > CHESED_DEATH.get().getAnimTime() - 10) return;
+
         if (this.level().getGameTime() % 2 == 0){
             float rad = 2;
             if (this.entityData.get(IS_LAUNCHING_ORBS)){
@@ -2036,8 +2040,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             this.removeMonoliths();
             this.killCrystals();
 
-            BossSpawnerEntity bossSpawnerEntity = this.getSpawner();
-            bossSpawnerEntity.setActive(true);
+            this.lookingAtTarget = false;
 
             for (var ticker : new ArrayList<>(this.getSystem().getTickers().keySet())) {
 
@@ -2049,18 +2052,43 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
             this.getSystem().startAnimation("DEATH", AnimationTicker.builder(CHESED_DEATH)
                     .build());
+
+            Vec3 forward = this.getForward();
+
+            Vec3 pos = this.position().add(forward.multiply(4,0,4)).add(0,1.75,0);
+
+            CutsceneData cutsceneData = new CutsceneData()
+                    .stopMode(CutsceneData.StopMode.AUTOMATIC)
+                    .time(CHESED_DEATH.get().getAnimTime() + 20)
+                    .addCameraPos(new CameraPos(pos,forward.reverse()));
+
+            for (Player player : this.getCombatants(true)){
+                if (player instanceof ServerPlayer serverPlayer){
+                    FDLibCalls.startCutsceneForPlayer(serverPlayer, cutsceneData);
+                }
+            }
+
         }
     }
 
     @Override
     protected void tickDeath() {
         this.deathTime++;
-        if (this.deathTime >= CHESED_DEATH.get().getAnimTime() + 5 && !this.level().isClientSide() && !this.isRemoved()) {
-            BossSpawnerEntity spawnerEntity = this.getSpawner();
-
-            spawnerEntity.setActive(true);
-
-            this.remove(Entity.RemovalReason.KILLED);
+        this.lookingAtTarget = false;
+        if (!this.level().isClientSide() && !this.isRemoved()) {
+            if (this.deathTime >= CHESED_DEATH.get().getAnimTime() + 30) {
+                BossSpawnerEntity spawnerEntity = this.getSpawner();
+                if (spawnerEntity != null) {
+                    spawnerEntity.setActive(true);
+                }
+                this.remove(Entity.RemovalReason.KILLED);
+            }else if (this.deathTime == CHESED_DEATH.get().getAnimTime() + 10){
+                for (Player player : this.getCombatants(true)){
+                    if (player instanceof ServerPlayer serverPlayer){
+                        FDLibCalls.sendScreenEffect(serverPlayer, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0f,0f,0f,1f),0,20,10);
+                    }
+                }
+            }
         }
     }
 
@@ -2116,6 +2144,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
         tag.putInt("bossHealth",this.remainingHits);
         this.bossInitializer.autoSave("initializer",tag);
+        super.addAdditionalSaveData(tag);
     }
 
 
@@ -2135,7 +2164,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }else{
             this.remainingHits = this.getBossMaxHits();
         }
-        super.load(tag);
+        super.readAdditionalSaveData(tag);
     }
 
     @Override

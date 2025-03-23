@@ -118,7 +118,7 @@ public class BossEntities {
     public static final Supplier<EntityType<ChesedBossSpawner>> CHESED_BOSS_SPAWNER = ENTITIES.register("chesed_boss_spawner",()->EntityType.Builder.of(
             ChesedBossSpawner::new, MobCategory.MISC
     )
-            .sized(0.5f,1f)
+            .sized(1f,2f)
             .build("chesed_boss_spawner"));
 
 

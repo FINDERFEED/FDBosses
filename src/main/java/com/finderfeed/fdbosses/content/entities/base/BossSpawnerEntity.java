@@ -38,9 +38,15 @@ public abstract class BossSpawnerEntity extends FDEntity {
 
             var entity = type.create(level());
 
+            entity.setYRot(0);
+            entity.setYBodyRot(0);
+            entity.setYHeadRot(0);
+
             entity.setSpawnedBy(this);
 
             entity.setPos(this.position());
+
+            level().addFreshEntity(entity);
 
             this.setActive(false);
 
@@ -69,7 +75,11 @@ public abstract class BossSpawnerEntity extends FDEntity {
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
-        this.setActive(tag.getBoolean("active"));
+        if (tag.contains("active")) {
+            this.setActive(tag.getBoolean("active"));
+        }else{
+            this.setActive(true);
+        }
     }
 
     @Override
