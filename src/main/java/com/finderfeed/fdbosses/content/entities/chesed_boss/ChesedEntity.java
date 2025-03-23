@@ -9,6 +9,8 @@ import com.finderfeed.fdbosses.client.particles.particle_processors.ChesedRayCir
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
+import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
+import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_monolith.ChesedMonolith;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_one_shot_vertical_ray.ChesedOneShotVerticalRayEntity;
@@ -88,13 +90,15 @@ import org.joml.Math;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Function;
 
 import static com.finderfeed.fdbosses.init.BossAnims.CHESED_ATTACK;
 import static com.finderfeed.fdbosses.init.BossAnims.*;
 
-public class ChesedEntity extends FDMob implements ChesedBossBuddy {
+public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerContextAssignable {
 
+    private UUID bossSpawnerUUID;
 
     public static final String FINAL_ATTACK = "final";
     public static final String CRYSTALS_ATTACK = "crystals";
@@ -2031,8 +2035,35 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         if (!level().isClientSide){
             this.removeMonoliths();
             this.killCrystals();
+
+            BossSpawnerEntity bossSpawnerEntity = this.getSpawner();
+            bossSpawnerEntity.setActive(true);
+
+            for (var ticker : new ArrayList<>(this.getSystem().getTickers().keySet())) {
+
+                if (ticker.equals("IDLE")) continue;
+
+                this.getSystem().stopAnimation(ticker);
+
+            }
+
+            this.getSystem().startAnimation("DEATH", AnimationTicker.builder(CHESED_DEATH)
+                    .build());
         }
     }
+
+    @Override
+    protected void tickDeath() {
+        this.deathTime++;
+        if (this.deathTime >= CHESED_DEATH.get().getAnimTime() + 5 && !this.level().isClientSide() && !this.isRemoved()) {
+            BossSpawnerEntity spawnerEntity = this.getSpawner();
+
+            spawnerEntity.setActive(true);
+
+            this.remove(Entity.RemovalReason.KILLED);
+        }
+    }
+
 
     private Vec3 getCenter(){
         return this.position().add(0,1.3,0);
@@ -2072,19 +2103,29 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
     }
 
     @Override
-    public boolean save(CompoundTag tag) {
+    public void addAdditionalSaveData(CompoundTag tag) {
         if (chain != null){
             CompoundTag t = new CompoundTag();
             chain.save(t);
             tag.put("chain",t);
         }
+
+        if (bossSpawnerUUID != null){
+            tag.putUUID("spawner",this.bossSpawnerUUID);
+        }
+
         tag.putInt("bossHealth",this.remainingHits);
         this.bossInitializer.autoSave("initializer",tag);
-        return super.save(tag);
     }
 
+
     @Override
-    public void load(CompoundTag tag) {
+    public void readAdditionalSaveData(CompoundTag tag) {
+
+        if (tag.contains("spawner")){
+            this.bossSpawnerUUID = tag.getUUID("spawner");
+        }
+
         this.bossInitializer.autoLoad("initializer",tag);
         if (chain != null){
             this.chain.load(tag.getCompound("chain"));
@@ -2092,8 +2133,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
         if (tag.contains("bossHealth")) {
             this.remainingHits = tag.getInt("bossHealth");
         }else{
-//            this.remainingHits = this.getBossMaxHits();
-//            this.remainingHits = 2; //TODO: remove!
+            this.remainingHits = this.getBossMaxHits();
         }
         super.load(tag);
     }
@@ -2149,4 +2189,19 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy {
     public int getHeadRotSpeed() {
         return 5;
     }
+
+    @Override
+    public void setSpawnedBy(BossSpawnerEntity bossSpawnerEntity) {
+        this.bossSpawnerUUID = bossSpawnerEntity.getUUID();
+    }
+
+    @Override
+    public BossSpawnerEntity getSpawner() {
+        if (level() instanceof ServerLevel serverLevel){
+            return (BossSpawnerEntity) serverLevel.getEntity(this.bossSpawnerUUID);
+        }
+        return null;
+    }
+
+
 }

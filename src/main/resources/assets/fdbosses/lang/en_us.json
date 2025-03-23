@@ -56,5 +56,6 @@
   "fdbosses.word.ok_listen": "Ok, listen.",
   "fdbosses.word.no_wait": "No wait!",
   "fdbosses.word.killed_chesed_in_screen": "Well, you killed him. Congratulations! I hope you feel bad about yourself for killing an innocent creature! You know, i wanted to crash the game but that would be a bad game design, so i will leave that decision to you. Here, press that button.",
-  "fdbosses.word.crash_game": "Crash the game"
+  "fdbosses.word.crash_game": "Crash the game",
+  "fdbosses.word.start_fight": "Start Bossfight"
 }

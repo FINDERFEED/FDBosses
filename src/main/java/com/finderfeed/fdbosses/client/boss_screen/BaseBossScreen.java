@@ -4,10 +4,14 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.BossRenderUtil;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreenOptions;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossSkill;
+import com.finderfeed.fdbosses.client.boss_screen.util.KilledASefirotException;
 import com.finderfeed.fdbosses.client.boss_screen.widget.BossAbilitesWidget;
 import com.finderfeed.fdbosses.client.boss_screen.widget.BossDetailsWidget;
 import com.finderfeed.fdbosses.client.boss_screen.widget.FDSkillButton;
 import com.finderfeed.fdbosses.client.boss_screen.widget.SkillInfoWidget;
+import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
+import com.finderfeed.fdbosses.content.entities.base.BossSpawnerStartFight;
+import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDButton;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.TextBlockWidget;
@@ -23,6 +27,8 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
@@ -42,9 +48,12 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
     private int moveThings = 0;
 
-    public BaseBossScreen(BossScreenOptions options) {
+    private int bossSpawnerId;
+
+    public BaseBossScreen(int bossSpawnerId, BossScreenOptions options) {
         super();
         this.options = options;
+        this.bossSpawnerId = bossSpawnerId;
     }
 
     @Override
@@ -63,6 +72,23 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         this.initSkillInfoWidget();
 
         this.initAbilitiesWidget();
+
+
+        FDButton startFightButton = new FDButton(this,5,5,110,24)
+                .setTexture(new FDButtonTextures(
+                        new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
+                        new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
+                ))
+                .setText(Component.translatable("fdbosses.word.start_fight").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
+                        110,1f,true,0,1)
+                .setOnClickAction(((fdWidget1, v2, v11, i1) -> {
+                    Level level = FDClientHelpers.getClientLevel();
+                    if (level.getEntity(bossSpawnerId) instanceof BossSpawnerEntity bossSpawner){
+                        PacketDistributor.sendToServer(new BossSpawnerStartFight(bossSpawnerId));
+                    }
+                    return true;
+                }));
+        this.addRenderableWidget(startFightButton);
 
     }
 

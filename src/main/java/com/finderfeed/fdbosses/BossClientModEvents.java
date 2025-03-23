@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningPartic
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedAttackRayParticle;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticle;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticle;
+import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_vertical_ray.ChesedVerticalRayAttackRenderer;
@@ -159,6 +160,15 @@ public class BossClientModEvents {
                         .freeRender(ChesedKineticFieldRenderer::render)
                 .build());
 
+        event.registerEntityRenderer(BossEntities.CHESED_BOSS_SPAWNER.get(), FDEntityRendererBuilder.builder()
+                        .addLayer(FDEntityRenderLayerOptions.builder()
+                                .model(BossModels.BOSS_SPAWNER)
+                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entity/boss_spawner.png")))
+                                .renderCondition((entity -> {
+                                    return ((BossSpawnerEntity)entity).isActive();
+                                }))
+                                .build())
+                .build());
 
 
         event.registerEntityRenderer(BossEntities.EARTH_SHATTER.get(), EarthShatterRenderer::new);

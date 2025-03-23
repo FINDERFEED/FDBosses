@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.init;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossSpawner;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.ChesedKineticFieldEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedFireTrailEntity;
@@ -113,6 +114,12 @@ public class BossEntities {
     )
             .sized(0.25f,0.25f)
             .build("chesed_one_shot_vertical_ray_attack"));
+
+    public static final Supplier<EntityType<ChesedBossSpawner>> CHESED_BOSS_SPAWNER = ENTITIES.register("chesed_boss_spawner",()->EntityType.Builder.of(
+            ChesedBossSpawner::new, MobCategory.MISC
+    )
+            .sized(0.5f,1f)
+            .build("chesed_boss_spawner"));
 
 
     @SubscribeEvent

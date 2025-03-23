@@ -8,14 +8,15 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 
 import java.util.HashMap;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class BossScreens {
 
-    private static final HashMap<EntityType<?>, Supplier<BaseBossScreen>> BOSS_SCREEN_OPTIONS = new HashMap<>();
+    private static final HashMap<EntityType<?>, Function<Integer, BaseBossScreen>> BOSS_SCREEN_OPTIONS = new HashMap<>();
 
-    public static final Supplier<BaseBossScreen> CHESED = register(BossEntities.CHESED.get(),()->{
-        return new ChesedBossScreen(new BossScreenOptions()
+    public static final Function<Integer, BaseBossScreen> CHESED = register(BossEntities.CHESED.get(),(id)->{
+        return new ChesedBossScreen(id,new BossScreenOptions()
                 .setBossDescription(Component.translatable("fdbosses.bosses.description.chesed"))
                 .setEntityType(BossEntities.CHESED.get())
                 .addSkill(new BossSkill(
@@ -81,7 +82,14 @@ public class BossScreens {
         );
     });
 
-    public static Supplier<BaseBossScreen> register(EntityType<?> entityType, Supplier<BaseBossScreen> factory){
+    public static BaseBossScreen getScreen(EntityType<?> type, int bossSpawnerId){
+        if (BOSS_SCREEN_OPTIONS.containsKey(type)){
+            return BOSS_SCREEN_OPTIONS.get(type).apply(bossSpawnerId);
+        }
+        return null;
+    }
+
+    public static Function<Integer, BaseBossScreen> register(EntityType<?> entityType, Function<Integer, BaseBossScreen> factory){
         BOSS_SCREEN_OPTIONS.put(entityType,factory);
         return factory;
     }

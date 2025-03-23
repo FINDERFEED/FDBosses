@@ -1,7 +1,10 @@
 package com.finderfeed.fdbosses;
 
 
+import com.finderfeed.fdbosses.client.boss_screen.BaseBossScreen;
+import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreens;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
+import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
@@ -19,6 +22,7 @@ import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -33,6 +37,13 @@ import java.util.Random;
 public class BossClientPackets {
 
     private static Random random = new Random();
+
+    public static void openBossDossierScreen(BossSpawnerEntity bossSpawner, EntityType<?> bossType){
+        BaseBossScreen baseBossScreen = BossScreens.getScreen(bossType,bossSpawner.getId());
+        if (baseBossScreen != null){
+            Minecraft.getInstance().setScreen(baseBossScreen);
+        }
+    }
 
     public static void posEvent(Vec3 pos,int event,int data){
         switch (event) {

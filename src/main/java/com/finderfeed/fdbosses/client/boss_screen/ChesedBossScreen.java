@@ -19,6 +19,7 @@ import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.util.WidgetTexture;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.vertex.*;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
@@ -54,7 +55,7 @@ public class ChesedBossScreen extends BaseBossScreen {
             Component.translatable("fdbosses.word.does_that_not_scare_you"),
             Component.translatable("fdbosses.word.ok_listen"),
             Component.translatable("fdbosses.word.no_wait"),
-            Component.translatable("fdbosses.word.killed_chesed_in_screen"),
+            Component.translatable("fdbosses.word.killed_chesed_in_screen").withStyle(ChatFormatting.RED),
     };
 
     private int maxHealth = 10;
@@ -68,8 +69,8 @@ public class ChesedBossScreen extends BaseBossScreen {
 
     private TimedText hurtText;
 
-    public ChesedBossScreen(BossScreenOptions options) {
-        super(options);
+    public ChesedBossScreen(int bossSpawnerId, BossScreenOptions options) {
+        super(bossSpawnerId, options);
     }
 
     @Override
@@ -219,7 +220,7 @@ public class ChesedBossScreen extends BaseBossScreen {
     public static void key(InputEvent.Key event){
         if (Minecraft.getInstance().level == null) return;
         if (event.getKey() == GLFW.GLFW_KEY_M){
-            Minecraft.getInstance().setScreen(BossScreens.CHESED.get());
+//            Minecraft.getInstance().setScreen(BossScreens.CHESED.apply(0));
         }
     }
 }
