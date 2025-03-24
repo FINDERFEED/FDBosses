@@ -1,7 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.chesed_boss;
 
 import com.finderfeed.fdbosses.BossUtil;
-import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
@@ -54,6 +53,7 @@ import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
+import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
@@ -2059,7 +2059,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
             CutsceneData cutsceneData = new CutsceneData()
                     .stopMode(CutsceneData.StopMode.AUTOMATIC)
-                    .time(CHESED_DEATH.get().getAnimTime() + 20)
+                    .time(CHESED_DEATH.get().getAnimTime() + 40)
                     .addCameraPos(new CameraPos(pos,forward.reverse()));
 
             for (Player player : this.getCombatants(true)){
@@ -2075,21 +2075,117 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     protected void tickDeath() {
         this.deathTime++;
         this.lookingAtTarget = false;
-        if (!this.level().isClientSide() && !this.isRemoved()) {
-            if (this.deathTime >= CHESED_DEATH.get().getAnimTime() + 30) {
-                BossSpawnerEntity spawnerEntity = this.getSpawner();
-                if (spawnerEntity != null) {
-                    spawnerEntity.setActive(true);
-                }
-                this.remove(Entity.RemovalReason.KILLED);
-            }else if (this.deathTime == CHESED_DEATH.get().getAnimTime() + 10){
-                for (Player player : this.getCombatants(true)){
-                    if (player instanceof ServerPlayer serverPlayer){
-                        FDLibCalls.sendScreenEffect(serverPlayer, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0f,0f,0f,1f),0,20,10);
+        if (!this.isRemoved()) {
+            if (!this.level().isClientSide()) {
+                if (this.deathTime >= CHESED_DEATH.get().getAnimTime() + 50) {
+                    BossSpawnerEntity spawnerEntity = this.getSpawner();
+                    if (spawnerEntity != null) {
+                        spawnerEntity.setActive(true);
                     }
+                    this.remove(Entity.RemovalReason.KILLED);
+                } else if (this.deathTime == CHESED_DEATH.get().getAnimTime() + 30) {
+                    for (Player player : this.getCombatants(true)) {
+                        if (player instanceof ServerPlayer serverPlayer) {
+                            FDLibCalls.sendScreenEffect(serverPlayer, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0f, 0f, 0f, 1f), 5, 20, 10);
+                        }
+                    }
+                }
+            }else{
+                if (this.deathTime < 30) {
+                    this.spawnDyingParticles();
+                }else if (this.deathTime == CHESED_DEATH.get().getAnimTime() - 3){
+                    Vec3 pos = this.position().add(0,1.1f,0);
+                    level().addParticle(BallParticleOptions.builder()
+                            .size(5f)
+                            .scalingOptions(0,0,3)
+                            .color(100,230,255)
+                            .build(),pos.x,pos.y,pos.z,0,0,0);
+                } else if (this.deathTime == CHESED_DEATH.get().getAnimTime()) {
+                    this.deathExplosionParticles();
                 }
             }
         }
+    }
+
+    private void deathExplosionParticles(){
+        Vec3 pos = this.position().add(0,1.1f,0);
+
+        level().addParticle(BallParticleOptions.builder()
+                        .size(5f)
+                        .scalingOptions(3,0,3)
+                        .color(100,230,255)
+                .build(),pos.x,pos.y,pos.z,0,0,0);
+
+        float speed = 1f;
+        for (int i = 0; i < 300;i++){
+
+            if (i % 2 == 0) {
+                level().addParticle(LightningParticleOptions.builder()
+                                .color(20, 150 + random.nextInt(50), 255)
+                                .lifetime(30)
+                                .maxLightningSegments(3)
+                                .randomRoll(true)
+                                .physics(true)
+                                .build(), pos.x, pos.y, pos.z,
+                        random.nextFloat() * speed - speed / 2,
+                        random.nextFloat() * speed - speed / 2,
+                        random.nextFloat() * speed - speed / 2
+                );
+            }
+
+
+            level().addParticle(BallParticleOptions.builder()
+                            .color(40, 200 + random.nextInt(30), 255)
+                            .scalingOptions(0,20,20)
+                            .physics(true)
+                            .size(0.25f)
+                            .build(), pos.x, pos.y, pos.z,
+                    random.nextFloat() * speed - speed/2,
+                    random.nextFloat() * speed - speed/2,
+                    random.nextFloat() * speed - speed/2
+            );
+
+        }
+    }
+
+    private void spawnDyingParticles(){
+        for (int i = 0; i < 5;i++) {
+            Vec3 pos = new Vec3(
+                        random.nextFloat() * 2 - 1,
+                        random.nextFloat() * 2 - 1,
+                        random.nextFloat() * 2 - 1
+                    )
+                    .normalize()
+                    .multiply(1.5, 1.5, 1.5)
+                    .add(
+                            this.getX() + random.nextFloat() * 0.2 - 0.1,
+                            this.getY() + random.nextFloat() * 0.2 + 1.1f,
+                            this.getZ() + random.nextFloat() * 0.2 - 0.1
+                    );
+
+            level().addParticle(LightningParticleOptions.builder()
+                            .color(20, 150 + random.nextInt(50), 255)
+                            .lifetime(10)
+                            .maxLightningSegments(3)
+                            .randomRoll(true)
+                            .build(), pos.x, pos.y, pos.z,
+                    random.nextFloat() * 0.05 - 0.025,
+                    random.nextFloat() * 0.05 - 0.025,
+                    random.nextFloat() * 0.05 - 0.025
+            );
+
+            level().addParticle(BallParticleOptions.builder()
+                            .color(40, 200 + random.nextInt(30), 255)
+                            .scalingOptions(0,10,5)
+                            .size(0.25f)
+                            .build(), pos.x, pos.y, pos.z,
+                    random.nextFloat() * 0.05 - 0.025,
+                    random.nextFloat() * 0.05 - 0.025,
+                    random.nextFloat() * 0.05 - 0.025
+            );
+
+        }
+
     }
 
 
