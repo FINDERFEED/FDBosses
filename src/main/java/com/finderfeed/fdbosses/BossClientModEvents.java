@@ -72,21 +72,13 @@ public class BossClientModEvents {
                         }))
                         .addLayer(FDEntityRenderLayerOptions.builder()
                                 .model(BossModels.CHESED)
+                                .ignoreHurtOverlay(true)
                                 .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")))
                                 .build()
                         )
                         .addLayer(FDEntityRenderLayerOptions.builder()
-                                .model(BossModels.CHESED)
-                                .renderType((entity,partialTick)->{
-                                    return RenderType.entityTranslucent(FDBosses.location("textures/entities/chesed_crystals.png"));
-                                })
-                                .color((entity,pticks)->{
-                                    return new FDColor(1,1,1,0f);
-                                })
-                                .build()
-                        )
-                        .addLayer(FDEntityRenderLayerOptions.builder()
                                 .model(BossModels.CHESED_CRYSTAL_LAYER)
+                                .ignoreHurtOverlay(true)
                                 .renderType((entity,pticks)->{
                                     return RenderType.eyes(FDBosses.location("textures/entities/chesed_crystals.png"));
                                 })
@@ -96,6 +88,7 @@ public class BossClientModEvents {
                                 .build())
                         .addLayer(FDEntityRenderLayerOptions.builder()
                                 .model(BossModels.CHESED_INFLATED)
+                                .ignoreHurtOverlay(true)
                                 .renderType((entity,pticks)->{
                                     return RenderType.entityTranslucentEmissive(FDBosses.location("textures/entities/chesed_white_tex.png"));
                                 })
