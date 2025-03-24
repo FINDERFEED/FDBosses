@@ -7,12 +7,16 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdlib.FDLib;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
+import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningParticleOptions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -124,7 +128,15 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
 
         }
 
-        //TODO: FX
+        if (level() instanceof ServerLevel serverLevel){
+            serverLevel.sendParticles(LightningParticleOptions.builder()
+                    .color(20, 200 + random.nextInt(50), 255)
+                    .lifetime(10)
+                    .maxLightningSegments(3)
+                    .randomRoll(true)
+                    .physics(true)
+                    .build(),this.getX(),this.getY() + 0.2f,this.getZ(),30,0.02f,0.02f,0.02f,0.05f);
+        }
 
     }
 

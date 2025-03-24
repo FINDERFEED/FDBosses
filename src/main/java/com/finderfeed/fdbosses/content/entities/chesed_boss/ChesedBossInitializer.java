@@ -120,9 +120,17 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
     @Override
     public void onTick() {
         int endTick = 120;
+        int idleAfterEnd = 20;
         ChesedEntity entity = this.getBoss();
-        if (this.getTick() >= endTick){
-            this.setFinished();
+        if (this.getTick() == endTick){
+            ChesedEntity chesedEntity = this.getBoss();
+
+            List<Player> players = chesedEntity.getCombatants(true);
+
+            for (Player player : players){
+                ServerPlayer serverPlayer = (ServerPlayer) player;
+                FDLibCalls.stopCutsceneForPlayer(serverPlayer);
+            }
         }else if (this.getTick() == endTick - 1){
             List<Player> players = entity.getCombatants(true);
             for (Player player : players){
@@ -151,6 +159,8 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
                     .frequency(50f)
                     .build());
             PacketDistributor.sendToPlayersTrackingEntity(entity,defaultShakePacket);
+        }else if (this.getTick() >= endTick + idleAfterEnd){
+            this.setFinished();
         }
     }
 
