@@ -13,7 +13,7 @@ public class BossEffects {
 
     public static final DeferredRegister<MobEffect> MOB_EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, FDBosses.MOD_ID);
 
-    public static final Holder<MobEffect> CHESED_GAZE = MOB_EFFECTS.register("chesed_gaze", ()->new SimpleEffect(MobEffectCategory.NEUTRAL,0x000000));
+    public static final Holder<MobEffect> CHESED_GAZE = MOB_EFFECTS.register("chesed_gaze", ()->new SimpleEffect(MobEffectCategory.NEUTRAL,0x681cff));
     public static final Holder<MobEffect> CHESED_DARKEN = MOB_EFFECTS.register("chesed_darken", ()->new SimpleEffect(MobEffectCategory.NEUTRAL,0x000000));
     public static final Holder<MobEffect> CHESED_ENERGIZED = MOB_EFFECTS.register("chesed_energized", ()->new SimpleEffect(MobEffectCategory.NEUTRAL,0x00edd9));
 

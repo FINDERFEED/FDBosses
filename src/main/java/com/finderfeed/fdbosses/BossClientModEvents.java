@@ -80,6 +80,16 @@ public class BossClientModEvents {
                                 .model(BossModels.CHESED_CRYSTAL_LAYER)
                                 .ignoreHurtOverlay(true)
                                 .renderType((entity,pticks)->{
+                                    return RenderType.entityTranslucent(FDBosses.location("textures/entities/chesed_crystals.png"));
+                                })
+                                .color((entity,pticks)->{
+                                    return new FDColor(1f,1f,1f,0f);
+                                })
+                                .build())
+                        .addLayer(FDEntityRenderLayerOptions.builder()
+                                .model(BossModels.CHESED_CRYSTAL_LAYER)
+                                .ignoreHurtOverlay(true)
+                                .renderType((entity,pticks)->{
                                     return RenderType.eyes(FDBosses.location("textures/entities/chesed_crystals.png"));
                                 })
                                 .color((entity,pticks)->{
@@ -157,6 +167,23 @@ public class BossClientModEvents {
                         .addLayer(FDEntityRenderLayerOptions.builder()
                                 .model(BossModels.BOSS_SPAWNER)
                                 .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/boss_spawner.png")))
+                                .renderCondition((entity -> {
+                                    return ((BossSpawnerEntity)entity).isActive();
+                                }))
+                                .build())
+                        .addLayer(FDEntityRenderLayerOptions.builder()
+                                .model(BossModels.BOSS_SPAWNER)
+                                .renderType(RenderType.entityTranslucentCull(FDBosses.location("textures/entities/boss_spawner_crystals.png")))
+                                .renderCondition((entity -> {
+                                    return ((BossSpawnerEntity)entity).isActive();
+                                }))
+                                .color(((entity, v) -> {
+                                    return new FDColor(1,1,1f,0.25f);
+                                }))
+                                .build())
+                        .addLayer(FDEntityRenderLayerOptions.builder()
+                                .model(BossModels.BOSS_SPAWNER_CRYSTAL_LAYER)
+                                .renderType(RenderType.eyes(FDBosses.location("textures/entities/boss_spawner_crystals.png")))
                                 .renderCondition((entity -> {
                                     return ((BossSpawnerEntity)entity).isActive();
                                 }))

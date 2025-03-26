@@ -243,11 +243,13 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 system.stopAnimation("IDLE");
             }
 
+            if (level().getGameTime() % 5 == 0) {
+                this.blindCombatants();
+            }
+
             if (bossInitializer.isFinished() && !this.isDeadOrDying()) {
                 this.chain.tick();
-                if (level().getGameTime() % 5 == 0) {
-                    this.blindCombatants();
-                }
+
 
                 if (this.getTarget() != null) {
                     this.checkTarget(this.getTarget());
