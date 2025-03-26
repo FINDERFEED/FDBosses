@@ -171,6 +171,13 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
                 .outTime(5)
                 .build(),p,10);
 
+
+        FDLibCalls.sendParticles((ServerLevel) level(),BallParticleOptions.builder()
+                .size(20f)
+                .scalingOptions(1,0,3)
+                .color(150,230,255)
+                .build(),p,60);
+
         //TODO: more gentle sound
 
     }

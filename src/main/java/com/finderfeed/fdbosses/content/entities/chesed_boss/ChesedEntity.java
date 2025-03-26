@@ -176,24 +176,24 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(ROCKFALL_ATTACK,this::rockfallAttack) // 1
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .attackListener(this::attackListener)
-//                    .addAttack(0, ray)
+                    .addAttack(0, ray)
                     .addAttack(1,AttackOptions.builder()
                             .addAttack(ELECTRIC_SPHERE_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
+                            .setNextAttack(rayOrBlocks)
                             .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(ROCKFALL_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(EARTHQUAKE_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(4,AttackOptions.builder()
-//                            .addAttack(ROLL_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(5,FINAL_ATTACK)
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(ROCKFALL_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(EARTHQUAKE_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(4,AttackOptions.builder()
+                            .addAttack(ROLL_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(5,FINAL_ATTACK)
             ;
 
         }
@@ -901,6 +901,13 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                         .inTime(0)
                         .stayTime(0)
                         .outTime(5)
+                        .build(),end,120);
+
+
+                FDLibCalls.sendParticles((ServerLevel) level(),BallParticleOptions.builder()
+                        .size(50f)
+                        .scalingOptions(2,0,3)
+                        .color(100,230,255)
                         .build(),end,120);
 
 
@@ -2356,12 +2363,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     @Override
     public void push(Entity entity) {
-
         Vec3 b = entity.position().subtract(this.position()).normalize().add(0,0.3,0);
-        System.out.println(b);
         entity.setDeltaMovement(b);
         entity.hasImpulse = true;
-
     }
 
 

@@ -1,7 +1,6 @@
 package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.init.BossEffects;
-import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.mojang.blaze3d.shaders.FogShape;
@@ -16,9 +15,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
-import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
-import org.lwjgl.glfw.GLFW;
 
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID,bus = EventBusSubscriber.Bus.GAME,value = Dist.CLIENT)

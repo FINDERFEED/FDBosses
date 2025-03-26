@@ -38,6 +38,12 @@ public class BossClientPackets {
 
     private static Random random = new Random();
 
+    public static void closeDossierScreen(){
+        if (Minecraft.getInstance().screen instanceof BaseBossScreen baseBossScreen){
+            Minecraft.getInstance().setScreen(null);
+        }
+    }
+
     public static void openBossDossierScreen(BossSpawnerEntity bossSpawner, EntityType<?> bossType){
         BaseBossScreen baseBossScreen = BossScreens.getScreen(bossType,bossSpawner.getId());
         if (baseBossScreen != null){

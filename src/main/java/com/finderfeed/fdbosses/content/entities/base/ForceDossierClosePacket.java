@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.base;
 
+import com.finderfeed.fdbosses.BossClientPackets;
 import com.finderfeed.fdbosses.client.boss_screen.BaseBossScreen;
 import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.RegisterFDPacket;
@@ -25,9 +26,7 @@ public class ForceDossierClosePacket extends FDPacket {
 
     @Override
     public void clientAction(IPayloadContext iPayloadContext) {
-        if (Minecraft.getInstance().screen instanceof BaseBossScreen baseBossScreen){
-            Minecraft.getInstance().setScreen(null);
-        }
+        BossClientPackets.closeDossierScreen();
     }
 
     @Override

@@ -30,13 +30,14 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
 import org.lwjgl.glfw.GLFW;
 
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
+//@EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class ChesedBossScreen extends BaseBossScreen {
 
     private static FDModel chesed;
@@ -216,11 +217,4 @@ public class ChesedBossScreen extends BaseBossScreen {
         return 0;
     }
 
-    @SubscribeEvent
-    public static void key(InputEvent.Key event){
-        if (Minecraft.getInstance().level == null) return;
-        if (event.getKey() == GLFW.GLFW_KEY_M){
-//            Minecraft.getInstance().setScreen(BossScreens.CHESED.apply(0));
-        }
-    }
 }
