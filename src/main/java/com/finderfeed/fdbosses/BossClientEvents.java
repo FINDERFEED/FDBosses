@@ -31,14 +31,6 @@ public class BossClientEvents {
     public static int chesedDarkenEffectTickO = 0;
     public static int chesedDarkenEffectTickMax = 10;
 
-//    @SubscribeEvent
-//    public static void test(InputEvent.Key event){
-//        if (Minecraft.getInstance().level == null) return;
-//
-//        if (event.getKey() == GLFW.GLFW_KEY_K){
-//            BossClientPackets.chesedRayReflectParticles();
-//        }
-//    }
 
     @SubscribeEvent
     public static void tickEvent(ClientTickEvent.Pre event){
