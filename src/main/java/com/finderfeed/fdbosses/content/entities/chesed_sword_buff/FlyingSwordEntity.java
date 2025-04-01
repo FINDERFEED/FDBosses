@@ -1,5 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.chesed_sword_buff;
 
+import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
@@ -12,6 +14,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
@@ -260,8 +263,15 @@ public class FlyingSwordEntity extends FDProjectile {
                 damage *= 1 + mod.amount();
             }
 
+            float dmg = BossConfigs.BOSS_CONFIG.get().itemConfig.flyingSwordDamagePercent / 100f;
+
+            damage *= dmg;
+
             target.invulnerableTime = 0;
-            target.hurt(level().damageSources().mobAttack(owner),(float) damage);
+            if (target.hurt(level().damageSources().mobAttack(owner),(float) damage)){
+                int duration = BossConfigs.BOSS_CONFIG.get().itemConfig.flyingSwordShockDuration;
+                target.addEffect(new MobEffectInstance(BossEffects.SHOCKED,duration,0));
+            }
 
         }
     }

@@ -10,6 +10,12 @@ public class BossConfig extends ReflectiveJsonConfig {
     @ConfigValue
     public ChesedConfig chesedConfig = new ChesedConfig();
 
+    @ConfigValue
+    public EffectConfig effectConfig = new EffectConfig();
+
+    @ConfigValue
+    public ItemConfig itemConfig = new ItemConfig();
+
     public BossConfig() {
         super(FDBosses.location("bosses"));
     }
