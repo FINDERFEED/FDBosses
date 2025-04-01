@@ -2,6 +2,8 @@ package com.finderfeed.fdbosses.content.entities.chesed_sword_buff;
 
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.util.FDProjectile;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
+import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -9,6 +11,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,6 +34,11 @@ public class FlyingSwordEntity extends FDProjectile {
     private static final EntityDataAccessor<Integer> TARGET_ID = SynchedEntityData.defineId(FlyingSwordEntity.class, EntityDataSerializers.INT);
 
     private UUID target = null;
+
+    public double xao;
+    public double yao;
+    public double zao;
+
 
     public FlyingSwordEntity(EntityType<? extends FDProjectile> type, Level level) {
         super(type, level);
@@ -76,13 +84,106 @@ public class FlyingSwordEntity extends FDProjectile {
 
     @Override
     public void tick() {
+        if (tickCount == 1){
+            this.xao = this.getX();
+            this.yao = this.getY();
+            this.zao = this.getZ();
+        }
         super.tick();
         if (!level().isClientSide){
             if (this.tickCount >= 400) {
                 this.remove(RemovalReason.DISCARDED);
             }
             this.handleTarget();
+        }else{
+
+            Vec3 center = this.getActualPos();
+            Vec3 centerO = new Vec3(xao,yao,zao);
+            Vec3 b = center.subtract(centerO);
+
+            double dist = Math.min(centerO.distanceTo(center),10);
+
+            float size = 0.125f;
+
+            Vec3 sp = b.normalize().multiply(0.25f,0.25f,0.25f);
+
+            for (float i = 0; i < dist; i += size * 2) {
+
+                double p = i / dist;
+
+                Vec3 ball = new Vec3(
+                        FDMathUtil.lerp(centerO.x,center.x,p),
+                        FDMathUtil.lerp(centerO.y,center.y,p),
+                        FDMathUtil.lerp(centerO.z,center.z,p)
+                ).add(
+                        random.nextFloat() * 0.25 - 0.125f,
+                        random.nextFloat() * 0.25 - 0.125f,
+                        random.nextFloat() * 0.25 - 0.125f
+                );
+
+                level().addParticle(BallParticleOptions.builder()
+                        .size(size)
+                        .color(0.1f, 0.9f, 1f)
+                        .scalingOptions(2, 0, 10)
+                                .friction(0.9f)
+                        .build(),
+                        ball.x + random.nextFloat() * 0.25 - 0.125f,
+                        ball.y + random.nextFloat() * 0.25 - 0.125f,
+                        ball.z + random.nextFloat() * 0.25 - 0.125f,
+                        sp.x,sp.y,sp.z);
+
+                if (tickCount % 2 == 0) {
+                    level().addParticle(LightningParticleOptions.builder()
+                                    .randomRoll(true)
+                                    .lifetime(2)
+                                    .maxLightningSegments(4)
+                                    .quadSize(0.3f)
+                                    .color(20, 100, 255)
+                                    .build(),
+                            ball.x + random.nextFloat() * 0.5 - 0.25f,
+                            ball.y + random.nextFloat() * 0.5 - 0.25f,
+                            ball.z + random.nextFloat() * 0.5 - 0.25f,
+                            sp.x, sp.y, sp.z);
+                }
+            }
+
+            xao = center.x;
+            yao = center.y;
+            zao = center.z;
         }
+    }
+
+    private Vec3 getActualPos(){
+
+        Vec3 center = this.position().add(0,this.getBbHeight() / 2,0);
+
+        float time = this.tickCount;
+        float p = Math.clamp(time / FlyingSwordEntity.DELAY_UNTIL_LAUNCH,0,1);
+        float offset = -Mth.sin(p * (FDMathUtil.FPI)) * 2;
+
+        int targetId = this.getTargetIdForClient();
+        if (level().getEntity(targetId) instanceof LivingEntity target){
+
+            Vec3 targetPos = this.getTargetPos(target,0);
+            Vec3 between = targetPos.subtract(center).normalize();
+
+            return center.add(
+                    between.multiply(offset,offset,offset)
+            );
+
+        }else {
+            return center;
+        }
+    }
+
+    @Override
+    public boolean isCurrentlyGlowing() {
+        return true;
+    }
+
+    @Override
+    public int getTeamColor() {
+        return 0x11aaff;
     }
 
     private void handleTarget(){
@@ -102,8 +203,9 @@ public class FlyingSwordEntity extends FDProjectile {
 
                     this.setDeltaMovement(deltaMovement);
 
-                    if (this.position().distanceTo(targetPos) <= 0.01f){
+                    if (this.position().distanceTo(targetPos) <= 0.5f){
                         this.hurtTarget(owner, livingTarget);
+                        this.remove(RemovalReason.DISCARDED);
                     }
 
                 }
@@ -130,13 +232,6 @@ public class FlyingSwordEntity extends FDProjectile {
     @Override
     protected void onHitEntity(EntityHitResult hitResult) {
         super.onHitEntity(hitResult);
-        if (!level().isClientSide && this.tickCount > DELAY_UNTIL_LAUNCH * 0.75f) {
-            if (this.getOwner() instanceof LivingEntity owner && owner.getAttributes().hasAttribute(Attributes.ATTACK_DAMAGE) && hitResult.getEntity() instanceof LivingEntity target){
-                this.hurtTarget(owner,target);
-            }
-            this.remove(RemovalReason.DISCARDED);
-        }
-
     }
 
     private void hurtTarget(LivingEntity owner, LivingEntity target){
@@ -165,6 +260,7 @@ public class FlyingSwordEntity extends FDProjectile {
                 damage *= 1 + mod.amount();
             }
 
+            target.invulnerableTime = 0;
             target.hurt(level().damageSources().mobAttack(owner),(float) damage);
 
         }

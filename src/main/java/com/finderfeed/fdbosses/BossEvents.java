@@ -16,7 +16,7 @@ public class BossEvents {
     public static void onEntityAttack(AttackEntityEvent event){
         Player player = event.getEntity();
         if (!player.level().isClientSide && event.getTarget() instanceof LivingEntity livingEntity){
-            FlyingSwordEntity.summonAtTarget(player, livingEntity, player.getMainHandItem());
+            FlyingSwordEntity.summonAtTarget(player, player, player.getMainHandItem());
         }
 
     }

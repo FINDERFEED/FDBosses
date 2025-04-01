@@ -58,6 +58,10 @@ public class FlyingSwordRenderer extends EntityRenderer<FlyingSwordEntity> {
 
 
         matrices.mulPose(Axis.ZN.rotationDegrees(45));
+
+        float scale = Math.clamp(p *2,0,1);
+        matrices.scale(scale,scale,scale);
+
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
         itemRenderer.render(entity.getItem(), ItemDisplayContext.FIXED, false, matrices, ColoredVertexConsumer.wrapBufferSource(src,5, 209, 255,200),
                 LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
