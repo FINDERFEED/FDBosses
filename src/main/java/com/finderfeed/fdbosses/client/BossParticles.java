@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.client;
 
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
+import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
 import com.finderfeed.fdbosses.FDBosses;
@@ -69,6 +70,18 @@ public class BossParticles {
         @Override
         public StreamCodec<? super RegistryFriendlyByteBuf, BigSmokeParticleOptions> streamCodec() {
             return BigSmokeParticleOptions.STREAM_CODEC;
+        }
+    });
+
+    public static final Supplier<ParticleType<RushParticleOptions>> RUSH_PARTICLE = PARTICLES.register("rush_particle",()->new ParticleType<RushParticleOptions>(true) {
+        @Override
+        public MapCodec<RushParticleOptions> codec() {
+            return RushParticleOptions.CODEC;
+        }
+
+        @Override
+        public StreamCodec<? super RegistryFriendlyByteBuf, RushParticleOptions> streamCodec() {
+            return RushParticleOptions.STREAM_CODEC;
         }
     });
 
