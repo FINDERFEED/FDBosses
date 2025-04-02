@@ -13,9 +13,4 @@ public class LightningCore extends Item {
         super(props);
     }
 
-    @Override
-    public boolean overrideOtherStackedOnMe(ItemStack p_150892_, ItemStack p_150893_, Slot p_150894_, ClickAction p_150895_, Player player, SlotAccess p_150897_) {
-        System.out.println(player.level());
-        return super.overrideOtherStackedOnMe(p_150892_, p_150893_, p_150894_, p_150895_, player, p_150897_);
-    }
 }
