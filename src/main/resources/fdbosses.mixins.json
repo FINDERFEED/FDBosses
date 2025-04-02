@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "fdbosses.refmap.json",
   "mixins": [
+    "CraftingMenuMixin",
     "EntityMixin"
   ],
   "minVersion": "0.8",

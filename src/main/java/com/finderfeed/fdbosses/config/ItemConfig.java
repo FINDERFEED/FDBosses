@@ -9,10 +9,10 @@ public class ItemConfig {
     public float flyingSwordDamagePercent = 50;
 
     @ConfigValue
-    public float chanceToSummonFlyingSword = 10;
+    public float chanceToSummonFlyingSword = 33;
 
     @ConfigValue
     @Comment("Time in ticks")
-    public int flyingSwordShockDuration = 20;
+    public int flyingSwordShockDuration = 100;
 
 }

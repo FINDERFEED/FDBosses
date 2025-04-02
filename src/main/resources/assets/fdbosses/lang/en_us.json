@@ -10,6 +10,7 @@
   "death.attack.electric_sphere": "%s tried to touch the lightning",
   "entity.fdbosses.chesed": "Chesed",
   "effect.fdbosses.chesed_gaze": "Chesed Gaze",
+  "effect.fdbosses.shocked": "Shocked",
   "effect_description.fdbosses.chesed_gaze": "Extreme level of blindness.",
   "effect.fdbosses.chesed_energized": "Energized",
   "effect_description.fdbosses.chesed_energized": "While player has this effect Chesed's lightning ray attack can be blocked with shield.\n\nIf lightning ray attack is blocked, Chesed takes 1 damage and effect is removed.",
@@ -23,7 +24,7 @@
   "fdbosses.skills.chesed.blocks": "Block Barrage",
   "fdbosses.skills.chesed.blocks_description": "Tears out blocks from the earth and hurls them onto target.\n\nDuring the second phase creates static field around all players that doesn't allow them to escape.",
   "fdbosses.skills.chesed.earthquake": "Earthquake",
-  "fdbosses.skills.chesed.earthquake_description": "Slams the earth emitting a shockwave with lightnings that travel out from Chesed position.\n\nDuring the second phase more lightnings are summoned and their movement speed is increased.",
+  "fdbosses.skills.chesed.earthquake_description": "Slams the earth emitting a shockwave and lightnings that travel out from Chesed position.\n\nDuring the second phase more lightnings are summoned and their movement speed is increased.",
   "fdbosses.skills.chesed.espheres": "Tempest Core",
   "fdbosses.skills.chesed.espheres_description": "Releases ball lightnings that travel out from Chesed.\n\nThese ball lightnings cannot be reflected.",
   "fdbosses.skills.chesed.monoliths": "Monoliths",
@@ -61,5 +62,6 @@
   "fdbosses.word.no_wait": "No wait!",
   "fdbosses.word.killed_chesed_in_screen": "Well, you killed him. Congratulations! I hope you feel bad about yourself for killing an innocent creature! You know, i wanted to crash the game but that would be a bad game design, so i will leave that decision to you. Here, press that button.",
   "fdbosses.word.crash_game": "Crash the game",
-  "fdbosses.word.start_fight": "Start Bossfight"
+  "fdbosses.word.start_fight": "Start Bossfight",
+  "fdbosses.word.lightning_core": "Lightning Core"
 }

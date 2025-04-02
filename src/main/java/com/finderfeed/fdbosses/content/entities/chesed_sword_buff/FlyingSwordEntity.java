@@ -14,6 +14,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlotGroup;
@@ -21,6 +22,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -61,14 +63,14 @@ public class FlyingSwordEntity extends FDProjectile {
 
         Vec3 between = targetPos.subtract(owner.position()).multiply(1,0,1).normalize();
 
-        float rndDistMod = 2 + level.random.nextFloat() * 2;
+        float rndDistMod = Mth.clamp(target.getBbWidth() * 2,2, 10) + level.random.nextFloat() * 2;
 
         float rndOffsNum = level.random.nextBoolean() ? 1 : -1;
 
         Vec3 randomOffset = between
                 .multiply(rndDistMod,rndDistMod,rndDistMod)
                 .yRot(
-                        rndOffsNum * FDMathUtil.FPI / 2 + (-rndOffsNum) * FDMathUtil.FPI / 4
+                        rndOffsNum * FDMathUtil.FPI / 2 + (-rndOffsNum) * FDMathUtil.FPI / 8
                 )
                 .add(0,1.5 + level.random.nextFloat() * 2,0);
 
@@ -80,7 +82,14 @@ public class FlyingSwordEntity extends FDProjectile {
 
         flyingSwordEntity.setTargetIdForClient(target);
 
-        level.addFreshEntity(flyingSwordEntity);
+        if (level.addFreshEntity(flyingSwordEntity)){
+            ((ServerLevel)level).sendParticles(BallParticleOptions.builder()
+                    .size(0.15f)
+                    .color(0.1f, 0.9f, 1f)
+                    .scalingOptions(2, 0, 5)
+                    .friction(0.8f)
+                    .build(),resultPos.x,resultPos.y,resultPos.z,60, 0,0,0,0.1f);
+        }
 
         return flyingSwordEntity;
     }
@@ -265,12 +274,19 @@ public class FlyingSwordEntity extends FDProjectile {
 
             float dmg = BossConfigs.BOSS_CONFIG.get().itemConfig.flyingSwordDamagePercent / 100f;
 
+            DamageSource damageSource = level().damageSources().mobAttack(owner);
+
+            damage = EnchantmentHelper.modifyDamage((ServerLevel) level(), this.getItem(), target, damageSource, (float) damage);
+
             damage *= dmg;
 
+            target.setRemainingFireTicks(0);
+
             target.invulnerableTime = 0;
-            if (target.hurt(level().damageSources().mobAttack(owner),(float) damage)){
+            if (target.hurt(damageSource,(float) damage)){
                 int duration = BossConfigs.BOSS_CONFIG.get().itemConfig.flyingSwordShockDuration;
                 target.addEffect(new MobEffectInstance(BossEffects.SHOCKED,duration,0));
+                EnchantmentHelper.doPostAttackEffects((ServerLevel) level(), target, damageSource);
             }
 
         }

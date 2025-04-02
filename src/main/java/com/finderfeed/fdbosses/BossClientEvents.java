@@ -1,14 +1,20 @@
 package com.finderfeed.fdbosses;
 
+import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
+import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.mojang.blaze3d.shaders.FogShape;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -16,6 +22,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 import net.neoforged.neoforge.client.event.ViewportEvent;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID,bus = EventBusSubscriber.Bus.GAME,value = Dist.CLIENT)
@@ -31,6 +38,18 @@ public class BossClientEvents {
     public static int chesedDarkenEffectTickO = 0;
     public static int chesedDarkenEffectTickMax = 10;
 
+
+    @SubscribeEvent
+    public static void collectTooltips(ItemTooltipEvent event){
+        var componentList = event.getToolTip();
+        ItemStack itemStack = event.getItemStack();
+        if (itemStack.has(BossDataComponents.ITEM_CORE.get())){
+            ItemCoreDataComponent itemCoreDataComponent = itemStack.get(BossDataComponents.ITEM_CORE);
+            if (itemCoreDataComponent.getCoreType() == ItemCoreDataComponent.CoreType.LIGHTNING) {
+                componentList.add(Component.translatable("fdbosses.word.lightning_core").withStyle(Style.EMPTY.withColor(0x11ffff)));
+            }
+        }
+    }
 
     @SubscribeEvent
     public static void tickEvent(ClientTickEvent.Pre event){

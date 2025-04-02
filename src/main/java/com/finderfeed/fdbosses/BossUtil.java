@@ -2,9 +2,14 @@ package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdlib.util.FDUtil;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -64,6 +69,16 @@ public class BossUtil {
 
     public static void posEvent(ServerLevel level, Vec3 pos, int event,int data,double radius){
         PacketDistributor.sendToPlayersNear(level,null,pos.x,pos.y,pos.z,radius,new PosLevelEventPacket(pos,event,data));
+    }
+
+    public static boolean itemContainsModifierForAttribute(ItemStack itemStack, Holder<Attribute> attributeHolder){
+        ItemAttributeModifiers modifiers = itemStack.getAttributeModifiers();
+        for (var modifier : modifiers.modifiers()){
+            if (modifier.attribute().value().equals(attributeHolder.value())){
+                return true;
+            }
+        }
+        return false;
     }
 
 }
