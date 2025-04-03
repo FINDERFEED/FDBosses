@@ -19,12 +19,16 @@ public class RushParticleOptions implements ParticleOptions {
     public static final MapCodec<RushParticleOptions> CODEC = RecordCodecBuilder.mapCodec(p->p.group(
             FDCodecs.VEC3.fieldOf("rushDirection").forGetter(v->v.rushDirection),
             FDCodecs.COLOR.fieldOf("color").forGetter(v->v.color),
+            Codec.FLOAT.fieldOf("length").forGetter(v->v.length),
+            Codec.FLOAT.fieldOf("width").forGetter(v->v.width),
             Codec.INT.fieldOf("lifetime").forGetter(v->v.lifetime)
     ).apply(p,RushParticleOptions::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, RushParticleOptions> STREAM_CODEC = StreamCodec.composite(
             FDByteBufCodecs.VEC3,v->v.rushDirection,
             FDByteBufCodecs.COLOR,v->v.color,
+            ByteBufCodecs.FLOAT,v->v.length,
+            ByteBufCodecs.FLOAT,v->v.width,
             ByteBufCodecs.INT, v->v.lifetime,
             RushParticleOptions::new
     );
@@ -32,16 +36,24 @@ public class RushParticleOptions implements ParticleOptions {
     private Vec3 rushDirection;
     private FDColor color;
     private int lifetime;
+    private float length;
+    private float width;
 
-    public RushParticleOptions(Vec3 rushDirection, FDColor color, int lifetime){
+    public RushParticleOptions(Vec3 rushDirection, FDColor color, float length, float width, int lifetime){
         this.rushDirection = rushDirection;
         this.color = color;
         this.lifetime = lifetime;
+        this.length = length;
+        this.width = width;
     }
 
     @Override
     public ParticleType<?> getType() {
         return BossParticles.RUSH_PARTICLE.get();
+    }
+
+    public float getLength() {
+        return length;
     }
 
     public Vec3 getRushDirection() {
@@ -55,4 +67,9 @@ public class RushParticleOptions implements ParticleOptions {
     public FDColor getColor() {
         return color;
     }
+
+    public float getWidth() {
+        return width;
+    }
+
 }

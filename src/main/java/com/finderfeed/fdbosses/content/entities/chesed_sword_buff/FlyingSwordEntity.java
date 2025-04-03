@@ -1,8 +1,10 @@
 package com.finderfeed.fdbosses.content.entities.chesed_sword_buff;
 
+import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOptions;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningParticleOptions;
@@ -63,7 +65,7 @@ public class FlyingSwordEntity extends FDProjectile {
 
         Vec3 between = targetPos.subtract(owner.position()).multiply(1,0,1).normalize();
 
-        float rndDistMod = Mth.clamp(target.getBbWidth() * 2,2, 10) + level.random.nextFloat() * 2;
+        float rndDistMod = Mth.clamp(target.getBbWidth() * 3,2, 10) + level.random.nextFloat() * 2;
 
         float rndOffsNum = level.random.nextBoolean() ? 1 : -1;
 
@@ -110,8 +112,48 @@ public class FlyingSwordEntity extends FDProjectile {
         }else{
 
             Vec3 center = this.getActualPos();
+
+            if (tickCount == DELAY_UNTIL_LAUNCH && level().getEntity(this.getTargetIdForClient()) instanceof LivingEntity target){
+
+                Vec3 targetPos = this.getTargetPos(target, 0);
+
+                Vec3 b = center.subtract(targetPos).normalize();
+
+                int count = 7;
+                for (int i = 0; i < count;i++){
+
+                    Vec3 rndOffset = new Vec3(
+                            random.nextFloat() * 2 - 1,
+                            random.nextFloat() * 2 - 1,
+                            random.nextFloat() * 2 - 1
+                    ).normalize();
+
+                    float bscale = i / (float) (count - 1) * 2;
+                    float scale = random.nextFloat() * 0.25f;
+                    float defaultScale = 0.1f;
+                    Vec3 pos = center.add(
+                            rndOffset.multiply(scale,scale,scale)
+                    ).add(rndOffset.multiply(defaultScale,defaultScale,defaultScale))
+                            .add(b.multiply(bscale,bscale,bscale));
+
+                    level().addParticle(new RushParticleOptions(b,
+                            new FDColor(0.8f,1f,1f,1f),
+                            random.nextFloat() * 0.5f + 0.25f,
+                            0.05f + random.nextFloat() * 0.025f,
+                            3 + random.nextInt(3)
+                            ),pos.x,pos.y,pos.z,0,0,0);
+
+                }
+            }
+
+
+
             Vec3 centerO = new Vec3(xao,yao,zao);
             Vec3 b = center.subtract(centerO);
+
+
+
+
 
             double dist = Math.min(centerO.distanceTo(center),10);
 
@@ -210,7 +252,7 @@ public class FlyingSwordEntity extends FDProjectile {
 
                     Vec3 between = targetPos.subtract(thisPos);
 
-                    float speed = 0.75f;
+                    float speed = 1f;
                     Vec3 deltaMovement = between.normalize().multiply(speed,speed,speed);
 
                     this.setDeltaMovement(deltaMovement);
