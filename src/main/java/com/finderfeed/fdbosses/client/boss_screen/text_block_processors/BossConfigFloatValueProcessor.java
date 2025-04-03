@@ -30,7 +30,7 @@ public class BossConfigFloatValueProcessor extends TextBlockProcessor {
             if (!(obj instanceof Number)){
                 throw new RuntimeException("A value " + valueName + " in " + configName + " is not float/int!");
             }else{
-                finalValue = (float) obj;
+                finalValue = ((Number)obj).floatValue();
             }
         }catch (Exception e){
             throw new RuntimeException(e);

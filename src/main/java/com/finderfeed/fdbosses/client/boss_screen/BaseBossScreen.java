@@ -11,6 +11,7 @@ import com.finderfeed.fdbosses.client.boss_screen.widget.SkillInfoWidget;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerStartFight;
 import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdlib.systems.simple_screen.FDScrollableWidget;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDButton;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.TextBlockWidget;
@@ -98,7 +99,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         Vector2f anchor = this.getAnchor(1f,0f);
 
         float bossInfoWidth = 237;
-        float bossInfoHeight = 140;
+        float bossInfoHeight = 130;
 
         float bossInfoYs = 0;
 
@@ -168,7 +169,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         this.initAbilitiesWidgetModeChangeButtons(bossAbilitesWidget);
 
-        this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget, skills);
+        this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget.bossAbilitiesButtonContainer, skills);
 
         this.addRenderableWidget(bossAbilitesWidget);
 
@@ -177,29 +178,31 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
     private void initAbilitiesWidgetModeChangeButtons(BossAbilitesWidget bossAbilitesWidget){
 
-        FDButton fdButtonSkills = new FDButton(this,30,20,110,24)
+        FDButton fdButtonSkills = new FDButton(this,32,0,73,24)
                 .setTexture(new FDButtonTextures(
-                        new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
-                        new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
+                        new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
+                        new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
                 ))
                 .setText(Component.translatable("fdbosses.word.abilities").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
-                        110,1f,true,0,1)
+                        73,1f,true,0,1)
                 .setOnClickAction((fdWidget, v, v1, i) -> {
-                    bossAbilitesWidget.setCurrentScroll(0);
-                    this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget, this.options.getSkills());
+                    bossAbilitesWidget.bossAbilitiesButtonContainer.setCurrentScroll(0);
+                    bossAbilitesWidget.bossAbilitiesButtonContainer.removeAllChildren();
+                    this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget.bossAbilitiesButtonContainer, this.options.getSkills());
                     return true;
                 });
 
-        FDButton fdButtonDrops = new FDButton(this,150,20,110,24)
+        FDButton fdButtonDrops = new FDButton(this,199-73,0,73,24)
                 .setTexture(new FDButtonTextures(
-                        new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
-                        new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
+                        new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
+                        new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
                 ))
                 .setText(Component.translatable("fdbosses.word.drops").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
-                        110,1f,true,0,1)
+                        73,1f,true,0,1)
                 .setOnClickAction(((fdWidget, v, v1, i) -> {
-                    bossAbilitesWidget.setCurrentScroll(0);
-                    this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget, this.options.getDrops());
+                    bossAbilitesWidget.bossAbilitiesButtonContainer.setCurrentScroll(0);
+                    bossAbilitesWidget.bossAbilitiesButtonContainer.removeAllChildren();
+                    this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget.bossAbilitiesButtonContainer, this.options.getDrops());
                     return true;
                 }));
 
@@ -210,9 +213,9 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
 
 
-    private void initAbilitiesWidgetInfoButtons(BossAbilitesWidget bossAbilitesWidget, List<BossInfo> bossInfos){
-        float offsx = 19;
-        float offsy = 30;
+    private void initAbilitiesWidgetInfoButtons(FDScrollableWidget bossAbilitesWidget, List<BossInfo> bossInfos){
+        float offsx = 5;
+        float offsy = 4;
         for (int  i = 0; i < bossInfos.size();i++) {
 
             BossInfo bossSkill = bossInfos.get(i);
@@ -231,10 +234,10 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                             matrices.pushPose();
                             matrices.translate(0, 0, 100);
                             BossRenderUtil.renderBossScreenTooltip(guiGraphics, Component.translatable("fdbosses.skills.skill_button"), v, v1, 200, this.getBaseStringColor(), 1f,
-                                    this.bossAbilitesWidget.getX(),
-                                    this.bossAbilitesWidget.getY(),
-                                    this.bossAbilitesWidget.getX() + this.bossAbilitesWidget.getWidth(),
-                                    this.bossAbilitesWidget.getY() + this.bossAbilitesWidget.getHeight() - 15
+                                    this.bossAbilitesWidget.bossAbilitiesButtonContainer.getX(),
+                                    this.bossAbilitesWidget.bossAbilitiesButtonContainer.getY(),
+                                    this.bossAbilitesWidget.bossAbilitiesButtonContainer.getX() + this.bossAbilitesWidget.bossAbilitiesButtonContainer.getWidth(),
+                                    this.bossAbilitesWidget.bossAbilitiesButtonContainer.getY() + this.bossAbilitesWidget.bossAbilitiesButtonContainer.getHeight()
                             );
                             matrices.popPose();
                         }

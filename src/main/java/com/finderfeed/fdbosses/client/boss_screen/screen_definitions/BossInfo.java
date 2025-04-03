@@ -24,7 +24,7 @@ public class BossInfo {
 
     public BossInfo(ItemStack skillIcon, Component skillStats, Component skillDescription) {
         this.infoIcon = Either.right(skillIcon);
-        this.infoName = skillIcon.getDisplayName();
+        this.infoName = skillIcon.getHoverName();
         this.infoStats = skillStats;
         this.infoDescription = skillDescription;
     }

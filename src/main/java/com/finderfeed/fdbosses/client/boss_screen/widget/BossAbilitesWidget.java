@@ -11,13 +11,15 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-public class BossAbilitesWidget extends FDScrollableWidget {
+public class BossAbilitesWidget extends FDWidget {
 
     private int stringColor;
-    private float maxScroll = 0;
+    public BossAbilitiesButtonContainer bossAbilitiesButtonContainer;
 
     public BossAbilitesWidget(Screen screen, float x, float y, int stringColor) {
         super(screen, x, y, 231,120);
+        bossAbilitiesButtonContainer = new BossAbilitiesButtonContainer(screen, 14,26,195,74);
+        this.addChild("infoContainer",bossAbilitiesButtonContainer);
         this.stringColor = stringColor;
     }
 
@@ -35,12 +37,7 @@ public class BossAbilitesWidget extends FDScrollableWidget {
         FDRenderUtil.bindTexture(FDBosses.location("textures/gui/boss_abilities.png"));
         FDRenderUtil.blitWithBlend(matrices, bossAbilitiesXs,bossAbilitiesYs,this.getWidth(),this.getHeight(),0,0,1f,1f,1f,1f,0,1f);
 
-        Component abilities = Component.translatable("fdbosses.word.abilities");
-        float abilitieswidth = font.width(abilities);
-
-        FDRenderUtil.renderScaledText(guiGraphics,abilities, bossAbilitiesXs + this.getWidth() / 2 - abilitieswidth / 2,bossAbilitiesYs + 7,1f,true,stringColor);
-
-        float p = this.getCurrentScroll() / this.getMaxScroll();
+        float p = bossAbilitiesButtonContainer.getCurrentScroll() / bossAbilitiesButtonContainer.getMaxScroll();
         if (Float.isNaN(p)){
             p = 0;
         }
@@ -51,34 +48,22 @@ public class BossAbilitesWidget extends FDScrollableWidget {
 
     }
 
-    @Override
-    public void addChild(String id, FDWidget widget) {
-        super.addChild(id, widget);
 
-        //74
 
-        maxScroll = Math.max(maxScroll,widget.getY() - (this.getY() + 27) + widget.getHeight() + 5);
-
-    }
-
-    @Override
-    public void useScissor() {
-        FDRenderUtil.Scissor.pushScissors(this.getX(),this.getY() + 26,this.getWidth() + 100,this.getHeight() - 40);
-    }
-
-    @Override
-    public void endScissor() {
-        FDRenderUtil.Scissor.popScissors();
-    }
 
     @Override
     public boolean onMouseClick(float v, float v1, int i) {
-        return false;
+        return true;
     }
 
     @Override
     public boolean onMouseRelease(float v, float v1, int i) {
         return false;
+    }
+
+    @Override
+    public boolean onMouseScroll(float v, float v1, float v2, float v3) {
+        return true;
     }
 
     @Override
@@ -96,18 +81,5 @@ public class BossAbilitesWidget extends FDScrollableWidget {
         return false;
     }
 
-    @Override
-    public float getMaxScroll() {
-        return Math.max(maxScroll - 74, 0);
-    }
 
-    @Override
-    public void onScroll(float v) {
-        this.moveChildren(0,-v);
-    }
-
-    @Override
-    public float scrollAmount() {
-        return 5;
-    }
 }

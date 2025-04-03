@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.client.boss_screen.widget;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossInfo;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDButton;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +30,11 @@ public class FDSkillButton extends FDButton {
             FDRenderUtil.blitWithBlend(graphics.pose(), this.getX() + 8, this.getY() + 8, 16, 16, 0, 0, 1, 1, 1, 1, 0, 1f);
         }else if (item.isPresent()){
             ItemStack stack = item.get();
+            PoseStack poseStack = graphics.pose();
+            poseStack.pushPose();
+            poseStack.translate(0,0,-100);
             FDRenderUtil.renderScaledItemStack(graphics,this.getX() + 8, this.getY() + 8, 1f, stack);
+            poseStack.popPose();
         }
     }
 

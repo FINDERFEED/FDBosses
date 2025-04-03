@@ -47,7 +47,7 @@ public class BossClientEvents {
         if (itemStack.has(BossDataComponents.ITEM_CORE.get())){
             ItemCoreDataComponent itemCoreDataComponent = itemStack.get(BossDataComponents.ITEM_CORE);
             if (itemCoreDataComponent.getCoreType() == ItemCoreDataComponent.CoreType.LIGHTNING) {
-                componentList.add(BossItems.LIGHTNING_CORE.get().getDefaultInstance().getDisplayName().copy().withStyle(Style.EMPTY.withColor(0x11ffff)));
+                componentList.add(BossItems.LIGHTNING_CORE.get().getDefaultInstance().getHoverName().copy().withStyle(Style.EMPTY.withColor(0x11ffff)));
             }
         }
     }

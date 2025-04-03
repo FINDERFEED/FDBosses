@@ -51,7 +51,7 @@
   "fdbosses.skills.chesed.mightiness_stats": "",
   "fdbosses.word.stats": "Stats",
   "fdbosses.word.info": "Info",
-  "fdbosses.skills.skill_button": "Click to see ability details",
+  "fdbosses.skills.skill_button": "Click to see the details",
   "fdbosses.word.ouch": "Ouch!",
   "fdbosses.word.that_hurts": "That hurts",
   "fdbosses.word.stop_it": "Stop it. Bosses do have feelings too, you know.",
@@ -65,6 +65,6 @@
   "fdbosses.word.crash_game": "Crash the game",
   "fdbosses.word.start_fight": "Start Bossfight",
   "fdbosses.word.drops": "Drops",
-  "fdbosses.drops.chesed.lightning_core_description": "A core that Chesed draws its power from. \n\nCan be applied to any weapon in crafting table. \n\nWhen attacking entities with a weapon that is enhanced with {{(fdlib:reference)id=item.fdbosses.lightning_core}} there is a chance to summon a ghost of your weapon that will attack the target and deal a set percentage of your weapon damage while inflicting {{(fdbosses:effect)id=fdbosses:shocked}}.",
-  "fdbosses.drops.chesed.lightning_core_stats": "Ghost weapon: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=flyingSwordDamagePercent}}% of weapon damage.\n\n {{(fdbosses:effect)id=fdbosses:shocked}}:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=effectConfig, value=shockDamageReductionPercent}}% outgoing damage reduction.\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=flyingSwordShockDuration}} ticks."
+  "fdbosses.drops.chesed.lightning_core_description": "A core that Chesed draws its power from. \n\nCan be applied to any weapon in crafting table. \n\nWhen attacking entities with a weapon that is enhanced with Lightning Core there is a chance to summon a ghost of your weapon that will attack the target and deal a set percentage of your weapon damage while inflicting {{(fdbosses:effect)id=fdbosses:shocked}}.",
+  "fdbosses.drops.chesed.lightning_core_stats": "Shock:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=effectConfig, value=shockDamageReductionPercent}}% outgoing damage reduction.\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=flyingSwordShockDuration}} ticks.\n\nGhost weapon: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=flyingSwordDamagePercent}}% of weapon damage.\n\nSummon chance:  {{(fdbosses:config_float) config=itemConfig, value=chanceToSummonFlyingSword}}%"
 }
