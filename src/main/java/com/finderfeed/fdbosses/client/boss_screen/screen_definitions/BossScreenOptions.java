@@ -8,7 +8,8 @@ import java.util.List;
 
 public class BossScreenOptions {
 
-    private List<BossSkill> skills = new ArrayList<>();
+    private List<BossInfo> skills = new ArrayList<>();
+    private List<BossInfo> drops = new ArrayList<>();
 
     private Component bossDescription = Component.empty();
 
@@ -27,13 +28,22 @@ public class BossScreenOptions {
         return this;
     }
 
-    public BossScreenOptions addSkill(BossSkill bossSkill){
+    public BossScreenOptions addSkill(BossInfo bossSkill){
         this.skills.add(bossSkill);
         return this;
     }
 
-    public List<BossSkill> getSkills() {
+    public BossScreenOptions addDrop(BossInfo bossDrop){
+        this.drops.add(bossDrop);
+        return this;
+    }
+
+    public List<BossInfo> getSkills() {
         return skills;
+    }
+
+    public List<BossInfo> getDrops(){
+        return drops;
     }
 
     public Component getBossDescription() {

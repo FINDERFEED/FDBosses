@@ -3,8 +3,7 @@ package com.finderfeed.fdbosses.client.boss_screen;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.BossRenderUtil;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreenOptions;
-import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossSkill;
-import com.finderfeed.fdbosses.client.boss_screen.util.KilledASefirotException;
+import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossInfo;
 import com.finderfeed.fdbosses.client.boss_screen.widget.BossAbilitesWidget;
 import com.finderfeed.fdbosses.client.boss_screen.widget.BossDetailsWidget;
 import com.finderfeed.fdbosses.client.boss_screen.widget.FDSkillButton;
@@ -31,6 +30,8 @@ import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.List;
 
 public abstract class BaseBossScreen extends SimpleFDScreen {
 
@@ -154,8 +155,8 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         this.skillInfoWidget = widget;
         this.skillInfoText = textBlockWidget;
         this.addRenderableWidget(widget);
-
     }
+
 
     private void initAbilitiesWidget(){
 
@@ -163,14 +164,58 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         BossAbilitesWidget bossAbilitesWidget = new BossAbilitesWidget(this,anchorEnd.x - 237, anchorEnd.y,this.getBaseStringColor());
 
+        List<BossInfo> skills = options.getSkills();
+
+        this.initAbilitiesWidgetModeChangeButtons(bossAbilitesWidget);
+
+        this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget, skills);
+
+        this.addRenderableWidget(bossAbilitesWidget);
+
+        this.bossAbilitesWidget = bossAbilitesWidget;
+    }
+
+    private void initAbilitiesWidgetModeChangeButtons(BossAbilitesWidget bossAbilitesWidget){
+
+        FDButton fdButtonSkills = new FDButton(this,30,20,110,24)
+                .setTexture(new FDButtonTextures(
+                        new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
+                        new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
+                ))
+                .setText(Component.translatable("fdbosses.word.abilities").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
+                        110,1f,true,0,1)
+                .setOnClickAction((fdWidget, v, v1, i) -> {
+                    bossAbilitesWidget.setCurrentScroll(0);
+                    this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget, this.options.getSkills());
+                    return true;
+                });
+
+        FDButton fdButtonDrops = new FDButton(this,150,20,110,24)
+                .setTexture(new FDButtonTextures(
+                        new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
+                        new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
+                ))
+                .setText(Component.translatable("fdbosses.word.drops").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
+                        110,1f,true,0,1)
+                .setOnClickAction(((fdWidget, v, v1, i) -> {
+                    bossAbilitesWidget.setCurrentScroll(0);
+                    this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget, this.options.getDrops());
+                    return true;
+                }));
+
+        bossAbilitesWidget.addChild("openSkills",fdButtonSkills);
+        bossAbilitesWidget.addChild("openDrops",fdButtonDrops);
+
+    }
+
+
+
+    private void initAbilitiesWidgetInfoButtons(BossAbilitesWidget bossAbilitesWidget, List<BossInfo> bossInfos){
         float offsx = 19;
         float offsy = 30;
+        for (int  i = 0; i < bossInfos.size();i++) {
 
-        var skills = options.getSkills();
-
-        for (int  i = 0; i < skills.size();i++) {
-
-            BossSkill bossSkill = skills.get(i);
+            BossInfo bossSkill = bossInfos.get(i);
 
             float x = offsx + (i % 5) * 39;
             float y = offsy + (i / 5) * 35;
@@ -207,36 +252,33 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         }
 
-        this.addRenderableWidget(bossAbilitesWidget);
-
-        this.bossAbilitesWidget = bossAbilitesWidget;
     }
 
-    public void openSkillInfo(BossSkill skill, boolean state){
+    public void openSkillInfo(BossInfo info, boolean state){
         if (!skillOpened && state){
-            if (skill.getSkillStats() == null) {
-                this.skillInfoText.setText(skill.getSkillDescription(), 1f, this.getBaseStringColor(), true);
+            if (info.getInfoStats() == null) {
+                this.skillInfoText.setText(info.getInfoDescription(), 1f, this.getBaseStringColor(), true);
                 this.skillInfoButton.setOnClickAction(null);
                 this.skillStatsButton.setOnClickAction(null);
                 skillInfoButton.setActive(false);
                 skillStatsButton.setActive(false);
             }else{
-                this.skillInfoText.setText(skill.getSkillDescription(), 1f, this.getBaseStringColor(), true);
+                this.skillInfoText.setText(info.getInfoDescription(), 1f, this.getBaseStringColor(), true);
                 this.skillInfoButton.setOnClickAction(((fdWidget, v, v1, i) -> {
-                    this.skillInfoText.setText(skill.getSkillDescription(), 1f, this.getBaseStringColor(), true);
+                    this.skillInfoText.setText(info.getInfoDescription(), 1f, this.getBaseStringColor(), true);
                     return true;
                 }));
                 this.skillStatsButton.setOnClickAction(((fdWidget, v, v1, i) -> {
-                    this.skillInfoText.setText(skill.getSkillStats(), 1f, this.getBaseStringColor(), true);
+                    this.skillInfoText.setText(info.getInfoStats(), 1f, this.getBaseStringColor(), true);
                     return true;
                 }));
                 skillInfoButton.setActive(true);
                 skillStatsButton.setActive(true);
 
             }
-            this.skillInfoWidget.setSkillName(skill.getSkillName(),this.getBaseStringColor());
+            this.skillInfoWidget.setSkillName(info.getInfoName(),this.getBaseStringColor());
 
-            this.skillInfoWidget.setSkillImage(skill.getSkillIcon());
+            this.skillInfoWidget.setSkillImage(info.getInfoIcon());
 
             this.skillInfoWidget.moveWidgetTo(OPEN_TIME,0,2, FDEasings::easeOutBounce);
             skillOpened = true;

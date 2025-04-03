@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses;
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossEffects;
+import com.finderfeed.fdbosses.init.BossItems;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.mojang.blaze3d.shaders.FogShape;
@@ -46,7 +47,7 @@ public class BossClientEvents {
         if (itemStack.has(BossDataComponents.ITEM_CORE.get())){
             ItemCoreDataComponent itemCoreDataComponent = itemStack.get(BossDataComponents.ITEM_CORE);
             if (itemCoreDataComponent.getCoreType() == ItemCoreDataComponent.CoreType.LIGHTNING) {
-                componentList.add(Component.translatable("fdbosses.word.lightning_core").withStyle(Style.EMPTY.withColor(0x11ffff)));
+                componentList.add(BossItems.LIGHTNING_CORE.get().getDefaultInstance().getDisplayName().copy().withStyle(Style.EMPTY.withColor(0x11ffff)));
             }
         }
     }

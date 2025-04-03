@@ -1,16 +1,17 @@
 package com.finderfeed.fdbosses.client.boss_screen.widget;
 
 import com.finderfeed.fdbosses.FDBosses;
-import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossSkill;
 import com.finderfeed.fdlib.systems.simple_screen.FDWidget;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.datafixers.util.Either;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 public class SkillInfoWidget extends FDWidget {
 
@@ -20,7 +21,7 @@ public class SkillInfoWidget extends FDWidget {
 
     private Component skillName = Component.empty();
     private int color = 0xffffff;
-    private ResourceLocation skillImage;
+    private Either<ResourceLocation, ItemStack> skillImage;
 
     public SkillInfoWidget(Screen screen, float x, float y, float width, float height, Component skillName, int color) {
         super(screen, x, y, width, height);
@@ -81,10 +82,17 @@ public class SkillInfoWidget extends FDWidget {
 
         //skill image
         if (skillImage != null) {
+            var item = skillImage.right();
+            var rl = skillImage.left();
+
             float offs = 20;
-            FDRenderUtil.bindTexture(skillImage);
-            FDRenderUtil.blitWithBlend(matrices,this.getX() + 97f,this.getY() + offs + 7,16,16,
-                    0,0,1,1,1,1,0,1f);
+            if (rl.isPresent()) {
+                FDRenderUtil.bindTexture(rl.get());
+                FDRenderUtil.blitWithBlend(matrices, this.getX() + 97f, this.getY() + offs + 7, 16, 16,
+                        0, 0, 1, 1, 1, 1, 0, 1f);
+            }else if (item.isPresent()){
+                FDRenderUtil.renderScaledItemStack(guiGraphics, this.getX() + 97f, this.getY() + offs + 7, 1f, item.get());
+            }
         }
 
         Component close = Component.translatable("fdbosses.close_skill_info");
@@ -104,7 +112,7 @@ public class SkillInfoWidget extends FDWidget {
         this.color = color;
     }
 
-    public void setSkillImage(ResourceLocation location){
+    public void setSkillImage(Either<ResourceLocation, ItemStack> location){
         this.skillImage = location;
     }
 

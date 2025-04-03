@@ -15,6 +15,7 @@
   "effect.fdbosses.chesed_energized": "Energized",
   "effect_description.fdbosses.chesed_energized": "While player has this effect Chesed's lightning ray attack can be blocked with shield.\n\nIf lightning ray attack is blocked, Chesed takes 1 damage and effect is removed.",
   "effect_description.minecraft.night_vision": "Just a regular night vision.\n\nAllows to see in the dark like its day.",
+  "effect_description.fdbosses.shocked": "Decreases outcoming damage by a set percentage.",
   "fdbosses.skills.chesed.crystals_description": "Casts this ability before the lightning ray attack.\n\nDestroys all crystals and then summons 1 crystal on each side of the battlefield.\n\nIf a crystal is destroyed by a player, that player becomes {{(fdbosses:effect)id=fdbosses:chesed_energized}}, then all other crystals on the battlefield are destroyed.",
   "fdbosses.skills.chesed.crystals": "Crystals",
   "fdbosses.close_skill_info": "Click empty space to close",
@@ -63,5 +64,7 @@
   "fdbosses.word.killed_chesed_in_screen": "Well, you killed him. Congratulations! I hope you feel bad about yourself for killing an innocent creature! You know, i wanted to crash the game but that would be a bad game design, so i will leave that decision to you. Here, press that button.",
   "fdbosses.word.crash_game": "Crash the game",
   "fdbosses.word.start_fight": "Start Bossfight",
-  "fdbosses.word.lightning_core": "Lightning Core"
+  "fdbosses.word.drops": "Drops",
+  "fdbosses.drops.chesed.lightning_core_description": "A core that Chesed draws its power from. \n\nCan be applied to any weapon in crafting table. \n\nWhen attacking entities with a weapon that is enhanced with {{(fdlib:reference)id=item.fdbosses.lightning_core}} there is a chance to summon a ghost of your weapon that will attack the target and deal a set percentage of your weapon damage while inflicting {{(fdbosses:effect)id=fdbosses:shocked}}.",
+  "fdbosses.drops.chesed.lightning_core_stats": "Ghost weapon: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=flyingSwordDamagePercent}}% of weapon damage.\n\n {{(fdbosses:effect)id=fdbosses:shocked}}:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=effectConfig, value=shockDamageReductionPercent}}% outgoing damage reduction.\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=flyingSwordShockDuration}} ticks."
 }
