@@ -178,7 +178,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
     private void initAbilitiesWidgetModeChangeButtons(BossAbilitesWidget bossAbilitesWidget){
 
-        FDButton fdButtonSkills = new FDButton(this,32,0,73,24)
+        FDButton fdButtonSkills = new FDButton(this,34,1,73,24)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
@@ -192,7 +192,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                     return true;
                 });
 
-        FDButton fdButtonDrops = new FDButton(this,199-73,0,73,24)
+        FDButton fdButtonDrops = new FDButton(this,197-73,1,73,24)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
