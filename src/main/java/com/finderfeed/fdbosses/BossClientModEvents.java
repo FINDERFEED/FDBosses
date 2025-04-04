@@ -193,6 +193,14 @@ public class BossClientModEvents {
                                 .build())
                 .build());
 
+        event.registerEntityRenderer(BossEntities.CHESED_RAY_REFLECTOR.get(), FDEntityRendererBuilder.builder()
+                        .addLayer(FDEntityRenderLayerOptions.builder()
+                                .model(BossModels.CHESED_RAY_REFLECTOR)
+                                .renderType((e,p)->{
+                                    return RenderType.entityCutout(FDBosses.location("textures/util/white_tex.png"));
+                                })
+                                .build())
+                .build());
 
         event.registerEntityRenderer(BossEntities.EARTH_SHATTER.get(), EarthShatterRenderer::new);
         event.registerEntityRenderer(BossEntities.BLOCK_PROJECTILE.get(), BlockProjectileRenderer::new);

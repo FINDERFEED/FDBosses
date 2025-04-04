@@ -14,6 +14,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.electric_sphere.Ches
 import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.flying_block_entity.FlyingBlockEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -121,6 +122,12 @@ public class BossEntities {
     )
             .sized(2f,2f)
             .build("chesed_boss_spawner"));
+
+    public static final Supplier<EntityType<ChesedRayReflector>> CHESED_RAY_REFLECTOR = ENTITIES.register("chesed_ray_reflector",()->EntityType.Builder.of(
+            ChesedRayReflector::new, MobCategory.MISC
+    )
+            .sized(2f,2f)
+            .build("chesed_ray_reflector"));
 
 
     public static final Supplier<EntityType<FlyingSwordEntity>> FLYING_SWORD = ENTITIES.register("flying_sword",()->EntityType.Builder.of(

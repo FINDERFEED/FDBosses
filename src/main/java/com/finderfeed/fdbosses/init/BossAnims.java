@@ -69,4 +69,7 @@ public class BossAnims {
     public static DeferredHolder<Animation,Animation> CHESED_DEATH = ANIMATIONS.register("chesed_death", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
     });
+    public static DeferredHolder<Animation,Animation> RAY_REFLECTOR_ACTIVATE = ANIMATIONS.register("ray_reflector_activate", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_ray_reflector_animations"));
+    });
 }
