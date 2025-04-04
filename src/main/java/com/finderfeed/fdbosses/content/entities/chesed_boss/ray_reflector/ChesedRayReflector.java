@@ -45,7 +45,7 @@ public class ChesedRayReflector extends FDEntity {
         int activationAnimLength = BossAnims.RAY_REFLECTOR_ACTIVATE.get().getAnimTime();
         if (this.isActive()){
             var animTicker = system.getTicker(ACTIVE_LAYER);
-            if (animTicker != null){
+            if (animTicker == null){
                 system.startAnimation(ACTIVE_LAYER, AnimationTicker.builder(BossAnims.RAY_REFLECTOR_ACTIVATE)
                                 .setToNullTransitionTime(0)
                         .build());
@@ -101,7 +101,7 @@ public class ChesedRayReflector extends FDEntity {
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
-
+        builder.define(ACTIVE,false);
     }
 
     @Override
