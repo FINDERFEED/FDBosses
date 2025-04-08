@@ -20,6 +20,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.electric_sphere.Ches
 import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.ChesedKineticFieldEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.packets.ChesedRayReflectPacket;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
@@ -991,31 +992,31 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
         float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.rayDamage;
 
+        boolean chesedRayReflectorHit = false;
+        List<LivingEntity> targets = new ArrayList<>();
+
         for (Entity entity : list){
             if (entity instanceof LivingEntity living){
-                boolean shouldHit = true;
-                if (living.hasEffect(BossEffects.CHESED_ENERGIZED)){
-                    if (living.getUseItem().getItem() instanceof ShieldItem shield){
-                        Vec3 v = this.getLookAngle().normalize();
-                        Vec3 b = living.getLookAngle().normalize();
-                        if (b.dot(v) < -0.5) {
 
-                            if (living instanceof ServerPlayer player){
-                                PacketDistributor.sendToPlayer(player,new ChesedRayReflectPacket());
-                            }
+            }else if (entity instanceof ChesedRayReflector reflector){
+                chesedRayReflectorHit = true;
+            }
+        }
 
-                            this.killCrystals();
-                            this.decreaseHitCount(1);
-                            shouldHit = false;
-                        }
-                    }
+        if (chesedRayReflectorHit){
+            this.decreaseHitCount(1);
+        }
+
+        for (LivingEntity target : targets){
+            if (target.hasEffect(BossEffects.CHESED_ENERGIZED)){
+                MobEffectInstance instance = target.getEffect(BossEffects.CHESED_ENERGIZED);
+                int amplifier = instance.getAmplifier();
+                target.removeEffect(BossEffects.CHESED_ENERGIZED);
+                if (amplifier > 0){
+                    target.addEffect(new MobEffectInstance(BossEffects.CHESED_ENERGIZED,400,amplifier - 1,false,true));
                 }
-                if (shouldHit){
-
-
-                    living.hurt(source, damage);
-
-                }
+            }else{
+                target.hurt(source,damage);
             }
         }
 

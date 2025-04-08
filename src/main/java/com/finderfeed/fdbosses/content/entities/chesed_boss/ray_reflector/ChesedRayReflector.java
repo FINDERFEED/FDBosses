@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
+import com.finderfeed.fdlib.systems.bedrock.animations.TransitionAnimation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import net.minecraft.nbt.CompoundTag;
@@ -24,6 +25,8 @@ public class ChesedRayReflector extends FDEntity {
 
     public static final EntityDataAccessor<Boolean> ACTIVE = SynchedEntityData.defineId(ChesedRayReflector.class, EntityDataSerializers.BOOLEAN);
 
+    private static float ANIMATION_SPEED = 2;
+
     private int activeTicker = 0;
 
     public ChesedRayReflector(EntityType<?> type, Level level) {
@@ -37,16 +40,47 @@ public class ChesedRayReflector extends FDEntity {
         if (!level().isClientSide){
             this.handleActivation(5);
             this.handleAnimation();
+        }else{
+
+        }
+    }
+
+    public int getAnimationLength(){
+        return Math.round(BossAnims.RAY_REFLECTOR_ACTIVATE.get().getAnimTime() / ANIMATION_SPEED);
+    }
+
+    private void handleClientTicker(){
+        var system = this.getSystem();
+        int activationAnimLength = this.getAnimationLength();
+        var ticker = system.getTicker(ACTIVE_LAYER);
+        if (ticker == null){
+            activeTicker = Mth.clamp(activeTicker - 1,0,activationAnimLength);
+        }
+
+        var animation = ticker.getAnimation();
+        if (animation instanceof TransitionAnimation transitionAnimation){
+            animation = transitionAnimation.getTransitionTo();
+        }
+
+        if (animation == BossAnims.RAY_REFLECTOR_ACTIVATE.get()){
+            if (ticker.isReversed()){
+                activeTicker = Mth.clamp(activeTicker - 1,0,activationAnimLength);
+            }else{
+                activeTicker = Mth.clamp(activeTicker + 1,0,activationAnimLength);
+            }
+        }else{
+            activeTicker = Mth.clamp(activeTicker - 1,0,activationAnimLength);
         }
     }
 
     private void handleAnimation(){
         var system = this.getSystem();
-        int activationAnimLength = BossAnims.RAY_REFLECTOR_ACTIVATE.get().getAnimTime();
+        int activationAnimLength = this.getAnimationLength();
         if (this.isActive()){
             var animTicker = system.getTicker(ACTIVE_LAYER);
             if (animTicker == null){
                 system.startAnimation(ACTIVE_LAYER, AnimationTicker.builder(BossAnims.RAY_REFLECTOR_ACTIVATE)
+                                .setSpeed(ANIMATION_SPEED)
                                 .setToNullTransitionTime(0)
                         .build());
             }
@@ -57,7 +91,9 @@ public class ChesedRayReflector extends FDEntity {
                     activeTicker = Mth.clamp(activeTicker + 1, 0, activationAnimLength);
                 }else{
                     system.startAnimation(ACTIVE_LAYER, AnimationTicker.builder(BossAnims.RAY_REFLECTOR_ACTIVATE)
-                                    .setToNullTransitionTime(0)
+                            .setSpeed(ANIMATION_SPEED)
+
+                            .setToNullTransitionTime(0)
                                     .reversed()
                                     .setLoopMode(Animation.LoopMode.ONCE)
                             .build());
@@ -89,6 +125,10 @@ public class ChesedRayReflector extends FDEntity {
             this.setActive(true);
         }
 
+    }
+
+    public int getActiveTicker() {
+        return activeTicker;
     }
 
     public void setActive(boolean active){

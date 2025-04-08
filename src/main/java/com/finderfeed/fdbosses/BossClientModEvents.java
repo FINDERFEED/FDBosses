@@ -197,7 +197,7 @@ public class BossClientModEvents {
                         .addLayer(FDEntityRenderLayerOptions.builder()
                                 .model(BossModels.CHESED_RAY_REFLECTOR)
                                 .renderType((e,p)->{
-                                    return RenderType.entityCutout(FDBosses.location("textures/util/white_tex.png"));
+                                    return RenderType.entityCutout(FDBosses.location("textures/entities/chesed_ray_reflector.png"));
                                 })
                                 .build())
                 .build());

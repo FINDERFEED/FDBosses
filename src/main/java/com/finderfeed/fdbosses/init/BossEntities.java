@@ -126,7 +126,7 @@ public class BossEntities {
     public static final Supplier<EntityType<ChesedRayReflector>> CHESED_RAY_REFLECTOR = ENTITIES.register("chesed_ray_reflector",()->EntityType.Builder.of(
             ChesedRayReflector::new, MobCategory.MISC
     )
-            .sized(2f,2f)
+            .sized(1f,2f)
             .build("chesed_ray_reflector"));
 
 
