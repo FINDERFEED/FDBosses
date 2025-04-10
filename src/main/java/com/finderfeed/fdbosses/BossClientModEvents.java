@@ -18,20 +18,19 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.flying_block_entity.FlyingBlockEntityRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.ChesedKineticFieldRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayReflectorRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
+import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.content.projectiles.renderers.BlockProjectileRenderer;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRenderLayerOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRendererBuilder;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDFreeEntityRenderer;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.text_block_parser.TextBlockProcessors;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.client.NullEntityRenderer;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
-import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
@@ -200,6 +199,7 @@ public class BossClientModEvents {
 
         event.registerEntityRenderer(BossEntities.CHESED_RAY_REFLECTOR.get(), FDEntityRendererBuilder.<ChesedRayReflector>builder()
                         .addLayer(FDEntityRenderLayerOptions.<ChesedRayReflector>builder()
+                                .transformation(((reflector, poseStack, v) -> poseStack.scale(0.8f,0.8f,0.8f)))
                                 .model(BossModels.CHESED_RAY_REFLECTOR)
                                 .renderType((e,p)->{
                                     return RenderType.entityCutout(FDBosses.location("textures/entities/chesed_ray_reflector.png"));
@@ -207,6 +207,7 @@ public class BossClientModEvents {
                                 .build())
                         .addLayer(FDEntityRenderLayerOptions.<ChesedRayReflector>builder()
                                 .model(BossModels.CHESED_RAY_REFLECTOR)
+                                .transformation(((reflector, poseStack, v) -> poseStack.scale(0.8f,0.8f,0.8f)))
                                 .renderType((e,p)->{
                                     return RenderType.entityTranslucent(FDBosses.location("textures/entities/chesed_ray_reflector_crystals.png"));
                                 })
@@ -216,13 +217,46 @@ public class BossClientModEvents {
                                 .build())
                         .addLayer(FDEntityRenderLayerOptions.<ChesedRayReflector>builder()
                                 .model(BossModels.CHESED_RAY_REFLECTOR)
+                                .transformation(((reflector, poseStack, v) -> poseStack.scale(0.8f,0.8f,0.8f)))
                                 .renderType((e,p)->{
                                     return RenderType.eyes(FDBosses.location("textures/entities/chesed_ray_reflector_crystals.png"));
                                 })
                                 .color((entity,pticks)->{
-                                    return new FDColor(0.3f,0.95f,1f,1f);
+                                    float animTime = BossAnims.RAY_REFLECTOR_ACTIVATE.get().getAnimTime();
+                                    float t = FDMathUtil.lerp(entity.activeTickerO,entity.getActiveTicker(),pticks) / animTime;
+
+
+                                    float r = FDMathUtil.lerp(0.5f,0.3f,t);
+                                    float g = FDMathUtil.lerp(0.5f,0.95f,t);
+                                    float b = FDMathUtil.lerp(0.5f,1f,t);
+
+                                    return new FDColor(r,g,b,1f);
                                 })
                                 .build())
+                        .addLayer(FDEntityRenderLayerOptions.<ChesedRayReflector>builder()
+                                .model(BossModels.CHESED_RAY_REFLECTOR)
+                                .renderCondition((entity)->{
+                                    int ticksToReveal = 3;
+
+                                    float animTime = BossAnims.RAY_REFLECTOR_ACTIVATE.get().getAnimTime();
+                                    return entity.getActiveTicker() > animTime - ticksToReveal;
+                                })
+                                .transformation(((reflector, poseStack, v) -> poseStack.scale(0.8f,0.8f,0.8f)))
+                                .renderType((e,p)->{
+                                    return RenderType.entityTranslucent(FDBosses.location("textures/entities/chesed_ray_reflector_crosshair.png"));
+                                })
+                                .color((entity,pticks)->{
+
+                                    int ticksToReveal = 3;
+
+                                    float animTime = BossAnims.RAY_REFLECTOR_ACTIVATE.get().getAnimTime();
+                                    float t = Mth.clamp(entity.getActiveTicker() + pticks - (animTime - ticksToReveal), 0, ticksToReveal);
+
+
+                                    return new FDColor(0.3f,0.95f,1f,t / ticksToReveal);
+                                })
+                                .build())
+                        .freeRender(new RayReflectorRenderer())
                 .build());
 
         event.registerEntityRenderer(BossEntities.EARTH_SHATTER.get(), EarthShatterRenderer::new);

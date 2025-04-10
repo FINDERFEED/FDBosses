@@ -997,15 +997,13 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
         for (Entity entity : list){
             if (entity instanceof LivingEntity living){
-
+                targets.add(living);
             }else if (entity instanceof ChesedRayReflector reflector){
                 chesedRayReflectorHit = true;
             }
         }
 
-        if (chesedRayReflectorHit){
-            this.decreaseHitCount(1);
-        }
+        boolean targetHadEnergized = false;
 
         for (LivingEntity target : targets){
             if (target.hasEffect(BossEffects.CHESED_ENERGIZED)){
@@ -1015,9 +1013,14 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 if (amplifier > 0){
                     target.addEffect(new MobEffectInstance(BossEffects.CHESED_ENERGIZED,400,amplifier - 1,false,true));
                 }
+                targetHadEnergized = true;
             }else{
                 target.hurt(source,damage);
             }
+        }
+
+        if (chesedRayReflectorHit && targetHadEnergized){
+            this.decreaseHitCount(1);
         }
 
     }
