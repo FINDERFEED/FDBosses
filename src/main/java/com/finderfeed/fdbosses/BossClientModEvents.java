@@ -30,6 +30,7 @@ import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.text_bloc
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.client.NullEntityRenderer;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
@@ -223,12 +224,33 @@ public class BossClientModEvents {
                                 })
                                 .color((entity,pticks)->{
                                     float animTime = BossAnims.RAY_REFLECTOR_ACTIVATE.get().getAnimTime();
-                                    float t = FDMathUtil.lerp(entity.activeTickerO,entity.getActiveTicker(),pticks) / animTime;
+
+                                    float t = FDMathUtil.lerp(entity.activeTickerO,entity.getActiveTicker(),pticks);
+
+                                    float p = t / animTime;
 
 
-                                    float r = FDMathUtil.lerp(0.5f,0.3f,t);
-                                    float g = FDMathUtil.lerp(0.5f,0.95f,t);
-                                    float b = FDMathUtil.lerp(0.5f,1f,t);
+                                    float r = FDMathUtil.lerp(0.5f,0.3f,p);
+                                    float g = FDMathUtil.lerp(0.5f,0.95f,p);
+                                    float b = FDMathUtil.lerp(0.5f,1f,p);
+
+                                    if (entity.isActivating()) {
+                                        float offsetTime = t - animTime / 2;
+                                        float t2 = Math.clamp(offsetTime / 10, 0, 1);
+
+                                        float p2;
+
+                                        if (t2 <= 0.25){
+                                            p2 = 1 - (float) Math.pow(4 * t2 - 1,2);
+                                        }else{
+                                            p2 = 1 - (float) Math.pow(1.335 * (t2 - 0.25),2);
+                                        }
+
+                                        r = FDMathUtil.lerp(r,1,p2);
+                                        g = FDMathUtil.lerp(g,1,p2);
+                                        b = FDMathUtil.lerp(b,1,p2);
+
+                                    }
 
                                     return new FDColor(r,g,b,1f);
                                 })

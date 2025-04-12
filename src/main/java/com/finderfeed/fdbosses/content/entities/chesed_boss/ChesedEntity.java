@@ -143,6 +143,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     private int remainingHits = 10;
 
+    private boolean alreadySpawned = false;
+
     private BossInitializer<ChesedEntity> bossInitializer = new ChesedBossInitializer(this);
 
     public ChesedEntity(EntityType<? extends Mob> type, Level level) {
@@ -234,7 +236,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             bossInitializer.tick();
 
 
-            if (tickCount == 5){
+            if (tickCount == 5 && !alreadySpawned){
+                alreadySpawned = true;
                 this.summonOrReviveMonoliths();
             }
 
@@ -893,6 +896,12 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 Vec3 reversedLook = look.reverse();
 
 
+                FDLibCalls.sendParticles((ServerLevel) level(),BallParticleOptions.builder()
+                        .size(25f)
+                        .scalingOptions(1,0,2)
+                        .color(150,230,255)
+                        .build(),p,200);
+
 
                 BossUtil.chesedRaySmoke((ServerLevel) level(),end,reversedLook,120);
                 ((ServerLevel)level()).playSound(null,end.x,end.y,end.z, BossSounds.CHESED_LIGHTNING_RAY.get(), SoundSource.HOSTILE,100f,0.8f);
@@ -1007,6 +1016,11 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
         for (LivingEntity target : targets){
             if (target.hasEffect(BossEffects.CHESED_ENERGIZED)){
+
+                if (target instanceof ServerPlayer serverPlayer){
+                    PacketDistributor.sendToPlayer(serverPlayer, new ChesedRayReflectPacket());
+                }
+
                 MobEffectInstance instance = target.getEffect(BossEffects.CHESED_ENERGIZED);
                 int amplifier = instance.getAmplifier();
                 target.removeEffect(BossEffects.CHESED_ENERGIZED);
@@ -2263,12 +2277,15 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
         tag.putInt("bossHealth",this.remainingHits);
         this.bossInitializer.autoSave("initializer",tag);
+        tag.putBoolean("alreadySpawned",alreadySpawned);
         super.addAdditionalSaveData(tag);
     }
 
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
+
+        this.alreadySpawned = tag.getBoolean("alreadySpawned");
 
         if (tag.contains("spawner")){
             this.bossSpawnerUUID = tag.getUUID("spawner");

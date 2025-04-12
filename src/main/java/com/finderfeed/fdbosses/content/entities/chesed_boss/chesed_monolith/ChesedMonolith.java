@@ -7,6 +7,9 @@ import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
@@ -16,6 +19,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, ChesedBossBuddy {
+
+    public static final EntityDataAccessor<Boolean> DEACTIVATED = SynchedEntityData.defineId(ChesedMonolith.class, EntityDataSerializers.BOOLEAN);
+
 
     @SerializableField
     private boolean deactivated = false;
@@ -31,30 +37,45 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
     @Override
     public void tick() {
         super.tick();
+        if (level().isClientSide){
+            if (!this.isDeactivated()){
+                this.getSystem().startAnimation("IDLE", AnimationTicker.builder(BossAnims.CHESED_MONOLITH_IDLE).build());
+                this.getSystem().stopAnimation("TURN_OFF");
+            }else{
+                this.getSystem().stopAnimation("IDLE");
+                this.getSystem().startAnimation("TURN_OFF", AnimationTicker.builder(BossAnims.CHESED_MONOLITH_TURN_OFF).build());
+            }
+        }else{
+            this.entityData.set(DEACTIVATED,deactivated);
+        }
     }
 
     public void setDeactivated(boolean deactivated) {
-        if (level().isClientSide) throw new RuntimeException("Cannot call this on client!");
-        if (!deactivated){
-            this.getSystem().startAnimation("IDLE", AnimationTicker.builder(BossAnims.CHESED_MONOLITH_IDLE).build());
-            this.getSystem().stopAnimation("TURN_OFF");
-        }else{
-            this.getSystem().stopAnimation("IDLE");
-            this.getSystem().startAnimation("TURN_OFF", AnimationTicker.builder(BossAnims.CHESED_MONOLITH_TURN_OFF).build());
-        }
         this.deactivated = deactivated;
     }
 
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> accessor) {
+        super.onSyncedDataUpdated(accessor);
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(DEACTIVATED,false);
+    }
+
     public boolean isDeactivated() {
-        return deactivated;
+        if (!level().isClientSide){
+            return deactivated;
+        }else {
+            return this.entityData.get(DEACTIVATED);
+        }
     }
 
     @Override
     public void onAddedToLevel() {
         super.onAddedToLevel();
-        if (!level().isClientSide){
-            this.setDeactivated(this.isDeactivated());
-        }
     }
 
     @Override
@@ -121,14 +142,19 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
     }
 
     @Override
-    public boolean save(CompoundTag tag) {
-        this.autoSave(tag);
-        return super.save(tag);
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        this.autoLoad(tag);
+
+        boolean deactivated = tag.getBoolean("deactivated");
+        this.setDeactivated(deactivated);
     }
 
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
-        this.autoLoad(tag);
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        this.autoSave(tag);
+        boolean deactivated = this.isDeactivated();
+        tag.putBoolean("deactivated",deactivated);
     }
 }
