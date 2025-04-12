@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LightBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
 public class ChesedBossSpawner extends BossSpawnerEntity {
@@ -26,7 +27,23 @@ public class ChesedBossSpawner extends BossSpawnerEntity {
     @Override
     public void tick() {
         super.tick();
-        if (level().isClientSide && this.isActive()){
+
+        if (!level().isClientSide){
+
+
+            BlockPos pos = this.getOnPos().above();
+            if (this.isActive()){
+                BlockState state;
+                if ((state = level().getBlockState(pos)).isAir() && !state.is(Blocks.LIGHT)){
+                    level().setBlock(pos, Blocks.LIGHT.defaultBlockState().setValue(LightBlock.LEVEL,15), Block.UPDATE_ALL);
+                }
+            }else{
+                if (level().getBlockState(pos).getBlock() == Blocks.LIGHT){
+                    level().setBlock(pos,Blocks.AIR.defaultBlockState(),Block.UPDATE_ALL);
+                }
+            }
+
+        }else if (level().isClientSide && this.isActive()){
 
             Vec3 add = new Vec3(0.5 + 0.5 * random.nextFloat(),0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat()).add(0,0.75,0);
             float lightningAdditiveLength = 1 - random.nextFloat();
@@ -64,17 +81,5 @@ public class ChesedBossSpawner extends BossSpawnerEntity {
     @Override
     public void setActive(boolean state) {
         super.setActive(state);
-        if (!level().isClientSide){
-            BlockPos pos = this.getOnPos().above();
-            if (state){
-                if (level().getBlockState(pos).isAir()){
-                    level().setBlock(pos, Blocks.LIGHT.defaultBlockState().setValue(LightBlock.LEVEL,15), Block.UPDATE_ALL);
-                }
-            }else{
-                if (level().getBlockState(pos).getBlock() == Blocks.LIGHT){
-                    level().setBlock(pos,Blocks.AIR.defaultBlockState(),Block.UPDATE_ALL);
-                }
-            }
-        }
     }
 }

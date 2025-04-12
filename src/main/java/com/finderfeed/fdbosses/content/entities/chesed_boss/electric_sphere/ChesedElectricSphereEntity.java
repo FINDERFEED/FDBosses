@@ -18,6 +18,7 @@ import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningPa
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -138,6 +139,14 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
                     .build(),this.getX(),this.getY() + 0.2f,this.getZ(),30,0.02f,0.02f,0.02f,0.05f);
         }
 
+    }
+
+    @Override
+    public boolean hurt(DamageSource src, float damage) {
+
+        if (!src.is(DamageTypes.GENERIC_KILL) && !src.is(DamageTypes.FELL_OUT_OF_WORLD)) return false;
+
+        return super.hurt(src, damage);
     }
 
     @Override

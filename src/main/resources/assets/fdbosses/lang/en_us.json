@@ -9,6 +9,7 @@
   "death.attack.chesed_vertical_ray": "%s got electrified",
   "death.attack.electric_sphere": "%s tried to touch the lightning",
   "entity.fdbosses.chesed": "Chesed",
+  "entity.fdbosses.chesed_boss_spawner": "Chesed Boss Spawner",
   "effect.fdbosses.chesed_gaze": "Chesed Gaze",
   "effect.fdbosses.shocked": "Shocked",
   "effect_description.fdbosses.chesed_gaze": "Extreme level of blindness.",

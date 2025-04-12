@@ -1523,7 +1523,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 instance.nextStage();
             }
         }else if (stage == 2){
-            if (!this.blockAttackProjectiles.isEmpty()) {
+            if (!this.blockAttackProjectiles.isEmpty() || this.trySearchProjectiles()) {
                 if (instance.tick % 8 == 0) {
                     LivingEntity player = this.getTarget();
                     if (player != null) {
@@ -1542,6 +1542,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         return false;
 
     }
+
 
     private void throwBlock(LivingEntity player,float height){
         ChesedBlockProjectile next = this.blockAttackProjectiles.removeLast();
@@ -1562,6 +1563,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         path.setSpeedOnEnd(targetPos.subtract(flyTo).multiply(0.25,0.25,0.25));
         next.movementPath = path;
     }
+
 
     private void initiateBlockProjectiles(int blocksUpTime,int blocksCycleTime,float height,int count){
         for (int i = 0; i < count; i++) {
