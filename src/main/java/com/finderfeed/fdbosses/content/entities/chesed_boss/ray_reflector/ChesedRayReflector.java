@@ -83,11 +83,11 @@ public class ChesedRayReflector extends FDEntity {
                 Vector3f pos1 = this.getModelPartPosition(this,"bone",  clientModel).mul(modelScale);
                 Vector3f pos2 = this.getModelPartPosition(this,"p1",  clientModel).mul(modelScale);
 
-                Vector3f dir1 = this.transformPoint(new Vector3f(1,0f,0f),"bone",clientModel).mul(modelScale).sub(pos1).mul(-1);
-                Vector3f dir2 = this.transformPoint(new Vector3f(1,0f,0f),"p1",clientModel).mul(modelScale).sub(pos2);
+                Vector3f dir1 = this.transformPoint(this,new Vector3f(1,0f,0f),"bone",clientModel).mul(modelScale).sub(pos1).mul(-1);
+                Vector3f dir2 = this.transformPoint(this,new Vector3f(1,0f,0f),"p1",clientModel).mul(modelScale).sub(pos2);
 
-                Vector3f hdir1 = this.transformPoint(new Vector3f(0,1f,0f),"bone",clientModel).mul(modelScale).sub(pos1);
-                Vector3f hdir2 = this.transformPoint(new Vector3f(0,1f,0f),"p1",clientModel).mul(modelScale).sub(pos2);
+                Vector3f hdir1 = this.transformPoint(this,new Vector3f(0,1f,0f),"bone",clientModel).mul(modelScale).sub(pos1);
+                Vector3f hdir2 = this.transformPoint(this,new Vector3f(0,1f,0f),"p1",clientModel).mul(modelScale).sub(pos2);
 
                 float voffs = 1.25f;
                 float voffs2 = 1.4f;

@@ -5,10 +5,10 @@
   "start_height": {
     "type": "minecraft:uniform",
     "max_inclusive": {
-      "absolute": 20
+      "absolute": -30
     },
     "min_inclusive": {
-      "absolute": -10
+      "absolute": -50
     }
   },
   "start_pool": "fdbosses:chesed_arena",
