@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.
 import com.finderfeed.fdbosses.content.entities.chesed_boss.flying_block_entity.FlyingBlockEntity;
 import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
@@ -23,6 +24,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -189,6 +191,9 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
 
 
             this.remove(RemovalReason.DISCARDED);
+
+            level().playSound(null, this.position().x,this.position().y,this.position().z, BossSounds.ROCK_IMPACT.get(), SoundSource.HOSTILE, 2f, 1f);
+
         }
     }
 
@@ -204,12 +209,16 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
             return !(entity instanceof ChesedBossBuddy) && entity.position().multiply(1,0,1).distanceTo(pos2.multiply(1,0,1)) <= radius;
         });
 
+
+
         for (LivingEntity entity : list){
 
             Vec3 b = entity.position().subtract(pos2).normalize();
 
-            double dot = b.dot(movement);
-            if (dot > 0.85) {
+            Vec3 forwardVec = movement.multiply(1,0,1).normalize();
+            double angle = Math.toDegrees(FDMathUtil.angleBetweenVectors(b.multiply(1,0,1),forwardVec));
+
+            if (angle < 30) {
                 entity.hurt(BossDamageSources.CHESED_BLOCK_ATTACK_SOURCE,damage);
                 entity.invulnerableTime = 0;
             }

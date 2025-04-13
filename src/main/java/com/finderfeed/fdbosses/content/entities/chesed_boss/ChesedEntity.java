@@ -180,6 +180,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .attackListener(this::attackListener)
                     .addAttack(0, ray)
+
                     .addAttack(1,AttackOptions.builder()
                             .addAttack(ELECTRIC_SPHERE_ATTACK)
                             .setNextAttack(rayOrBlocks)
@@ -210,6 +211,34 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     @Override
     public boolean hurt(DamageSource src, float damage) {
+
+        if (!level().isClientSide && src.getEntity() instanceof LivingEntity livingEntity){
+            if (!this.isRolling()) {
+                Vec3 between = livingEntity.position().subtract(this.position());
+                double distance = between.length();
+                if (distance < 10) {
+                    between = between.normalize();
+
+                    Vec3 speed = new Vec3(between.x * 10, between.y + 0.5, between.z * 10);
+                    if (livingEntity instanceof ServerPlayer serverPlayer) {
+                        FDLibCalls.setServerPlayerSpeed(serverPlayer, speed);
+                    } else {
+                        livingEntity.setDeltaMovement(between.x * 10, between.y + 0.5, between.z * 10);
+                        livingEntity.hasImpulse = true;
+                    }
+
+                    livingEntity.hurt(BossDamageSources.chesedAttack(this),2f);
+
+                    level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.FAST_LIGHTNING_STRIKE.get(), SoundSource.HOSTILE, 2f, 1f);
+                    FDLibCalls.sendParticles((ServerLevel) level(), BallParticleOptions.builder()
+                            .size(25f)
+                            .scalingOptions(0, 0, 2)
+                            .color(150, 230, 255)
+                            .build(), this.position().add(between.multiply(2, 2, 2)), 100);
+
+                }
+            }
+        }
 
         if (!src.is(DamageTypes.GENERIC_KILL) && !src.is(DamageTypes.FELL_OUT_OF_WORLD)) return false;
 
@@ -793,7 +822,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
 
 
-            Vector3f between = new Vector3f(36, 0, 0).rotateY(FDMathUtil.FPI / 4 + FDMathUtil.FPI / 2 * i + (random.nextFloat() * 2 - 1) * FDMathUtil.FPI / 5f);
+            Vector3f between = new Vector3f(36, 0, 0).rotateY(FDMathUtil.FPI / 4 + FDMathUtil.FPI / 2 * i /*+ (random.nextFloat() * 2 - 1) * FDMathUtil.FPI / 5f*/);
             Vector3f summonPos = pos.add(between, new Vector3f());
             Vector3f normalized = between.normalize(new Vector3f());
 
@@ -1364,8 +1393,11 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     this.summonCirclingParticlesServerside(4, 0.55f, 2, 0.5f, 6, 9);
                 }
 
-                if (t == 18) {
+                if (t == 17){
+                    this.level().playSound(null, this.getX(),this.getY(),this.getZ(), BossSounds.CHESED_FLOOR_SMASH.get(), SoundSource.HOSTILE, 10f, 1f);
+                } else if (t == 18) {
                     this.summonRadialEarthquake(radius, true);
+
                 } else if (t == 21) {
                     PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                             .frequency(10f)
@@ -1515,6 +1547,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             if (tick == 13){
                 if (blockAttackProjectiles.size() == count) {
                     BossUtil.posEvent((ServerLevel) level(), this.position().add(0, 0.05, 0), BossUtil.CHESED_GET_BLOCKS_FROM_EARTH_EVENT, 0, 60);
+                    level().playSound(null, this.getX(),this.getY(),this.getZ(), BossSounds.CHESED_FLOOR_SMASH.get(), SoundSource.HOSTILE, 5f, 1f);
                 }
                 if (this.isBelowHalfHP()) {
                     this.trapPlayers(true);
@@ -1569,7 +1602,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         for (int i = 0; i < count; i++) {
             float angle = this.getInitProjectileRotation(i, count);
             ChesedBlockProjectile projectile = new ChesedBlockProjectile(BossEntities.BLOCK_PROJECTILE.get(), level());
-            projectile.setDamage(1);
+
             projectile.setBlockState(random.nextFloat() > 0.5 ? Blocks.SCULK.defaultBlockState() : Blocks.DEEPSLATE.defaultBlockState());
             projectile.setDropParticlesTime(blocksUpTime);
             var path = this.createRotationPath(angle, -2,height, 30, blocksUpTime, false);
@@ -1766,7 +1799,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             Vec3 pushDirection = FDMathUtil.getNormalVectorFromLineToPoint(oldPos,pos,entity.position()).multiply(1,0,1)
                     .normalize()
                     .multiply(3,0,3)
-                    .add(0,1.5,0);
+                    .add(0,0.5,0);
             livingEntity.hurt(BossDamageSources.CHESED_ROLL_SOURCE,damage);
             if (livingEntity instanceof Player player){
                 FDLibCalls.setServerPlayerSpeed((ServerPlayer) player,pushDirection);

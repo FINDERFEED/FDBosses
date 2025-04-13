@@ -61,6 +61,8 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
 
             if (tickCount == this.getAttackPreparationTime()) {
 
+                level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.FAST_LIGHTNING_STRIKE.get(), SoundSource.HOSTILE, 1f, 1f);
+
                 this.rayParticleAndShake();
 
                 this.doDamage();

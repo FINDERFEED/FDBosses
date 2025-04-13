@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
@@ -19,6 +20,8 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -85,6 +88,11 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
                             .amplitude(15.f)
                             .build(),pos,5);
                 }
+
+            }
+
+            if (this.tickCount > 10) {
+                level().playSound(null, pos.x, pos.y, pos.z, BossSounds.ROCK_IMPACT.get(), SoundSource.HOSTILE, 0.5f, 1f);
             }
 
             SlamParticlesPacket packet = new SlamParticlesPacket(

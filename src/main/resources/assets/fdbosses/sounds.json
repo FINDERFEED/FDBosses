@@ -22,5 +22,25 @@
   },
   "chesed_boom_explosion_prepare": {
     "sounds": [ "fdbosses:chesed_boom_explosion_prepare" ]
+  },
+  "rock_impact": {
+    "sounds": [
+      "fdbosses:rock_impact_1",
+      "fdbosses:rock_impact_2",
+      "fdbosses:rock_impact_3",
+      "fdbosses:rock_impact_4",
+      "fdbosses:rock_impact_5",
+      "fdbosses:rock_impact_6"
+    ]
+  },
+  "chesed_floor_smash": {
+    "sounds": [
+      "fdbosses:chesed_smash_floor"
+    ]
+  },
+  "fast_lightning_strike": {
+    "sounds": [
+      "fdbosses:fast_lightning_strike"
+    ]
   }
 }

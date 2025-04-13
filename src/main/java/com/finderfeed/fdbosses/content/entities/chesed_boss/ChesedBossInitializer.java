@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.chesed_boss;
 
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDLib;
 import com.finderfeed.fdlib.FDLibCalls;
@@ -15,9 +16,11 @@ import com.finderfeed.fdlib.systems.cutscenes.EasingType;
 import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
+import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -148,6 +151,9 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
                             .maxVerticalSpeedEdges(0.15f)
                             .maxVerticalSpeedCenter(0.15f)
             );
+
+            entity.level().playSound(null, entity.getX(),entity.getY(),entity.getZ(), BossSounds.CHESED_FLOOR_SMASH.get(), SoundSource.HOSTILE, 10f, 1f);
+
             PacketDistributor.sendToPlayersTrackingEntity(entity,packet);
 
             DefaultShakePacket defaultShakePacket = new DefaultShakePacket(FDShakeData.builder()
