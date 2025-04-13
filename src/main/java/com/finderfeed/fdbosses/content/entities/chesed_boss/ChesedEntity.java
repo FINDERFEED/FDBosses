@@ -21,6 +21,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.ChesedKineticFieldEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
+import com.finderfeed.fdbosses.content.util.DelayedSound;
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.packets.ChesedRayReflectPacket;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
@@ -69,6 +70,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -147,6 +149,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     private BossInitializer<ChesedEntity> bossInitializer = new ChesedBossInitializer(this);
 
+    private List<DelayedSound> delayedSounds = new ArrayList<>();
+
     public ChesedEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
         if (serverModel == null) {
@@ -179,25 +183,26 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(ROCKFALL_ATTACK,this::rockfallAttack) // 1
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .attackListener(this::attackListener)
-                    .addAttack(0, ray)
-
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack(ELECTRIC_SPHERE_ATTACK)
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack(ROCKFALL_ATTACK)
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack(EARTHQUAKE_ATTACK)
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(4,AttackOptions.builder()
-                            .addAttack(ROLL_ATTACK)
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(5,FINAL_ATTACK)
+                    .addAttack(0, BLOCKS_ATTACK)
+//                    .addAttack(0, ray)
+//
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack(ELECTRIC_SPHERE_ATTACK)
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack(ROCKFALL_ATTACK)
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack(EARTHQUAKE_ATTACK)
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(4,AttackOptions.builder()
+//                            .addAttack(ROLL_ATTACK)
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(5,FINAL_ATTACK)
             ;
 
         }
@@ -264,6 +269,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
             bossInitializer.tick();
 
+            this.tickDelayedSounds();
 
             if (tickCount == 5 && !alreadySpawned){
                 alreadySpawned = true;
@@ -319,6 +325,20 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     }
                 }else{
                     this.idleParticles();
+                }
+            }
+        }
+    }
+
+    private void tickDelayedSounds(){
+        if (!level().isClientSide) {
+            var iterator = this.delayedSounds.listIterator();
+            System.out.println(this.delayedSounds.size());
+            while (iterator.hasNext()) {
+                var s = iterator.next();
+                if (s.tick()){
+                    level().playSound(null, s.pos.x,s.pos.y,s.pos.z,s.soundEvent,s.soundSource,s.volume,s.pitch);
+                    iterator.remove();
                 }
             }
         }
@@ -1360,7 +1380,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 state = Blocks.BLACKSTONE.defaultBlockState();
             }
 
-            ChesedFallingBlock.summon(level(), state,p,damage);
+            ChesedFallingBlock fallingBlock = ChesedFallingBlock.summon(level(), state,p,damage);
+            fallingBlock.softerSound = true;
         }
     }
 
@@ -1595,6 +1616,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         path.addPos(flyTo.add(0,1,0));
         path.setSpeedOnEnd(targetPos.subtract(flyTo).multiply(0.25,0.25,0.25));
         next.movementPath = path;
+
+        this.delayedSounds.add(new DelayedSound(BossSounds.THROW_STUFF.get(), SoundSource.HOSTILE, flyTo,10f,1f,7));
     }
 
 
@@ -2438,4 +2461,5 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         entity.setDeltaMovement(b);
         entity.hasImpulse = true;
     }
+
 }

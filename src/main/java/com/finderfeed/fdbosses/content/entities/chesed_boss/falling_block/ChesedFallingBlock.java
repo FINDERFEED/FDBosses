@@ -41,6 +41,8 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
     @SerializableField
     public float damage;
 
+    public boolean softerSound = false;
+
     public ChesedFallingBlock(EntityType<? extends AbstractHurtingProjectile> type, Level level) {
         super(type, level);
     }
@@ -92,7 +94,11 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
             }
 
             if (this.tickCount > 10) {
-                level().playSound(null, pos.x, pos.y, pos.z, BossSounds.ROCK_IMPACT.get(), SoundSource.HOSTILE, 0.5f, 1f);
+                float volume = 0.5f;
+                if (softerSound){
+                    volume = 0.2f;
+                }
+                level().playSound(null, pos.x, pos.y, pos.z, BossSounds.ROCK_IMPACT.get(), SoundSource.HOSTILE, volume, 1f);
             }
 
             SlamParticlesPacket packet = new SlamParticlesPacket(

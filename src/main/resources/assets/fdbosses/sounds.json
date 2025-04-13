@@ -42,5 +42,10 @@
     "sounds": [
       "fdbosses:fast_lightning_strike"
     ]
+  },
+  "throw_stuff": {
+    "sounds": [
+      "fdbosses:throw_stuff"
+    ]
   }
 }

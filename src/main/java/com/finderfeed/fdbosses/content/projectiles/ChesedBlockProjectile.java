@@ -192,7 +192,7 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
 
             this.remove(RemovalReason.DISCARDED);
 
-            level().playSound(null, this.position().x,this.position().y,this.position().z, BossSounds.ROCK_IMPACT.get(), SoundSource.HOSTILE, 2f, 1f);
+            level().playSound(null, this.position().x,this.position().y,this.position().z, BossSounds.ROCK_IMPACT.get(), SoundSource.HOSTILE, 0.75f, 1f);
 
         }
     }

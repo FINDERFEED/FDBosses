@@ -24,6 +24,7 @@ public class BossSounds {
     public static final Supplier<SoundEvent> ROCK_IMPACT = SOUNDS.register("rock_impact",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"rock_impact")));
     public static final Supplier<SoundEvent> CHESED_FLOOR_SMASH = SOUNDS.register("chesed_floor_smash",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_floor_smash")));
     public static final Supplier<SoundEvent> FAST_LIGHTNING_STRIKE = SOUNDS.register("fast_lightning_strike",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"fast_lightning_strike")));
+    public static final Supplier<SoundEvent> THROW_STUFF = SOUNDS.register("throw_stuff",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"throw_stuff")));
 
 
 }
