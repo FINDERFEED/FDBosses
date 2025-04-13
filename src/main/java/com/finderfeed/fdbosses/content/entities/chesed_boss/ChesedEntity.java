@@ -183,26 +183,25 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(ROCKFALL_ATTACK,this::rockfallAttack) // 1
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .attackListener(this::attackListener)
-                    .addAttack(0, BLOCKS_ATTACK)
-//                    .addAttack(0, ray)
-//
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(ELECTRIC_SPHERE_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(ROCKFALL_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(EARTHQUAKE_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(4,AttackOptions.builder()
-//                            .addAttack(ROLL_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(5,FINAL_ATTACK)
+                    .addAttack(0, ray)
+
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(ELECTRIC_SPHERE_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(ROCKFALL_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(EARTHQUAKE_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(4,AttackOptions.builder()
+                            .addAttack(ROLL_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(5,FINAL_ATTACK)
             ;
 
         }
@@ -315,6 +314,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 this.monolithEnergyDrainParticles();
             }
 
+
             if (this.isRolling()){
                 this.handleClientRolling();
             }else{
@@ -333,7 +333,6 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     private void tickDelayedSounds(){
         if (!level().isClientSide) {
             var iterator = this.delayedSounds.listIterator();
-            System.out.println(this.delayedSounds.size());
             while (iterator.hasNext()) {
                 var s = iterator.next();
                 if (s.tick()){
@@ -1073,7 +1072,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 MobEffectInstance instance = target.getEffect(BossEffects.CHESED_ENERGIZED);
                 int amplifier = instance.getAmplifier();
                 target.removeEffect(BossEffects.CHESED_ENERGIZED);
-                if (amplifier > 0){
+                if (amplifier > 0 && !chesedRayReflectorHit){
                     target.addEffect(new MobEffectInstance(BossEffects.CHESED_ENERGIZED,400,amplifier - 1,false,true));
                 }
                 targetHadEnergized = true;
@@ -1577,7 +1576,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 instance.nextStage();
             }
         }else if (stage == 2){
-            if (!this.blockAttackProjectiles.isEmpty() || this.trySearchProjectiles()) {
+            if (!this.blockAttackProjectiles.isEmpty()) {
                 if (instance.tick % 8 == 0) {
                     LivingEntity player = this.getTarget();
                     if (player != null) {
@@ -1617,7 +1616,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         path.setSpeedOnEnd(targetPos.subtract(flyTo).multiply(0.25,0.25,0.25));
         next.movementPath = path;
 
-        this.delayedSounds.add(new DelayedSound(BossSounds.THROW_STUFF.get(), SoundSource.HOSTILE, flyTo,10f,1f,7));
+        this.delayedSounds.add(new DelayedSound(BossSounds.THROW_STUFF.get(), SoundSource.HOSTILE, flyTo,10f,2f,7));
     }
 
 
@@ -1672,7 +1671,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
 
     private boolean trySearchProjectiles(){
-        List<ChesedBlockProjectile> projectiles = level().getEntitiesOfClass(ChesedBlockProjectile.class,this.getBoundingBox().inflate(10,20,10));
+        List<ChesedBlockProjectile> projectiles = level().getEntitiesOfClass(ChesedBlockProjectile.class,this.getBoundingBox().inflate(10,20,10),projectile->{
+            return true;
+        });
         if (!projectiles.isEmpty()){
             this.blockAttackProjectiles = projectiles;
             return true;
@@ -2132,6 +2133,12 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     public void die(DamageSource p_21014_) {
         super.die(p_21014_);
         if (!level().isClientSide){
+
+            this.trySearchProjectiles();
+            for (var projectile : this.blockAttackProjectiles){
+                projectile.remove(RemovalReason.DISCARDED);
+            }
+
             this.removeMonoliths();
             this.killCrystals();
 
@@ -2444,9 +2451,11 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     @Override
     public void push(Entity entity) {
-        Vec3 b = entity.position().subtract(this.position()).normalize().add(0,0.3,0);
-        entity.setDeltaMovement(b);
-        entity.hasImpulse = true;
+        if (!this.isRolling()) {
+            Vec3 b = entity.position().subtract(this.position()).normalize().add(0, 0.3, 0);
+            entity.setDeltaMovement(b);
+            entity.hasImpulse = true;
+        }
     }
 
 

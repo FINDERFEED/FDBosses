@@ -165,7 +165,9 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
                     .frequency(50f)
                     .build());
             PacketDistributor.sendToPlayersTrackingEntity(entity,defaultShakePacket);
-        }else if (this.getTick() >= endTick + idleAfterEnd){
+        }else if (this.getTick() == 72 || this.getTick() == 82){
+            entity.level().playSound(null, entity.getX(),entity.getY(),entity.getZ(), BossSounds.CHESED_OPEN.get(), SoundSource.HOSTILE, 10f, 0.8f);
+        } else if (this.getTick() >= endTick + idleAfterEnd){
             this.setFinished();
         }
     }

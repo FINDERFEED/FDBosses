@@ -13,18 +13,19 @@ public class BossSounds {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, FDBosses.MOD_ID);
 
 
-    public static final Supplier<SoundEvent> CHESED_RAY = SOUNDS.register("ray_attack",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"ray_attack")));
-    public static final Supplier<SoundEvent> ROCKFALL = SOUNDS.register("rockfall",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"rockfall")));
-    public static final Supplier<SoundEvent> RUMBLING = SOUNDS.register("rumbling",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"rumbling")));
-    public static final Supplier<SoundEvent> CHESED_LIGHTNING_RAY = SOUNDS.register("lightning_attack",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"lightning_attack")));
-    public static final Supplier<SoundEvent> CHESED_FINAL_ATTACK_EXPLOSION = SOUNDS.register("chesed_boom_explosion",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_boom_explosion")));
-    public static final Supplier<SoundEvent> CHESED_FINAL_ATTACK_EXPLOSION_BIGGER = SOUNDS.register("chesed_boom_explosion_bigger",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_boom_explosion_bigger")));
-    public static final Supplier<SoundEvent> CHESED_FINAL_ATTACK_EXPLOSION_PREPARE = SOUNDS.register("chesed_boom_explosion_prepare",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_boom_explosion_prepare")));
-    public static final Supplier<SoundEvent> CHESED_FINAL_ATTACK_RAY = SOUNDS.register("chesed_boom_ray",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_boom_ray")));
-    public static final Supplier<SoundEvent> ROCK_IMPACT = SOUNDS.register("rock_impact",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"rock_impact")));
-    public static final Supplier<SoundEvent> CHESED_FLOOR_SMASH = SOUNDS.register("chesed_floor_smash",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_floor_smash")));
-    public static final Supplier<SoundEvent> FAST_LIGHTNING_STRIKE = SOUNDS.register("fast_lightning_strike",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"fast_lightning_strike")));
-    public static final Supplier<SoundEvent> THROW_STUFF = SOUNDS.register("throw_stuff",()->SoundEvent.createVariableRangeEvent(ResourceLocation.tryBuild(FDBosses.MOD_ID,"throw_stuff")));
+    public static final Supplier<SoundEvent> CHESED_RAY = SOUNDS.register("ray_attack",()->SoundEvent.createVariableRangeEvent(FDBosses.location("ray_attack")));
+    public static final Supplier<SoundEvent> ROCKFALL = SOUNDS.register("rockfall",()->SoundEvent.createVariableRangeEvent(FDBosses.location("rockfall")));
+    public static final Supplier<SoundEvent> RUMBLING = SOUNDS.register("rumbling",()->SoundEvent.createVariableRangeEvent(FDBosses.location("rumbling")));
+    public static final Supplier<SoundEvent> CHESED_LIGHTNING_RAY = SOUNDS.register("lightning_attack",()->SoundEvent.createVariableRangeEvent(FDBosses.location("lightning_attack")));
+    public static final Supplier<SoundEvent> CHESED_FINAL_ATTACK_EXPLOSION = SOUNDS.register("chesed_boom_explosion",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_boom_explosion")));
+    public static final Supplier<SoundEvent> CHESED_FINAL_ATTACK_EXPLOSION_BIGGER = SOUNDS.register("chesed_boom_explosion_bigger",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_boom_explosion_bigger")));
+    public static final Supplier<SoundEvent> CHESED_FINAL_ATTACK_EXPLOSION_PREPARE = SOUNDS.register("chesed_boom_explosion_prepare",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_boom_explosion_prepare")));
+    public static final Supplier<SoundEvent> CHESED_FINAL_ATTACK_RAY = SOUNDS.register("chesed_boom_ray",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_boom_ray")));
+    public static final Supplier<SoundEvent> ROCK_IMPACT = SOUNDS.register("rock_impact",()->SoundEvent.createVariableRangeEvent(FDBosses.location("rock_impact")));
+    public static final Supplier<SoundEvent> CHESED_FLOOR_SMASH = SOUNDS.register("chesed_floor_smash",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_floor_smash")));
+    public static final Supplier<SoundEvent> FAST_LIGHTNING_STRIKE = SOUNDS.register("fast_lightning_strike",()->SoundEvent.createVariableRangeEvent(FDBosses.location("fast_lightning_strike")));
+    public static final Supplier<SoundEvent> THROW_STUFF = SOUNDS.register("throw_stuff",()->SoundEvent.createVariableRangeEvent(FDBosses.location("throw_stuff")));
+    public static final Supplier<SoundEvent> CHESED_OPEN = SOUNDS.register("chesed_open",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_open")));
 
 
 }

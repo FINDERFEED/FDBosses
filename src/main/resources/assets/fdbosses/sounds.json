@@ -34,18 +34,15 @@
     ]
   },
   "chesed_floor_smash": {
-    "sounds": [
-      "fdbosses:chesed_smash_floor"
-    ]
+    "sounds": ["fdbosses:chesed_smash_floor"]
   },
   "fast_lightning_strike": {
-    "sounds": [
-      "fdbosses:fast_lightning_strike"
-    ]
+    "sounds": ["fdbosses:fast_lightning_strike"]
   },
   "throw_stuff": {
-    "sounds": [
-      "fdbosses:throw_stuff"
-    ]
+    "sounds": ["fdbosses:throw_stuff"]
+  },
+  "chesed_open": {
+    "sounds": ["fdbosses:chesed_open"]
   }
 }
