@@ -44,5 +44,8 @@
   },
   "chesed_open": {
     "sounds": ["fdbosses:chesed_open"]
+  },
+  "final_attack_charge": {
+    "sounds": ["fdbosses:chesed_boom_charge"]
   }
 }
