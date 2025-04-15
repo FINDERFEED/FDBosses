@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
@@ -13,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
@@ -72,6 +74,10 @@ public class ChesedMovingVerticalRay extends LivingEntity implements AutoSeriali
             }
 
             this.doDamage();
+
+            if (tickCount % 2 == 0){
+                level().playSound(null, this.getX(),this.getY(), this.getZ(), BossSounds.LIGHTNING_RAY_PASS.get(), SoundSource.HOSTILE, 1f, 1f);
+            }
 
         }else{
 

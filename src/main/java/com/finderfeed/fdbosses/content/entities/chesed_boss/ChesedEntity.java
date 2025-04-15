@@ -183,26 +183,25 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(ROCKFALL_ATTACK,this::rockfallAttack) // 1
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .attackListener(this::attackListener)
-                    .addAttack(0, ROLL_ATTACK)
-//                    .addAttack(0, ray)
-//
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(ELECTRIC_SPHERE_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(ROCKFALL_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(EARTHQUAKE_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(4,AttackOptions.builder()
-//                            .addAttack(ROLL_ATTACK)
-//                            .setNextAttack(ray)
-//                            .build())
-//                    .addAttack(5,FINAL_ATTACK)
+                    .addAttack(0, ray)
+
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(ELECTRIC_SPHERE_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(ROCKFALL_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(EARTHQUAKE_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(4,AttackOptions.builder()
+                            .addAttack(ROLL_ATTACK)
+                            .build())
+                    .addAttack(5, ray)
+                    .addAttack(6,FINAL_ATTACK)
             ;
 
         }
@@ -1339,7 +1338,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             float duration = 400;
 
 
-            if (tick % (this.isBelowHalfHP() ? 20 : 40) == 0){
+            if (tick % (this.isBelowHalfHP() ? 25 : 40) == 0){
                 this.summonDelayedVerticalRayOnFieldNearPlayers(5,this.isBelowHalfHP() ? 3 : 2);
             }
 
@@ -1443,6 +1442,12 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                             .outTime(5)
                             .amplitude(3.f)
                             .build(), this.position(), 50);
+
+                    FDLibCalls.sendParticles((ServerLevel) level(), BallParticleOptions.builder()
+                            .size(25f)
+                            .scalingOptions(0, 0, 2)
+                            .color(150 - random.nextInt(50), 230, 255)
+                            .build(), this.position(), 60);
 
                     int count = this.isBelowHalfHP() ? 12 : 8;
 
@@ -1751,8 +1756,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .amplitude(3.5f)
                     .build(),pos,10);
 
-            this.level().playSound(null,pos.x,pos.y,pos.z,BossSounds.RUMBLING_SHORT.get(),SoundSource.HOSTILE,1f,1f);
-
+            if (tickCount % 2 == 0) {
+                this.level().playSound(null, pos.x, pos.y, pos.z, BossSounds.RUMBLING_SHORT.get(), SoundSource.HOSTILE, 1f, 1f);
+            }
             if (system.getTickerAnimation("ROLL_AROUND") != CHESED_ROLL.get()){
                 system.startAnimation("ROLL_AROUND",AnimationTicker.builder(CHESED_ROLL)
                         .startTime(tick)

@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDLib;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
@@ -14,9 +15,11 @@ import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
@@ -123,7 +126,17 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
 
         DamageSource source = BossDamageSources.CHESED_ELECTRIC_SPHERE_SOURCE;
 
+        level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.FAST_LIGHTNING_STRIKE.get(), SoundSource.HOSTILE, 1f, 1f);
+
+        FDLibCalls.sendParticles((ServerLevel) level(), BallParticleOptions.builder()
+                .size(2f)
+                .scalingOptions(0, 0, 2)
+                .color(150, 230, 255)
+                .build(), this.position(), 30);
+
         for (LivingEntity entity : list){
+
+
 
             entity.hurt(source,damage);
 

@@ -56,5 +56,8 @@
   },
   "ghost_weapon_fly_out": {
     "sounds": ["fdbosses:ghost_weapon_fly_out"]
+  },
+  "lightning_ray_pass": {
+    "sounds": ["fdbosses:lightning_ray_pass"]
   }
 }
