@@ -218,7 +218,7 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
             Vec3 forwardVec = movement.multiply(1,0,1).normalize();
             double angle = Math.toDegrees(FDMathUtil.angleBetweenVectors(b.multiply(1,0,1),forwardVec));
 
-            if (angle < 30) {
+            if (angle < 25) {
                 entity.hurt(BossDamageSources.CHESED_BLOCK_ATTACK_SOURCE,damage);
                 entity.invulnerableTime = 0;
             }

@@ -2,6 +2,8 @@
   "item.fdbosses.lightning_core": "Lightning Core",
   "death.attack.chesed_roll_attack": "%s was rolled over",
   "death.attack.chesed_attack": "%s was obliterated by %s",
+  "death.attack.chesed_lor_attack": "%s was turned into a book by %s",
+  "death.attack.chesed_ba_attack": "%s couldn't handle an army of robots",
   "death.attack.chesed_earthquake": "%s was buried under the rocks",
   "death.attack.chesed_falling_block": "%s lost its head to a boulder",
   "death.attack.chesed_falling_block.player": "%s lost its head to a boulder",

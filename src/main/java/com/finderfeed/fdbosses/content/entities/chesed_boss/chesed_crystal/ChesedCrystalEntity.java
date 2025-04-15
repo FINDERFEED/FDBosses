@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_crystal;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossEffects;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.init.FDEDataSerializers;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
@@ -11,6 +12,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.F
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -21,6 +23,7 @@ import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 public class ChesedCrystalEntity extends FDLivingEntity implements ChesedBossBuddy {
 
@@ -83,6 +86,16 @@ public class ChesedCrystalEntity extends FDLivingEntity implements ChesedBossBud
         }else{
             lastHurtByPlayer = null;
             return false;
+        }
+    }
+
+    @Nullable
+    @Override
+    protected SoundEvent getHurtSound(DamageSource src) {
+        if (src.is(DamageTypes.GENERIC_KILL)){
+            return null;
+        }else{
+            return BossSounds.CHESED_CRYSTAL_HIT.get();
         }
     }
 

@@ -1,6 +1,8 @@
 {
   "values": [
     "fdbosses:chesed_attack",
+    "fdbosses:chesed_lor_attack",
+    "fdbosses:chesed_ba_attack",
     "fdbosses:electric_sphere",
     "fdbosses:chesed_falling_block",
     "fdbosses:chesed_vertical_ray",

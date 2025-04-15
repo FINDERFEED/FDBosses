@@ -17,6 +17,8 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 public class BossDamageSources {
 
     public static final ResourceKey<DamageType> CHESED_ATTACK = key("chesed_attack");
+    public static final ResourceKey<DamageType> CHESED_LOR_EASTER_EGG_ATTACK = key("chesed_lor_attack");
+    public static final ResourceKey<DamageType> CHESED_BA_EASTER_EGG_ATTACK = key("chesed_ba_attack");
     public static final ResourceKey<DamageType> CHESED_ELECTRIC_SPHERE = key("electric_sphere");
     public static final ResourceKey<DamageType> CHESED_FALLING_BLOCK = key("chesed_falling_block");
     public static final ResourceKey<DamageType> CHESED_VERTICAL_RAY = key("chesed_vertical_ray");
@@ -26,6 +28,8 @@ public class BossDamageSources {
 
 
     private static EntityDamageSource CHESED_ATTACK_SOURCE;
+    private static EntityDamageSource CHESED_LOR_ATTACK_SOURCE;
+    private static EntityDamageSource CHESED_BA_ATTACK_SOURCE;
     public static DamageSource CHESED_ELECTRIC_SPHERE_SOURCE;
     public static DamageSource CHESED_FALLING_BLOCK_SOURCE;
     public static DamageSource CHESED_VERTICAL_RAY_SOURCE;
@@ -37,11 +41,22 @@ public class BossDamageSources {
         return CHESED_ATTACK_SOURCE.create(attacker);
     }
 
+    public static DamageSource chesedLorAttack(Entity attacker){
+        return CHESED_LOR_ATTACK_SOURCE.create(attacker);
+    }
+
+    public static DamageSource chesedBaAttack(Entity attacker){
+        return CHESED_BA_ATTACK_SOURCE.create(attacker);
+    }
+
     @SubscribeEvent
     public static void registerDamageTypes(ServerStartedEvent event){
         RegistryAccess access = event.getServer().registryAccess();
 
         CHESED_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_ATTACK));
+        CHESED_LOR_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_LOR_EASTER_EGG_ATTACK));
+        CHESED_BA_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_BA_EASTER_EGG_ATTACK));
+        CHESED_BA_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_ATTACK));
         CHESED_ELECTRIC_SPHERE_SOURCE = new DamageSource(access.holderOrThrow(CHESED_ELECTRIC_SPHERE));
         CHESED_FALLING_BLOCK_SOURCE = new DamageSource(access.holderOrThrow(CHESED_FALLING_BLOCK));
         CHESED_VERTICAL_RAY_SOURCE = new DamageSource(access.holderOrThrow(CHESED_VERTICAL_RAY));

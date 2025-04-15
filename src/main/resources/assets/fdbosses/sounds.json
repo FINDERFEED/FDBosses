@@ -47,5 +47,11 @@
   },
   "final_attack_charge": {
     "sounds": ["fdbosses:chesed_boom_charge"]
+  },
+  "chesed_crystal_hit": {
+    "sounds": ["fdbosses:chesed_crystal_hit"]
+  },
+  "rumbling_short": {
+    "sounds": ["fdbosses:rumbling_short"]
   }
 }

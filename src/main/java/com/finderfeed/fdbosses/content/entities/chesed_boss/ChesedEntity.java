@@ -183,6 +183,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(ROCKFALL_ATTACK,this::rockfallAttack) // 1
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .attackListener(this::attackListener)
+                    .addAttack(0, ROLL_ATTACK)
 //                    .addAttack(0, ray)
 //
 //                    .addAttack(1,AttackOptions.builder()
@@ -199,9 +200,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 //                            .build())
 //                    .addAttack(4,AttackOptions.builder()
 //                            .addAttack(ROLL_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
+//                            .setNextAttack(ray)
 //                            .build())
-                    .addAttack(5,FINAL_ATTACK)
+//                    .addAttack(5,FINAL_ATTACK)
             ;
 
         }
@@ -1047,7 +1048,10 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             return !(entity instanceof ChesedBossBuddy);
         });
 
-        DamageSource source = BossDamageSources.chesedAttack(this);
+
+
+
+
 
         float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.rayDamage;
 
@@ -1079,6 +1083,17 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 }
                 targetHadEnergized = true;
             }else{
+
+                DamageSource source = BossDamageSources.chesedAttack(this);
+
+                if (level().random.nextFloat() < 0.05){
+                    if (level().random.nextFloat() > 0.5){
+                        source = BossDamageSources.chesedBaAttack(this);
+                    }else {
+                        source = BossDamageSources.chesedLorAttack(this);
+                    }
+                }
+
                 target.hurt(source,damage);
             }
         }
@@ -1735,6 +1750,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .outTime(5)
                     .amplitude(3.5f)
                     .build(),pos,10);
+
+            this.level().playSound(null,pos.x,pos.y,pos.z,BossSounds.RUMBLING_SHORT.get(),SoundSource.HOSTILE,1f,1f);
+
             if (system.getTickerAnimation("ROLL_AROUND") != CHESED_ROLL.get()){
                 system.startAnimation("ROLL_AROUND",AnimationTicker.builder(CHESED_ROLL)
                         .startTime(tick)

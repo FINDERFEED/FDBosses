@@ -27,6 +27,8 @@ public class BossSounds {
     public static final Supplier<SoundEvent> THROW_STUFF = SOUNDS.register("throw_stuff",()->SoundEvent.createVariableRangeEvent(FDBosses.location("throw_stuff")));
     public static final Supplier<SoundEvent> CHESED_OPEN = SOUNDS.register("chesed_open",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_open")));
     public static final Supplier<SoundEvent> CHESED_FINAL_ATTACK_CHARGE = SOUNDS.register("final_attack_charge",()->SoundEvent.createVariableRangeEvent(FDBosses.location("final_attack_charge")));
+    public static final Supplier<SoundEvent> CHESED_CRYSTAL_HIT = SOUNDS.register("chesed_crystal_hit",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_crystal_hit")));
+    public static final Supplier<SoundEvent> RUMBLING_SHORT = SOUNDS.register("rumbling_short",()->SoundEvent.createVariableRangeEvent(FDBosses.location("rumbling_short")));
 
 
 }
