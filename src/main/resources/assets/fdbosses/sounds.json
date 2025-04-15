@@ -53,5 +53,8 @@
   },
   "rumbling_short": {
     "sounds": ["fdbosses:rumbling_short"]
+  },
+  "ghost_weapon_fly_out": {
+    "sounds": ["fdbosses:ghost_weapon_fly_out"]
   }
 }

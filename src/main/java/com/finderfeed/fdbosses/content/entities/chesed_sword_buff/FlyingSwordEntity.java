@@ -4,6 +4,8 @@ import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOption
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossSounds;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
@@ -15,6 +17,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -109,6 +112,11 @@ public class FlyingSwordEntity extends FDProjectile {
                 this.remove(RemovalReason.DISCARDED);
             }
             this.handleTarget();
+
+            if (tickCount == DELAY_UNTIL_LAUNCH - 2){
+                level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.GHOST_WEAPON_FLY_OUT.get(), SoundSource.NEUTRAL, 1f, 1f + random.nextFloat() * 0.25f);
+            }
+
         }else{
 
             Vec3 center = this.getActualPos();
@@ -140,7 +148,7 @@ public class FlyingSwordEntity extends FDProjectile {
                             new FDColor(0.8f,1f,1f,1f),
                             random.nextFloat() * 0.5f + 0.25f,
                             0.05f + random.nextFloat() * 0.025f,
-                            3 + random.nextInt(3)
+                            2 + random.nextInt(2)
                             ),pos.x,pos.y,pos.z,0,0,0);
 
                 }
@@ -258,6 +266,14 @@ public class FlyingSwordEntity extends FDProjectile {
                     this.setDeltaMovement(deltaMovement);
 
                     if (this.position().distanceTo(targetPos) <= 0.5f){
+                        FDLibCalls.sendParticles((ServerLevel) level(), BallParticleOptions.builder()
+                                .size(2f)
+                                .scalingOptions(0, 0, 2)
+                                .color(150, 230, 255)
+                                .build(), targetPos, 30);
+                        level().playSound(null, targetPos.x,targetPos.y,targetPos.z, BossSounds.FAST_LIGHTNING_STRIKE.get(), SoundSource.HOSTILE, 2f, 1 + random.nextFloat() * 0.5f);
+
+
                         this.hurtTarget(owner, livingTarget);
                         this.remove(RemovalReason.DISCARDED);
                     }
