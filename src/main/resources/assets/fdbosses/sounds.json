@@ -59,5 +59,8 @@
   },
   "lightning_ray_pass": {
     "sounds": ["fdbosses:lightning_ray_pass"]
+  },
+  "electric_spheres_release": {
+    "sounds": ["fdbosses:electric_spheres_release"]
   }
 }

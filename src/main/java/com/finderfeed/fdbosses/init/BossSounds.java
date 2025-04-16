@@ -31,6 +31,7 @@ public class BossSounds {
     public static final Supplier<SoundEvent> RUMBLING_SHORT = SOUNDS.register("rumbling_short",()->SoundEvent.createVariableRangeEvent(FDBosses.location("rumbling_short")));
     public static final Supplier<SoundEvent> GHOST_WEAPON_FLY_OUT = SOUNDS.register("ghost_weapon_fly_out",()->SoundEvent.createVariableRangeEvent(FDBosses.location("ghost_weapon_fly_out")));
     public static final Supplier<SoundEvent> LIGHTNING_RAY_PASS = SOUNDS.register("lightning_ray_pass",()->SoundEvent.createVariableRangeEvent(FDBosses.location("lightning_ray_pass")));
+    public static final Supplier<SoundEvent> ELECTRIC_HUM = SOUNDS.register("electric_spheres_release",()->SoundEvent.createVariableRangeEvent(FDBosses.location("electric_spheres_release")));
 
 
 }

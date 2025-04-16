@@ -183,25 +183,26 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(ROCKFALL_ATTACK,this::rockfallAttack) // 1
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .attackListener(this::attackListener)
-                    .addAttack(0, ray)
-
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack(ELECTRIC_SPHERE_ATTACK)
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack(ROCKFALL_ATTACK)
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack(EARTHQUAKE_ATTACK)
-                            .setNextAttack(rayOrBlocks)
-                            .build())
-                    .addAttack(4,AttackOptions.builder()
-                            .addAttack(ROLL_ATTACK)
-                            .build())
-                    .addAttack(5, ray)
-                    .addAttack(6,FINAL_ATTACK)
+                    .addAttack(0, ELECTRIC_SPHERE_ATTACK)
+//                    .addAttack(0, ray)
+//
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack(ELECTRIC_SPHERE_ATTACK)
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack(ROCKFALL_ATTACK)
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack(EARTHQUAKE_ATTACK)
+//                            .setNextAttack(rayOrBlocks)
+//                            .build())
+//                    .addAttack(4,AttackOptions.builder()
+//                            .addAttack(ROLL_ATTACK)
+//                            .build())
+//                    .addAttack(5, ray)
+//                    .addAttack(6,FINAL_ATTACK)
             ;
 
         }
@@ -1124,6 +1125,10 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 this.summonLessSpheresAround(this.position(),tick);
             }
 
+            if (tick % 60 == 0){
+                level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.ELECTRIC_HUM.get(), SoundSource.HOSTILE, 10f, 1f);
+            }
+
             if (tick > 200){
                 instance.nextStage();
             }
@@ -1149,6 +1154,10 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
             }
 
+            if (tick % 60 == 0){
+                level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.ELECTRIC_HUM.get(), SoundSource.HOSTILE, 10f, 1f);
+            }
+
             if (tick > 200){
                 instance.nextStage();
             }
@@ -1159,6 +1168,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     this.summonSpheresAround(25, tick / 10f * FDMathUtil.FPI / 9);
                 }
 
+                if (tick % 60 == 0 && tick <= 120){
+                    level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.ELECTRIC_HUM.get(), SoundSource.HOSTILE, 10f, 1f);
+                }
 
             }else if (tick < 350){
                 this.entityData.set(IS_LAUNCHING_ORBS,false);
@@ -1599,7 +1611,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             }
         }else if (stage == 2){
             if (!this.blockAttackProjectiles.isEmpty()) {
-                if (instance.tick % 8 == 0) {
+                int rate = this.isBelowHalfHP() ? 10 : 8;
+                if (instance.tick % rate == 0) {
                     LivingEntity player = this.getTarget();
                     if (player != null) {
                         this.throwBlock(player, height);
