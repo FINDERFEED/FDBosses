@@ -71,5 +71,8 @@
   },
   "electric_sphere_storm_end": {
     "sounds": ["fdbosses:electric_sphere_storm_end"]
+  },
+  "chesed_death": {
+    "sounds": ["fdbosses:chesed_death"]
   }
 }

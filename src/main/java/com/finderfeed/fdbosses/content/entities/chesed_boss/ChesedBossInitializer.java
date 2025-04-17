@@ -166,7 +166,7 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
                     .build());
             PacketDistributor.sendToPlayersTrackingEntity(entity,defaultShakePacket);
         }else if (this.getTick() == 72 || this.getTick() == 82){
-            entity.level().playSound(null, entity.getX(),entity.getY(),entity.getZ(), BossSounds.CHESED_OPEN.get(), SoundSource.HOSTILE, 10f, 1f);
+//            entity.level().playSound(null, entity.getX(),entity.getY(),entity.getZ(), BossSounds.CHESED_OPEN.get(), SoundSource.HOSTILE, 10f, 1f);
         } else if (this.getTick() >= endTick + idleAfterEnd){
             this.setFinished();
         }

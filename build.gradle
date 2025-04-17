@@ -17,6 +17,13 @@ repositories {
     flatDir {
         dirs("libraries")
     }
+
+    maven {
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
+    }
 }
 
 base {
@@ -75,6 +82,9 @@ configurations {
 dependencies {
 
     implementation "net.neoforged:neoforge:${neo_version}"
+
+    implementation "curse.maven:sodium-394468:6382651"
+    implementation "curse.maven:irisshaders-455508:6213632"
 
     implementation fileTree(dir: 'build/libraries', include: ['*.jar'])
 

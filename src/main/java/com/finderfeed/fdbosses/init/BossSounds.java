@@ -35,6 +35,7 @@ public class BossSounds {
     public static final Supplier<SoundEvent> ELECTRIC_SPHERES_CAST = SOUNDS.register("electric_spheres_start",()->SoundEvent.createVariableRangeEvent(FDBosses.location("electric_spheres_start")));
     public static final Supplier<SoundEvent> ELECTRIC_SPHERES_STORM = SOUNDS.register("electric_sphere_storm",()->SoundEvent.createVariableRangeEvent(FDBosses.location("electric_sphere_storm")));
     public static final Supplier<SoundEvent> ELECTRIC_SPHERES_STORM_END = SOUNDS.register("electric_sphere_storm_end",()->SoundEvent.createVariableRangeEvent(FDBosses.location("electric_sphere_storm_end")));
+    public static final Supplier<SoundEvent> CHESED_DEATH = SOUNDS.register("chesed_death",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_death")));
 
 
 }

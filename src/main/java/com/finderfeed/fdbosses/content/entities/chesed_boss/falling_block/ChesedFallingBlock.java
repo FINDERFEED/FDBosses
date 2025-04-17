@@ -99,19 +99,20 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
                     volume = 0.2f;
                 }
                 level().playSound(null, pos.x, pos.y, pos.z, BossSounds.ROCK_IMPACT.get(), SoundSource.HOSTILE, volume, 1f);
+                SlamParticlesPacket packet = new SlamParticlesPacket(
+                        new SlamParticlesPacket.SlamData(result.getBlockPos(),pos.add(0,0.5,0),new Vec3(1,0,0))
+                                .maxAngle(FDMathUtil.FPI * 2)
+                                .maxSpeed(0.3f)
+                                .collectRadius(2)
+                                .maxParticleLifetime(30)
+                                .count(20)
+                                .maxVerticalSpeedEdges(0.15f)
+                                .maxVerticalSpeedCenter(0.15f)
+                );
+                PacketDistributor.sendToPlayersTrackingEntity(this,packet);
             }
 
-            SlamParticlesPacket packet = new SlamParticlesPacket(
-                    new SlamParticlesPacket.SlamData(result.getBlockPos(),pos.add(0,0.5,0),new Vec3(1,0,0))
-                            .maxAngle(FDMathUtil.FPI * 2)
-                            .maxSpeed(0.3f)
-                            .collectRadius(2)
-                            .maxParticleLifetime(30)
-                            .count(20)
-                            .maxVerticalSpeedEdges(0.15f)
-                            .maxVerticalSpeedCenter(0.15f)
-            );
-            PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+
             this.remove(RemovalReason.DISCARDED);
         }
     }

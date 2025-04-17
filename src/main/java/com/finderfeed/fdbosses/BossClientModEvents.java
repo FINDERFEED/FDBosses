@@ -182,6 +182,9 @@ public class BossClientModEvents {
                                 .model(BossModels.BOSS_SPAWNER)
                                 .renderType(RenderType.entityTranslucentCull(FDBosses.location("textures/entities/boss_spawner_crystals.png")))
                                 .renderCondition((entity -> {
+
+
+
                                     return ((BossSpawnerEntity)entity).isActive();
                                 }))
                                 .color(((entity, v) -> {
