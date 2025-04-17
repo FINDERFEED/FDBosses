@@ -74,5 +74,8 @@
   },
   "chesed_death": {
     "sounds": ["fdbosses:chesed_death"]
+  },
+  "attack_ding": {
+    "sounds": ["fdbosses:attack_ding"]
   }
 }

@@ -345,6 +345,7 @@ public class FlyingSwordEntity extends FDProjectile {
                 int duration = BossConfigs.BOSS_CONFIG.get().itemConfig.flyingSwordShockDuration;
                 target.addEffect(new MobEffectInstance(BossEffects.SHOCKED,duration,0));
                 EnchantmentHelper.doPostAttackEffects((ServerLevel) level(), target, damageSource);
+                target.invulnerableTime = 0;
             }
 
         }

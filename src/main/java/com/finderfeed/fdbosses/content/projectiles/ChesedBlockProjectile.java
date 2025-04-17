@@ -26,6 +26,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
@@ -41,6 +42,7 @@ import org.joml.*;
 import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 public class ChesedBlockProjectile extends FDProjectile implements AutoSerializable {
 
@@ -50,6 +52,8 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
 
     @SerializableField
     private float damage;
+
+    private UUID target;
 
     public ProjectileMovementPath movementPath = null;
     private int dropParticlesTime = 0;
@@ -75,6 +79,21 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
                 if (movementPath.isFinished()){
                     movementPath.tick(this);
                     movementPath = movementPath.getNext();
+
+                    LivingEntity target = this.getTarget((ServerLevel) level());
+                    if (target != null){
+
+                        Vec3 tpos = this.targetGroundPosition(target);
+                        Vec3 b = tpos.subtract(this.position());
+                        Vec3 h = b.multiply(1,0,1);
+                        Vec3 targetPos = tpos.add(h.normalize().reverse().multiply(2.5,0,2.5));
+                        float speedMod = 0.12f;
+                        Vec3 speed = targetPos.subtract(this.position()).multiply(speedMod,speedMod,speedMod);
+                        this.setDeltaMovement(speed);
+
+                    }
+
+
                 }
             }
 
@@ -84,6 +103,31 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
         }
 
     }
+
+    private Vec3 targetGroundPosition(LivingEntity target){
+
+
+        Vec3 toReturn = target.position();
+
+
+
+
+        BlockPos pos = new BlockPos(
+                (int) org.joml.Math.floor(toReturn.x),
+                (int) org.joml.Math.floor(toReturn.y),
+                (int) org.joml.Math.floor(toReturn.z)
+        );
+        for (int i = 0; i < 5;i++){
+            if (level().getBlockState(pos.offset(0,-i,0)).isAir()){
+                toReturn = toReturn.subtract(0,1,0);
+            }else{
+                return toReturn;
+            }
+
+        }
+        return toReturn;
+    }
+
 
     public void setDamage(float damage) {
         this.damage = damage;
@@ -330,6 +374,19 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
     }
 
 
+    public LivingEntity getTarget(ServerLevel serverLevel){
+        if (this.target == null) return null;
+        if (serverLevel.getEntity(this.target) instanceof LivingEntity l){
+            return l;
+        }else{
+            return null;
+        }
+    }
+
+    public void setTarget(LivingEntity target){
+        this.target = target.getUUID();
+    }
+
     @Override
     public void lerpTo(double x, double y, double z, float p_19899_, float p_19900_, int p_19901_) {
         super.lerpTo(x, y, z, p_19899_, p_19900_, p_19901_);
@@ -345,26 +402,38 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
     }
 
 
+
+
     @Override
-    public boolean save(CompoundTag tag) {
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
         if (movementPath != null){
             movementPath.autoSave("path",tag);
         }
         tag.putFloat("rotationSpeed",this.getRotationSpeed());
         tag.put("state", NbtUtils.writeBlockState(this.getBlockState()));
+        if (target != null){
+            tag.putUUID("target",this.target);
+        }
         this.autoSave(tag);
-        return super.save(tag);
     }
 
+
+
     @Override
-    public void load(CompoundTag tag) {
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
         if (tag.contains("path")){
             this.movementPath = new ProjectileMovementPath();
             this.movementPath.autoLoad("path",tag);
         }
+
+        if (tag.contains("target")){
+            this.target = tag.getUUID("target");
+        }
+
         this.setRotationSpeed(tag.getFloat("rotationSpeed"));
         this.setBlockState(NbtUtils.readBlockState(level().holderLookup(Registries.BLOCK),tag.getCompound("state")));
         this.autoLoad(tag);
-        super.load(tag);
     }
 }
