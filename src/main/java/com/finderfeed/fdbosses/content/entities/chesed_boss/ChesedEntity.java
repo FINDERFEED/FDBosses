@@ -22,12 +22,12 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.util.DelayedSound;
+import com.finderfeed.fdbosses.content.util.RepeatedSound;
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.packets.ChesedRayReflectPacket;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDHelpers;
-import com.finderfeed.fdlib.FDLib;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDScreenEffects;
 import com.finderfeed.fdlib.network.lib_packets.PlaySoundInEarsPacket;
@@ -63,6 +63,7 @@ import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -70,7 +71,6 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -82,7 +82,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ShieldItem;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -103,6 +102,9 @@ import static com.finderfeed.fdbosses.init.BossAnims.CHESED_ATTACK;
 import static com.finderfeed.fdbosses.init.BossAnims.*;
 
 public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerContextAssignable {
+
+    public static int ARENA_HEIGHT = 40;
+    public static int ARENA_RADIUS = 39;
 
     private UUID bossSpawnerUUID;
 
@@ -151,6 +153,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     private List<DelayedSound> delayedSounds = new ArrayList<>();
 
+    private RepeatedSound repeatedSound = null;
+
     public ChesedEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
         if (serverModel == null) {
@@ -163,13 +167,13 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
 
             AttackOptions ray = AttackOptions.builder()
-                    .setPreAttack("crystals")
-                    .addAttack("ray")
+                    .setPreAttack(CRYSTALS_ATTACK)
+                    .addAttack(RAY_ATTACK)
                     .build();
 
             AttackOptions rayOrBlocks = AttackOptions.builder()
                     .addAttack(2,ray)
-                    .addAttack(3,"blocks")
+                    .addAttack(3,BLOCKS_ATTACK)
                     .build();
 
             chain = new AttackChain(level.random)
@@ -289,6 +293,16 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             if (bossInitializer.isFinished() && !this.isDeadOrDying()) {
                 this.chain.tick();
 
+                this.electrifiedAir();
+
+                if (repeatedSound != null && repeatedSound.tick(level())){
+
+                    if (repeatedSound.sound.soundEvent == BossSounds.ELECTRIC_SPHERES_STORM.get()){
+                        level().playSound(null,this.getX(),this.getY(),this.getZ(),BossSounds.ELECTRIC_SPHERES_STORM_END.get(),SoundSource.HOSTILE, repeatedSound.sound.volume,repeatedSound.sound.pitch);
+                    }
+
+                    repeatedSound = null;
+                }
 
                 if (this.getTarget() != null) {
                     this.checkTarget(this.getTarget());
@@ -331,13 +345,42 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }
     }
 
+    private void electrifiedAir(){
+        for (LivingEntity entity : this.getAffectedEntities(false)){
+
+            double y = this.getY();
+            double ey = entity.getY();
+            if (ey - y > 3){
+                if (entity.tickCount % 30 == 0) {
+                    if (entity.hurt(BossDamageSources.chesedAttack(this), 4)) {
+
+                    }
+                }
+
+                if (tickCount % 5 == 0){
+                    ((ServerLevel)level()).sendParticles(LightningParticleOptions.builder()
+                            .color(50 + random.nextInt(40), 183 + random.nextInt(60), 200 + random.nextInt(50))
+                            .quadSize(0.1f)
+                            .lifetime(10)
+                            .randomRoll(true)
+                            .build(),
+                            entity.getX(),
+                            entity.getY() + entity.getBbHeight() / 2,
+                            entity.getZ(),
+                            4, entity.getBbWidth()/2,0.5,entity.getBbWidth()/2,0);
+                }
+
+            }
+        }
+    }
+
     private void tickDelayedSounds(){
         if (!level().isClientSide) {
             var iterator = this.delayedSounds.listIterator();
             while (iterator.hasNext()) {
                 var s = iterator.next();
                 if (s.tick()){
-                    level().playSound(null, s.pos.x,s.pos.y,s.pos.z,s.soundEvent,s.soundSource,s.volume,s.pitch);
+                    level().playSound(null, s.pos.x,s.pos.y,s.pos.z,s.sound.soundEvent, s.sound.soundSource,s.sound.volume,s.sound.pitch);
                     iterator.remove();
                 }
             }
@@ -411,8 +454,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     }
 
     public List<LivingEntity> getAffectedEntities(boolean includeCreativeAndSpectator){
-        float radius = this.enrageRadius();
-        List<LivingEntity> combatants = level().getEntitiesOfClass(LivingEntity.class,new AABB(-radius,-2,-radius,radius,40,radius).move(this.position()),(entity)->{
+        float radius = this.targetDetectionRadius();
+        List<LivingEntity> combatants = level().getEntitiesOfClass(LivingEntity.class,new AABB(-radius,-2,-radius,radius,ARENA_HEIGHT,radius).move(this.position()),(entity)->{
 
             if (entity instanceof ChesedBossBuddy) return false;
 
@@ -428,8 +471,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     }
 
     public List<Player> getCombatants(boolean includeCreativeAndSpectator){
-        float radius = this.enrageRadius();
-        List<Player> combatants = level().getEntitiesOfClass(Player.class,new AABB(-radius,-2,-radius,radius,40,radius).move(this.position()),(player)->{
+        float radius = this.targetDetectionRadius();
+        List<Player> combatants = level().getEntitiesOfClass(Player.class,new AABB(-radius,-1,-radius,radius,ARENA_HEIGHT,radius).move(this.position()),(player)->{
             return player.position().multiply(1,0,1).distanceTo(this.position().multiply(1,0,1)) <= radius
                     && (includeCreativeAndSpectator || !(player.isCreative() || player.isSpectator())) && player.isAlive();
         });
@@ -441,7 +484,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         if (target.isDeadOrDying()){
             this.changeTarget();
             return;
-        }else if (target.position().distanceTo(this.position()) > this.enrageRadius()){
+        }else if (target.position().distanceTo(this.position()) > this.targetDetectionRadius()){
             this.changeTarget();
             return;
         }
@@ -566,14 +609,28 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 direction.z * heightMd * 3
         );
 
-        BallParticleOptions options = BallParticleOptions.builder()
-                .particleProcessor(new CircleParticleProcessor(
-                        basePos,true,true,2
-                ))
-                .color(1 + random.nextInt(40), 183 + random.nextInt(60), 165 + random.nextInt(60))
-                .size(0.4f)
-                .scalingOptions(2,20,10)
-                .build();
+        ParticleOptions options;
+
+        if (random.nextFloat() < 0.9) {
+            options = BallParticleOptions.builder()
+                    .particleProcessor(new CircleParticleProcessor(
+                            basePos, true, true, 2
+                    ))
+                    .color(1 + random.nextInt(40), 183 + random.nextInt(60), 165 + random.nextInt(60))
+                    .size(0.4f)
+                    .scalingOptions(2, 20, 10)
+                    .build();
+        }else{
+            options = LightningParticleOptions.builder()
+                    .particleProcessor(new CircleParticleProcessor(
+                            basePos, true, true, 2
+                    ))
+                    .color(50 + random.nextInt(40), 183 + random.nextInt(60), 165 + random.nextInt(60))
+                    .quadSize(0.4f)
+                    .lifetime(10)
+                    .randomRoll(true)
+                    .build();
+        }
 
         level().addParticle(options,true,rotateFromPos.x,rotateFromPos.y,rotateFromPos.z,0,0,0);
 
@@ -723,6 +780,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
         return false;
     }
+
 
     private void darkenCombatants(int duration,boolean clear){
 
@@ -1115,7 +1173,10 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 this.getSystem().startAnimation("CAST", AnimationTicker.builder(CHESED_CAST)
                         .setToNullTransitionTime(0)
                         .build());
+
             }else if (tick > 15) {
+                level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.ELECTRIC_SPHERES_CAST.get(), SoundSource.HOSTILE, 5f, 1f);
+                this.repeatedSound = new RepeatedSound(BossSounds.ELECTRIC_SPHERES_STORM.get(), SoundSource.HOSTILE, this.position(),5f, 1f, 60, 11);
                 this.entityData.set(IS_LAUNCHING_ORBS, true);
                 instance.nextStage();
             }
@@ -1125,9 +1186,6 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 this.summonLessSpheresAround(this.position(),tick);
             }
 
-            if (tick % 60 == 0){
-                level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.ELECTRIC_HUM.get(), SoundSource.HOSTILE, 10f, 1f);
-            }
 
             if (tick > 200){
                 instance.nextStage();
@@ -1154,9 +1212,6 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
             }
 
-            if (tick % 60 == 0){
-                level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.ELECTRIC_HUM.get(), SoundSource.HOSTILE, 10f, 1f);
-            }
 
             if (tick > 200){
                 instance.nextStage();
@@ -1168,9 +1223,6 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     this.summonSpheresAround(25, tick / 10f * FDMathUtil.FPI / 9);
                 }
 
-                if (tick % 60 == 0 && tick <= 120){
-                    level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.ELECTRIC_HUM.get(), SoundSource.HOSTILE, 10f, 1f);
-                }
 
             }else if (tick < 350){
                 this.entityData.set(IS_LAUNCHING_ORBS,false);
@@ -1184,8 +1236,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     }
 
     private void summonLessSpheresAround(Vec3 pos,int tick){
+        float rndAngle = random.nextFloat() * FDMathUtil.FPI / 8 - FDMathUtil.FPI / 16;
         for (int i = 0; i < 4; i++) {
-            Vec3 v = new Vec3(1, 0, 0).yRot(i * FDMathUtil.FPI / 2 + tick / 2f * FDMathUtil.FPI / 8);
+            Vec3 v = new Vec3(1, 0, 0).yRot(i * FDMathUtil.FPI / 2 + tick / 2f * FDMathUtil.FPI / 8 + rndAngle);
             this.shootSphere(pos,v);
         }
     }
@@ -2338,7 +2391,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         return this.getRemainingHits() < this.getBossMaxHits() / 2f;
     }
 
-    private float enrageRadius(){
+    private float targetDetectionRadius(){
         return 39;
     }
 
@@ -2508,6 +2561,11 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         Vec3 b = entity.position().subtract(this.position()).multiply(1,0,1).normalize().add(0,0.5,0);
         entity.setDeltaMovement(b);
         entity.hasImpulse = true;
+    }
+
+    @Override
+    public boolean isPersistenceRequired() {
+        return true;
     }
 
 }

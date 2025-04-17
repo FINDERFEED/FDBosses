@@ -62,5 +62,14 @@
   },
   "electric_spheres_release": {
     "sounds": ["fdbosses:electric_spheres_release"]
+  },
+  "electric_spheres_start": {
+    "sounds": ["fdbosses:electric_spheres_start"]
+  },
+  "electric_sphere_storm": {
+    "sounds": ["fdbosses:electric_sphere_storm"]
+  },
+  "electric_sphere_storm_end": {
+    "sounds": ["fdbosses:electric_sphere_storm_end"]
   }
 }

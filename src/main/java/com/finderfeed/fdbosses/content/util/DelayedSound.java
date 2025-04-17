@@ -7,19 +7,13 @@ import net.minecraft.world.phys.Vec3;
 
 public class DelayedSound {
 
-    public SoundEvent soundEvent;
-    public SoundSource soundSource;
+    public ServerSoundInstance sound;
     public Vec3 pos;
-    public float volume;
-    public float pitch;
 
     private int remainingTicks = 0;
 
     public DelayedSound(SoundEvent soundEvent, SoundSource source, Vec3 pos, float volume, float pitch, int delay){
-        this.soundEvent = soundEvent;
-        this.soundSource = source;
-        this.volume = volume;
-        this.pitch = pitch;
+        this.sound = new ServerSoundInstance(soundEvent,source,volume,pitch);
         this.pos = pos;
         this.remainingTicks = delay;
     }

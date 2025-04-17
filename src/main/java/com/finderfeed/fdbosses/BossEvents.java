@@ -1,10 +1,12 @@
 package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
+import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossEffects;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -12,13 +14,77 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
+import net.neoforged.neoforge.event.level.ExplosionEvent;
+
+import java.util.Iterator;
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class BossEvents {
+
+    @SubscribeEvent
+    public static void preventArenaDestruction(BlockEvent.BreakEvent event){
+        LevelAccessor level = event.getLevel();
+        if (!level.isClientSide()){
+            BlockPos pos = event.getPos();
+            var spawners = level.getEntitiesOfClass(BossSpawnerEntity.class, new AABB(-100,-100,-100,100,100,100).move(pos.getCenter()));
+            for (BossSpawnerEntity bossSpawnerEntity : spawners){
+                if (!bossSpawnerEntity.canInteractWithBlockPos(pos)){
+                    event.setCanceled(true);
+                    return;
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void preventArenaDestruction(BlockEvent.EntityPlaceEvent event){
+        LevelAccessor level = event.getLevel();
+        if (!level.isClientSide()){
+            BlockPos pos = event.getPos();
+            var spawners = level.getEntitiesOfClass(BossSpawnerEntity.class, new AABB(-100,-100,-100,100,100,100).move(pos.getCenter()));
+            for (BossSpawnerEntity bossSpawnerEntity : spawners){
+                if (!bossSpawnerEntity.canInteractWithBlockPos(pos)){
+                    event.setCanceled(true);
+                    return;
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void preventArenaDestruction(ExplosionEvent.Detonate event){
+        Level level = event.getLevel();
+        if (!level.isClientSide()){
+
+
+            var list = event.getAffectedBlocks();
+
+            Iterator<BlockPos> blockPosIterator = list.listIterator();
+
+            var spawners = level.getEntitiesOfClass(BossSpawnerEntity.class, new AABB(-100, -100, -100, 100, 100, 100).move(event.getExplosion().center()));
+
+            while (blockPosIterator.hasNext()) {
+
+                BlockPos pos = blockPosIterator.next();
+                for (BossSpawnerEntity bossSpawnerEntity : spawners) {
+                    if (!bossSpawnerEntity.canInteractWithBlockPos(pos)) {
+                        blockPosIterator.remove();
+                        break;
+                    }
+                }
+
+
+            }
+        }
+    }
 
     @SubscribeEvent
     public static void onEntityAttack(AttackEntityEvent event){

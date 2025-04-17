@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.base;
 
 import com.finderfeed.fdbosses.BossClientPackets;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -86,4 +87,6 @@ public abstract class BossSpawnerEntity extends FDEntity {
     protected void addAdditionalSaveData(CompoundTag tag) {
         tag.putBoolean("active", this.isActive());
     }
+
+    public abstract boolean canInteractWithBlockPos(BlockPos blockPos);
 }

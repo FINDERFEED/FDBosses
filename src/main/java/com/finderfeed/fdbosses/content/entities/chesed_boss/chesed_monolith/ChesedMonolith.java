@@ -157,4 +157,5 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
         boolean deactivated = this.isDeactivated();
         tag.putBoolean("deactivated",deactivated);
     }
+
 }

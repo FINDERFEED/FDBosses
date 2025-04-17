@@ -82,4 +82,22 @@ public class ChesedBossSpawner extends BossSpawnerEntity {
     public void setActive(boolean state) {
         super.setActive(state);
     }
+
+    @Override
+    public boolean canInteractWithBlockPos(BlockPos blockPos) {
+
+        Vec3 v = blockPos.getCenter();
+        Vec3 pos = this.position();
+
+        double yDiff = v.y - pos.y;
+
+        var hdist = v.multiply(1,0,1).distanceTo(pos.multiply(1,0,1));
+
+
+        if (hdist < ChesedEntity.ARENA_RADIUS && yDiff > -2 && yDiff < ChesedEntity.ARENA_HEIGHT){
+            return false;
+        }
+
+        return true;
+    }
 }

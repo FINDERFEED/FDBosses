@@ -32,6 +32,9 @@ public class BossSounds {
     public static final Supplier<SoundEvent> GHOST_WEAPON_FLY_OUT = SOUNDS.register("ghost_weapon_fly_out",()->SoundEvent.createVariableRangeEvent(FDBosses.location("ghost_weapon_fly_out")));
     public static final Supplier<SoundEvent> LIGHTNING_RAY_PASS = SOUNDS.register("lightning_ray_pass",()->SoundEvent.createVariableRangeEvent(FDBosses.location("lightning_ray_pass")));
     public static final Supplier<SoundEvent> ELECTRIC_HUM = SOUNDS.register("electric_spheres_release",()->SoundEvent.createVariableRangeEvent(FDBosses.location("electric_spheres_release")));
+    public static final Supplier<SoundEvent> ELECTRIC_SPHERES_CAST = SOUNDS.register("electric_spheres_start",()->SoundEvent.createVariableRangeEvent(FDBosses.location("electric_spheres_start")));
+    public static final Supplier<SoundEvent> ELECTRIC_SPHERES_STORM = SOUNDS.register("electric_sphere_storm",()->SoundEvent.createVariableRangeEvent(FDBosses.location("electric_sphere_storm")));
+    public static final Supplier<SoundEvent> ELECTRIC_SPHERES_STORM_END = SOUNDS.register("electric_sphere_storm_end",()->SoundEvent.createVariableRangeEvent(FDBosses.location("electric_sphere_storm_end")));
 
 
 }
