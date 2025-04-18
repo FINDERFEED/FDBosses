@@ -77,5 +77,11 @@
   },
   "attack_ding": {
     "sounds": ["fdbosses:attack_ding"]
+  },
+  "chesed_ray_charge": {
+    "sounds": ["fdbosses:chesed_ray_charge"]
+  },
+  "chesed_ray_charge_fast": {
+    "sounds": ["fdbosses:chesed_ray_charge_fast"]
   }
 }

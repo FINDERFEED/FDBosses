@@ -71,6 +71,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
@@ -187,8 +188,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(ROCKFALL_ATTACK,this::rockfallAttack) // 1
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .attackListener(this::attackListener)
-                    .addAttack(0,BLOCKS_ATTACK)
-//                    .addAttack(0, ray)
+//                    .addAttack(0,BLOCKS_ATTACK)
+                    .addAttack(0, ray)
 //                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack(ELECTRIC_SPHERE_ATTACK)
 //                            .setNextAttack(rayOrBlocks)
@@ -941,13 +942,18 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             int rayAttackTick = 35;
             int rayAttackReloadTime = 30;
 
+            SoundEvent soundEvent = BossSounds.CHESED_RAY_CHARGE.get();
+
             if (this.isBelowHalfHP()){
+                soundEvent = BossSounds.CHESED_RAY_CHARGE_FAST.get();
                 rayAttackTick = 25;
                 animationSpeed = 1.5f;
                 rayAttackReloadTime = 20;
             }
 
             if (tick == 0) {
+
+                level().playSound(null,this.getX(),this.getY(),this.getZ(), soundEvent, SoundSource.HOSTILE, 5f ,1f);
 
                 this.getSystem().startAnimation("ATTACK", AnimationTicker.builder(CHESED_ATTACK)
                                 .setToNullTransitionTime(0)
