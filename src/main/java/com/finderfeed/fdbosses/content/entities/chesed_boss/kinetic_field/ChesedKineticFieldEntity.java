@@ -18,6 +18,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class ChesedKineticFieldEntity extends FDEntity {
 
+    public static final int KINETIC_FIELD_SQUARE_RADIUS = 5;
+
     public ChesedKineticFieldEntity(EntityType<?> type, Level level) {
         super(type, level);
         this.getSystem().startAnimation("SPAWN", AnimationTicker.builder(BossAnims.CHESED_KINETIC_FIELD_SPAWN).build());
@@ -56,6 +58,11 @@ public class ChesedKineticFieldEntity extends FDEntity {
             this.spawnSpearParticles(radius,-radius);
 
         }
+    }
+
+    @Override
+    public boolean isPickable() {
+        return true;
     }
 
     private void spawnSpearParticles(double offsetX, double offsetZ){
@@ -116,7 +123,7 @@ public class ChesedKineticFieldEntity extends FDEntity {
     }
 
     public double getSquareRadius(){
-        return 5;
+        return KINETIC_FIELD_SQUARE_RADIUS;
     }
 
 

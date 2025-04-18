@@ -38,6 +38,7 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
     @SerializableField
     private float damage;
 
+    public boolean softerSound = false;
 
     public ChesedOneShotVerticalRayEntity(EntityType<?> type, Level level) {
         super(type, level);
@@ -61,7 +62,7 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
 
             if (tickCount == this.getAttackPreparationTime()) {
 
-                level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.FAST_LIGHTNING_STRIKE.get(), SoundSource.HOSTILE, 1f, 1f);
+                level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.FAST_LIGHTNING_STRIKE.get(), SoundSource.HOSTILE, softerSound ? 0.25f : 1f, 1f);
 
                 this.rayParticleAndShake();
 

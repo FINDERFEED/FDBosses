@@ -117,6 +117,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     public static final String EARTHQUAKE_ATTACK = "equake";
     public static final String ROCKFALL_ATTACK = "rockfall";
     public static final String ELECTRIC_SPHERE_ATTACK = "esphere";
+    public static final String RAY_EVASION_ATTACK = "ray_evasion";
 
     private static final Vec3[] MONOLITH_SPAWN_OFFSETS = {
             new Vec3(10,0,10),
@@ -187,9 +188,10 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(EARTHQUAKE_ATTACK,this::earthquakeAttack) // 1
                     .registerAttack(ROCKFALL_ATTACK,this::rockfallAttack) // 1
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
+                    .registerAttack(RAY_EVASION_ATTACK,this::rayEvasionAttack) // 1
                     .attackListener(this::attackListener)
-//                    .addAttack(0,BLOCKS_ATTACK)
-                    .addAttack(0, ray)
+                    .addAttack(0,RAY_EVASION_ATTACK)
+//                    .addAttack(0, ray)
 //                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack(ELECTRIC_SPHERE_ATTACK)
 //                            .setNextAttack(rayOrBlocks)
@@ -660,6 +662,67 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }
     }
 
+    public boolean rayEvasionAttack(AttackInstance inst){
+
+        /*
+        ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(), resultingPos,
+                        BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRayDamage, 40, 30);
+         */
+
+        int stage = inst.stage;
+        int tick = inst.tick;
+
+        if (stage == 0){
+            if (tick == 0) {
+                this.trapPlayers(true);
+            }else if (tick > 20) {
+                inst.nextStage();
+            }
+        }else if (stage == 1){
+            if (tick == 0){
+                for (ChesedKineticFieldEntity kineticFieldEntity : this.findCages()){
+                    this.summonRayPattern1(kineticFieldEntity, kineticFieldEntity.getSquareRadius() - 0.5);
+                }
+            }else if (tick > 20){
+                inst.nextStage();
+            }
+        }else{
+            if (tick > 20) {
+                this.trapPlayers(false);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private List<ChesedKineticFieldEntity> findCages(){
+        return this.level().getEntitiesOfClass(ChesedKineticFieldEntity.class, new AABB(-ARENA_RADIUS,-1,-ARENA_RADIUS,ARENA_RADIUS,3,ARENA_RADIUS).move(this.position()));
+    }
+
+    private void summonRayPattern1(ChesedKineticFieldEntity kineticFieldEntity, double maxRad){
+
+        Vec3 pos = kineticFieldEntity.position();
+
+        this.summonOneShotAtPos(pos.add(-maxRad,0,-maxRad));
+        this.summonOneShotAtPos(pos.add(maxRad,0,-maxRad));
+        this.summonOneShotAtPos(pos.add(maxRad,0,maxRad));
+        this.summonOneShotAtPos(pos.add(-maxRad,0,maxRad));
+
+        this.summonOneShotAtPos(pos.add(maxRad,0,0));
+        this.summonOneShotAtPos(pos.add(0,0,maxRad));
+        this.summonOneShotAtPos(pos.add(-maxRad,0,0));
+        this.summonOneShotAtPos(pos.add(0,0,-maxRad));
+
+        this.summonOneShotAtPos(pos);
+
+    }
+
+    private void summonOneShotAtPos(Vec3 pos){
+        ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(), pos,
+                BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRayDamage, 40, 30);
+        entity.softerSound = true;
+    }
 
     public boolean finalBOOMAttack(AttackInstance instance){
 
