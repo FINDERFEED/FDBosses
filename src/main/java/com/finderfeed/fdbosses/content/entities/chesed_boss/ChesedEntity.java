@@ -188,9 +188,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(EARTHQUAKE_ATTACK,this::earthquakeAttack) // 1
                     .registerAttack(ROCKFALL_ATTACK,this::rockfallAttack) // 1
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
-                    .registerAttack(RAY_EVASION_ATTACK,this::rayEvasionAttack) // 1
+                    .registerAttack(RAY_EVASION_ATTACK,this::rayEvasionAttack)
                     .attackListener(this::attackListener)
-                    .addAttack(0,RAY_EVASION_ATTACK)
                     .addAttack(0, ray)
                     .addAttack(1,AttackOptions.builder()
                             .addAttack(ELECTRIC_SPHERE_ATTACK)
@@ -207,8 +206,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .addAttack(4,AttackOptions.builder()
                             .addAttack(ROLL_ATTACK)
                             .build())
-                    .addAttack(5, ray)
-                    .addAttack(6,FINAL_ATTACK)
+                    .addAttack(5, RAY_EVASION_ATTACK)
+                    .addAttack(6, FINAL_ATTACK)
             ;
 
         }
@@ -354,7 +353,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             double ey = entity.getY();
             if (ey - y > 3){
                 if (entity.tickCount % 30 == 0) {
-                    if (entity.hurt(BossDamageSources.chesedAttack(this), 4)) {
+                    float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.electrifiedAirDamage;
+                    if (entity.hurt(BossDamageSources.chesedAttack(this), damage)) {
 
                     }
                 }
@@ -393,6 +393,13 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         if (this.getTarget() == null){
             return AttackAction.WAIT;
         }
+
+        if (!this.isBelowHalfHP()){
+            if (attackName.equals(RAY_EVASION_ATTACK)){
+                return AttackAction.SKIP;
+            }
+        }
+
         this.doBlinding = true;
         return AttackAction.PROCEED;
     }

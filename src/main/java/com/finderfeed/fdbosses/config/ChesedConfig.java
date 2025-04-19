@@ -8,10 +8,16 @@ public class ChesedConfig  {
     public int chesedMaxHits = 10;
 
     @ConfigValue
+    public float electrifiedAirDamage = 4f;
+
+    @ConfigValue
     public float electricSphereDamage = 10f;
 
     @ConfigValue
     public float rockfallRayDamage = 10f;
+
+    @ConfigValue
+    public float kineticFieldRayDamage = 10f;
 
     @ConfigValue
     public float rockfallRockDamage = 5f;

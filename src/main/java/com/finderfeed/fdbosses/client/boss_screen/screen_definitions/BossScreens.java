@@ -26,6 +26,12 @@ public class BossScreens {
                         Component.translatable("fdbosses.skills.chesed.mightiness_description")
                 ))
                 .addSkill(new BossInfo(
+                        FDBosses.location("textures/mob_effect/shocked.png"),
+                        Component.translatable("fdbosses.skills.chesed.electrified_air"),
+                        Component.translatable("fdbosses.skills.chesed.electrified_air_stats"),
+                        Component.translatable("fdbosses.skills.chesed.electrified_air_description")
+                ))
+                .addSkill(new BossInfo(
                         FDBosses.location("textures/gui/skills/chesed/monoliths.png"),
                         Component.translatable("fdbosses.skills.chesed.monoliths"),
                         Component.translatable("fdbosses.skills.chesed.monoliths_stats"),
@@ -72,6 +78,12 @@ public class BossScreens {
                         Component.translatable("fdbosses.skills.chesed.rockfall"),
                         Component.translatable("fdbosses.skills.chesed.rockfall_stats"),
                         Component.translatable("fdbosses.skills.chesed.rockfall_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/gui/skills/chesed/missing.png"),
+                        Component.translatable("fdbosses.skills.chesed.kinetic_field"),
+                        Component.translatable("fdbosses.skills.chesed.kinetic_field_stats"),
+                        Component.translatable("fdbosses.skills.chesed.kinetic_field_description")
                 ))
                 .addSkill(new BossInfo(
                         FDBosses.location("textures/gui/skills/chesed/final.png"),

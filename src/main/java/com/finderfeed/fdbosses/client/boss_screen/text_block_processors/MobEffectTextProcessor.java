@@ -14,11 +14,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.MobEffectTextureManager;
+import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectInstance;
 
 import java.util.HashMap;
 import java.util.List;
@@ -62,8 +65,48 @@ public class MobEffectTextProcessor extends TextBlockProcessor {
 
         ImageTextEntry imageTextEntry = new ImageTextEntry(imageInText,textScale,interaction);
 
-        SimpleTextEntry text = new SimpleTextEntry(effect.getDisplayName().copy().withStyle(Style.EMPTY.withColor(color).withUnderlined(true)),textScale,renderShadow,textColor, interaction);
+
+        MutableComponent displayName = effect.getDisplayName().copy();
+
+        if (arguments.containsKey("level")){
+            int level = Integer.parseInt(arguments.get("level"));
+            String s = this.levelToString(level);
+            if (!s.isEmpty()){
+                displayName = displayName.append(" " + s);
+            }
+        }
+
+        SimpleTextEntry text = new SimpleTextEntry(displayName.withStyle(Style.EMPTY.withColor(color).withUnderlined(true)),textScale,renderShadow,textColor, interaction);
 
         return List.of(imageTextEntry,text);
+    }
+
+    private String levelToString(int level){
+        switch (level){
+            case 1 -> {
+                return "II";
+            }
+            case 2 -> {
+                return "III";
+            }
+            case 3 -> {
+                return "IV";
+            }
+            case 4 -> {
+                return "V";
+            }
+            case 5 -> {
+                return "VI";
+            }
+            case 6 -> {
+                return "VII";
+            }
+            case 7 -> {
+                return "VIII";
+            }
+            default -> {
+                return "";
+            }
+        }
     }
 }
