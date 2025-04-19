@@ -396,7 +396,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
         if (!this.isBelowHalfHP()){
             if (attackName.equals(RAY_EVASION_ATTACK)){
-                return AttackAction.SKIP;
+//                return AttackAction.SKIP;
             }
         }
 
@@ -677,12 +677,13 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         if (stage == 0){
             if (tick == 0) {
                 this.trapPlayers(true);
+                doBlinding = false;
             }else if (tick > 20) {
                 inst.nextStage();
             }
         }else if (stage == 1){
 
-            int rate = 60;
+            int rate = 40;
 
             if (tick % rate == 0){
                 for (ChesedKineticFieldEntity kineticFieldEntity : this.findCages()){
@@ -694,6 +695,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }else{
             if (tick > 20) {
                 this.trapPlayers(false);
+                doBlinding = true;
                 return true;
             }
         }
@@ -759,19 +761,20 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             double l = 2 * Math.PI * maxRad;
             double angleB = 4 / l * Math.PI;
 
-            for (double a = 0; a < Math.PI * 2;a+=angleB){
+            for (double a = 0; a < Math.PI * 2 - angleB;a+=angleB){
                 Vec3 b = new Vec3(maxRad,0,0).yRot((float)a);
                 this.summonOneShotAtPos(pos.add(b));
             }
 
+            this.summonOneShotAtPos(pos);
 
         }
     }
 
     private void summonOneShotAtPos(Vec3 pos){
         ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(), pos,
-                BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRayDamage, 40, 40);
-        entity.setDamageRadius(2f);
+                BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRayDamage, 40, 30);
+        entity.setDamageRadius(1.75f);
         entity.softerSound = true;
     }
 
