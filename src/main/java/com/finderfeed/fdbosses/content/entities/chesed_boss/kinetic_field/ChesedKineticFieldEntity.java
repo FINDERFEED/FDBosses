@@ -7,6 +7,7 @@ import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOpti
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -96,7 +97,7 @@ public class ChesedKineticFieldEntity extends FDEntity {
 
     }
 
-    public VoxelShape getCollisionShape(Player player){
+    public VoxelShape getCollisionShape(Entity player){
 
         double rad = this.getSquareRadius();
 

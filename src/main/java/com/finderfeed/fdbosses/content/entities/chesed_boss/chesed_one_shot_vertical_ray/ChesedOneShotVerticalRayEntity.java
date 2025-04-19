@@ -38,6 +38,9 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
     @SerializableField
     private float damage;
 
+    @SerializableField
+    private float damageRadius = 2.5f;
+
     public boolean softerSound = false;
 
     public ChesedOneShotVerticalRayEntity(EntityType<?> type, Level level) {
@@ -181,14 +184,11 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
                 .color(150,230,255)
                 .build(),p,60);
 
-        //TODO: more gentle sound
-
     }
 
 
     private void doDamage(){
 
-        float damageRadius = 2.5f;
         AABB box = new AABB(-damageRadius,0,-damageRadius,damageRadius,this.getHeight(),damageRadius).move(this.position());
         var list = level().getEntitiesOfClass(LivingEntity.class,box, BossUtil.entityInVerticalRadiusPredicate(this.position(),damageRadius));
 
@@ -200,6 +200,14 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
 
         }
 
+    }
+
+    public float getDamageRadius() {
+        return damageRadius;
+    }
+
+    public void setDamageRadius(float damageRadius) {
+        this.damageRadius = damageRadius;
     }
 
     public float getHeight() {

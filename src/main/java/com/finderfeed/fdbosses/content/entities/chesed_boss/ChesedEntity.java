@@ -664,11 +664,6 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     public boolean rayEvasionAttack(AttackInstance inst){
 
-        /*
-        ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(), resultingPos,
-                        BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRayDamage, 40, 30);
-         */
-
         int stage = inst.stage;
         int tick = inst.tick;
 
@@ -679,11 +674,14 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 inst.nextStage();
             }
         }else if (stage == 1){
-            if (tick == 0){
+
+            int rate = 60;
+
+            if (tick % rate == 0){
                 for (ChesedKineticFieldEntity kineticFieldEntity : this.findCages()){
-                    this.summonRayPattern1(kineticFieldEntity, kineticFieldEntity.getSquareRadius() - 0.5);
+                    this.summonRayPattern(kineticFieldEntity, kineticFieldEntity.getSquareRadius() - 0.5, (tick / rate) % 4);
                 }
-            }else if (tick > 20){
+            }else if (tick > 300){
                 inst.nextStage();
             }
         }else{
@@ -700,27 +698,73 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         return this.level().getEntitiesOfClass(ChesedKineticFieldEntity.class, new AABB(-ARENA_RADIUS,-1,-ARENA_RADIUS,ARENA_RADIUS,3,ARENA_RADIUS).move(this.position()));
     }
 
-    private void summonRayPattern1(ChesedKineticFieldEntity kineticFieldEntity, double maxRad){
+    //0 - center and corners
+    //1 - thunder cross split attack
+    //2 - square
+    //3 - circle
+    private void summonRayPattern(ChesedKineticFieldEntity kineticFieldEntity, double maxRad, int pattern){
 
         Vec3 pos = kineticFieldEntity.position();
 
-        this.summonOneShotAtPos(pos.add(-maxRad,0,-maxRad));
-        this.summonOneShotAtPos(pos.add(maxRad,0,-maxRad));
-        this.summonOneShotAtPos(pos.add(maxRad,0,maxRad));
-        this.summonOneShotAtPos(pos.add(-maxRad,0,maxRad));
+        if (pattern == 0) {
 
-        this.summonOneShotAtPos(pos.add(maxRad,0,0));
-        this.summonOneShotAtPos(pos.add(0,0,maxRad));
-        this.summonOneShotAtPos(pos.add(-maxRad,0,0));
-        this.summonOneShotAtPos(pos.add(0,0,-maxRad));
+            this.summonOneShotAtPos(pos.add(-maxRad, 0, -maxRad));
+            this.summonOneShotAtPos(pos.add(maxRad, 0, -maxRad));
+            this.summonOneShotAtPos(pos.add(maxRad, 0, maxRad));
+            this.summonOneShotAtPos(pos.add(-maxRad, 0, maxRad));
 
-        this.summonOneShotAtPos(pos);
+            this.summonOneShotAtPos(pos.add(maxRad, 0, 0));
+            this.summonOneShotAtPos(pos.add(0, 0, maxRad));
+            this.summonOneShotAtPos(pos.add(-maxRad, 0, 0));
+            this.summonOneShotAtPos(pos.add(0, 0, -maxRad));
 
+            this.summonOneShotAtPos(pos);
+        }else if (pattern == 1){
+
+            this.summonOneShotAtPos(pos.add(-maxRad/2,0,-maxRad/2));
+            this.summonOneShotAtPos(pos.add(maxRad/2,0,-maxRad/2));
+            this.summonOneShotAtPos(pos.add(maxRad/2,0,maxRad/2));
+            this.summonOneShotAtPos(pos.add(-maxRad/2,0,maxRad/2));
+
+            this.summonOneShotAtPos(pos.add(-maxRad, 0, -maxRad));
+            this.summonOneShotAtPos(pos.add(maxRad, 0, -maxRad));
+            this.summonOneShotAtPos(pos.add(maxRad, 0, maxRad));
+            this.summonOneShotAtPos(pos.add(-maxRad, 0, maxRad));
+
+            this.summonOneShotAtPos(pos);
+
+        }else if (pattern == 2){
+
+            this.summonOneShotAtPos(pos.add(-maxRad/2,0,-maxRad/2));
+            this.summonOneShotAtPos(pos.add(maxRad/2,0,-maxRad/2));
+            this.summonOneShotAtPos(pos.add(maxRad/2,0,maxRad/2));
+            this.summonOneShotAtPos(pos.add(-maxRad/2,0,maxRad/2));
+
+
+            this.summonOneShotAtPos(pos.add(maxRad/2, 0, 0));
+            this.summonOneShotAtPos(pos.add(0, 0, maxRad/2));
+            this.summonOneShotAtPos(pos.add(-maxRad/2, 0, 0));
+            this.summonOneShotAtPos(pos.add(0, 0, -maxRad/2));
+
+        }else if (pattern == 3){
+
+
+            double l = 2 * Math.PI * maxRad;
+            double angleB = 4 / l * Math.PI;
+
+            for (double a = 0; a < Math.PI * 2;a+=angleB){
+                Vec3 b = new Vec3(maxRad,0,0).yRot((float)a);
+                this.summonOneShotAtPos(pos.add(b));
+            }
+
+
+        }
     }
 
     private void summonOneShotAtPos(Vec3 pos){
         ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(), pos,
-                BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRayDamage, 40, 30);
+                BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRayDamage, 40, 40);
+        entity.setDamageRadius(2f);
         entity.softerSound = true;
     }
 
