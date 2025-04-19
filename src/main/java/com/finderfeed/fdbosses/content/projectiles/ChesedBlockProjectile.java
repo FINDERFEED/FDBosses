@@ -53,8 +53,6 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
     @SerializableField
     private float damage;
 
-    private UUID target;
-
     public ProjectileMovementPath movementPath = null;
     private int dropParticlesTime = 0;
 
@@ -79,21 +77,6 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
                 if (movementPath.isFinished()){
                     movementPath.tick(this);
                     movementPath = movementPath.getNext();
-
-                    LivingEntity target = this.getTarget((ServerLevel) level());
-                    if (target != null){
-
-                        Vec3 tpos = this.targetGroundPosition(target);
-                        Vec3 b = tpos.subtract(this.position());
-                        Vec3 h = b.multiply(1,0,1);
-                        Vec3 targetPos = tpos.add(h.normalize().reverse().multiply(2.5,0,2.5));
-                        float speedMod = 0.12f;
-                        Vec3 speed = targetPos.subtract(this.position()).multiply(speedMod,speedMod,speedMod);
-                        this.setDeltaMovement(speed);
-
-                    }
-
-
                 }
             }
 
@@ -374,18 +357,6 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
     }
 
 
-    public LivingEntity getTarget(ServerLevel serverLevel){
-        if (this.target == null) return null;
-        if (serverLevel.getEntity(this.target) instanceof LivingEntity l){
-            return l;
-        }else{
-            return null;
-        }
-    }
-
-    public void setTarget(LivingEntity target){
-        this.target = target.getUUID();
-    }
 
     @Override
     public void lerpTo(double x, double y, double z, float p_19899_, float p_19900_, int p_19901_) {
@@ -412,9 +383,6 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
         }
         tag.putFloat("rotationSpeed",this.getRotationSpeed());
         tag.put("state", NbtUtils.writeBlockState(this.getBlockState()));
-        if (target != null){
-            tag.putUUID("target",this.target);
-        }
         this.autoSave(tag);
     }
 
@@ -426,10 +394,6 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
         if (tag.contains("path")){
             this.movementPath = new ProjectileMovementPath();
             this.movementPath.autoLoad("path",tag);
-        }
-
-        if (tag.contains("target")){
-            this.target = tag.getUUID("target");
         }
 
         this.setRotationSpeed(tag.getFloat("rotationSpeed"));
