@@ -82,6 +82,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -156,6 +157,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     private List<DelayedSound> delayedSounds = new ArrayList<>();
 
     private RepeatedSound repeatedSound = null;
+
+    private boolean dropLoot = true;
 
     public ChesedEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
@@ -396,7 +399,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
         if (!this.isBelowHalfHP()){
             if (attackName.equals(RAY_EVASION_ATTACK)){
-//                return AttackAction.SKIP;
+                return AttackAction.SKIP;
             }
         }
 
@@ -2321,6 +2324,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
                 ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(), resultingPos,
                         BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRayDamage, 40, 30);
+                entity.setDamageRadius(2f);
 
             }
 
@@ -2353,6 +2357,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     @Override
     public void die(DamageSource p_21014_) {
+        this.dropLoot = false;
         super.die(p_21014_);
         if (!level().isClientSide){
 
@@ -2418,6 +2423,20 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                             FDLibCalls.sendScreenEffect(serverPlayer, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0f, 0f, 0f, 1f), 5, 20, 10);
                         }
                     }
+                }else if (this.deathTime == CHESED_DEATH.get().getAnimTime()){
+
+                    dropLoot = true;
+                    this.dropAllDeathLoot((ServerLevel) level(),level().damageSources().generic());
+                    if (this.captureDrops() != null) {
+                        for (ItemEntity entity : this.captureDrops()) {
+
+                            Vec3 rnd = new Vec3(1,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat());
+
+                            entity.setDeltaMovement(rnd.add(0,0.25,0));
+
+                        }
+                    }
+
                 }
             }else{
                 if (this.deathTime < 30) {
@@ -2434,6 +2453,11 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 }
             }
         }
+    }
+
+    @Override
+    protected boolean shouldDropLoot() {
+        return this.dropLoot;
     }
 
     private void deathExplosionParticles(){
