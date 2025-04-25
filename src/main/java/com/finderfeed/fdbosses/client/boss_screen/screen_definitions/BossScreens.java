@@ -80,7 +80,7 @@ public class BossScreens {
                         Component.translatable("fdbosses.skills.chesed.rockfall_description")
                 ))
                 .addSkill(new BossInfo(
-                        FDBosses.location("textures/gui/skills/chesed/missing.png"),
+                        FDBosses.location("textures/gui/skills/chesed/kinetic_field.png"),
                         Component.translatable("fdbosses.skills.chesed.kinetic_field"),
                         Component.translatable("fdbosses.skills.chesed.kinetic_field_stats"),
                         Component.translatable("fdbosses.skills.chesed.kinetic_field_description")

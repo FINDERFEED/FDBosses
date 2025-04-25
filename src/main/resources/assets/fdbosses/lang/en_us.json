@@ -24,7 +24,7 @@
   "fdbosses.close_skill_info": "Click empty space to close",
   "fdbosses.bosses.description.chesed": "A creature born out of rocks corroded by sculk. Wields enormous magic power.",
   "fdbosses.skills.chesed.mightiness": "Mightiness",
-  "fdbosses.skills.chesed.mightiness_description": "Chesed cannot be hurt directly.\n\nAll damage inflicted by Chesed cannot be lowered by any resistances.\n\nGives all combatants {{(fdbosses:effect)id=minecraft:night_vision}} while alive.\n\nIf a player looks away from Chesed, that player is inflicted with {{(fdbosses:effect)id=fdbosses:chesed_gaze}}.",
+  "fdbosses.skills.chesed.mightiness_description": "Chesed cannot be hurt directly.\n\nAll damage inflicted by Chesed cannot be lowered by any resistances.\n\nGives all combatants {{(fdbosses:effect)id=minecraft:night_vision}} while alive.\n\nIf a player looks away from Chesed, that player is inflicted with {{(fdbosses:effect)id=fdbosses:chesed_gaze}}.\n\nSecond phase begins when Chesed is below half hp.",
   "fdbosses.skills.chesed.blocks": "Block Barrage",
   "fdbosses.skills.chesed.blocks_description": "Tears out blocks from the earth and hurls them onto target.",
   "fdbosses.skills.chesed.earthquake": "Earthquake",
@@ -75,5 +75,5 @@
   "fdbosses.skills.chesed.electrified_air_stats": "Air: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=electrifiedAirDamage}}",
   "fdbosses.skills.chesed.kinetic_field": "Kinetic Field",
   "fdbosses.skills.chesed.kinetic_field_stats": "Lightnings: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=kineticFieldRayDamage}}",
-  "fdbosses.skills.chesed.kinetic_field_description": "Traps players in a kinetic field that doesn't allow them to escape. Periodically summons lightnings in all kinetic fields."
+  "fdbosses.skills.chesed.kinetic_field_description": "Uses this attack only on second phase.\n\nTraps players in a kinetic field that doesn't allow them to escape.\n\nPeriodically summons lightnings in all kinetic fields."
 }

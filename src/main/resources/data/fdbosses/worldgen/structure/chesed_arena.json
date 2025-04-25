@@ -1,6 +1,7 @@
 {
   "type": "minecraft:jigsaw",
   "biomes": "#minecraft:is_overworld",
+  "liquid_settings": "ignore_waterlogging",
   "size": 4,
   "start_height": {
     "type": "minecraft:uniform",
@@ -12,7 +13,7 @@
     }
   },
   "start_pool": "fdbosses:chesed_arena",
-  "step": "top_layer_modification",
+  "step": "underground_structures",
   "terrain_adaptation": "encapsulate",
   "max_distance_from_center": 115,
   "use_expansion_hack": false,
