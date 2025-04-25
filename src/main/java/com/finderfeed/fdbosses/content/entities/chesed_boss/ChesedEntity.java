@@ -160,6 +160,10 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     private boolean dropLoot = true;
 
+    private int secondPhaseTicker = 0;
+
+    private boolean secondPhaseAnimPlayed = false;
+
     public ChesedEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
         if (serverModel == null) {
@@ -294,7 +298,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 this.blindCombatants();
             }
 
-            if (bossInitializer.isFinished() && !this.isDeadOrDying()) {
+            if (bossInitializer.isFinished() && !this.isDeadOrDying() && secondPhaseTicker <= 0) {
                 this.chain.tick();
 
                 this.electrifiedAir();
@@ -327,6 +331,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 this.setRolling(false);
                 this.setDrainingMonoliths(false);
             }
+
+            this.tickSecondPhaseStart();
+
         }else{
 
             if (this.isDrainingFromMonoliths()){
@@ -347,6 +354,112 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 }
             }
         }
+    }
+
+    private void tickSecondPhaseStart(){
+
+        if (!bossInitializer.isFinished() || tickCount < 350) return;
+
+        int tickerTime = 600;
+
+        if (!secondPhaseAnimPlayed && (this.isBelowHalfHP() || true)){
+            this.secondPhaseTicker = tickerTime;
+            secondPhaseAnimPlayed = true;
+            lookingAtTarget = false;
+        }
+
+        if (this.secondPhaseTicker <= 0) return;
+
+        Vec3 hlook = this.getLookAngle().multiply(1,0,1).normalize();
+
+
+        int firstRayOffset = 29;
+        int perRayOffset = 11;
+        float distmult = 37;
+        float heighton = 23;
+
+        if (this.secondPhaseTicker == tickerTime){
+
+            this.stopAllNonIdleAnimations();
+
+            this.getSystem().startAnimation("PREPARE_SECOND_PHASE", AnimationTicker.builder(CHESED_SECOND_PHASE_PREPARE)
+                            .setToNullTransitionTime(0)
+                    .build());
+
+        }else if (this.secondPhaseTicker == tickerTime - 20){
+            this.getSystem().startAnimation("SECOND_PHASE_START", AnimationTicker.builder(CHESED_SECOND_PHASE_STRIKE_WALLS)
+                    .setToNullTransitionTime(0)
+                    .build());
+        }else if (this.secondPhaseTicker == tickerTime - firstRayOffset){
+
+            Vec3 v = hlook.yRot((FDMathUtil.FPI / 4 + FDMathUtil.FPI / 2))
+                    .multiply(distmult,0,distmult)
+                    .add(0,heighton,0);
+            this.decorativeRay(v.add(this.position()));
+
+        }else if (this.secondPhaseTicker == tickerTime - firstRayOffset - perRayOffset){
+
+            Vec3 v = hlook.yRot((FDMathUtil.FPI / 4 + FDMathUtil.FPI))
+                    .multiply(distmult,0,distmult)
+                    .add(0,heighton,0);
+            this.decorativeRay(v.add(this.position()));
+
+        }else if (this.secondPhaseTicker == tickerTime - firstRayOffset - perRayOffset * 2){
+
+            Vec3 v = hlook.yRot((FDMathUtil.FPI / 4 + FDMathUtil.FPI * 3 / 2))
+                    .multiply(distmult,0,distmult)
+                    .add(0,heighton,0);
+            this.decorativeRay(v.add(this.position()));
+
+        }else if (this.secondPhaseTicker == tickerTime - firstRayOffset - perRayOffset * 3){
+
+            Vec3 v = hlook.yRot(FDMathUtil.FPI / 4)
+                    .multiply(distmult,0,distmult)
+                    .add(0,heighton,0);
+            this.decorativeRay(v.add(this.position()));
+
+        }
+
+        secondPhaseTicker = Mth.clamp(secondPhaseTicker - 1,0, Integer.MAX_VALUE);
+    }
+
+    private void decorativeRay(Vec3 end){
+
+        Vec3 start = this.position().add(0,1.5,0);
+
+        Vec3 look = start.subtract(end).normalize();
+
+        ChesedRayOptions options = ChesedRayOptions.builder()
+                .time(2,2,5)
+                .lightningColor(90, 180, 255)
+                .color(100, 255, 255)
+                .end(end)
+                .width(0.8f)
+                .build();
+        FDLibCalls.sendParticles((ServerLevel) level(),options,start,120);
+
+        FDLibCalls.sendParticles((ServerLevel) level(),BallParticleOptions.builder()
+                .size(25f)
+                .scalingOptions(1,0,2)
+                .color(150,230,255)
+                .build(),end,200);
+
+        BossUtil.chesedRaySmoke((ServerLevel) level(),end,look,120);
+
+        PositionedScreenShakePacket.send((ServerLevel) level(),FDShakeData.builder()
+                .frequency(5)
+                .amplitude(5f)
+                .inTime(0)
+                .stayTime(0)
+                .outTime(5)
+                .build(),end,120);
+
+        BossUtil.chesedRayExplosion((ServerLevel) level(),end,look,100,15,0.75f);
+
+        this.summonStonesAfterRayAttack(30, look.multiply(1,0,1).normalize(),end);
+
+        ((ServerLevel)level()).playSound(null,end.x,end.y,end.z, BossSounds.CHESED_RAY.get(), SoundSource.HOSTILE,50f,1f);
+
     }
 
     private void electrifiedAir(){
@@ -2371,13 +2484,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
             this.lookingAtTarget = false;
 
-            for (var ticker : new ArrayList<>(this.getSystem().getTickers().keySet())) {
-
-                if (ticker.equals("IDLE")) continue;
-
-                this.getSystem().stopAnimation(ticker);
-
-            }
+            this.stopAllNonIdleAnimations();
 
 
             this.getSystem().startAnimation("DEATH", AnimationTicker.builder(CHESED_DEATH)
@@ -2400,6 +2507,16 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
 //            level().playSound(null, this.getX(),this.getY(),this.getZ(), BossSounds.CHESED_DEATH.get(), SoundSource.HOSTILE, 5f, 1f);
 
+
+        }
+    }
+
+    private void stopAllNonIdleAnimations(){
+        for (var ticker : new ArrayList<>(this.getSystem().getTickers().keySet())) {
+
+            if (ticker.equals("IDLE")) continue;
+
+            this.getSystem().stopAnimation(ticker);
 
         }
     }
@@ -2594,12 +2711,17 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         tag.putInt("bossHealth",this.remainingHits);
         this.bossInitializer.autoSave("initializer",tag);
         tag.putBoolean("alreadySpawned",alreadySpawned);
+        tag.putInt("secondPhaseTicker",this.secondPhaseTicker);
+        tag.putBoolean("secondPhaseBegun",this.secondPhaseAnimPlayed);
         super.addAdditionalSaveData(tag);
     }
 
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
+
+        this.secondPhaseTicker = tag.getInt("secondPhaseTicker");
+        this.secondPhaseAnimPlayed = tag.getBoolean("secondPhaseBegun");
 
         this.alreadySpawned = tag.getBoolean("alreadySpawned");
 

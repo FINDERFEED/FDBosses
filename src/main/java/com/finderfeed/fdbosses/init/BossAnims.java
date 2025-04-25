@@ -27,6 +27,12 @@ public class BossAnims {
     public static DeferredHolder<Animation,Animation> CHESED_ROLL_UP_END = ANIMATIONS.register("chesed_roll_up_end", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
     });
+    public static DeferredHolder<Animation,Animation> CHESED_SECOND_PHASE_PREPARE = ANIMATIONS.register("chesed_second_phase_prepare", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
+    public static DeferredHolder<Animation,Animation> CHESED_SECOND_PHASE_STRIKE_WALLS = ANIMATIONS.register("chesed_second_phase_strike_walls", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
+    });
     public static DeferredHolder<Animation,Animation> CHESED_ROLL_UP_JUST_END /*_ALREADY YOU_ROLLING_BASTARD*/ = ANIMATIONS.register("chesed_roll_up_just_end", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"));
     });
