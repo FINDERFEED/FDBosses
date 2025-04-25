@@ -181,6 +181,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }
         if (!level.isClientSide) {
 
+            this.remainingHits = 5;
+
 
             AttackOptions ray = AttackOptions.builder()
                     .setPreAttack(CRYSTALS_ATTACK)
@@ -367,7 +369,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
         if (!bossInitializer.isFinished() || tickCount < 250) return;
 
-        int tickerTime = 200;
+        int tickerTime = 210;
 
         if (!secondPhaseAnimPlayed && this.isBelowHalfHP()){
             this.secondPhaseTicker = tickerTime;
@@ -375,6 +377,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             lookingAtTarget = false;
             this.killCrystals();
             this.setRolling(false);
+            this.entityData.set(IS_LAUNCHING_ORBS,false);
+            this.chain.reset();
         }
 
         if (this.secondPhaseTicker <= 0) return;
@@ -382,6 +386,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         Vec3 hlook = this.getLookAngle().multiply(1,0,1).normalize();
 
 
+        int fullOffset = 20;
         int firstRayOffset = 39;
         int perRayOffset = 11;
         float distmult = 37;
@@ -393,30 +398,71 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
             this.getSystem().startAnimation("PREPARE_SECOND_PHASE", AnimationTicker.builder(CHESED_SECOND_PHASE_PREPARE)
                             .setToNullTransitionTime(0)
+                            .startTime(2)
+                            .setSpeed(0.75f)
                     .build());
 
-            Vec3 pos = this.position()
-                    .add(0,2,0)
-                    .add(hlook.multiply(4,0,4));
-
-            this.sendPacketToCombatants(new SendScreenEffectPacket<>(new ScreenColorData(0f,0f,0f,1f),FDScreenEffects.SCREEN_COLOR.get(),0,10,20));
 
 
-            CutsceneData cutsceneData = new CutsceneData()
-                    .time(60)
-                    .timeEasing(EasingType.EASE_IN_OUT)
-                    .stopMode(CutsceneData.StopMode.UNSTOPPABLE)
-                    .addCameraPos(new CameraPos(pos,hlook.reverse().add(0,-0.2,0)))
-                    .addCameraPos(new CameraPos(pos.add(hlook.multiply(20,0,20)),hlook.reverse().add(0,0.1,0)));
+            this.sendPacketToCombatants(new SendScreenEffectPacket<>(new ScreenColorData(0f,0f,0f,1f),FDScreenEffects.SCREEN_COLOR.get(),0,fullOffset,20));
 
-            this.sendPacketToCombatants(new StartCutscenePacket(cutsceneData));
 
-        }else if (this.secondPhaseTicker == tickerTime - 30){
+
+
+        }else if (this.secondPhaseTicker <= tickerTime - fullOffset && this.secondPhaseTicker >= tickerTime - fullOffset - 10){
+
+            int count = 3;
+
+            float angle = FDMathUtil.FPI * 2 / count;
+
+            Vec3 center = this.position();
+
+            for (int i = 0; i < count; i++) {
+                float a = angle * i;
+                Vec3 v = new Vec3(3,0,0).yRot(a);
+                Vec3 ppos = this.position().add(v);
+                FDLibCalls.sendParticles(((ServerLevel) level()),BallParticleOptions.builder()
+                        .size(0.5f)
+                        .color(100 + random.nextInt(50), 255, 255)
+                        .particleProcessor(new CompositeParticleProcessor(
+                                new CircleParticleProcessor(center,true,true,1),
+                                new SetParticleSpeedProcessor(new Vec3(0,0.075,0))
+                        ))
+                        .scalingOptions(10,10,0)
+                        .build(),ppos,ARENA_RADIUS * 2);
+
+            }
+            if (this.secondPhaseTicker == tickerTime - fullOffset) {
+                Vec3 pos = this.position()
+                        .add(0, 3, 0)
+                        .add(hlook.multiply(4, 0, 4));
+
+                this.sendPacketToCombatants(new DefaultShakePacket(FDShakeData.builder()
+                        .stayTime(30)
+                        .inTime(2)
+                        .outTime(0)
+                        .amplitude(0.2f)
+                        .build()));
+
+                this.getSystem().startAnimation("PREPARE_SECOND_PHASE", AnimationTicker.builder(CHESED_SECOND_PHASE_PREPARE)
+                        .setToNullTransitionTime(0)
+                        .build());
+
+                CutsceneData cutsceneData = new CutsceneData()
+                        .time(60)
+                        .timeEasing(EasingType.EASE_IN_OUT)
+                        .stopMode(CutsceneData.StopMode.UNSTOPPABLE)
+                        .addCameraPos(new CameraPos(pos, hlook.reverse().add(0, -0.3, 0)))
+                        .addCameraPos(new CameraPos(pos.add(hlook.multiply(20, 0, 20)), hlook.reverse().add(0, 0.1, 0)));
+
+                this.sendPacketToCombatants(new StartCutscenePacket(cutsceneData));
+            }
+        } else if (this.secondPhaseTicker == tickerTime - 30 - fullOffset){
             this.getSystem().startAnimation("SECOND_PHASE_START", AnimationTicker.builder(CHESED_SECOND_PHASE_STRIKE_WALLS)
                     .setToNullTransitionTime(0)
                     .build());
 
-        }else if (this.secondPhaseTicker == tickerTime - firstRayOffset){
+        }else if (this.secondPhaseTicker == tickerTime - firstRayOffset - fullOffset){
 
             Vec3 v = hlook.yRot((FDMathUtil.FPI / 4 + FDMathUtil.FPI / 2))
                     .multiply(distmult,0,distmult)
@@ -430,7 +476,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .amplitude(0.2f)
                     .build()));
 
-        }else if (this.secondPhaseTicker == tickerTime - firstRayOffset - perRayOffset){
+        }else if (this.secondPhaseTicker == tickerTime - firstRayOffset - perRayOffset - fullOffset){
 
             Vec3 v = hlook.yRot((FDMathUtil.FPI / 4 + FDMathUtil.FPI))
                     .multiply(distmult,0,distmult)
@@ -445,14 +491,13 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .amplitude(0.5f)
                     .build()));
 
-        }else if (this.secondPhaseTicker == tickerTime - firstRayOffset - perRayOffset * 2){
+        }else if (this.secondPhaseTicker == tickerTime - firstRayOffset - perRayOffset * 2 - fullOffset){
 
             Vec3 v = hlook.yRot((FDMathUtil.FPI / 4 + FDMathUtil.FPI * 3 / 2))
                     .multiply(distmult,0,distmult)
                     .add(0,heighton,0);
             this.decorativeRay(v.add(this.position()));
 
-            this.sendPacketToCombatants(new SendScreenEffectPacket<>(new ScreenColorData(0f,0f,0f,1f),FDScreenEffects.SCREEN_COLOR.get(),20,40,20));
 
             this.sendPacketToCombatants(new DefaultShakePacket(FDShakeData.builder()
                     .stayTime(perRayOffset - 2)
@@ -461,7 +506,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .amplitude(0.75f)
                     .build()));
 
-        }else if (this.secondPhaseTicker == tickerTime - firstRayOffset - perRayOffset * 3){
+        }else if (this.secondPhaseTicker == tickerTime - firstRayOffset - perRayOffset * 3 - fullOffset){
 
             Vec3 v = hlook.yRot(FDMathUtil.FPI / 4)
                     .multiply(distmult,0,distmult)
@@ -475,8 +520,12 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .amplitude(0.9f)
                     .build()));
 
-        }else if (this.secondPhaseTicker == 80){
+            this.sendPacketToCombatants(new SendScreenEffectPacket<>(new ScreenColorData(0f,0f,0f,1f),FDScreenEffects.SCREEN_COLOR.get(),5,80,20));
 
+
+        }else if (this.secondPhaseTicker == 40){
+
+            lookingAtTarget = true;
             this.sendPacketToCombatants(new StopCutscenePacket());
 
         }
@@ -1968,8 +2017,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             }
         }else if (stage == 2){
             if (!this.blockAttackProjectiles.isEmpty()) {
-                int rate = this.isBelowHalfHP() ? 15 : 8;
-                if (instance.tick % rate == 0) {
+                ;
+                if (instance.tick % 8 == 0) {
                     LivingEntity player = this.getTarget();
                     if (player != null) {
                         this.throwBlock(player, height);
@@ -2796,7 +2845,6 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             this.remainingHits = tag.getInt("bossHealth");
         }else{
             this.remainingHits = this.getBossMaxHits();
-            this.remainingHits = 5;
         }
         super.readAdditionalSaveData(tag);
     }
