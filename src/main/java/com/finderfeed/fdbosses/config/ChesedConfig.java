@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.config;
 
+import com.finderfeed.fdlib.systems.config.Comment;
 import com.finderfeed.fdlib.systems.config.ConfigValue;
 
 public class ChesedConfig  {
@@ -42,5 +43,9 @@ public class ChesedConfig  {
 
     @ConfigValue
     public float finalAttackDamagePercentPerMonolith = 25f;
+
+    @ConfigValue
+    @Comment("If health is greater than value, sets the health equal to the value")
+    public float healthAfterSecondPhaseTransition = 10f;
 
 }

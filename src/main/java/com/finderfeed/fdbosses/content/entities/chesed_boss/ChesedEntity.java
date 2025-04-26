@@ -37,10 +37,8 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.Animatio
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
-import com.finderfeed.fdlib.systems.cutscenes.CurveType;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
 import com.finderfeed.fdlib.systems.cutscenes.EasingType;
-import com.finderfeed.fdlib.systems.cutscenes.packets.MoveCutsceneCameraPacket;
 import com.finderfeed.fdlib.systems.cutscenes.packets.StartCutscenePacket;
 import com.finderfeed.fdlib.systems.cutscenes.packets.StopCutscenePacket;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
@@ -170,6 +168,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     private int secondPhaseTicker = 0;
 
     private boolean secondPhaseAnimPlayed = false;
+
+    private int skipAttackTimes = 0;
 
     public ChesedEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
@@ -528,6 +528,18 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             lookingAtTarget = true;
             this.sendPacketToCombatants(new StopCutscenePacket());
 
+            float rh = BossConfigs.BOSS_CONFIG.get().chesedConfig.healthAfterSecondPhaseTransition;
+
+            for (Player player : this.getCombatants(false)){
+                float health = player.getHealth();
+                if (health > rh){
+                    player.setHealth(rh);
+                }
+            }
+
+            skipAttackTimes = 2;
+
+            this.chain.reset();
         }
 
         secondPhaseTicker = Mth.clamp(secondPhaseTicker - 1,0, Integer.MAX_VALUE);
@@ -618,6 +630,11 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     public AttackAction attackListener(String attackName){
         if (this.getTarget() == null){
             return AttackAction.WAIT;
+        }
+
+        if (skipAttackTimes > 0){
+            skipAttackTimes--;
+            return AttackAction.SKIP;
         }
 
         if (!this.isBelowHalfHP()){

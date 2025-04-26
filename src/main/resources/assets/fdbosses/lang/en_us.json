@@ -24,7 +24,7 @@
   "fdbosses.close_skill_info": "Click empty space to close",
   "fdbosses.bosses.description.chesed": "A creature born out of rocks corroded by sculk. Wields enormous magic power.",
   "fdbosses.skills.chesed.mightiness": "Mightiness",
-  "fdbosses.skills.chesed.mightiness_description": "Chesed cannot be hurt directly.\n\nAll damage inflicted by Chesed cannot be lowered by any resistances.\n\nGives all combatants {{(fdbosses:effect)id=minecraft:night_vision}} while alive.\n\nIf a player looks away from Chesed, that player is inflicted with {{(fdbosses:effect)id=fdbosses:chesed_gaze}}.\n\nSecond phase begins when Chesed is below half hp.",
+  "fdbosses.skills.chesed.mightiness_description": "Chesed cannot be hurt directly.\n\nAll damage inflicted by Chesed cannot be lowered by any resistances.\n\nGives all combatants {{(fdbosses:effect)id=minecraft:night_vision}} while alive.\n\nIf a player looks away from Chesed, that player is inflicted with {{(fdbosses:effect)id=fdbosses:chesed_gaze}}.\n\nChesed proceeds to second phase when hp drow below 50%.",
   "fdbosses.skills.chesed.blocks": "Block Barrage",
   "fdbosses.skills.chesed.blocks_description": "Tears out blocks from the earth and hurls them onto target.",
   "fdbosses.skills.chesed.earthquake": "Earthquake",
