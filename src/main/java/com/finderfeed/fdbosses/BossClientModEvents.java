@@ -11,6 +11,7 @@ import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticle;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticle;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_one_shot_vertical_ray.ChesedOneShotVerticalRayRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_vertical_ray.ChesedVerticalRayAttackRenderer;
@@ -74,17 +75,17 @@ public class BossClientModEvents {
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
         event.registerEntityRenderer(BossEntities.CHESED.get(),
-                FDEntityRendererBuilder.builder()
+                FDEntityRendererBuilder.<ChesedEntity>builder()
                         .shouldRender(((entity, frustum, x, y, z) -> {
                             return true;
                         }))
-                        .addLayer(FDEntityRenderLayerOptions.builder()
+                        .addLayer(FDEntityRenderLayerOptions.<ChesedEntity>builder()
                                 .model(BossModels.CHESED)
                                 .ignoreHurtOverlay(true)
                                 .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")))
                                 .build()
                         )
-                        .addLayer(FDEntityRenderLayerOptions.builder()
+                        .addLayer(FDEntityRenderLayerOptions.<ChesedEntity>builder()
                                 .model(BossModels.CHESED_CRYSTAL_LAYER)
                                 .ignoreHurtOverlay(true)
                                 .renderType((entity,pticks)->{
@@ -94,7 +95,7 @@ public class BossClientModEvents {
                                     return new FDColor(1f,1f,1f,0f);
                                 })
                                 .build())
-                        .addLayer(FDEntityRenderLayerOptions.builder()
+                        .addLayer(FDEntityRenderLayerOptions.<ChesedEntity>builder()
                                 .model(BossModels.CHESED_CRYSTAL_LAYER)
                                 .ignoreHurtOverlay(true)
                                 .renderType((entity,pticks)->{
@@ -104,7 +105,7 @@ public class BossClientModEvents {
                                     return new FDColor(1f,1f,1f,1f);
                                 })
                                 .build())
-                        .addLayer(FDEntityRenderLayerOptions.builder()
+                        .addLayer(FDEntityRenderLayerOptions.<ChesedEntity>builder()
                                 .model(BossModels.CHESED_INFLATED)
                                 .ignoreHurtOverlay(true)
                                 .renderType((entity,pticks)->{
@@ -120,6 +121,7 @@ public class BossClientModEvents {
                                 }))
                                 .build()
                         )
+                        .freeRender(new ChesedRenderer())
                         .build()
         );
         event.registerEntityRenderer(BossEntities.CHESED_ELECTRIC_SPHERE.get(),FDEntityRendererBuilder.builder()
