@@ -18,10 +18,100 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
     public void render(ChesedEntity chesedEntity, float yaw, float pticks, PoseStack poseStack, MultiBufferSource multiBufferSource, int light) {
 
         this.renderRayEffect(chesedEntity, yaw, pticks, poseStack, multiBufferSource, light);
+        this.renderRockfallRayEffect(chesedEntity, yaw, pticks, poseStack, multiBufferSource, light);
 
     }
 
     public static final ResourceLocation CHESED_RAY_PREPARE = FDBosses.location("textures/util/chesed_ray_prepare.png");
+
+    private void renderRockfallRayEffect(ChesedEntity chesedEntity, float yaw, float pticks, PoseStack poseStack, MultiBufferSource multiBufferSource, int light){
+
+        var system = chesedEntity.getSystem();
+
+        var ticker = system.getTicker(ChesedEntity.ROCKFALL_TICKER);
+
+        if (ticker != null){
+
+            float elapsedTime = ticker.getTime(pticks);
+
+            float offset = 20;
+            float prepareTime = 27f;
+            float offsetP = Mth.clamp((elapsedTime - offset) / prepareTime,0, 1f);
+
+            float easedP = FDEasings.easeOut(offsetP);
+
+            float rotation = 360 * FDEasings.easeOutBack(offsetP);
+            float alpha = easedP;
+            float directionOffset = -1 * easedP;
+            float sizeMod = 0;
+
+            if (elapsedTime - offset - prepareTime > 0){
+
+                float awayTime = 7f * ticker.getSpeedModifier();
+
+
+                float offsetP2 = Math.clamp((elapsedTime - offset - prepareTime) / awayTime, 0, 1);
+
+                float easedP2 = FDEasings.easeOut(offsetP2);
+
+                alpha = 1 - offsetP2;
+                directionOffset = 5 * (easedP2);
+                sizeMod = offsetP2 * 2;
+
+            }
+
+            VertexConsumer consumer = multiBufferSource.getBuffer(RenderType.entityTranslucentEmissive(CHESED_RAY_PREPARE));
+
+            Vec3 dir = new Vec3(0,1,0);
+
+            QuadRenderer.start(consumer)
+                    .color(1,1,1,alpha)
+                    .direction(dir)
+                    .pose(poseStack)
+                    .offsetOnDirection(2 - directionOffset)
+                    .translate(0,1.5f,0)
+                    .size(1.5f + sizeMod)
+                    .rotationDegrees(rotation)
+                    .render();
+
+            QuadRenderer.start(consumer)
+                    .color(1,1,1,alpha)
+                    .direction(dir)
+                    .pose(poseStack)
+                    .offsetOnDirection(3 - directionOffset)
+                    .translate(0,1.5f,0)
+                    .size(0.75f + sizeMod)
+                    .rotationDegrees(-rotation)
+                    .render();
+
+
+            float offset2 = 45;
+
+            float offset2P = FDEasings.easeOut(Mth.clamp((elapsedTime - offset2) / 10,0, 1f));
+
+            if (offset2P > 0 && offset2P != 1){
+
+                QuadRenderer.start(consumer)
+                        .color(1,1,1,1 - offset2P)
+                        .offsetOnDirection(30)
+                        .size(offset2P * 40)
+                        .pose(poseStack)
+                        .render();
+
+                QuadRenderer.start(consumer)
+                        .color(1,1,1,1 - offset2P)
+                        .offsetOnDirection(30)
+                        .size(offset2P * 20)
+                        .pose(poseStack)
+                        .render();
+
+
+            }
+
+
+        }
+
+    }
 
     private void renderRayEffect(ChesedEntity chesedEntity, float yaw, float pticks, PoseStack poseStack, MultiBufferSource multiBufferSource, int light){
 
@@ -46,7 +136,8 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
 
             if (elapsedTime - offset - prepareTime > 0){
 
-                float awayTime = 7f;
+                float awayTime = 7f * ticker.getSpeedModifier();
+
 
                 float offsetP2 = Math.clamp((elapsedTime - offset - prepareTime) / awayTime, 0, 1);
 
@@ -58,7 +149,7 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
 
             }
 
-            VertexConsumer consumer = multiBufferSource.getBuffer(RenderType.breezeEyes(CHESED_RAY_PREPARE));
+            VertexConsumer consumer = multiBufferSource.getBuffer(RenderType.entityTranslucentEmissive(CHESED_RAY_PREPARE));
 
             Vec3 dir = new Vec3(1,0,0).yRot((float)Math.toRadians(-yaw - 90));
 
@@ -79,7 +170,7 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
                     .offsetOnDirection(3 - directionOffset)
                     .translate(0,1.5f,0)
                     .size(0.75f + sizeMod)
-                    .rotationDegrees(rotation)
+                    .rotationDegrees(-rotation)
                     .render();
 
 

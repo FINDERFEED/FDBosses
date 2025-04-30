@@ -94,6 +94,9 @@ public class BossClientModEvents {
                                 .color((entity,pticks)->{
                                     return new FDColor(1f,1f,1f,0f);
                                 })
+                                .renderCondition((chesedEntity -> {
+                                    return true;
+                                }))
                                 .build())
                         .addLayer(FDEntityRenderLayerOptions.<ChesedEntity>builder()
                                 .model(BossModels.CHESED_CRYSTAL_LAYER)
@@ -104,6 +107,9 @@ public class BossClientModEvents {
                                 .color((entity,pticks)->{
                                     return new FDColor(1f,1f,1f,1f);
                                 })
+                                .renderCondition((chesedEntity -> {
+                                    return true;
+                                }))
                                 .build())
                         .addLayer(FDEntityRenderLayerOptions.<ChesedEntity>builder()
                                 .model(BossModels.CHESED_INFLATED)

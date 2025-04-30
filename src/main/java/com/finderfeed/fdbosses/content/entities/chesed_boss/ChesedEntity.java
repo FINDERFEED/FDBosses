@@ -110,6 +110,8 @@ import static com.finderfeed.fdbosses.init.BossAnims.*;
 
 public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerContextAssignable {
 
+    public static final String ROCKFALL_TICKER = "ROCKFALL";
+
     public static final String RAY_ATTACK_LAYER = "ATTACK";
 
     public static int ARENA_HEIGHT = 40;
@@ -183,7 +185,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }
         if (!level.isClientSide) {
 
-            this.remainingHits = 5;
+//            this.remainingHits = 4;
 
 
             AttackOptions ray = AttackOptions.builder()
@@ -208,15 +210,15 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .registerAttack(RAY_EVASION_ATTACK,this::rayEvasionAttack)
                     .attackListener(this::attackListener)
-                    .addAttack(0, ray)
+//                    .addAttack(0, ray)
 //                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack(ELECTRIC_SPHERE_ATTACK)
 //                            .setNextAttack(rayOrBlocks)
 //                            .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(ROCKFALL_ATTACK)
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(ROCKFALL_ATTACK)
 //                            .setNextAttack(rayOrBlocks)
-//                            .build())
+                            .build())
 //                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack(EARTHQUAKE_ATTACK)
 //                            .setNextAttack(rayOrBlocks)
@@ -1655,7 +1657,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         int height = 32;
         int rad = 36;
         if (stage == 0){
-            this.getSystem().startAnimation("ROCKFALL", AnimationTicker.builder(CHESED_ROCKFALL_CAST)
+            this.getSystem().startAnimation(ROCKFALL_TICKER, AnimationTicker.builder(CHESED_ROCKFALL_CAST)
                             .setToNullTransitionTime(0)
                     .build());
 
@@ -1714,6 +1716,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
                 BossUtil.chesedRayExplosion((ServerLevel) level(),this.position().add(0,height,0),new Vec3(0,-1,0),120,10,1);
                 ((ServerLevel)level()).playSound(null,this.getX(),this.getY() + height,this.getZ(), BossSounds.CHESED_RAY.get(), SoundSource.HOSTILE,100f,1f);
+//                if (true){
+//                    return true;
+//                }
                 PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.ROCKFALL.get(),1,1));
                 PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.RUMBLING.get(),1,1));
 
