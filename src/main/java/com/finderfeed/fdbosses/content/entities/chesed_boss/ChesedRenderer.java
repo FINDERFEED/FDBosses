@@ -70,7 +70,6 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
 
         poseStack.pushPose();
 
-
         poseStack.translate(0,1.4,0);
 
         Random random = new Random(234234);
@@ -81,7 +80,7 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
 
             Matrix4f matrix4f = poseStack.last().pose();
 
-            poseStack.mulPose(Axis.YP.rotation(id * angle));
+            poseStack.mulPose(Axis.YP.rotation(id * angle + (float)Math.toRadians(-chesedEntity.getYRot() - 90)));
 
             int texId = 0;
 

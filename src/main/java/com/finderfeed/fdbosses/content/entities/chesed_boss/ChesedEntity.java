@@ -1033,6 +1033,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     public boolean finalBOOMAttack(AttackInstance instance){
 
         if (instance.stage == 0) {
+            lookingAtTarget = false;
             int chargeEndTime = 100;
             int chargeStartTime = 20;
             int afterChargeIdle = 30;
@@ -1059,6 +1060,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             }
         }else if (instance.stage == 1) {
 
+            lookingAtTarget = false;
             int rayStartTick = 15;
             int rayDuration = FINAL_ATTACK_RAY_ROTATION_DURATION;
             int buildupSoundStart = 54;
@@ -1092,6 +1094,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                         new ImpactFrame(base).setDuration(1).setInverted(true)
                 );
             } else if (instance.tick == damageAndEffectsStart) {
+
+                lookingAtTarget = false;
                 this.setMonolithDrainPercent(0);
 
                 this.boomAttackAfterBlackout();
@@ -1138,6 +1142,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             }
         }else if (instance.stage == 2){
             if (instance.tick > 100){
+
+                lookingAtTarget = true;
                 this.summonOrReviveMonoliths();
                 this.setMonolithsImmunity(false);
                 return true;
@@ -1194,25 +1200,40 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
             float dist = v1.distance(v2);
 
-            for (float v = 0; v < dist; v += 0.5f){
+            for (float v = 0; v < dist; v += 2f){
 
-                Vector3f b = v1.lerp(v2,v / dist,new Vector3f());
+                Vector3f b = v1.lerp(v2,Math.clamp(random.nextFloat(),0,1),new Vector3f());
 
 
                 for (int k = 0; k < 3;k++) {
 
-                    Vector3f n = b.normalize(new Vector3f()).mul(0.025f * k / 2f);
+                    float rndHeight = random.nextFloat() * 0.8f - 0.4f;
 
-                    BallParticleOptions options = BallParticleOptions.builder()
-                            .size(0.5f - random.nextFloat() * 0.1f)
-                            .scalingOptions(5 + random.nextInt(3),0,30)
-                            .color(150 + random.nextInt(40),230,255)
-                            .build();
+                    float hp = 1 - Math.abs(rndHeight) / 0.4f;
+
+                    Vector3f n = b.normalize(new Vector3f()).mul(0.025f * k / 2f * hp);
+
+                    ParticleOptions options;
+
+                    if (random.nextFloat() > 0.5) {
+                        options = BallParticleOptions.builder()
+                                .size(1f - random.nextFloat() * 0.1f - (1 - hp) * 0.2f)
+                                .scalingOptions(5 + random.nextInt(3), 0, 40)
+                                .color(150 + random.nextInt(40), 230, 255)
+                                .build();
+                    }else{
+                        options = LightningParticleOptions.builder()
+                                .color(50 + random.nextInt(40), 183 + random.nextInt(60), 200 + random.nextInt(50))
+                                .quadSize(0.25f)
+                                .lifetime(40)
+                                .randomRoll(true)
+                                .build();
+                    }
 
                     level().addParticle(options,
                             true,
                             this.getX() + b.x + random.nextFloat() * 0.5 - 0.25f,
-                            this.getY() + 2 + b.y + random.nextFloat() * 1.4 - 1f,
+                            this.getY() + 1.4f + b.y + rndHeight,
                             this.getZ() + b.z + random.nextFloat() * 0.5 - 0.25f,
                             -n.x + random.nextFloat() * 0.01f - 0.005f,
                             -n.y + random.nextFloat() * 0.01f - 0.005f,
