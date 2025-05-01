@@ -351,6 +351,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
         }else{
 
+
+            this.clientBoomAttackRotatingRay();
+
             if (this.isDrainingFromMonoliths()){
                 this.monolithEnergyDrainParticles();
             }
@@ -1162,6 +1165,69 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     }
 
     public static final int FINAL_ATTACK_RAY_ROTATION_DURATION = 15;
+
+
+    private void clientBoomAttackRotatingRay(){
+
+        var system = this.getSystem();
+
+        var ticker = system.getTicker(ChesedEntity.FINAL_ATTACK_LAYER);
+
+        if (ticker == null) return;
+
+        float elapsedTime = ticker.getElapsedTime();
+
+        float offset = 155;
+
+        if (elapsedTime < offset || elapsedTime > 157) return;
+
+        float radius = 35;
+
+        float angle = FDMathUtil.FPI / 12;
+
+        Vector3f v1 = new Vector3f(radius,0,0);
+        Vector3f v2 = new Vector3f(radius,0,0).rotateY(angle);
+
+
+
+        for (float i = 0; i < FDMathUtil.FPI * 2; i += angle){
+
+            float dist = v1.distance(v2);
+
+            for (float v = 0; v < dist; v += 0.5f){
+
+                Vector3f b = v1.lerp(v2,v / dist,new Vector3f());
+
+
+                for (int k = 0; k < 3;k++) {
+
+                    Vector3f n = b.normalize(new Vector3f()).mul(0.025f * k / 2f);
+
+                    BallParticleOptions options = BallParticleOptions.builder()
+                            .size(0.5f - random.nextFloat() * 0.1f)
+                            .scalingOptions(5 + random.nextInt(3),0,30)
+                            .color(150 + random.nextInt(40),230,255)
+                            .build();
+
+                    level().addParticle(options,
+                            true,
+                            this.getX() + b.x + random.nextFloat() * 0.5 - 0.25f,
+                            this.getY() + 2 + b.y + random.nextFloat() * 1.4 - 1f,
+                            this.getZ() + b.z + random.nextFloat() * 0.5 - 0.25f,
+                            -n.x + random.nextFloat() * 0.01f - 0.005f,
+                            -n.y + random.nextFloat() * 0.01f - 0.005f,
+                            -n.z + random.nextFloat() * 0.01f - 0.005f
+                    );
+                }
+
+            }
+
+
+            v1 = v1.rotateY(angle);
+            v2 = v2.rotateY(angle);
+        }
+
+    }
 
     private void boomAttackRotatingRay(int rotateDuration){
 
