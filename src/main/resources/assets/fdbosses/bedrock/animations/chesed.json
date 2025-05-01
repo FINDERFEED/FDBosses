@@ -3113,7 +3113,7 @@
 			}
 		},
 		"chesed_boom_attack": {
-			"animation_length": 9,
+			"animation_length": 13,
 			"bones": {
 				"base": {
 					"rotation": {

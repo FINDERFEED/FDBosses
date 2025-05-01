@@ -114,6 +114,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     public static final String RAY_ATTACK_LAYER = "ATTACK";
 
+    public static final String FINAL_ATTACK_LAYER = "BOOM";
+
     public static int ARENA_HEIGHT = 40;
     public static int ARENA_RADIUS = 39;
 
@@ -215,10 +217,10 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 //                            .addAttack(ELECTRIC_SPHERE_ATTACK)
 //                            .setNextAttack(rayOrBlocks)
 //                            .build())
-                    .addAttack(1,AttackOptions.builder()
-                            .addAttack(ROCKFALL_ATTACK)
+//                    .addAttack(1,AttackOptions.builder()
+//                            .addAttack(ROCKFALL_ATTACK)
 //                            .setNextAttack(rayOrBlocks)
-                            .build())
+//                            .build())
 //                    .addAttack(1,AttackOptions.builder()
 //                            .addAttack(EARTHQUAKE_ATTACK)
 //                            .setNextAttack(rayOrBlocks)
@@ -227,7 +229,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 //                            .addAttack(ROLL_ATTACK)
 //                            .build())
 //                    .addAttack(5, RAY_EVASION_ATTACK)
-//                    .addAttack(6, FINAL_ATTACK)
+                    .addAttack(6, FINAL_ATTACK)
             ;
 
         }
@@ -1036,7 +1038,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             if (instance.tick == 0) {
                 this.setMonolithsImmunity(true);
                 this.setMonolithDrainPercent(0);
-                this.getSystem().startAnimation("BOOM", AnimationTicker.builder(CHESED_BOOM_ATTACK)
+                this.getSystem().startAnimation(FINAL_ATTACK_LAYER, AnimationTicker.builder(CHESED_BOOM_ATTACK)
                         .setToNullTransitionTime(0)
                         .build());
             }else if (instance.tick == chargeStartTime - 5){
@@ -1055,7 +1057,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }else if (instance.stage == 1) {
 
             int rayStartTick = 15;
-            int rayDuration = 15;
+            int rayDuration = FINAL_ATTACK_RAY_ROTATION_DURATION;
             int buildupSoundStart = 54;
             int impactFramesStart = 58;
             int damageAndEffectsStart = 60;
@@ -1158,6 +1160,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }
 
     }
+
+    public static final int FINAL_ATTACK_RAY_ROTATION_DURATION = 15;
 
     private void boomAttackRotatingRay(int rotateDuration){
 
