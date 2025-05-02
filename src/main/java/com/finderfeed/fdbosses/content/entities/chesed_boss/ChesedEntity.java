@@ -94,6 +94,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -291,6 +293,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         system.setVariable("variable.appear_height",400);
         system.setVariable("variable.angle",360);
         if (!this.level().isClientSide){
+
+            this.passiveEntityPullInArena();
 
             this.bossBar.setPercentage(this.getRemainingHits() / (float) this.getBossMaxHits());
 
@@ -2734,6 +2738,40 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }
     }
 
+    private void passiveEntityPullInArena(){
+
+        int pullRadius = 5;
+        int arenaRadius = ARENA_RADIUS - 2;
+
+        var entities = this.level().getEntitiesOfClass(Entity.class,new AABB(-arenaRadius - pullRadius,-2,-arenaRadius - pullRadius,arenaRadius + pullRadius,20,arenaRadius + pullRadius).move(this.position()),(entity)->!(entity instanceof ChesedBossBuddy));
+
+        for (var entity : entities){
+
+            Vec3 b = this.position().subtract(entity.position());
+            Vec3 h = b.multiply(1,0,1);
+            double dist = h.length();
+
+            if (dist >= arenaRadius && dist <= arenaRadius + pullRadius){
+
+                ClipContext clipContext = new ClipContext(entity.position().add(0,entity.getBbHeight()/2,0),this.position().add(0,2,0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+
+                BlockHitResult result = level().clip(clipContext);
+
+                if (result.getType() != HitResult.Type.MISS) continue;
+
+                Vec3 speed = b.normalize();
+
+                if (entity instanceof ServerPlayer serverPlayer && (!serverPlayer.isCreative() && !serverPlayer.isSpectator())){
+                    FDLibCalls.setServerPlayerSpeed(serverPlayer, speed);
+                }else{
+                    entity.setDeltaMovement(speed);
+                }
+
+            }
+        }
+
+    }
+
     private void stopAllNonIdleAnimations(){
         for (var ticker : new ArrayList<>(this.getSystem().getTickers().keySet())) {
 
@@ -3065,6 +3103,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     public void push(Vec3 p_347665_) {
 
     }
+
 
     @Override
     protected void doPush(Entity entity) {
