@@ -8,6 +8,8 @@ import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -17,6 +19,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Random;
+import org.joml.Vector3f;
 
 public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
 
@@ -26,12 +29,110 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
         this.renderRayEffect(chesedEntity, yaw, pticks, poseStack, multiBufferSource, light);
         this.renderRockfallRayEffect(chesedEntity, yaw, pticks, poseStack, multiBufferSource, light);
         this.renderFinalAttackCracks(chesedEntity, yaw, pticks, poseStack, multiBufferSource, light);
+        this.renderEarthquakeCastFffects(chesedEntity, yaw, pticks, poseStack, multiBufferSource, light);
 
     }
 
     public static final ResourceLocation CHESED_RAY_PREPARE = FDBosses.location("textures/util/chesed_ray_prepare.png");
 
     public static final ResourceLocation FINAL_ATTACK_CRACKS = FDBosses.location("textures/util/chesed_wall_crack.png");
+
+    private void renderEarthquakeCastFffects(ChesedEntity chesedEntity, float yaw, float pticks, PoseStack poseStack, MultiBufferSource multiBufferSource, int light){
+        var system = chesedEntity.getSystem();
+
+        var ticker = system.getTicker(ChesedEntity.EARTHQUAKE_ATTACK_LAYER);
+
+        if (ticker == null) return;
+
+        float height = chesedEntity.getModelPartPosition(chesedEntity,"core",ChesedEntity.clientModel).y;
+
+        float elapsedTime = ticker.getTime(pticks);
+        int timeOffset = 5;
+        int animLength = 15;
+
+        float p = Mth.clamp((elapsedTime - timeOffset) / animLength, 0, 1);
+
+        float size = 5f;
+
+
+        if (elapsedTime > 21){
+
+
+            float p2 = Mth.clamp((elapsedTime - 21) / 4, 0, 1);
+
+            size = (1 - p2) * 5;
+
+        }
+
+        if (p == 0) return;
+
+        float easedOut = FDEasings.easeOut(p);
+
+        float rotation = easedOut * 180;
+
+        VertexConsumer vertexConsumer = multiBufferSource.getBuffer(RenderType.entityTranslucentEmissive(CHESED_RAY_PREPARE));
+
+        QuadRenderer.start(vertexConsumer)
+                .color(1f,1f,1f,easedOut)
+                .translate(0,0.05f,0)
+                .pose(poseStack)
+                .rotationDegrees(rotation)
+                .size(size * easedOut)
+                .render();
+
+        QuadRenderer.start(vertexConsumer)
+                .color(1f,1f,1f,easedOut)
+                .translate(0,0.05f,0)
+                .pose(poseStack)
+                .rotationDegrees(-rotation)
+                .size(size * 2 * easedOut)
+                .render();
+
+
+
+
+
+
+
+        poseStack.pushPose();
+        VertexConsumer vertex = multiBufferSource.getBuffer(RenderType.lightning());
+        Matrix4f m = poseStack.last().pose();
+
+
+        Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+
+        Vec3 camPos = camera.getPosition();
+        Vec3 thisPos = chesedEntity.position();
+        Vec3 b = thisPos.subtract(camPos);
+        double angle = Math.atan2(b.x,b.z);
+        poseStack.mulPose(Axis.YP.rotation(FDMathUtil.FPI + (float)angle));
+
+        float width = 0.25f;
+
+        vertex.addVertex(m,0,0,0f).setColor(0.3f, 1f, 1f,p);
+        vertex.addVertex(m,0,height,0f).setColor(0.3f, 1f, 1f,p);
+        vertex.addVertex(m,-width,height,0f).setColor(0.3f, 1f, 1f,0);
+        vertex.addVertex(m,-width,0,0f).setColor(0.3f, 1f, 1f,0);
+
+
+        vertex.addVertex(m,width,0,0f).setColor(0.3f, 1f, 1f,0);
+        vertex.addVertex(m,width,height,0f).setColor(0.3f, 1f, 1f,0);
+        vertex.addVertex(m,0,height,0f).setColor(0.3f, 1f, 1f,p);
+        vertex.addVertex(m,0,0,0f).setColor(0.3f, 1f, 1f,p);
+
+        vertex.addVertex(m,0,0,0.01f).setColor(1f, 1f, 1f,p);
+        vertex.addVertex(m,0,height,0.01f).setColor(1f, 1f, 1f,p);
+        vertex.addVertex(m,-width/4f,height,0.01f).setColor(1f, 1f, 1f,0);
+        vertex.addVertex(m,-width/4f,0,0.01f).setColor(1f, 1f, 1f,0);
+
+
+        vertex.addVertex(m,width/4f,0,0.01f).setColor(1f, 1f, 1f,0);
+        vertex.addVertex(m,width/4f,height,0.01f).setColor(1f, 1f, 1f,0);
+        vertex.addVertex(m,0,height,0.01f).setColor(1f, 1f, 1f,p);
+        vertex.addVertex(m,0,0,0.01f).setColor(1f, 1f, 1f,p);
+
+        poseStack.popPose();
+    }
 
     private void renderFinalAttackCracks(ChesedEntity chesedEntity, float yaw, float pticks, PoseStack poseStack, MultiBufferSource multiBufferSource, int light){
 

@@ -40,7 +40,7 @@ public class BossEntities {
     public static final Supplier<EntityType<ChesedEntity>> CHESED = ENTITIES.register("chesed",()->EntityType.Builder.<ChesedEntity>of(
             ChesedEntity::new, MobCategory.CREATURE
     )
-            .sized(3f,3f)
+            .sized(5f,3f)
             .build("chesed"));
 
     public static final Supplier<EntityType<ChesedMonolith>> CHESED_MONOLITH = ENTITIES.register("chesed_monolith",()->EntityType.Builder.<ChesedMonolith>of(

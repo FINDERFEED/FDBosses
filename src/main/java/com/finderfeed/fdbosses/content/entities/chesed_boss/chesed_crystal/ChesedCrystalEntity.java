@@ -99,6 +99,12 @@ public class ChesedCrystalEntity extends FDLivingEntity implements ChesedBossBud
         }
     }
 
+    @Nullable
+    @Override
+    protected SoundEvent getDeathSound() {
+        return BossSounds.CHESED_CRYSTAL_HIT.get();
+    }
+
     @Override
     public void onAddedToLevel() {
         super.onAddedToLevel();

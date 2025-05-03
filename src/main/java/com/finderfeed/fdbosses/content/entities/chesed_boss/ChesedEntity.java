@@ -118,6 +118,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     public static final String FINAL_ATTACK_LAYER = "BOOM";
 
+    public static final String EARTHQUAKE_ATTACK_LAYER = "EARTHQUAKE";
+
     public static int ARENA_HEIGHT = 40;
     public static int ARENA_RADIUS = 39;
 
@@ -148,8 +150,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     public FDServerBossBar bossBar = new FDServerBossBar(BossBars.CHESED_BOSS_BAR,this);
 
     public AttackChain chain;
-    private static FDModel serverModel;
-    private static FDModel clientModel;
+    protected static FDModel serverModel;
+    protected static FDModel clientModel;
     private Vec3 oldRollPos;
     private boolean playIdle = true;
     private boolean lookingAtTarget = true;
@@ -214,33 +216,27 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .registerAttack(RAY_EVASION_ATTACK,this::rayEvasionAttack)
                     .attackListener(this::attackListener)
-//                    .addAttack(0, ray)
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(ELECTRIC_SPHERE_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(ROCKFALL_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(EARTHQUAKE_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(4,AttackOptions.builder()
-//                            .addAttack(ROLL_ATTACK)
-//                            .build())
-//                    .addAttack(5, RAY_EVASION_ATTACK)
+                    .addAttack(0, ray)
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(ELECTRIC_SPHERE_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(ROCKFALL_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(EARTHQUAKE_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(4,AttackOptions.builder()
+                            .addAttack(ROLL_ATTACK)
+                            .build())
+                    .addAttack(5, RAY_EVASION_ATTACK)
                     .addAttack(6, FINAL_ATTACK)
             ;
 
         }
-    }
-
-    @Override
-    public void onAddedToLevel() {
-        super.onAddedToLevel();
-
     }
 
     @Override
@@ -1954,16 +1950,16 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 }
 
                 if (t == 0) {
-                    this.getSystem().startAnimation("earthquake", AnimationTicker.builder(CHESED_EARTHQUAKE_CAST)
+                    this.getSystem().startAnimation(EARTHQUAKE_ATTACK_LAYER, AnimationTicker.builder(CHESED_EARTHQUAKE_CAST)
                             .setToNullTransitionTime(0)
                             .build());
                 }
-                if (t % 2 == 0) {
-                    SonicParticleOptions options = SonicParticleOptions.builder().facing(0, 1, 0).color(0.3f, 1f, 1f).startSize(radius).endSize(0).resizeSpeed(-0.3f).resizeAcceleration(-1f).build();
-                    for (Player player : this.level().getNearbyPlayers(BossUtil.ALL, this, this.getBoundingBox().inflate(100))) {
-                        ((ServerLevel) level()).sendParticles((ServerPlayer) player, options, true, this.position().x, this.position().y + 0.01, this.position().z, 1, 0, 0, 0, 0);
-                    }
-                }
+//                if (t % 2 == 0) {
+//                    SonicParticleOptions options = SonicParticleOptions.builder().facing(0, 1, 0).color(0.3f, 1f, 1f).startSize(radius).endSize(0).resizeSpeed(-0.3f).resizeAcceleration(-1f).build();
+//                    for (Player player : this.level().getNearbyPlayers(BossUtil.ALL, this, this.getBoundingBox().inflate(100))) {
+//                        ((ServerLevel) level()).sendParticles((ServerPlayer) player, options, true, this.position().x, this.position().y + 0.01, this.position().z, 1, 0, 0, 0, 0);
+//                    }
+//                }
             } else {
                 if (t < 10) {
                     this.summonCirclingParticlesServerside(4, 0.55f, 2, 0.5f, 6, 9);
@@ -3091,7 +3087,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     @Override
     public void push(Entity entity) {
-        if (!this.isRolling()) {
+        if (!this.isRolling() && !(entity instanceof ChesedBossBuddy)) {
             Vec3 b = entity.position().subtract(this.position()).normalize().add(0, 0.3, 0);
             entity.setDeltaMovement(b);
             entity.hasImpulse = true;
@@ -3107,9 +3103,11 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     @Override
     protected void doPush(Entity entity) {
-        Vec3 b = entity.position().subtract(this.position()).multiply(1,0,1).normalize().add(0,0.5,0);
-        entity.setDeltaMovement(b);
-        entity.hasImpulse = true;
+        if (!this.isRolling() && !(entity instanceof ChesedBossBuddy)) {
+            Vec3 b = entity.position().subtract(this.position()).multiply(1, 0, 1).normalize().add(0, 0.5, 0);
+            entity.setDeltaMovement(b);
+            entity.hasImpulse = true;
+        }
     }
 
     @Override

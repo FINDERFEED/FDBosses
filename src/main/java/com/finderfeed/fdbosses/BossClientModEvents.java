@@ -134,6 +134,7 @@ public class BossClientModEvents {
                         .addLayer(FDEntityRenderLayerOptions.builder()
                                 .model(BossModels.CHESED_ELECTRIC_SPHERE)
                                 .transformation((entity,matrices,pticks)->{
+                                    matrices.translate(0,0.5f,0);
                                     float time = entity.tickCount + pticks;
                                     float md = 16;
                                     float scale = Mth.clamp(time / 20f,0,1) * ((float)Math.sin(time * 2) / md + (1 - 1 / md));

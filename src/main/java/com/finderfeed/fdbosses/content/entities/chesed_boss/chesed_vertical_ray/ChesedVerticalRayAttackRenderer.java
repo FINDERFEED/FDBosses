@@ -57,7 +57,7 @@ public class ChesedVerticalRayAttackRenderer extends EntityRenderer<ChesedMoving
         ArcLightningParticle.fullLightningDraw(entity.level().getGameTime(),entity.getId() * 35535,
                 breaks,matrices.last().pose(), vertex,
                 List.of(Vec3.ZERO,Vec3.ZERO.add(0,height,0)),
-                0.25f,width * 1.5f,0.3f, 0.7f, 1f,1f
+                0.25f,width * 1.5f,0.3f, 0.8f, 1f,1f
         );
 
         matrices.popPose();
