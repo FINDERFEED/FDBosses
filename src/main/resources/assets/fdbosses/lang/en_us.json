@@ -22,7 +22,7 @@
   "fdbosses.skills.chesed.crystals_description": "Casts this ability before the lightning ray attack.\n\nDestroys all crystals and then summons 1 crystal on each side of the battlefield.\n\nIf a crystal is destroyed by a player, that player becomes {{(fdbosses:effect)id=fdbosses:chesed_energized,level=1}}.",
   "fdbosses.skills.chesed.crystals": "Crystals",
   "fdbosses.close_skill_info": "Click empty space to close",
-  "fdbosses.bosses.description.chesed": "A creature born out of rocks corroded by sculk. Wields enormous magic power.",
+  "fdbosses.bosses.description.chesed": "A creature born out of rocks corroded by sculk. Wields enormous magic power.\n\n§cRecommended weapon type: {{(fdlib:item)item=minecraft:diamond_axe}}",
   "fdbosses.skills.chesed.mightiness": "Mightiness",
   "fdbosses.skills.chesed.mightiness_description": "Chesed cannot be hurt directly.\n\nAll damage inflicted by Chesed cannot be lowered by any resistances.\n\nGives all combatants {{(fdbosses:effect)id=minecraft:night_vision}} while alive.\n\nIf a player looks away from Chesed, that player is inflicted with {{(fdbosses:effect)id=fdbosses:chesed_gaze}}.\n\nChesed proceeds to second phase when hp drop below 50%.",
   "fdbosses.skills.chesed.blocks": "Block Barrage",
@@ -75,5 +75,8 @@
   "fdbosses.skills.chesed.electrified_air_stats": "Air: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=electrifiedAirDamage}}",
   "fdbosses.skills.chesed.kinetic_field": "Kinetic Field",
   "fdbosses.skills.chesed.kinetic_field_stats": "Lightnings: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=kineticFieldRayDamage}}",
-  "fdbosses.skills.chesed.kinetic_field_description": "Uses this attack only on second phase.\n\nTraps players in a kinetic field that doesn't allow them to escape.\n\nPeriodically summons lightnings in all kinetic fields."
+  "fdbosses.skills.chesed.kinetic_field_description": "Uses this attack only on second phase.\n\nTraps players in a kinetic field that doesn't allow them to escape.\n\nPeriodically summons lightnings in all kinetic fields.",
+  "fdbosses.word.didnt_read_skills": "It is highly advised to read boss skill descriptions before the fight. Do you really wish to start the fight now?",
+  "fdbosses.word.yes": "Yes",
+  "fdbosses.word.no": "No"
 }

@@ -4,10 +4,7 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.BossRenderUtil;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreenOptions;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossInfo;
-import com.finderfeed.fdbosses.client.boss_screen.widget.BossAbilitesWidget;
-import com.finderfeed.fdbosses.client.boss_screen.widget.BossDetailsWidget;
-import com.finderfeed.fdbosses.client.boss_screen.widget.FDSkillButton;
-import com.finderfeed.fdbosses.client.boss_screen.widget.SkillInfoWidget;
+import com.finderfeed.fdbosses.client.boss_screen.widget.*;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerStartFight;
 import com.finderfeed.fdlib.FDClientHelpers;
@@ -36,6 +33,8 @@ import java.util.List;
 
 public abstract class BaseBossScreen extends SimpleFDScreen {
 
+    public static boolean wasSkillRead = false;
+
     private static int OPEN_TIME = 9;
     private boolean skillOpened = false;
     private int openTicker = 0;
@@ -47,6 +46,8 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     private FDButton skillStatsButton;
     private FDButton skillInfoButton;
     private float bossMenuXStart = 0;
+
+    private DidntReadSkillWarningWidget didntReadSkillWarningWidget;
 
     private int moveThings = 0;
 
@@ -75,6 +76,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         this.initAbilitiesWidget();
 
+        this.initDidntReadSkillWarningWidget();
 
         FDButton startFightButton = new FDButton(this,5,5,110,24)
                 .setTexture(new FDButtonTextures(
@@ -84,14 +86,66 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                 .setText(Component.translatable("fdbosses.word.start_fight").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         110,1f,true,0,1)
                 .setOnClickAction(((fdWidget1, v2, v11, i1) -> {
-                    Level level = FDClientHelpers.getClientLevel();
-                    if (level.getEntity(bossSpawnerId) instanceof BossSpawnerEntity bossSpawner){
-                        PacketDistributor.sendToServer(new BossSpawnerStartFight(bossSpawnerId));
+
+                    if (wasSkillRead) {
+
+                        Level level = FDClientHelpers.getClientLevel();
+                        if (level.getEntity(bossSpawnerId) instanceof BossSpawnerEntity bossSpawner) {
+                            PacketDistributor.sendToServer(new BossSpawnerStartFight(bossSpawnerId));
+                        }
+
+                    }else{
+                        this.didntReadSkillWarningWidget.setActive(true);
                     }
+
                     return true;
                 }));
         this.addRenderableWidget(startFightButton);
 
+    }
+
+    private void initDidntReadSkillWarningWidget(){
+        Vector2f anchor = this.getAnchor(0.5f,0.5f);
+
+        DidntReadSkillWarningWidget didntReadSkillWarningWidget = new DidntReadSkillWarningWidget(this, anchor.x - 150,anchor.y - 40, 300, 80);
+
+        this.didntReadSkillWarningWidget = didntReadSkillWarningWidget;
+
+        FDButton yes = new FDButton(this,20,didntReadSkillWarningWidget.getHeight() - 25,110,24)
+                .setTexture(new FDButtonTextures(
+                        new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
+                        new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
+                ))
+                .setText(Component.translatable("fdbosses.word.yes").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
+                        110,1f,true,0,1)
+                .setOnClickAction(((fdWidget1, v2, v11, i1) -> {
+                    Level level = FDClientHelpers.getClientLevel();
+                    if (level.getEntity(bossSpawnerId) instanceof BossSpawnerEntity bossSpawner) {
+                        PacketDistributor.sendToServer(new BossSpawnerStartFight(bossSpawnerId));
+                    }
+                    return true;
+                }));
+
+
+        FDButton no = new FDButton(this,didntReadSkillWarningWidget.getWidth() - 120,didntReadSkillWarningWidget.getHeight() - 25,110,24)
+                .setTexture(new FDButtonTextures(
+                        new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
+                        new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
+                ))
+                .setText(Component.translatable("fdbosses.word.no").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
+                        110,1f,true,0,1)
+                .setOnClickAction(((fdWidget1, v2, v11, i1) -> {
+                    this.didntReadSkillWarningWidget.setActive(false);
+                    return true;
+                }));
+
+        this.didntReadSkillWarningWidget.setActive(false);
+
+        didntReadSkillWarningWidget.addChild("yes",yes);
+        didntReadSkillWarningWidget.addChild("no",no);
+
+
+        this.addRenderableWidget(didntReadSkillWarningWidget);
     }
 
     private void initBossDetails(){
@@ -107,7 +161,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         widget.setBossInfo(this.options.getEntityType().getDescription(),this.getBaseStringColor());
         this.bossMenuXStart = anchor.x - bossInfoWidth;
 
-        TextBlockWidget bossDescription = new TextBlockWidget(this, 18,60,195, 40);
+        TextBlockWidget bossDescription = new TextBlockWidget(this, 18,60,195, 52);
         bossDescription.setText(options.getBossDescription(),1f,this.getBaseStringColor(),true);
 
         widget.addChild("bossDescription",bossDescription);
@@ -245,6 +299,8 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                     .setOnClickAction(((fdWidget, mx, my, button) -> {
                         if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT) return false;
 
+                        BaseBossScreen.wasSkillRead = true;
+
                         this.openSkillInfo(bossSkill,true);
 
                         return true;
@@ -324,13 +380,31 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         this.renderBack(graphics,mx,my,pticks);
 
         for (Renderable renderable : this.renderables) {
-            if (renderable != this.skillInfoWidget) {
+            if (renderable != this.skillInfoWidget && renderable != didntReadSkillWarningWidget) {
                 renderable.render(graphics, mx, my, pticks);
             }
         }
 
+
         this.renderSkillInfo(graphics,mx,my,pticks);
 
+        this.renderDidntReadSkillInfoWidget(graphics,mx,my,pticks);
+    }
+
+    private void renderDidntReadSkillInfoWidget(GuiGraphics graphics, int mx, int my, float pticks){
+        if (!didntReadSkillWarningWidget.isActive()) return;
+
+        Vector2f anchorEnd = this.getAnchor(1f,1f);
+
+        PoseStack poseStack = graphics.pose();
+
+
+
+        poseStack.pushPose();
+        poseStack.translate(0,0,200);
+        FDRenderUtil.fill(poseStack,0,0,anchorEnd.x,anchorEnd.y,0f,0f,0f,0.925f);
+        didntReadSkillWarningWidget.render(graphics,mx,my,pticks);
+        poseStack.popPose();
     }
 
     private void renderSkillInfo(GuiGraphics graphics, int mx, int my, float pticks){
@@ -338,7 +412,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         PoseStack matrices = graphics.pose();
         matrices.pushPose();
-        matrices.translate(0,0,100);
+        matrices.translate(0,0,200);
         float a = this.openTicker / (float) OPEN_TIME;
         if (skillOpened) {
             a = FDEasings.easeOut(FDEasings.easeOut(a));
@@ -360,7 +434,12 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
-        if (this.skillOpened) {
+        if (didntReadSkillWarningWidget.isActive()){
+            if (FDRenderUtil.isMouseInBounds((float) mx,(float) my,didntReadSkillWarningWidget.getX(),didntReadSkillWarningWidget.getY(),didntReadSkillWarningWidget.getWidth(),didntReadSkillWarningWidget.getHeight())){
+                return didntReadSkillWarningWidget.mouseClicked(mx,my, button);
+            }
+            return false;
+        } else if (this.skillOpened) {
             float xBorder = this.skillInfoWidget.getX() + this.skillInfoWidget.getWidth();
             if (mx > xBorder) {
                 this.openSkillInfo(null,false);
