@@ -191,9 +191,6 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }
         if (!level.isClientSide) {
 
-//            this.remainingHits = 4;
-
-
             AttackOptions ray = AttackOptions.builder()
                     .setPreAttack(CRYSTALS_ATTACK)
                     .addAttack(RAY_ATTACK)
@@ -1382,7 +1379,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         int tick = instance.tick;
         int stage = instance.stage;
 
-        if (stage == 0){
+        if (stage == 0 && tick == 0){
             this.changeTarget();
         }
 
@@ -2116,9 +2113,11 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                             .build());
 
                     this.initiateBlockProjectiles(blocksUpTime,blocksCycleTime,height,count);
+                    this.changeTarget();
                     instance.nextStage();
                 }
             }else{
+                this.changeTarget();
                 instance.nextStage();
             }
         }else if (stage == 1){
