@@ -83,5 +83,8 @@
   },
   "chesed_ray_charge_fast": {
     "sounds": ["fdbosses:chesed_ray_charge_fast"]
+  },
+  "monolith_hit": {
+    "sounds": ["fdbosses:monolith_hit"]
   }
 }
