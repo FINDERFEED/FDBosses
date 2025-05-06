@@ -1,5 +1,6 @@
 {
   "item.fdbosses.lightning_core": "Lightning Core",
+  "item.fdbosses.eye_of_chesed": "Eye Of Chesed",
   "death.attack.chesed_roll_attack": "%s was rolled over",
   "death.attack.chesed_attack": "%s was obliterated by %s",
   "death.attack.chesed_lor_attack": "%s was turned into a book by %s",

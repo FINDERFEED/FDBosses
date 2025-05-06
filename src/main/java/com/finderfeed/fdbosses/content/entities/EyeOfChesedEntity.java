@@ -51,7 +51,7 @@ public class EyeOfChesedEntity extends EyeOfEnder {
                     .addParticle(
                             options,
                             d0 - vec3.x * 0.5 + this.random.nextDouble() * 0.6 - 0.3,
-                            d1 - vec3.y * 0.5 - 0.5,
+                            d1 - vec3.y * 0.5,
                             d2 - vec3.z * 0.5 + this.random.nextDouble() * 0.6 - 0.3,
                             vec3.x * 0.25f,
                             vec3.y * 0.25f,
