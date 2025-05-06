@@ -78,5 +78,6 @@
   "fdbosses.skills.chesed.kinetic_field_description": "Uses this attack only on second phase.\n\nTraps players in a kinetic field that doesn't allow them to escape.\n\nPeriodically summons lightnings in all kinetic fields.",
   "fdbosses.word.didnt_read_skills": "It is highly advised to read boss skill descriptions before the fight. Do you really wish to start the fight now?",
   "fdbosses.word.yes": "Yes",
-  "fdbosses.word.no": "No"
+  "fdbosses.word.no": "No",
+  "fdbosses.word.fdbosses": "FDBosses"
 }

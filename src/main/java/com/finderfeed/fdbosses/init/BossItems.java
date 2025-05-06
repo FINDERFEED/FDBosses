@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.init;
 
+import com.finderfeed.fdbosses.content.items.EyeOfChesed;
 import com.finderfeed.fdbosses.content.items.LightningCore;
 import com.finderfeed.fdbosses.debug.DebugStick;
 import com.finderfeed.fdbosses.FDBosses;
@@ -21,6 +22,8 @@ public class BossItems {
 
     public static final Supplier<LightningCore> LIGHTNING_CORE = ITEMS.register("lightning_core",()->new LightningCore(new Item.Properties().stacksTo(1)));
 
+    public static final Supplier<EyeOfChesed> EYE_OF_CHESED = ITEMS.register("eye_of_chesed", EyeOfChesed::new);
+
     public static final Supplier<Item> NO_ENTITY_SPAWN_BLOCK = ITEMS.register("no_entity_spawn_block",
             ()->new BlockItem(BossBlocks.NO_ENTITY_SPAWN_BLOCK.get(), new Item.Properties()));
 
@@ -29,8 +32,9 @@ public class BossItems {
 
         @SubscribeEvent
         public static void addToCreativeTabs(BuildCreativeModeTabContentsEvent event){
-            if (event.getTabKey().equals(CreativeModeTabs.COMBAT)){
+            if (event.getTab().equals(BossCreativeTabs.MAIN.get())){
                 event.accept(LIGHTNING_CORE.get());
+                event.accept(EYE_OF_CHESED.get());
             }
         }
 

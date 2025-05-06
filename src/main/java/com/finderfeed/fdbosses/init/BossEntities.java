@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.init;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.content.entities.EyeOfChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossSpawner;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.ChesedKineticFieldEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
@@ -85,6 +86,11 @@ public class BossEntities {
     )
             .sized(0.2f,0.2f)
             .build("radial_earthquake"));
+
+    public static final Supplier<EntityType<EyeOfChesedEntity>> EYE_OF_CHESED = ENTITIES.register("eye_of_chesed",()->EntityType.Builder.<EyeOfChesedEntity>of(
+            EyeOfChesedEntity::new, MobCategory.MISC
+    )
+            .sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(4).build("eye_of_chesed"));
 
     public static final Supplier<EntityType<ChesedCrystalEntity>> CHESED_CRYSTAL = ENTITIES.register("chesed_crystal",()->EntityType.Builder.of(
             ChesedCrystalEntity::new, MobCategory.MISC

@@ -32,6 +32,7 @@ public class FDBosses {
         BossEntities.ENTITIES.register(bus);
         BossEffects.MOB_EFFECTS.register(bus);
         BossParticles.PARTICLES.register(bus);
+        BossCreativeTabs.CREATIVE_TABS.register(bus);
         BossDataComponents.DATA_COMPONENTS.register(bus);
     }
 
