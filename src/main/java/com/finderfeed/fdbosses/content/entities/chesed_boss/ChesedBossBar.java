@@ -31,7 +31,7 @@ public class ChesedBossBar extends FDBossBarInterpolated {
 
     private static final Random r = new Random();
 
-    public static final ResourceLocation TEXTURE = ResourceLocation.tryBuild(FDBosses.MOD_ID,"textures/boss_bars/chesed_boss_bar2.png");
+    public static final ResourceLocation TEXTURE = ResourceLocation.tryBuild(FDBosses.MOD_ID,"textures/boss_bars/chesed_bossbar.png");
 
     private int previousHitStrength = 0;
     private int time = 0;
@@ -44,7 +44,7 @@ public class ChesedBossBar extends FDBossBarInterpolated {
         super(uuid, entityId,10);
     }
 
-    //198 (192) 45 (50)
+    //254 59 (54)
     @Override
     public void renderInterpolatedBossBar(GuiGraphics graphics, float partialTicks,float interpolatedPercentage) {
 
@@ -64,22 +64,22 @@ public class ChesedBossBar extends FDBossBarInterpolated {
             long rndOffset = 2343;
 
             Random shakeRnd = new Random((time + 1) * rndOffset);
-            float tx = shakeRnd.nextFloat() * 2 - 1;
-            float ty = shakeRnd.nextFloat() * 2 - 1;
+            float tx = shakeRnd.nextFloat() * 2.5f - 1.25f;
+            float ty = shakeRnd.nextFloat() * 2.5f - 1.25f;
 
             matrices.translate(tx * str, ty * str, 0);
         }
 
         FDRenderUtil.bindTexture(TEXTURE);
-        FDRenderUtil.blitWithBlend(matrices,-198/2f,0,198,45,0,0,
-                198,45,198,50,0,1f);
+        FDRenderUtil.blitWithBlend(matrices,-254/2f,0,254,54,0,0,
+                254,54,254,59,0,1f);
 
-        float hpPosX = -198/2f + 3;
-        float hpPosY = 20;
+        float hpPosX = -254/2f + 31;
+        float hpPosY = 26;
         float hpW = 192f;
 
-        FDRenderUtil.blitWithBlend(matrices,hpPosX,hpPosY,hpW * interpolatedPercentage,5,0,45,
-                hpW * interpolatedPercentage,5,198,50,0,1f);
+        FDRenderUtil.blitWithBlend(matrices,hpPosX,hpPosY,hpW * interpolatedPercentage,5,0,54,
+                hpW * interpolatedPercentage,5,254,59,0,1f);
 
 
 
@@ -92,8 +92,8 @@ public class ChesedBossBar extends FDBossBarInterpolated {
                 .position(hpPosX,hpPosY,0)
                 .setResolution(hpW,5)
                 .setUVSpan(0.5f,1)
-                .setUpColor(0.1f,0.5f,0.5f,0f)
-                .setDownColor(0.1f,0.8f,0.8f,0.8f)
+                .setUpColor(0.1f,0.8f,0.8f,0f)
+                .setDownColor(0.5f,1f,1f,0.8f)
                 .setShaderUniform("size",hpW,5)
                 .setShaderUniform("xyOffset",0,shaderTime)
                 .setShaderUniform("sections",100)
@@ -116,15 +116,15 @@ public class ChesedBossBar extends FDBossBarInterpolated {
             hpW *= interpolatedPercentage;
 
             List<Vec3> path = List.of(
-                    new Vec3(hpPosX, hpPosY + 2, 0),
-                    new Vec3(hpPosX + hpW, hpPosY + 2, 0)
+                    new Vec3(hpPosX-2, hpPosY + 2.5f, 0),
+                    new Vec3(hpPosX + hpW+2, hpPosY + 2.5f, 0)
             );
             List<Vec3> path2 = List.of(
-                    new Vec3(hpPosX, hpPosY + 2, 0),
-                    new Vec3(hpPosX + hpW, hpPosY + 2, 0)
+                    new Vec3(hpPosX-2, hpPosY + 2.5f, 0),
+                    new Vec3(hpPosX + hpW+2, hpPosY + 2.5f, 0)
             );
-            float lw = 1.5f;
-            float lspread = 3;
+            float lw = 1.75f;
+            float lspread = 4;
             int lightningBreaks = Math.max(2, Math.round(interpolatedPercentage * 20));
             ArcLightningParticle.fullLightningImmediateDraw(time, 32423543, lightningBreaks, matrices.last().pose(), path, lw, lspread, 0.2f, 1f, 1f, t);
             ArcLightningParticle.fullLightningImmediateDraw(time, 32423543, lightningBreaks, matrices.last().pose(), path, lw / 2, lspread, 0.7f, 1f, 1f, t);
@@ -152,7 +152,7 @@ public class ChesedBossBar extends FDBossBarInterpolated {
             float randomOffset2 = r.nextFloat() * 200 - 100;
             float x = w / 2 + randomOffset;
             float x2 = w / 2 + randomOffset2;
-            float y = 22;
+            float y = 28;
             FDTexturedSParticle.create(FDRenderUtil.ParticleRenderTypesS.TEXTURES_BLUR_ADDITIVE, BallParticle.LOCATION)
                     .setPos(x, y, true)
                     .setMaxQuadSize(3.5f)
