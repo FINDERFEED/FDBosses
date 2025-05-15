@@ -48,4 +48,8 @@ public class ChesedConfig  {
     @Comment("If health is greater than value, sets the health equal to the value")
     public float healthAfterSecondPhaseTransition = 10f;
 
+    @ConfigValue
+    @Comment("Monolith hp gain when second phase starts")
+    public float additionalSecondPhaseMonolithHP = 50f;
+
 }

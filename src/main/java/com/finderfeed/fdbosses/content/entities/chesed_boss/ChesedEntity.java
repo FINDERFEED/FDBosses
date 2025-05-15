@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.chesed_boss;
 
 import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
@@ -87,6 +88,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
@@ -371,6 +374,20 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }
     }
 
+    private void addMonolithHP(){
+        var monoliths = this.getMonoliths();
+        float monolithHPGain = BossConfigs.BOSS_CONFIG.get().chesedConfig.additionalSecondPhaseMonolithHP;
+        for (var m : monoliths){
+            AttributeModifier hpModifier = new AttributeModifier(FDBosses.location("monolith_hp"), monolithHPGain, AttributeModifier.Operation.ADD_VALUE);
+            var attr = m.getAttribute(Attributes.MAX_HEALTH);
+            if (attr != null) {
+                attr.addTransientModifier(
+                        hpModifier
+                );
+            }
+        }
+    }
+
     private void tickSecondPhaseStart(){
 
         if (!bossInitializer.isFinished() || tickCount < 250) return;
@@ -385,6 +402,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             this.setRolling(false);
             this.entityData.set(IS_LAUNCHING_ORBS,false);
             this.chain.reset();
+
+            this.addMonolithHP();
         }
 
         if (this.secondPhaseTicker <= 0) return;
