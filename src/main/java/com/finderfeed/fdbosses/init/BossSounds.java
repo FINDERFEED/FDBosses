@@ -40,6 +40,7 @@ public class BossSounds {
     public static final Supplier<SoundEvent> CHESED_RAY_CHARGE = SOUNDS.register("chesed_ray_charge",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_ray_charge")));
     public static final Supplier<SoundEvent> CHESED_RAY_CHARGE_FAST = SOUNDS.register("chesed_ray_charge_fast",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_ray_charge_fast")));
     public static final Supplier<SoundEvent> MONOLITH_HIT = SOUNDS.register("monolith_hit",()->SoundEvent.createVariableRangeEvent(FDBosses.location("monolith_hit")));
+    public static final Supplier<SoundEvent> CHESED_IDLE = SOUNDS.register("chesed_idle",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_idle")));
 
 
 }

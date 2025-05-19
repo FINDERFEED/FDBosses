@@ -28,6 +28,7 @@ import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.packets.ChesedRayReflectPacket;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
+import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDScreenEffects;
@@ -194,6 +195,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }
         if (!level.isClientSide) {
 
+            remainingHits = 5;
+
             AttackOptions ray = AttackOptions.builder()
                     .setPreAttack(CRYSTALS_ATTACK)
                     .addAttack(RAY_ATTACK)
@@ -358,6 +361,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 this.monolithEnergyDrainParticles();
             }
 
+            this.playIdleSound();
 
             if (this.isRolling()){
                 this.handleClientRolling();
@@ -374,6 +378,12 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }
     }
 
+    private void playIdleSound(){
+        if (level().getGameTime() % 28 == 0){
+            level().playSound(FDClientHelpers.getClientPlayer(), this.getX(),this.getY(),this.getZ(),BossSounds.CHESED_IDLE.get(),SoundSource.HOSTILE,5f,1f);
+        }
+    }
+
     private void addMonolithHP(){
         var monoliths = this.getMonoliths();
         float monolithHPGain = BossConfigs.BOSS_CONFIG.get().chesedConfig.additionalSecondPhaseMonolithHP;
@@ -385,6 +395,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                         hpModifier
                 );
             }
+            m.setHealth(m.getMaxHealth());
         }
     }
 
