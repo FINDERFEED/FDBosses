@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
 import com.finderfeed.fdbosses.client.particles.particle_processors.ChesedRayCircleParticleProcessor;
+import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
@@ -60,6 +61,7 @@ import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenC
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
+import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningParticleOptions;
@@ -625,10 +627,22 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             double ey = entity.getY();
             if (ey - y > 3){
                 if (entity.tickCount % 30 == 0) {
-                    float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.electrifiedAirDamage;
-                    if (entity.hurt(BossDamageSources.chesedAttack(this), damage)) {
 
+
+                    float damagePercent = BossConfigs.BOSS_CONFIG.get().chesedConfig.electrifiedAirCurrentHealthDamagePercent;
+
+                    float instadeathHP = BossConfigs.BOSS_CONFIG.get().chesedConfig.electrifiedAirInstadeathHP;
+
+                    float health = entity.getHealth();
+
+                    float damage;
+                    if (health <= instadeathHP){
+                        damage = Integer.MAX_VALUE;
+                    }else{
+                        damage = health * (damagePercent / 100f);
                     }
+
+                    entity.hurt(BossDamageSources.chesedAttack(this), damage);
                 }
 
                 if (tickCount % 5 == 0){
@@ -1053,8 +1067,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     }
 
     private void summonOneShotAtPos(Vec3 pos){
-        ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(), pos,
-                BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRayDamage, 40, 30);
+        float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.kineticFieldRayDamage;
+        ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(), pos, damage, 40, 30);
         entity.setDamageRadius(1.75f);
         entity.softerSound = true;
     }
@@ -2789,10 +2803,45 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
                 Vec3 speed = b.normalize();
 
-                if (entity instanceof ServerPlayer serverPlayer && (!serverPlayer.isCreative() && !serverPlayer.isSpectator())){
-                    FDLibCalls.setServerPlayerSpeed(serverPlayer, speed);
+                boolean doParticles = false;
+
+                if (entity instanceof ServerPlayer serverPlayer){
+                    if ((!serverPlayer.isCreative() && !serverPlayer.isSpectator())) {
+                        FDLibCalls.setServerPlayerSpeed(serverPlayer, speed);
+                        doParticles = true;
+                    }
                 }else{
+                    doParticles = true;
                     entity.setDeltaMovement(speed);
+                }
+
+
+                if (doParticles) {
+                    ParticleOptions rush = new RushParticleOptions(speed.reverse(),
+                            new FDColor(0.8f, 1f, 1f, 1f),
+                            random.nextFloat() * 0.5f + 0.25f,
+                            0.05f + random.nextFloat() * 0.025f,
+                            2 + random.nextInt(2));
+
+                    BallParticleOptions ball = BallParticleOptions.builder()
+                            .color(40, 200 + random.nextInt(30), 255)
+                            .scalingOptions(0, 20, 20)
+                            .size(0.25f)
+                            .scalingOptions(2, 0, 4)
+                            .build();
+
+                    ((ServerLevel) level()).sendParticles(rush,
+                            entity.getX(),
+                            entity.getY() + entity.getBbHeight() / 2,
+                            entity.getZ(), 10,
+                            entity.getBbWidth() / 2, entity.getBbHeight() / 2, entity.getBbWidth() / 2, 0f);
+
+
+                    ((ServerLevel) level()).sendParticles(ball,
+                            entity.getX(),
+                            entity.getY() + entity.getBbHeight() / 2,
+                            entity.getZ(), 10,
+                            entity.getBbWidth() / 2, entity.getBbHeight() / 2, entity.getBbWidth() / 2, 0f);
                 }
 
             }

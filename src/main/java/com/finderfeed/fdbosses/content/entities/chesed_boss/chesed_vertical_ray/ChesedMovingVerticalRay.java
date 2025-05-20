@@ -137,7 +137,7 @@ public class ChesedMovingVerticalRay extends LivingEntity implements AutoSeriali
 
         for (LivingEntity entity : list){
 
-            if (entity instanceof ChesedBossBuddy) continue;
+            if (entity instanceof ChesedBossBuddy || entity instanceof ChesedMovingVerticalRay) continue;
 
             entity.hurt(BossDamageSources.CHESED_VERTICAL_RAY_SOURCE,this.getDamage());
 

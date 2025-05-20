@@ -9,7 +9,12 @@ public class ChesedConfig  {
     public int chesedMaxHits = 10;
 
     @ConfigValue
-    public float electrifiedAirDamage = 4f;
+    @Comment("Defence from flight")
+    public float electrifiedAirCurrentHealthDamagePercent = 33f;
+
+    @ConfigValue
+    @Comment("Immediately kills the player if HP is lower than value")
+    public float electrifiedAirInstadeathHP = 2f;
 
     @ConfigValue
     public float electricSphereDamage = 10f;
