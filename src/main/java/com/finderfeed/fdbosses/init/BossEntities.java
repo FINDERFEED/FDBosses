@@ -17,6 +17,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.flying_block_entity.
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -144,6 +145,14 @@ public class BossEntities {
             .build("flying_sword"));
 
 
+    public static final Supplier<EntityType<MalkuthEntity>> MALKUTH = ENTITIES.register("malkuth",()->EntityType.Builder.of(
+            MalkuthEntity::new, MobCategory.CREATURE
+    )
+            .updateInterval(1)
+            .sized(0.2f,0.2f)
+            .build("malkuth"));
+
+
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event){
         event.put(CHESED.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,10).build());
@@ -151,6 +160,8 @@ public class BossEntities {
         event.put(CHESED_VERTICAL_RAY_ATTACK.get(), LivingEntity.createLivingAttributes().build());
         event.put(CHESED_MONOLITH.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,50).build());
         event.put(CHESED_CRYSTAL.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
+
+        event.put(MALKUTH.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
     }
 
 

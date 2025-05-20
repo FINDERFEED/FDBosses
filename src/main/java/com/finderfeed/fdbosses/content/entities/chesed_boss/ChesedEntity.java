@@ -195,8 +195,6 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }
         if (!level.isClientSide) {
 
-            remainingHits = 5;
-
             AttackOptions ray = AttackOptions.builder()
                     .setPreAttack(CRYSTALS_ATTACK)
                     .addAttack(RAY_ATTACK)

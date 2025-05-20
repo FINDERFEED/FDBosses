@@ -75,6 +75,14 @@ public class BossClientModEvents {
 
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
+
+        event.registerEntityRenderer(BossEntities.MALKUTH.get(), FDEntityRendererBuilder.builder()
+                        .addLayer(FDEntityRenderLayerOptions.builder()
+                                .model(BossModels.WIP_MODEL)
+                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/wip.png")))
+                                .build())
+                .build());
+
         event.registerEntityRenderer(BossEntities.CHESED.get(),
                 FDEntityRendererBuilder.<ChesedEntity>builder()
                         .shouldRender(((entity, frustum, x, y, z) -> {
