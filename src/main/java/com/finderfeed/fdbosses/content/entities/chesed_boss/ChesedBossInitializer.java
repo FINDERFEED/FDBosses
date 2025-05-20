@@ -16,6 +16,7 @@ import com.finderfeed.fdlib.systems.cutscenes.EasingType;
 import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
+import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.server.level.ServerLevel;
@@ -140,7 +141,23 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
                 ServerPlayer serverPlayer = (ServerPlayer) player;
                 FDLibCalls.sendScreenEffect(serverPlayer, FDScreenEffects.SCREEN_COLOR.get(),new ScreenColorData(0f,0f,0f,1f),0,20,20);
             }
-        }else if (this.getTick() == 48){
+        }else if (this.getTick() == 29){
+
+            entity.level().playSound(null, entity.getX(),entity.getY(),entity.getZ(), BossSounds.ROCK_IMPACT.get(), SoundSource.HOSTILE, 5f, 0.85f);
+
+        }else if (this.getTick() == 30){
+
+            PositionedScreenShakePacket.send((ServerLevel) entity.level(),FDShakeData.builder()
+                    .frequency(10)
+                    .amplitude(10f)
+                    .inTime(0)
+                    .stayTime(0)
+                    .outTime(10)
+                    .build(),entity.position().add(0,ChesedEntity.ARENA_HEIGHT - 2,0),ChesedEntity.ARENA_HEIGHT);
+            entity.rockfallCastStones(15, 30, FDMathUtil.FPI * 2 / 15f);
+            entity.level().playSound(null, entity.getX(),entity.getY(),entity.getZ(), BossSounds.CHESED_RAY.get(), SoundSource.HOSTILE, 5f, 1f);
+
+        } else if (this.getTick() == 48){
             SlamParticlesPacket packet = new SlamParticlesPacket(
                     new SlamParticlesPacket.SlamData(entity.getOnPos(),entity.position().add(0,0.5,0),new Vec3(1,0,0))
                             .maxAngle(FDMathUtil.FPI * 2)

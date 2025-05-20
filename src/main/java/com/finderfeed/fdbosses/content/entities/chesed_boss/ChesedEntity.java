@@ -759,7 +759,11 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     }
 
     public List<Player> getCombatants(boolean includeCreativeAndSpectator){
-        float radius = this.targetDetectionRadius();
+        return this.getCombatants(includeCreativeAndSpectator, 0);
+    }
+
+    public List<Player> getCombatants(boolean includeCreativeAndSpectator,float additionalRadius){
+        float radius = this.targetDetectionRadius() + additionalRadius;
         List<Player> combatants = level().getEntitiesOfClass(Player.class,new AABB(-radius,-1,-radius,radius,ARENA_HEIGHT,radius).move(this.position()),(player)->{
             return player.position().multiply(1,0,1).distanceTo(this.position().multiply(1,0,1)) <= radius
                     && (includeCreativeAndSpectator || !(player.isCreative() || player.isSpectator())) && player.isAlive();
@@ -1110,7 +1114,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
             } else if (instance.tick == buildupSoundStart) {
                 this.setMonolithDrainPercent(0);
-                PacketDistributor.sendToPlayersTrackingEntity(this, new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_PREPARE.get(), 1f, 1));
+                this.playInEarsSound(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_PREPARE.get(), 1f, 1);
             } else if (instance.tick == impactFramesStart) {
                 this.setMonolithDrainPercent(0);
                 ImpactFrame base = new ImpactFrame(0.5f, 0.1f, 4, false);
@@ -1126,7 +1130,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 this.setMonolithDrainPercent(0);
 
                 this.boomAttackAfterBlackout();
-                PacketDistributor.sendToPlayersTrackingEntity(this, new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_BIGGER.get(), 1f, 1));
+                this.playInEarsSound(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_BIGGER.get(), 1f, 1);
 
                 DefaultShakePacket.send((ServerLevel) level(), this.position(), 60, FDShakeData.builder()
                         .amplitude(0.25f)
@@ -1446,9 +1450,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 int d = this.isBelowHalfHP() ? 12 : 10;
 
                 if (tick == rayAttackTick - d){
-                    for (Player player : this.getCombatants(false)){
-                        PacketDistributor.sendToPlayer((ServerPlayer) player, new PlaySoundInEarsPacket(BossSounds.ATTACK_DING.get(),1f,2f));
-                    }
+                    this.playInEarsSound(BossSounds.ATTACK_DING.get(),1f,2f);
                 }
 
                 if (tick < rayAttackTick - 5){
@@ -1798,7 +1800,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                                     new SetParticleSpeedProcessor(new Vec3(0,0.2,0))
                             ))
                             .scalingOptions(10,10,0)
-                            .build(),ppos,height * 2);
+                            .build(),ppos,height * 1.25f);
 
 
                 }
@@ -1820,7 +1822,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                         .inTime(0)
                         .stayTime(0)
                         .outTime(10)
-                        .build(),this.position().add(0,height,0),height * 2);
+                        .build(),this.position().add(0,height,0),height * 1.25f);
                 DefaultShakePacket.send((ServerLevel) level(),this.position(),60,FDShakeData.builder()
                                 .amplitude(0.15f)
                                 .inTime(0)
@@ -1834,44 +1836,18 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
                 BossUtil.chesedRayExplosion((ServerLevel) level(),this.position().add(0,height,0),new Vec3(0,-1,0),120,10,1);
                 ((ServerLevel)level()).playSound(null,this.getX(),this.getY() + height,this.getZ(), BossSounds.CHESED_RAY.get(), SoundSource.HOSTILE,100f,1f);
-//                if (true){
-//                    return true;
-//                }
-                PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.ROCKFALL.get(),1,1));
-                PacketDistributor.sendToPlayersTrackingEntity(this,new PlaySoundInEarsPacket(BossSounds.RUMBLING.get(),1,1));
+
+
+                this.playInEarsSound(BossSounds.ROCKFALL.get(),1,1);
+                this.playInEarsSound(BossSounds.RUMBLING.get(),1,1);
 
                 int count = 10 + random.nextInt(10);
                 float angle = FDMathUtil.FPI * 2 / count;
 
 
-                for (int i = 0; i < count;i++) {
+                this.rockfallCastStones(count, height, angle);
 
-
-                    BlockState state = random.nextFloat() > 0.5f ? Blocks.DEEPSLATE.defaultBlockState() : Blocks.SCULK.defaultBlockState();
-
-                    ChesedFallingBlock block = ChesedFallingBlock.summon(level(), state, this.position().add(0, height, 0),
-                            BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRockDamage);
-
-                    Vec3 v = new Vec3(random.nextFloat() * 0.025 + 0.2,0,0).yRot(angle * i + (random.nextFloat() * 2 - 1) * angle);
-
-                    block.setDeltaMovement(v.add(0,-random.nextFloat() * 0.5 - 0.25,0));
-
-                    float rnd = random.nextFloat() * 0.05f;
-
-                    FDLibCalls.addParticleEmitter(level(), height * 2, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
-                                    .color(0.35f - rnd, 0.35f - rnd, 0.35f - rnd)
-                                    .lifetime(0, 0, 50)
-                                    .size(2f)
-                                    .build())
-                            .lifetime(200)
-                            .processor(new BoundToEntityProcessor(block.getId(), Vec3.ZERO))
-                            .position(this.position())
-                            .build());
-
-
-                }
-
-                FDLibCalls.addParticleEmitter(level(), height * 2, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+                FDLibCalls.addParticleEmitter(level(), height * 1.25f, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
                                 .color(0.25f, 0.25f, 0.25f)
                                 .lifetime(0, 0, 100)
                                 .size(1f)
@@ -1929,6 +1905,35 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
 
         return false;
+    }
+
+    public void rockfallCastStones(int count, float height, float angle){
+        for (int i = 0; i < count;i++) {
+
+
+            BlockState state = random.nextFloat() > 0.5f ? Blocks.DEEPSLATE.defaultBlockState() : Blocks.SCULK.defaultBlockState();
+
+            ChesedFallingBlock block = ChesedFallingBlock.summon(level(), state, this.position().add(0, height, 0),
+                    BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRockDamage);
+
+            Vec3 v = new Vec3(random.nextFloat() * 0.025 + 0.2,0,0).yRot(angle * i + (random.nextFloat() * 2 - 1) * angle);
+
+            block.setDeltaMovement(v.add(0,-random.nextFloat() * 0.5 - 0.25,0));
+
+            float rnd = random.nextFloat() * 0.05f;
+
+            FDLibCalls.addParticleEmitter(level(), height * 2, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+                            .color(0.35f - rnd, 0.35f - rnd, 0.35f - rnd)
+                            .lifetime(0, 0, 50)
+                            .size(2f)
+                            .build())
+                    .lifetime(200)
+                    .processor(new BoundToEntityProcessor(block.getId(), Vec3.ZERO))
+                    .position(this.position())
+                    .build());
+
+
+        }
     }
 
     private void summonStonesAround(int count, int rad, Vec3 center, boolean useEasing, boolean reverseEasing, Function<Float,Float> func){
@@ -2795,6 +2800,12 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             }
         }
 
+    }
+
+    public void playInEarsSound(SoundEvent soundEvent, float volume, float pitch){
+        for (var player : this.getCombatants(true, 10)){
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new PlaySoundInEarsPacket(soundEvent,pitch,volume));
+        }
     }
 
     private void stopAllNonIdleAnimations(){
