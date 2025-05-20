@@ -201,8 +201,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .build();
 
             AttackOptions rayOrBlocks = AttackOptions.builder()
-                    .addAttack(2,ray)
-                    .addAttack(3,BLOCKS_ATTACK)
+                    .addAttack(3,ray)
+                    .addAttack(2,BLOCKS_ATTACK)
                     .build();
 
             chain = new AttackChain(level.random)
@@ -1448,7 +1448,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 int d = this.isBelowHalfHP() ? 12 : 10;
 
                 if (tick == rayAttackTick - d){
-                    this.playInEarsSound(BossSounds.ATTACK_DING.get(),1f,2f);
+                    this.playInEarsSound(BossSounds.ATTACK_DING.get(),1f,1f);
                 }
 
                 if (tick < rayAttackTick - 5){
