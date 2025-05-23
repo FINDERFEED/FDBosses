@@ -13,6 +13,7 @@ public class BossSounds {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, FDBosses.MOD_ID);
 
 
+    public static final Supplier<SoundEvent> BUTTON_CLICK = SOUNDS.register("button_click",()->SoundEvent.createVariableRangeEvent(FDBosses.location("button_click")));
     public static final Supplier<SoundEvent> CHESED_RAY = SOUNDS.register("ray_attack",()->SoundEvent.createVariableRangeEvent(FDBosses.location("ray_attack")));
     public static final Supplier<SoundEvent> ROCKFALL = SOUNDS.register("rockfall",()->SoundEvent.createVariableRangeEvent(FDBosses.location("rockfall")));
     public static final Supplier<SoundEvent> RUMBLING = SOUNDS.register("rumbling",()->SoundEvent.createVariableRangeEvent(FDBosses.location("rumbling")));

@@ -28,7 +28,7 @@
   "fdbosses.close_skill_info": "Click empty space to close",
   "fdbosses.bosses.description.chesed": "A creature born out of rocks corroded by sculk. Wields enormous magic power.\n\n§cRecommended weapon type: {{(fdlib:item)item=minecraft:diamond_axe}}",
   "fdbosses.skills.chesed.mightiness": "Mightiness",
-  "fdbosses.skills.chesed.mightiness_description": "Chesed cannot be hurt directly.\n\nAll damage inflicted by Chesed cannot be lowered by any resistances.\n\nGives all combatants {{(fdbosses:effect)id=minecraft:night_vision}} while alive.\n\nIf a player looks away from Chesed, that player is inflicted with {{(fdbosses:effect)id=fdbosses:chesed_gaze}}.\n\nChesed proceeds to second phase when hp drop below 50%.",
+  "fdbosses.skills.chesed.mightiness_description": "Chesed cannot be hurt directly and its arena cannot be easily escaped from.\n\nAll damage inflicted by Chesed cannot be lowered by any resistances.\n\nGives all combatants {{(fdbosses:effect)id=minecraft:night_vision}} while alive.\n\nIf a player looks away from Chesed, that player is inflicted with {{(fdbosses:effect)id=fdbosses:chesed_gaze}}.\n\nChesed proceeds to second phase when hp drop below 50%.",
   "fdbosses.skills.chesed.blocks": "Block Barrage",
   "fdbosses.skills.chesed.blocks_description": "Tears out blocks from the earth and hurls them onto target.",
   "fdbosses.skills.chesed.earthquake": "Earthquake",
@@ -36,7 +36,7 @@
   "fdbosses.skills.chesed.espheres": "Tempest Core",
   "fdbosses.skills.chesed.espheres_description": "Releases ball lightnings that travel out from Chesed.\n\nThese ball lightnings cannot be reflected.",
   "fdbosses.skills.chesed.monoliths": "Monoliths",
-  "fdbosses.skills.chesed.monoliths_description": "Spawns 4 monoliths when summoned. \n\nMonoliths deactivate upon death and cannot be damaged anymore.\n\nGain additional {{(fdbosses:config_float) config=chesedConfig, value=additionalSecondPhaseMonolithHP}} HP on second phase.",
+  "fdbosses.skills.chesed.monoliths_description": "Spawns 4 monoliths when summoned. \n\nMonoliths deactivate upon death and cannot be damaged anymore.\n\nMonoliths gain additional {{(fdbosses:config_float) config=chesedConfig, value=additionalSecondPhaseMonolithHP}} HP on second phase.",
   "fdbosses.skills.chesed.roll": "Rolling Thunder",
   "fdbosses.skills.chesed.roll_description": "Rolls around the arena damaging and pushing away everyone who step in its way. \n\nDuring second phase leaves a fire trail behind.",
   "fdbosses.skills.chesed.rockfall": "Rockfall",
@@ -76,12 +76,12 @@
   "fdbosses.drops.chesed.lightning_core_stats": "Shock:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=effectConfig, value=shockDamageReductionPercent}}% outgoing damage reduction.\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=flyingSwordShockDuration}} ticks.\n\nGhost weapon: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=flyingSwordDamagePercent}}% of weapon damage.\n\nSummon chance:  {{(fdbosses:config_float) config=itemConfig, value=chanceToSummonFlyingSword}}%",
   "fdbosses.skills.chesed.electrified_air": "Electrified Air",
   "fdbosses.skills.chesed.electrified_air_description": "Air above Chesed crackles with power. Entities that interact with it are damaged.",
-  "fdbosses.skills.chesed.electrified_air_stats": "Air: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=electrifiedAirCurrentHealthDamagePercent}}% current HP.\n\nInstantly kills affected entity if HP is lower than {{(fdbosses:config_float) config=chesedConfig, value=electrifiedAirInstadeathHP}}.",
+  "fdbosses.skills.chesed.electrified_air_stats": "Air: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=electrifiedAirCurrentHealthDamagePercent}}% current HP.\n\nInstantly kills affected entity if HP is lower than  {{(fdbosses:config_float) config=chesedConfig, value=electrifiedAirInstadeathHP}}.",
   "fdbosses.skills.chesed.kinetic_field": "Kinetic Field",
   "fdbosses.skills.chesed.kinetic_field_stats": "Lightnings: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=chesedConfig, value=kineticFieldRayDamage}}",
   "fdbosses.skills.chesed.kinetic_field_description": "Uses this attack only on second phase.\n\nTraps players in a kinetic field that doesn't allow them to escape.\n\nPeriodically summons lightnings in all kinetic fields.",
   "fdbosses.word.didnt_read_skills": "It is highly advised to read boss skill descriptions before the fight. Do you really wish to start the fight now?",
   "fdbosses.word.yes": "Yes",
   "fdbosses.word.no": "No",
-  "fdbosses.word.fdbosses": "FDBosses"
+  "fdbosses.word.fdbosses": "Qliphoth Awakening"
 }

@@ -89,5 +89,8 @@
   },
   "chesed_idle": {
     "sounds": ["fdbosses:chesed_idle"]
+  },
+  "button_click": {
+    "sounds": ["fdbosses:button_click"]
   }
 }

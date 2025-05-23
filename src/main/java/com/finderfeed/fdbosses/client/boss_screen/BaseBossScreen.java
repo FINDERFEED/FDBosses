@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossInfo;
 import com.finderfeed.fdbosses.client.boss_screen.widget.*;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerStartFight;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.simple_screen.FDScrollableWidget;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
@@ -83,6 +84,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                         new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
                 ))
+                .setSound(BossSounds.BUTTON_CLICK.get())
                 .setText(Component.translatable("fdbosses.word.start_fight").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         110,1f,true,0,1)
                 .setOnClickAction(((fdWidget1, v2, v11, i1) -> {
@@ -116,6 +118,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                         new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
                 ))
+                .setSound(BossSounds.BUTTON_CLICK.get())
                 .setText(Component.translatable("fdbosses.word.yes").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         110,1f,true,0,1)
                 .setOnClickAction(((fdWidget1, v2, v11, i1) -> {
@@ -132,6 +135,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                         new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
                 ))
+                .setSound(BossSounds.BUTTON_CLICK.get())
                 .setText(Component.translatable("fdbosses.word.no").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         110,1f,true,0,1)
                 .setOnClickAction(((fdWidget1, v2, v11, i1) -> {
@@ -184,6 +188,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
                 ))
+                .setSound(BossSounds.BUTTON_CLICK.get())
                 .setText(Component.translatable("fdbosses.word.stats").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         61,1f,true,0,1);
 
@@ -192,6 +197,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
                 ))
+                .setSound(BossSounds.BUTTON_CLICK.get())
                 .setText(Component.translatable("fdbosses.word.info").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         61,1f,true,0,1);
 
@@ -237,6 +243,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
                 ))
+                .setSound(BossSounds.BUTTON_CLICK.get())
                 .setText(Component.translatable("fdbosses.word.abilities").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         73,1f,true,0,1)
                 .setOnClickAction((fdWidget, v, v1, i) -> {
@@ -251,6 +258,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
                 ))
+                .setSound(BossSounds.BUTTON_CLICK.get())
                 .setText(Component.translatable("fdbosses.word.drops").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         73,1f,true,0,1)
                 .setOnClickAction(((fdWidget, v, v1, i) -> {
@@ -296,6 +304,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                             matrices.popPose();
                         }
                     }))
+                    .setSound(BossSounds.BUTTON_CLICK.get())
                     .setOnClickAction(((fdWidget, mx, my, button) -> {
                         if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT) return false;
 

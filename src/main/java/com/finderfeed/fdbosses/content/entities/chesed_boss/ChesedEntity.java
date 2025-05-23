@@ -396,6 +396,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 );
             }
             m.setHealth(m.getMaxHealth());
+            m.setDeactivated(false);
         }
     }
 
