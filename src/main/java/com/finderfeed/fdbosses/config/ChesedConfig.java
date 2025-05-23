@@ -14,7 +14,7 @@ public class ChesedConfig  {
 
     @ConfigValue
     @Comment("Immediately kills the player if HP is lower than value")
-    public float electrifiedAirInstadeathHP = 2f;
+    public float electrifiedAirInstadeathHP = 4f;
 
     @ConfigValue
     public float electricSphereDamage = 10f;

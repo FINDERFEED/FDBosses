@@ -20,4 +20,8 @@ public class BossConfig extends ReflectiveJsonConfig {
         super(FDBosses.location("bosses"));
     }
 
+    @Override
+    public boolean isClientside() {
+        return false;
+    }
 }
