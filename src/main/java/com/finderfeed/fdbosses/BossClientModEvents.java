@@ -9,6 +9,7 @@ import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedAttackRa
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticle;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticle;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticle;
+import com.finderfeed.fdbosses.content.blocks.TrophyBlock;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedRenderer;
@@ -22,21 +23,33 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayReflectorRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
+import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
+import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.content.projectiles.renderers.BlockProjectileRenderer;
+import com.finderfeed.fdbosses.init.BossTileEntities;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRenderLayerOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRendererBuilder;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockEntityRenderLayer;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockEntityRendererBuilder;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockEntityTransformation;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockRenderLayerOptions;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.text_block_parser.TextBlockProcessors;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.client.NullEntityRenderer;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -55,6 +68,39 @@ public class BossClientModEvents {
         event.enqueueWork(()->{
             TextBlockProcessors.register(FDBosses.location("effect"),new MobEffectTextProcessor());
             TextBlockProcessors.register(FDBosses.location("config_float"),new BossConfigFloatValueProcessor());
+
+
+
+
+
+            FDBlockEntityTransformation<TrophyBlockEntity> baseTransform = (trophy,matrices,pticks)->{
+                matrices.mulPose(Axis.YP.rotationDegrees(trophy.getAngleFromState()));
+            };
+
+            FDBlockEntityTransformation<ChesedTrophyTileEntity> chesedTransform = (trophy,matrices,pticks)->{
+                matrices.scale(0.3f,0.3f,0.3f);
+                baseTransform.apply(trophy,matrices,pticks);
+            };
+
+            BlockEntityRenderers.register((BlockEntityType<ChesedTrophyTileEntity>)BossTileEntities.CHESED_TROPHY.get(),
+                    FDBlockEntityRendererBuilder.<ChesedTrophyTileEntity>builder()
+                    .addLayer(FDBlockRenderLayerOptions.<ChesedTrophyTileEntity>builder()
+                            .model(BossModels.CHESED)
+                            .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")))
+                            .transformation(chesedTransform)
+                            .build()
+                    )
+                    .addLayer(FDBlockRenderLayerOptions.<ChesedTrophyTileEntity>builder()
+                            .model(BossModels.CHESED_CRYSTAL_LAYER)
+                            .renderType((entity,pticks)->{
+                                return RenderType.eyes(FDBosses.location("textures/entities/chesed_crystals.png"));
+                            })
+                            .color((entity,pticks)->{
+                                return new FDColor(1f,1f,1f,1f);
+                            })
+                            .transformation(chesedTransform)
+                            .build())
+                    .build());
         });
     }
 
