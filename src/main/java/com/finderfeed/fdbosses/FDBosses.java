@@ -35,6 +35,7 @@ public class FDBosses {
         BossTileEntities.TILE_ENTITIES.register(bus);
         BossCreativeTabs.CREATIVE_TABS.register(bus);
         BossDataComponents.DATA_COMPONENTS.register(bus);
+        BossRecipeSerializers.RECIPE_SERIALIZERS.register(bus);
     }
 
 

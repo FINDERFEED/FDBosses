@@ -17,11 +17,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(CraftingMenu.class)
 public class CraftingMenuMixin {
 
-
-    @Inject(method = "slotChangedCraftingGrid", at = @At("HEAD"), cancellable = true)
-    private static void slotChangedCraftingGrid(AbstractContainerMenu menu, Level level, Player player, CraftingContainer craftingContainer, ResultContainer resultContainer, RecipeHolder<CraftingRecipe> recipe, CallbackInfo ci){
-        BossMixinHandler.slotChangedCraftingGrid(menu, level, player, craftingContainer, resultContainer, recipe, ci);
-    }
+//
+//    @Inject(method = "slotChangedCraftingGrid", at = @At("HEAD"), cancellable = true)
+//    private static void slotChangedCraftingGrid(AbstractContainerMenu menu, Level level, Player player, CraftingContainer craftingContainer, ResultContainer resultContainer, RecipeHolder<CraftingRecipe> recipe, CallbackInfo ci){
+////        BossMixinHandler.slotChangedCraftingGrid(menu, level, player, craftingContainer, resultContainer, recipe, ci);
+//    }
 
 
 }
