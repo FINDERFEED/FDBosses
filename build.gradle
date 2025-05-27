@@ -85,6 +85,7 @@ dependencies {
 
     implementation "curse.maven:sodium-394468:6382651"
     implementation "curse.maven:irisshaders-455508:6213632"
+    implementation "curse.maven:worldedit-225608:5830452"
 
     implementation fileTree(dir: 'build/libraries', include: ['*.jar'])
 
