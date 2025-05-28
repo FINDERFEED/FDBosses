@@ -2,7 +2,7 @@
   "type": "minecraft:jigsaw",
   "biomes": "#minecraft:is_overworld",
   "liquid_settings": "ignore_waterlogging",
-  "size": 4,
+  "size": 8,
   "start_height": {
     "type": "minecraft:uniform",
     "max_inclusive": {
