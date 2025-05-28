@@ -25,13 +25,12 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayRef
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
 import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
-import com.finderfeed.fdbosses.init.BossAnims;
-import com.finderfeed.fdbosses.init.BossEntities;
-import com.finderfeed.fdbosses.init.BossModels;
+import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.content.projectiles.renderers.BlockProjectileRenderer;
-import com.finderfeed.fdbosses.init.BossTileEntities;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRenderLayerOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRendererBuilder;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDModelItemRenderer;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDModelItemRendererOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockEntityRenderLayer;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockEntityRendererBuilder;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockEntityTransformation;
@@ -47,6 +46,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -57,17 +57,53 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import org.joml.Vector3f;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD,value = Dist.CLIENT,modid = FDBosses.MOD_ID)
 public class BossClientModEvents {
 
 
     @SubscribeEvent
+    public static void registerClientExtensions(RegisterClientExtensionsEvent event){
+        event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
+                .addModel(BossModels.CHESED,RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")))
+                .addModel(BossModels.CHESED_CRYSTAL_LAYER,RenderType.eyes(FDBosses.location("textures/entities/chesed_crystals.png")))
+                .setScale((ctx)->{
+                    if (ctx == ItemDisplayContext.GROUND){
+                        return 0.15f;
+                    }
+                    return 0.25f;
+                })
+                .addRotation((itemDisplayContext -> {
+                    if (itemDisplayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND || itemDisplayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND){
+                        return 180f;
+                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND){
+                        return 40f;
+                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND){
+                        return -40f;
+                    }
+                    return 0f;
+                }))
+                .addTranslation((ctx)->{
+                    if (ctx == ItemDisplayContext.GUI){
+                        return new Vector3f(0.1f,-0.1f,0);
+                    }else if (ctx == ItemDisplayContext.GROUND){
+                        return new Vector3f();
+                    }
+                    return new Vector3f(0.1f,0f,0f);
+                })
+        ), BossItems.CHESED_TROPHY.get());
+    }
+
+    @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event){
         event.enqueueWork(()->{
             TextBlockProcessors.register(FDBosses.location("effect"),new MobEffectTextProcessor());
             TextBlockProcessors.register(FDBosses.location("config_float"),new BossConfigFloatValueProcessor());
+
+
 
 
 

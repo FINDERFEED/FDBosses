@@ -11,6 +11,17 @@
         }
       ],
       "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [],
+          "name": "fdbosses:chesed_trophy"
+        }
+      ],
+      "rolls": 1.0
     }
   ],
   "random_sequence": "fdbosses:entities/chesed"

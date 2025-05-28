@@ -41,10 +41,10 @@ public abstract class TrophyBlockEntity extends FDBlockEntity {
                 angle = 180;
             }
             case WEST -> {
-                angle = 270;
+                angle = 90;
             }
             case EAST -> {
-                angle = 90;
+                angle = 270;
             }
         }
         return angle;
