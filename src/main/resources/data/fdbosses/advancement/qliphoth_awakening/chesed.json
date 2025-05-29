@@ -1,0 +1,33 @@
+{
+  "parent": "fdbosses:qliphoth_awakening/root",
+  "criteria": {
+    "killed_chesed": {
+      "conditions": {
+        "boss_entity_type": "fdbosses:chesed"
+      },
+      "trigger": "fdbosses:boss_killed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.qliphoth_awakening.chesed.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "fdbosses:chesed_trophy"
+    },
+    "title": {
+      "translate": "advancements.qliphoth_awakening.chesed.title"
+    }
+  },
+  "requirements": [
+    [
+      "killed_chesed"
+    ]
+  ],
+  "rewards": {
+    "experience": 300
+  },
+  "sends_telemetry_event": true
+}

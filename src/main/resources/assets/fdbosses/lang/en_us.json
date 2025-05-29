@@ -84,5 +84,9 @@
   "fdbosses.word.didnt_read_skills": "It is highly advised to read boss skill descriptions before the fight. Do you really wish to start the fight now?",
   "fdbosses.word.yes": "Yes",
   "fdbosses.word.no": "No",
-  "fdbosses.word.fdbosses": "Qliphoth Awakening"
+  "fdbosses.word.fdbosses": "Qliphoth Awakening",
+  "advancements.qliphoth_awakening.root.title": "Qliphoth Awakening",
+  "advancements.qliphoth_awakening.root.description": "And so it begins...",
+  "advancements.qliphoth_awakening.chesed.title": "Chesed",
+  "advancements.qliphoth_awakening.chesed.description": "No mercy for merciless"
 }

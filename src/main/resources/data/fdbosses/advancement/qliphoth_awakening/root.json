@@ -1,0 +1,37 @@
+{
+  "criteria": {
+    "boss_find_item_crafted": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "fdbosses:eye_of_chesed"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "display": {
+    "announce_to_chat": true,
+    "background": "minecraft:textures/gui/advancements/backgrounds/stone.png",
+    "description": {
+      "translate": "advancements.qliphoth_awakening.root.description"
+    },
+    "icon": {
+      "count": 1,
+      "id": "fdbosses:eye_of_chesed"
+    },
+    "show_toast": true,
+    "title": {
+      "translate": "advancements.qliphoth_awakening.root.title"
+    }
+  },
+  "requirements": [
+    [
+      "boss_find_item_crafted"
+    ]
+  ],
+  "sends_telemetry_event": true
+}

@@ -2889,6 +2889,13 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
                     dropLoot = true;
                     this.dropAllDeathLoot((ServerLevel) level(),level().damageSources().generic());
+
+                    for (var combatant : this.getCombatants(true)){
+                        if (!combatant.isSpectator()){
+                            BossCriteriaTriggers.BOSS_KILLED.get().trigger((ServerPlayer) combatant,this);
+                        }
+                    }
+
                     if (this.captureDrops() != null) {
                         for (ItemEntity entity : this.captureDrops()) {
 
