@@ -84,5 +84,11 @@
   "fdbosses.word.didnt_read_skills": "Перед битвой рекомендуется прочитать описание способностей. Вы действительно хотите начать битву сейчас?",
   "fdbosses.word.yes": "Да",
   "fdbosses.word.no": "Нет",
-  "fdbosses.word.fdbosses": "Qliphoth Awakening"
+  "fdbosses.word.fdbosses": "Qliphoth Awakening",
+  "advancements.qliphoth_awakening.root.title": "Qliphoth Awakening",
+  "advancements.qliphoth_awakening.root.description": "Начало",
+  "advancements.qliphoth_awakening.chesed.title": "Хесед",
+  "advancements.qliphoth_awakening.chesed.description": "Никакой пощади беспощадным",
+  "fdbosses.drops.chesed.trophy_description": "Трофей Хесед чтобы вы могли похвастаться своими героическими деяниями",
+  "fdbosses.word.tried_to_break_arena": "Зловещая сила не дает вам осквернять это место."
 }
