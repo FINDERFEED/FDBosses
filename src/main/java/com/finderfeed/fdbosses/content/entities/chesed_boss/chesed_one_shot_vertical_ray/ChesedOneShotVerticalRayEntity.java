@@ -124,7 +124,7 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
                         .color(0.3f, 1f, 1f,1f)
                         .physics(false)
                         .friction(0.4f)
-                        .scalingOptions(0,0,20 + random.nextInt(4))
+                        .scalingOptions(0,0,10 + random.nextInt(4))
                         .build();
                 level().addParticle(options,true,spawn.x,spawn.y,spawn.z,speed.x,speed.y,speed.z);
             }
@@ -161,7 +161,7 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
         Vec3 p = this.position();
         Vec3 end = p.add(0,this.getHeight(),0);
         ChesedRayOptions options = ChesedRayOptions.builder()
-                .time(0, 13, 5)
+                .time(0, 7, 5)
                 .lightningColor(90, 180, 255)
                 .color(100, 255, 255)
                 .end(end)
