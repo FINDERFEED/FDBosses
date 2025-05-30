@@ -88,5 +88,7 @@
   "advancements.qliphoth_awakening.root.title": "Qliphoth Awakening",
   "advancements.qliphoth_awakening.root.description": "And so it begins...",
   "advancements.qliphoth_awakening.chesed.title": "Chesed",
-  "advancements.qliphoth_awakening.chesed.description": "No mercy for merciless"
+  "advancements.qliphoth_awakening.chesed.description": "No mercy for merciless",
+  "fdbosses.drops.chesed.trophy_description": "A trophy of Chesed to showcase your heroic deeds",
+  "fdbosses.word.tried_to_break_arena": "An evil force prevents you from corrupting this place."
 }

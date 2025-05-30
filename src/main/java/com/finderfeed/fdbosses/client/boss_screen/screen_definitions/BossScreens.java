@@ -97,6 +97,11 @@ public class BossScreens {
                         Component.translatable("fdbosses.drops.chesed.lightning_core_stats"),
                         Component.translatable("fdbosses.drops.chesed.lightning_core_description")
                 ))
+                .addDrop(new BossInfo(
+                        BossItems.CHESED_TROPHY.get().getDefaultInstance(),
+                        null,
+                        Component.translatable("fdbosses.drops.chesed.trophy_description")
+                ))
         );
     });
 

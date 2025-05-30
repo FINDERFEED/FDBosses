@@ -104,6 +104,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.*;
 import org.joml.Math;
@@ -219,24 +220,24 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .registerAttack(RAY_EVASION_ATTACK,this::rayEvasionAttack)
                     .attackListener(this::attackListener)
-//                    .addAttack(0, ray)
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(ELECTRIC_SPHERE_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
+                    .addAttack(0, ray)
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(ELECTRIC_SPHERE_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
                     .addAttack(1,AttackOptions.builder()
                             .addAttack(ROCKFALL_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
+                            .setNextAttack(rayOrBlocks)
                             .build())
-//                    .addAttack(1,AttackOptions.builder()
-//                            .addAttack(EARTHQUAKE_ATTACK)
-//                            .setNextAttack(rayOrBlocks)
-//                            .build())
-//                    .addAttack(4,AttackOptions.builder()
-//                            .addAttack(ROLL_ATTACK)
-//                            .build())
-//                    .addAttack(5, RAY_EVASION_ATTACK)
-//                    .addAttack(6, FINAL_ATTACK)
+                    .addAttack(1,AttackOptions.builder()
+                            .addAttack(EARTHQUAKE_ATTACK)
+                            .setNextAttack(rayOrBlocks)
+                            .build())
+                    .addAttack(4,AttackOptions.builder()
+                            .addAttack(ROLL_ATTACK)
+                            .build())
+                    .addAttack(5, RAY_EVASION_ATTACK)
+                    .addAttack(6, FINAL_ATTACK)
             ;
 
         }
@@ -1496,7 +1497,6 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 Vec3 p = this.getCenter().add(look.reverse());
                 Vec3 end = p.add(look.multiply(60,60,60));
 
-                this.damageOnRay(p,end);
 
                 ClipContext clipContext = new ClipContext(p,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
                 var result = level().clip(clipContext);
@@ -1544,6 +1544,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
                 this.summonStonesAfterRayAttack(30,reversedLook,end);
                 BossUtil.chesedRayExplosion((ServerLevel) level(),end,reversedLook,100,15,0.75f);
+                this.damageOnRay(p,end);
             }else if (tick > rayAttackTick){
                 if (tick > rayAttackTick + rayAttackReloadTime){
                     instance.nextStage();
