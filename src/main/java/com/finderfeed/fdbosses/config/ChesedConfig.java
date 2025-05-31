@@ -47,7 +47,7 @@ public class ChesedConfig  {
     public float fireTrailDamage = 2;
 
     @ConfigValue
-    public float finalAttackDamagePercentPerMonolith = 33f;
+    public float finalAttackDamagePercentPerMonolith = 30f;
 
     @ConfigValue
     @Comment("If health is greater than value, sets the health equal to the value")

@@ -102,6 +102,7 @@ public class BossScreens {
                         null,
                         Component.translatable("fdbosses.drops.chesed.trophy_description")
                 ))
+                .setTLDRComponent(Component.translatable("fdbosses.tldr.chesed"))
         );
     });
 

@@ -24,7 +24,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector2f;
@@ -79,7 +82,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         this.initDidntReadSkillWarningWidget();
 
-        FDButton startFightButton = new FDButton(this,5,5,110,24)
+        FDButton startFightButton = new FDButton(this,6,6,110,24)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
@@ -103,6 +106,8 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                     return true;
                 }));
         this.addRenderableWidget(startFightButton);
+
+        this.initTLDRButton();
 
     }
 
@@ -271,6 +276,41 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         bossAbilitesWidget.addChild("openSkills",fdButtonSkills);
         bossAbilitesWidget.addChild("openDrops",fdButtonDrops);
 
+    }
+
+    private void initTLDRButton(){
+
+
+        Vector2f anchor = this.getAnchor(0,1);
+
+
+        BossInfo bossInfo = new BossInfo(ResourceLocation.parse("minecraft:textures/item/book.png"),Component.translatable("fdbosses.word.short_description"),null,this.options.getTLDRComponent());
+        FDButton skill = new FDSkillButton(this,anchor.x + 4,anchor.y - 36,32,32, bossInfo)
+                .setTexture(new FDButtonTextures(
+                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),
+                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),1,1)
+                ))
+                .setOnHoverAction(((fdWidget, guiGraphics, v, v1, v2) -> {
+                    if (!this.skillOpened) {
+                        PoseStack matrices = guiGraphics.pose();
+                        matrices.pushPose();
+                        matrices.translate(0, 0, 100);
+                        BossRenderUtil.renderBossScreenTooltip(guiGraphics, Component.translatable("fdbosses.word.tldr"), v, v1, 200, this.getBaseStringColor(), 1f);
+                        matrices.popPose();
+                    }
+                }))
+                .setSound(BossSounds.BUTTON_CLICK.get())
+                .setOnClickAction(((fdWidget, mx, my, button) -> {
+                    if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT) return false;
+
+                    BaseBossScreen.wasSkillRead = true;
+
+                    this.openSkillInfo(bossInfo,true);
+
+                    return true;
+                }));
+
+        this.addRenderableWidget(skill);
     }
 
 
