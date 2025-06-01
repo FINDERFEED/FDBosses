@@ -196,6 +196,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         if (clientModel == null){
             clientModel = new FDModel(BossModels.CHESED.get());
         }
+
+        remainingHits = BossConfigs.BOSS_CONFIG.get().chesedConfig.chesedMaxHits;
+
         if (!level.isClientSide) {
 
             AttackOptions ray = AttackOptions.builder()
@@ -1069,7 +1072,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     }
 
     private void summonOneShotAtPos(Vec3 pos){
-        float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.kineticFieldRayDamage;
+        float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().chesedConfig.kineticFieldRayDamage);
         ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(), pos, damage, 40, 30);
         entity.setDamageRadius(1.75f);
         entity.softerSound = true;
@@ -1621,7 +1624,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
 
 
-        float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.rayDamage;
+        float damage = BossUtil.transformDamage(level(), BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().chesedConfig.rayDamage));
 
         boolean chesedRayReflectorHit = false;
         List<LivingEntity> targets = new ArrayList<>();
@@ -1778,7 +1781,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 .addPos(sppos)
                 .addPos(endPos);
 
-        float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.electricSphereDamage;
+        float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().chesedConfig.electricSphereDamage);
 
         ChesedElectricSphereEntity sphereEntity = ChesedElectricSphereEntity.summon(level(),damage,path);
     }
@@ -1928,7 +1931,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             BlockState state = random.nextFloat() > 0.5f ? Blocks.DEEPSLATE.defaultBlockState() : Blocks.SCULK.defaultBlockState();
 
             ChesedFallingBlock block = ChesedFallingBlock.summon(level(), state, this.position().add(0, height, 0),
-                    BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRockDamage);
+                    BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRockDamage));
 
             Vec3 v = new Vec3(random.nextFloat() * 0.025 + 0.2,0,0).yRot(angle * i + (random.nextFloat() * 2 - 1) * angle);
 
@@ -1952,7 +1955,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     private void summonStonesAround(int count, int rad, Vec3 center, boolean useEasing, boolean reverseEasing, Function<Float,Float> func){
 
-        float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRockDamage;
+        float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRockDamage);
 
         for (int i = 0; i < count;i++){
 
@@ -2037,7 +2040,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     this.summonVerticalRayAttacksRadial(random.nextFloat() * FDMathUtil.FPI * 2,
                             FDMathUtil.FPI * (random.nextFloat() > 0.5 ? 1 : -1),
                             radius + 2,
-                            BossConfigs.BOSS_CONFIG.get().chesedConfig.earthquakeRayDamage,
+                            BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().chesedConfig.earthquakeRayDamage),
                             90 - (this.isBelowHalfHP() ? 10 : 0),
                             count);
 
@@ -2094,7 +2097,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         PacketDistributor.sendToPlayersTrackingEntity(this,packet);
 
         RadialEarthquakeEntity radialEarthquakeEntity = RadialEarthquakeEntity.summon(level(),this.getOnPos(),1,radius,1f,
-                BossConfigs.BOSS_CONFIG.get().chesedConfig.eartquakeDamage
+                BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().chesedConfig.eartquakeDamage)
         );
         if (doSonicParticles) {
             for (int i = 0; i < 6; i++) {
@@ -2263,7 +2266,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             var next = this.createRotationPath(angle, height,height, 30, blocksCycleTime, true);
 
             path.setNext(next);
-            projectile.setDamage(BossConfigs.BOSS_CONFIG.get().chesedConfig.blockAttackDamage);
+            projectile.setDamage(BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().chesedConfig.blockAttackDamage));
             projectile.noPhysics = true;
             projectile.setPos(path.getPositions().getFirst());
             projectile.movementPath = path;
@@ -2367,7 +2370,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     for (int i = 0; i < amount;i++) {
                         ChesedFireTrailEntity fireTrailEntity =
                                 ChesedFireTrailEntity.summon(level(), pos.add(0, -0.5, 0).add(b.normalize().multiply(i,i,i)),
-                                        BossConfigs.BOSS_CONFIG.get().chesedConfig.fireTrailDamage, 80);
+                                        BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().chesedConfig.fireTrailDamage), 80);
                     }
                 }
                 this.handleRoll(tick, pos);
@@ -2425,7 +2428,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             return entity instanceof LivingEntity living && !(entity instanceof ChesedBossBuddy);
         });
 
-        float damage = BossConfigs.BOSS_CONFIG.get().chesedConfig.rollAttackDamage;
+        float damage = BossUtil.transformDamage(level(), BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().chesedConfig.rollAttackDamage));
 
         for (Entity entity : entities){
             LivingEntity livingEntity = (LivingEntity) entity;
@@ -2707,7 +2710,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 Vec3 resultingPos = pos.yRot(angle * i).add(player.position());
 
                 ChesedOneShotVerticalRayEntity entity = ChesedOneShotVerticalRayEntity.summon(level(), resultingPos,
-                        BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRayDamage, 40, 30);
+                        BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().chesedConfig.rockfallRayDamage), 40, 30);
                 entity.setDamageRadius(2f);
 
             }

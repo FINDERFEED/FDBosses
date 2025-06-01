@@ -1,5 +1,7 @@
 package com.finderfeed.fdbosses;
 
+import com.finderfeed.fdbosses.config.BossConfig;
+import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdlib.util.FDUtil;
 import net.minecraft.core.Holder;
@@ -7,6 +9,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -31,6 +34,27 @@ public class BossUtil {
     public static final int CHESED_RAY_EXPLOSION = 4;
     public static final int CHESED_RAY_ATTACK_SMOKE = 5;
     public static final int CHESED_BOOM_PARTICLES = 6;
+
+    public static float transformDamage(Level level, float damage){
+        Difficulty difficulty = level.getDifficulty();
+        switch (difficulty){
+            case EASY -> {
+                return BossConfigs.BOSS_CONFIG.get().easyDifficultyBossDamageMultiplier * damage;
+            }
+            case NORMAL -> {
+                return BossConfigs.BOSS_CONFIG.get().normalDifficultyBossDamageMultiplier * damage;
+            }
+            case HARD -> {
+                return BossConfigs.BOSS_CONFIG.get().hardDifficultyBossDamageMultiplier * damage;
+            }
+            case PEACEFUL -> {
+                return BossConfigs.BOSS_CONFIG.get().peacefulDifficultyBossDamageMuliplier * damage;
+            }
+            default -> {
+                return BossConfigs.BOSS_CONFIG.get().hardDifficultyBossDamageMultiplier * damage;
+            }
+        }
+    }
 
     public static Predicate<Entity> entityInVerticalRadiusPredicate(Vec3 pos,float radius){
         return (entity)->{
