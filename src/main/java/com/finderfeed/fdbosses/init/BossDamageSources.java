@@ -56,7 +56,6 @@ public class BossDamageSources {
         CHESED_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_ATTACK));
         CHESED_LOR_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_LOR_EASTER_EGG_ATTACK));
         CHESED_BA_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_BA_EASTER_EGG_ATTACK));
-        CHESED_BA_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_ATTACK));
         CHESED_ELECTRIC_SPHERE_SOURCE = new DamageSource(access.holderOrThrow(CHESED_ELECTRIC_SPHERE));
         CHESED_FALLING_BLOCK_SOURCE = new DamageSource(access.holderOrThrow(CHESED_FALLING_BLOCK));
         CHESED_VERTICAL_RAY_SOURCE = new DamageSource(access.holderOrThrow(CHESED_VERTICAL_RAY));

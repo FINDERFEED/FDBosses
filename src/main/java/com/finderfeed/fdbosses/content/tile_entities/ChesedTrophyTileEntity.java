@@ -30,7 +30,7 @@ public class ChesedTrophyTileEntity extends TrophyBlockEntity {
                 var bp = this.getBlockPos();
 
                 float height = 0.4f;
-                Vec3 basePos = new Vec3(bp.getX() + 0.5f, bp.getY() + height,bp.getZ() + 0.5f);
+                Vec3 basePos = new Vec3(bp.getX() + 0.5, bp.getY() + height,bp.getZ() + 0.5);
                 float baseAngle = -(float) Math.toRadians(-this.getAngleFromState()) + FDMathUtil.FPI / 4;
                 float randomRange = FDMathUtil.FPI * 2 - FDMathUtil.FPI / 2;
                 for (int i = 0; i < 2;i++) {

@@ -8,6 +8,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
@@ -19,7 +21,8 @@ public class BossBlocks {
     public static final Supplier<Block> NO_ENTITY_SPAWN_BLOCK = BLOCKS.register("no_entity_spawn_block",()->new NoEntitySpawnBlock());
 
     public static final Supplier<TrophyBlock> CHESED_TROPHY = BLOCKS.register("chesed_trophy",()->new TrophyBlock(
-            BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)
+            BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F)
+                    .instabreak()
                     .noOcclusion(),
             BossAnims.CHESED_IDLE,
             BossAnims.CHESED_ATTACK,

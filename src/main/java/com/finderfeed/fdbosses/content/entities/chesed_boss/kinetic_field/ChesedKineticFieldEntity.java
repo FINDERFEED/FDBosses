@@ -105,14 +105,14 @@ public class ChesedKineticFieldEntity extends FDEntity {
 
         AABB box = new AABB(
                         pos.x - rad,
-                        pos.y,
+                        pos.y - 0.1,
                         pos.z - rad,
                         pos.x + rad,
                         pos.y + 3,
                         pos.z + rad
 
         ).inflate(0.025);
-        if (box.contains(player.position())) {
+        if (box.contains(player.position()) || box.contains(player.position().add(0,player.getBbHeight(),0))) {
             return Shapes.join(
                     Shapes.INFINITY,
                     Shapes.create(box),

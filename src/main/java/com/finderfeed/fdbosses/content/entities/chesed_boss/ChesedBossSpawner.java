@@ -9,7 +9,9 @@ import com.finderfeed.fdlib.systems.particle.SetParticleSpeedProcessor;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -100,4 +102,10 @@ public class ChesedBossSpawner extends BossSpawnerEntity {
 
         return true;
     }
+
+    @Override
+    public Component onArenaDestructionMessage() {
+        return Component.translatable("fdbosses.word.tried_to_break_arena").withStyle(ChatFormatting.RED);
+    }
+
 }

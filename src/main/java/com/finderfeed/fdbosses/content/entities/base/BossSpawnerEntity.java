@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.BossClientPackets;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -89,4 +90,7 @@ public abstract class BossSpawnerEntity extends FDEntity {
     }
 
     public abstract boolean canInteractWithBlockPos(BlockPos blockPos);
+
+    public abstract Component onArenaDestructionMessage();
+
 }

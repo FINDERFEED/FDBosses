@@ -27,6 +27,9 @@ public class BossItems {
     public static final Supplier<Item> NO_ENTITY_SPAWN_BLOCK = ITEMS.register("no_entity_spawn_block",
             ()->new BlockItem(BossBlocks.NO_ENTITY_SPAWN_BLOCK.get(), new Item.Properties()));
 
+    public static final Supplier<Item> CHESED_TROPHY = ITEMS.register("chesed_trophy",
+            ()->new BlockItem(BossBlocks.CHESED_TROPHY.get(), new Item.Properties().stacksTo(1)));
+
     @EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
     public static class AddToCreativeTabs{
 
@@ -35,6 +38,7 @@ public class BossItems {
             if (event.getTab().equals(BossCreativeTabs.MAIN.get())){
                 event.accept(LIGHTNING_CORE.get());
                 event.accept(EYE_OF_CHESED.get());
+                event.accept(CHESED_TROPHY.get());
             }
         }
 

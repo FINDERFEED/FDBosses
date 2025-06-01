@@ -1,4 +1,5 @@
 {
+  "block.fdbosses.chesed_trophy": "Chesed Trophy",
   "item.fdbosses.lightning_core": "Lightning Core",
   "item.fdbosses.eye_of_chesed": "Eye Of Chesed",
   "death.attack.chesed_roll_attack": "%s was rolled over",
@@ -6,11 +7,13 @@
   "death.attack.chesed_lor_attack": "%s was turned into a book by %s",
   "death.attack.chesed_ba_attack": "%s couldn't handle an army of robots",
   "death.attack.chesed_earthquake": "%s was buried under the rocks",
+  "death.attack.chesed_earthquake.player": "%s was buried under the rocks",
   "death.attack.chesed_falling_block": "%s lost its head to a boulder",
   "death.attack.chesed_falling_block.player": "%s lost its head to a boulder",
   "death.attack.chesed_block_attack": "%s couldn't handle flying 100 kilograms",
   "death.attack.chesed_vertical_ray": "%s got electrified",
   "death.attack.electric_sphere": "%s tried to touch the lightning",
+  "death.attack.electric_sphere.player": "%s tried to touch the lightning",
   "entity.fdbosses.chesed": "Chesed",
   "entity.fdbosses.chesed_boss_spawner": "Chesed Boss Spawner",
   "entity.fdbosses.chesed_monolith": "Chesed Monolith",
@@ -83,5 +86,14 @@
   "fdbosses.word.didnt_read_skills": "It is highly advised to read boss skill descriptions before the fight. Do you really wish to start the fight now?",
   "fdbosses.word.yes": "Yes",
   "fdbosses.word.no": "No",
-  "fdbosses.word.fdbosses": "Qliphoth Awakening"
+  "fdbosses.word.fdbosses": "Qliphoth Awakening",
+  "advancements.qliphoth_awakening.root.title": "Qliphoth Awakening",
+  "advancements.qliphoth_awakening.root.description": "And so it begins...",
+  "advancements.qliphoth_awakening.chesed.title": "Chesed",
+  "advancements.qliphoth_awakening.chesed.description": "No mercy for merciless",
+  "fdbosses.drops.chesed.trophy_description": "A trophy of Chesed to showcase your heroic deeds",
+  "fdbosses.word.tried_to_break_arena": "An evil force prevents you from corrupting this place.",
+  "fdbosses.tldr.chesed": "Chesed damage pierces armor and shields.\n\nTo damage Chesed:\n\nWait until lightning ray attack, kill a crystal with an axe to get {{(fdbosses:effect)id=fdbosses:chesed_energized,level=1}}, run to a ray reflector and make Chesed hit it. You are immune to lightning ray attack when you are {{(fdbosses:effect)id=fdbosses:chesed_energized}}.\n\nChesed has an attack which damage depends on the amount of active monoliths, if all monoliths are active - there is no way to survive the attack. To deactivate a monolith - kill it.",
+  "fdbosses.word.tldr": "Short Boss Description",
+  "fdbosses.word.short_description": "Short Description"
 }

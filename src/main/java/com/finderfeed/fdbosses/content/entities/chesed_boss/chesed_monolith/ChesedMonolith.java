@@ -7,10 +7,13 @@ import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
+import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -84,7 +87,8 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
     @Override
     public boolean hurt(DamageSource src, float damage) {
 
-        if (this.isImmuneToAttacks() && !src.is(DamageTypes.GENERIC_KILL) && !src.is(DamageTypes.FELL_OUT_OF_WORLD)) return false;
+
+        if ((this.isDeactivated() || this.isImmuneToAttacks()) && !src.is(DamageTypes.GENERIC_KILL) && !src.is(DamageTypes.FELL_OUT_OF_WORLD)) return false;
 
         return super.hurt(src, damage);
     }
@@ -94,9 +98,28 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
         if (src.is(DamageTypes.GENERIC_KILL) || src.is(DamageTypes.FELL_OUT_OF_WORLD)){
             super.die(src);
         }else {
-            if (!level().isClientSide) {
+            if (level() instanceof ServerLevel serverLevel) {
                 this.setHealth(this.getMaxHealth());
                 this.setDeactivated(true);
+
+                BallParticleOptions options = BallParticleOptions.builder()
+                        .size(0.5f)
+                        .color(0.3f, 1f, 1f,1f)
+                        .physics(false)
+                        .friction(0.7f)
+                        .scalingOptions(0,0,10 + random.nextInt(4))
+                        .build();
+                serverLevel.sendParticles(options,this.getX(),this.getY() + 2.5,this.getZ(),30, 0.1f,0.1f,0.1f,0.25f);
+                var li = LightningParticleOptions.builder()
+                        .color(50 + random.nextInt(40), 183 + random.nextInt(60), 200 + random.nextInt(50))
+                        .quadSize(0.2f)
+                        .lifetime(10)
+                        .randomRoll(true)
+                        .build();
+                serverLevel.sendParticles(li,this.getX(),this.getY() + 2.5,this.getZ(),20, 0.1f,0.1f,0.1f,0.05f);
+
+
+
             }
         }
     }

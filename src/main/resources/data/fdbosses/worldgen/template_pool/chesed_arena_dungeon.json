@@ -51,6 +51,33 @@
       "element": {
         "projection": "rigid",
         "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:chesed_arena_dungeon/chesed_dungeon_piece_5",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:chesed_arena_dungeon/chesed_dungeon_piece_6",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:chesed_arena_dungeon/chesed_dungeon_piece_7",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
         "location": "fdbosses:chesed_arena_dungeon/long_dungeon_entrance_passage",
         "processors": "minecraft:empty"
       }

@@ -10,6 +10,7 @@ public class BossScreenOptions {
 
     private List<BossInfo> skills = new ArrayList<>();
     private List<BossInfo> drops = new ArrayList<>();
+    private Component TLDRComponent = null;
 
     private Component bossDescription = Component.empty();
 
@@ -38,6 +39,11 @@ public class BossScreenOptions {
         return this;
     }
 
+    public BossScreenOptions setTLDRComponent(Component component){
+        this.TLDRComponent = component;
+        return this;
+    }
+
     public List<BossInfo> getSkills() {
         return skills;
     }
@@ -52,5 +58,9 @@ public class BossScreenOptions {
 
     public EntityType<?> getEntityType() {
         return entityType;
+    }
+
+    public Component getTLDRComponent() {
+        return TLDRComponent.copy();
     }
 }
