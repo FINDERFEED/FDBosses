@@ -15,7 +15,7 @@ import net.neoforged.fml.common.Mod;
 public class FDBosses {
 
     public static final String MOD_ID = "fdbosses";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public static ResourceLocation location(String loc){
         return ResourceLocation.tryBuild(MOD_ID,loc);

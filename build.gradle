@@ -86,6 +86,7 @@ dependencies {
     implementation "curse.maven:sodium-394468:6382651"
     implementation "curse.maven:irisshaders-455508:6213632"
     implementation "curse.maven:worldedit-225608:5830452"
+    implementation "curse.maven:gravestone-mod-238551:5794085"
 //    implementation "curse.maven:placebo-283644:6446766"
 //    implementation "curse.maven:fastworkbench-288885:5670423"
 

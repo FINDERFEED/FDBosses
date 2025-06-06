@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses;
 
+import com.finderfeed.fdbosses.config.BossConfig;
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
@@ -10,7 +11,9 @@ import com.finderfeed.fdbosses.init.BossEffects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -21,6 +24,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -31,6 +35,8 @@ import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.ExplosionEvent;
 
 import java.util.Iterator;
+import java.util.List;
+import java.util.regex.Pattern;
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class BossEvents {
@@ -41,6 +47,17 @@ public class BossEvents {
         if (!level.isClientSide()){
             BlockPos pos = event.getPos();
             var spawners = level.getEntitiesOfClass(BossSpawnerEntity.class, new AABB(-100,-100,-100,100,100,100).move(pos.getCenter()));
+
+            if (!spawners.isEmpty()){
+
+                BlockState state = level.getBlockState(pos);
+                boolean v = checkBlockStateAllowedToBreakInArena(state);
+                if (v){
+                    return;
+                }
+            }
+
+
             Component message = null;
             for (BossSpawnerEntity bossSpawnerEntity : spawners){
                 if (!bossSpawnerEntity.canInteractWithBlockPos(pos)){
@@ -55,6 +72,22 @@ public class BossEvents {
                 }
             }
         }
+    }
+
+    public static boolean checkBlockStateAllowedToBreakInArena(BlockState blockState){
+
+        List<Pattern> patterns = BossConfigs.BOSS_CONFIG.get().blocksAllowedToBreakInArenaPatterns;
+
+        for (Pattern pattern : patterns){
+            ResourceLocation location = BuiltInRegistries.BLOCK.getKey(blockState.getBlock());
+            String string = location.toString();
+            var test = pattern.asPredicate().test(string);
+            if (test){
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @SubscribeEvent
