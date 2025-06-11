@@ -83,7 +83,7 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
 
             FDLibCalls.startCutsceneForPlayer(serverPlayer,cutsceneData);
         }
-        chesedEntity.getSystem().startAnimation("APPEAR", AnimationTicker.builder(BossAnims.CHESED_APPEAR)
+        chesedEntity.getAnimationSystem().startAnimation("APPEAR", AnimationTicker.builder(BossAnims.CHESED_APPEAR)
                 .setLoopMode(Animation.LoopMode.ONCE)
                 .setToNullTransitionTime(0)
                 .build());

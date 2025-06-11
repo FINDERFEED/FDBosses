@@ -45,11 +45,11 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
         super.tick();
         if (level().isClientSide){
             if (!this.isDeactivated()){
-                this.getSystem().startAnimation("IDLE", AnimationTicker.builder(BossAnims.CHESED_MONOLITH_IDLE).build());
-                this.getSystem().stopAnimation("TURN_OFF");
+                this.getAnimationSystem().startAnimation("IDLE", AnimationTicker.builder(BossAnims.CHESED_MONOLITH_IDLE).build());
+                this.getAnimationSystem().stopAnimation("TURN_OFF");
             }else{
-                this.getSystem().stopAnimation("IDLE");
-                this.getSystem().startAnimation("TURN_OFF", AnimationTicker.builder(BossAnims.CHESED_MONOLITH_TURN_OFF).build());
+                this.getAnimationSystem().stopAnimation("IDLE");
+                this.getAnimationSystem().startAnimation("TURN_OFF", AnimationTicker.builder(BossAnims.CHESED_MONOLITH_TURN_OFF).build());
             }
         }else{
             this.entityData.set(DEACTIVATED,deactivated);

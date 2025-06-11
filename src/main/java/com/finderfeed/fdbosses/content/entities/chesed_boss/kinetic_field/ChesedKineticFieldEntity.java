@@ -23,7 +23,7 @@ public class ChesedKineticFieldEntity extends FDEntity {
 
     public ChesedKineticFieldEntity(EntityType<?> type, Level level) {
         super(type, level);
-        this.getSystem().startAnimation("SPAWN", AnimationTicker.builder(BossAnims.CHESED_KINETIC_FIELD_SPAWN).build());
+        this.getAnimationSystem().startAnimation("SPAWN", AnimationTicker.builder(BossAnims.CHESED_KINETIC_FIELD_SPAWN).build());
     }
 
 
@@ -42,7 +42,7 @@ public class ChesedKineticFieldEntity extends FDEntity {
             }
         }
 
-        this.getSystem().setVariable("variable.radius",(float)this.getSquareRadius() * 16);
+        this.getAnimationSystem().setVariable("variable.radius",(float)this.getSquareRadius() * 16);
 
     }
 

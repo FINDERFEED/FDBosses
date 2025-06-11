@@ -38,7 +38,7 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
     public static final ResourceLocation FINAL_ATTACK_CRACKS = FDBosses.location("textures/util/chesed_wall_crack.png");
 
     private void renderEarthquakeCastFffects(ChesedEntity chesedEntity, float yaw, float pticks, PoseStack poseStack, MultiBufferSource multiBufferSource, int light){
-        var system = chesedEntity.getSystem();
+        var system = chesedEntity.getAnimationSystem();
 
         var ticker = system.getTicker(ChesedEntity.EARTHQUAKE_ATTACK_LAYER);
 
@@ -136,7 +136,7 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
 
     private void renderFinalAttackCracks(ChesedEntity chesedEntity, float yaw, float pticks, PoseStack poseStack, MultiBufferSource multiBufferSource, int light){
 
-        var system = chesedEntity.getSystem();
+        var system = chesedEntity.getAnimationSystem();
 
         var ticker = system.getTicker(ChesedEntity.FINAL_ATTACK_LAYER);
 
@@ -219,7 +219,7 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
 
     private void renderRockfallRayEffect(ChesedEntity chesedEntity, float yaw, float pticks, PoseStack poseStack, MultiBufferSource multiBufferSource, int light){
 
-        var system = chesedEntity.getSystem();
+        var system = chesedEntity.getAnimationSystem();
 
         var ticker = system.getTicker(ChesedEntity.ROCKFALL_TICKER);
 
@@ -308,7 +308,7 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
 
     private void renderRayEffect(ChesedEntity chesedEntity, float yaw, float pticks, PoseStack poseStack, MultiBufferSource multiBufferSource, int light){
 
-        var system = chesedEntity.getSystem();
+        var system = chesedEntity.getAnimationSystem();
 
         var ticker = system.getTicker(ChesedEntity.RAY_ATTACK_LAYER);
 

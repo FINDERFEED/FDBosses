@@ -34,7 +34,7 @@ public class ChesedCrystalEntity extends FDLivingEntity implements ChesedBossBud
 
     public ChesedCrystalEntity(EntityType<? extends FDLivingEntity> type, Level level) {
         super(type, level);
-        this.getSystem().startAnimation("SPAWN", AnimationTicker.builder(BossAnims.CHESED_CRYSTAL_SPAWN.get())
+        this.getAnimationSystem().startAnimation("SPAWN", AnimationTicker.builder(BossAnims.CHESED_CRYSTAL_SPAWN.get())
                 .setToNullTransitionTime(0)
                 .build());
     }
@@ -60,7 +60,7 @@ public class ChesedCrystalEntity extends FDLivingEntity implements ChesedBossBud
             }
             dead = true;
             deathTime = 10;
-            this.getSystem().startAnimation("DEATH", AnimationTicker.builder(BossAnims.CHESED_CRYSTAL_SPAWN.get())
+            this.getAnimationSystem().startAnimation("DEATH", AnimationTicker.builder(BossAnims.CHESED_CRYSTAL_SPAWN.get())
                     .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
                     .reversed()
                     .setSpeed(2f)

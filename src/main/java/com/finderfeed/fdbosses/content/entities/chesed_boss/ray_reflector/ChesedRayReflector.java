@@ -147,7 +147,7 @@ public class ChesedRayReflector extends FDEntity {
 
     public boolean isActivating(){
 
-        var ticker = this.getSystem().getTicker(ACTIVE_LAYER);
+        var ticker = this.getAnimationSystem().getTicker(ACTIVE_LAYER);
         if (ticker == null) return false;
 
         var animation = ticker.getAnimation();
@@ -167,7 +167,7 @@ public class ChesedRayReflector extends FDEntity {
     }
 
     private void handleClientTicker(){
-        var system = this.getSystem();
+        var system = this.getAnimationSystem();
         int activationAnimLength = this.getAnimationLength();
         var ticker = system.getTicker(ACTIVE_LAYER);
         if (ticker == null){
@@ -192,7 +192,7 @@ public class ChesedRayReflector extends FDEntity {
     }
 
     private void handleAnimation(){
-        var system = this.getSystem();
+        var system = this.getAnimationSystem();
         int activationAnimLength = this.getAnimationLength();
         if (this.isActive()){
             var animTicker = system.getTicker(ACTIVE_LAYER);

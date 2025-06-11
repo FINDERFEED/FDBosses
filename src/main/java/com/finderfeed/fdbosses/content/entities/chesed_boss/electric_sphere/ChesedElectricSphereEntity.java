@@ -68,7 +68,7 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
             this.detectEntitiesAndExplode();
         }else{
             this.idleParticles();
-            this.getSystem().startAnimation("IDLE", AnimationTicker.builder(BossAnims.ELECTRIC_ORB_IDLE.get()).build());
+            this.getAnimationSystem().startAnimation("IDLE", AnimationTicker.builder(BossAnims.ELECTRIC_ORB_IDLE.get()).build());
         }
     }
 
@@ -114,7 +114,7 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
     public void onAddedToLevel() {
         super.onAddedToLevel();
         if (level().isClientSide){
-            this.getSystem().startAnimation("IDLE", AnimationTicker.builder(BossAnims.ELECTRIC_ORB_IDLE.get()).build());
+            this.getAnimationSystem().startAnimation("IDLE", AnimationTicker.builder(BossAnims.ELECTRIC_ORB_IDLE.get()).build());
         }
     }
 
