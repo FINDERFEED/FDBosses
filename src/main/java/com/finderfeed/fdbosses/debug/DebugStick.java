@@ -25,8 +25,9 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
+            float speed = 3f;
 
-            MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level, player.position(), player.getLookAngle().multiply(3,3,3), MalkuthAttackType.FIRE, 0, 3);
+            MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level, player.position(), player.getLookAngle().multiply(speed,speed,speed), MalkuthAttackType.ICE, 0, 2);
 
 
 

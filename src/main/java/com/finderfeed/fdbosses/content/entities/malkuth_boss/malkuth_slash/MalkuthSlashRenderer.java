@@ -28,8 +28,10 @@ public class MalkuthSlashRenderer extends EntityRenderer<MalkuthSlashProjectile>
         float slashSize = projectile.getSlashSize();
 
 
+
         QuadRenderer.start(src.getBuffer(RenderType.eyes(this.getTextureLocation(projectile))))
                 .direction(projectile.getDeltaMovement().reverse())
+                .translate(0,projectile.getBbHeight()/2,0)
                 .sizeY(slashSize * 0.3461538f)
                 .sizeX(slashSize)
                 .pose(matrices)
