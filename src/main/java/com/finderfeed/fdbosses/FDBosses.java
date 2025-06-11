@@ -37,6 +37,7 @@ public class FDBosses {
         BossDataComponents.DATA_COMPONENTS.register(bus);
         BossCriteriaTriggers.CRITERION_TRIGGERS.register(bus);
         BossRecipeSerializers.RECIPE_SERIALIZERS.register(bus);
+        BossEntityDataSerializers.ENTITY_DATA_SERIALIZERS.register(bus);
     }
 
 
