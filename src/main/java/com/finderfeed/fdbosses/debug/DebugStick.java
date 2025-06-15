@@ -1,11 +1,18 @@
 package com.finderfeed.fdbosses.debug;
 
+import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.FDHelpers;
+import com.finderfeed.fdlib.init.FDRenderTypes;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.ModelSystem;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.BaseModelAttachmentData;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.instances.fdmodel.FDModelAttachmentData;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.instances.item_stack.ItemStackAttachmentData;
+import com.finderfeed.fdlib.systems.render_types.FDRenderType;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -13,6 +20,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -51,19 +59,23 @@ public class DebugStick extends Item {
                 if (entity instanceof ChesedEntity chesedEntity){
                     ModelSystem modelSystem = chesedEntity.getModelSystem();
                     if (player.isCrouching()) {
-                        modelSystem.removeAttachedModel(uuid1);
-                        modelSystem.removeAttachedModel(uuid2);
-                        modelSystem.removeAttachedModel(uuid3);
-                        modelSystem.removeAttachedModel(uuid4);
-                        modelSystem.removeAttachedModel(uuid5);
-                        modelSystem.removeAttachedModel(uuid6);
+                        modelSystem.removeAttachment(uuid1);
+                        modelSystem.removeAttachment(uuid2);
+                        modelSystem.removeAttachment(uuid3);
                     }else{
-                        modelSystem.attachModelToLayer(0, "r16", uuid1, BossModels.CHESED.get());
-                        modelSystem.attachModelToLayer(0, "r11", uuid2, BossModels.CHESED.get());
-                        modelSystem.attachModelToLayer(0, "t", uuid3, BossModels.CHESED.get());
-                        modelSystem.attachModelToLayer(2, "r16", uuid4, BossModels.CHESED.get());
-                        modelSystem.attachModelToLayer(2, "r11", uuid5, BossModels.CHESED.get());
-                        modelSystem.attachModelToLayer(2, "t", uuid6, BossModels.CHESED.get());
+                        modelSystem.attachToLayer(0, "r16", uuid1, FDModelAttachmentData.create(new BaseModelAttachmentData()
+                                .translation(0,0,0)
+                                .scale(0.5f,0.5f,0.5f)
+                                .rotation(0,0,FDMathUtil.FPI + 2 * FDMathUtil.FPI/4), BossModels.CHESED.get())
+                                .color(1f,1f,0f,1f)
+                                .renderType(FDRenderTypes.ENTITY_CUTOUT_NO_CULL.get())
+                                .texture(FDBosses.location("textures/entities/chesed.png")));
+
+                        modelSystem.attachToLayer(0, "r11", uuid2, new ItemStackAttachmentData( new BaseModelAttachmentData()
+                                .translation(-1,0,0)
+                                .scale(2,2,2)
+                                .rotation(FDMathUtil.FPI,0,-FDMathUtil.FPI/4), Items.DIAMOND_AXE.getDefaultInstance()));
+                        modelSystem.attachToLayer(0, "t", uuid3, new ItemStackAttachmentData(new BaseModelAttachmentData(), Items.DIAMOND_AXE.getDefaultInstance()));
                     }
                 }
             }
