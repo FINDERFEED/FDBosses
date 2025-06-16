@@ -149,7 +149,7 @@ public class BossEntities {
     public static final Supplier<EntityType<MalkuthEntity>> MALKUTH = ENTITIES.register("malkuth",()->EntityType.Builder.of(
             MalkuthEntity::new, MobCategory.CREATURE
     )
-            .sized(0.2f,0.2f)
+            .sized(1f,4f)
             .build("malkuth"));
 
 
@@ -170,7 +170,7 @@ public class BossEntities {
         event.put(CHESED_MONOLITH.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,50).build());
         event.put(CHESED_CRYSTAL.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
 
-        event.put(MALKUTH.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
+        event.put(MALKUTH.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,20).build());
     }
 
 

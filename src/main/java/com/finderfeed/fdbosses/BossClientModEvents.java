@@ -23,6 +23,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayReflectorRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
 import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
@@ -160,14 +161,16 @@ public class BossClientModEvents {
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
 
-        event.registerEntityRenderer(BossEntities.MALKUTH.get(), FDEntityRendererBuilder.builder()
-                        .addLayer(FDEntityRenderLayerOptions.builder()
+        event.registerEntityRenderer(BossEntities.MALKUTH.get(), FDEntityRendererBuilder.<MalkuthEntity>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<MalkuthEntity>builder()
                                 .model(BossModels.MALKUTH)
                                 .renderType(RenderType.entityCutoutNoCull(FDBosses.location("textures/entities/malkuth/malkuth_solid.png")))
+                                .addBoneController("head", new HeadBoneTransformation<>())
                                 .build())
-                        .addLayer(FDEntityRenderLayerOptions.builder()
+                        .addLayer(FDEntityRenderLayerOptions.<MalkuthEntity>builder()
                                 .model(BossModels.MALKUTH)
                                 .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/malkuth/malkuth_emissive.png")))
+                                .addBoneController("head", new HeadBoneTransformation<>())
                                 .light(LightTexture.FULL_BRIGHT)
                                 .build())
                 .build());

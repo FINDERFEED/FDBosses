@@ -1,21 +1,21 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.HeadController;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.init.FDRenderTypes;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.ModelSystem;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.BaseModelAttachmentData;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.instances.fdmodel.FDModelAttachmentData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 import java.util.UUID;
 
-public class MalkuthEntity extends FDLivingEntity {
+public class MalkuthEntity extends FDMob {
 
     public static final UUID FIRE_SWORD_UUID = UUID.fromString("7a6d1a24-599a-4717-baa3-42d9e3293896");
     public static final UUID FIRE_SWORD_EMISSIVE_UUID = UUID.fromString("cd95b81b-4a3f-4ef0-9b46-f0b3503ed7fb");
@@ -26,8 +26,11 @@ public class MalkuthEntity extends FDLivingEntity {
     public static final ResourceLocation MALKUTH_ICE_SWORD = FDBosses.location("textures/item/malkuth_sword_ice_emissive.png");
     public static final ResourceLocation MALKUTH_FIRE_SWORD = FDBosses.location("textures/item/malkuth_sword_fire_emissive.png");
 
-    public MalkuthEntity(EntityType<? extends LivingEntity> type, Level level) {
+    private HeadController headController;
+
+    public MalkuthEntity(EntityType<? extends FDMob> type, Level level) {
         super(type, level);
+        this.headController = new HeadController(this);
     }
 
     @Override
@@ -36,6 +39,16 @@ public class MalkuthEntity extends FDLivingEntity {
             this.attachSwords();
         }
         super.tick();
+        if (level().isClientSide){
+            this.headController.tickClient();
+        }else{
+            this.setYRot(this.yBodyRot);
+            Player player = this.level().getNearestPlayer(this, 30);
+
+            if (player != null){
+                this.getLookControl().setLookAt(player);
+            }
+        }
     }
 
 
@@ -85,6 +98,11 @@ public class MalkuthEntity extends FDLivingEntity {
     private void deattachSwords(){
         this.deattachIceSword();
         this.deattachFireSword();
+    }
+
+    @Override
+    public int getHeadRotSpeed() {
+        return super.getHeadRotSpeed();
     }
 
 }
