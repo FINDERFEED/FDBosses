@@ -24,4 +24,8 @@ public class BossModels {
     public static final Supplier<FDModelInfo> CHESED_RAY_REFLECTOR = INFOS.register("chesed_ray_reflector",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_ray_reflector"),1f));
     public static final Supplier<FDModelInfo> WIP_MODEL = INFOS.register("wip",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"wip"),1f));
 
+    //Malkuth
+    public static final Supplier<FDModelInfo> MALKUTH = INFOS.register("malkuth",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"),1f));
+    public static final Supplier<FDModelInfo> MALKUTH_SWORD = INFOS.register("malkuth_sword",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_sword"),1f));
+
 }

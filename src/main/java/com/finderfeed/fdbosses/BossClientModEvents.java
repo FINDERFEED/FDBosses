@@ -43,6 +43,7 @@ import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -161,8 +162,13 @@ public class BossClientModEvents {
 
         event.registerEntityRenderer(BossEntities.MALKUTH.get(), FDEntityRendererBuilder.builder()
                         .addLayer(FDEntityRenderLayerOptions.builder()
-                                .model(BossModels.WIP_MODEL)
-                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/wip.png")))
+                                .model(BossModels.MALKUTH)
+                                .renderType(RenderType.entityCutoutNoCull(FDBosses.location("textures/entities/malkuth/malkuth_solid.png")))
+                                .build())
+                        .addLayer(FDEntityRenderLayerOptions.builder()
+                                .model(BossModels.MALKUTH)
+                                .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/malkuth/malkuth_emissive.png")))
+                                .light(LightTexture.FULL_BRIGHT)
                                 .build())
                 .build());
 
