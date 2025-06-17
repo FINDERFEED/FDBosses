@@ -5,8 +5,8 @@
 			"loop": true,
 			"animation_length": 4,
 			"bones": {
-				"chest": {
-					"rotation": ["math.sin(query.anim_time * 90) * 45", 0, "math.cos(query.anim_time * 90) * 45"]
+				"head": {
+					"rotation": [0, "-math.sin(query.anim_time * 90) * 180", 0]
 				}
 			}
 		}

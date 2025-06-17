@@ -1,6 +1,7 @@
-package com.finderfeed.fdbosses;
+package com.finderfeed.fdbosses.head_stuff;
 
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimatedObject;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModelPart;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -13,6 +14,7 @@ import java.lang.Math;
 
 public class HeadController<T extends Mob & IHasHead<T> & AnimatedObject> {
 
+    private HeadControllerContainer<T> container;
     private FDModel fdModel;
     private T entity;
     private String headBone;
@@ -24,11 +26,14 @@ public class HeadController<T extends Mob & IHasHead<T> & AnimatedObject> {
     private float oldHeadRotationX = 0;
     private float oldHeadRotationY = 0;
 
-    public HeadController(FDModel model, String headBone, T entity){
+
+
+    public HeadController(HeadControllerContainer<T> container, FDModel model, String headBone, T entity){
         this.entity = entity;
         this.headBone = headBone;
         this.fdModel =  model;
         this.headTransitionSpeed = entity.getHeadRotSpeed();
+        this.container = container;
     }
 
     public void clientTick(){
@@ -50,15 +55,42 @@ public class HeadController<T extends Mob & IHasHead<T> & AnimatedObject> {
 
     }
 
+    public void onControllerModeChanged(HeadControllerContainer.Mode oldMode, HeadControllerContainer.Mode newMode){
+        if (newMode == HeadControllerContainer.Mode.LOOK){
+
+            this.entity.getAnimationSystem().applyAnimations(this.fdModel, 0);
+            FDModelPart part = this.fdModel.getModelPart(headBone);
+
+            this.currentHeadRotationX = FDMathUtil.convertMCYRotationToNormal(this.currentHeadRotationX + part.getXRot());
+            this.currentHeadRotationY = FDMathUtil.convertMCYRotationToNormal(this.currentHeadRotationY + part.getYRot());
+            this.oldHeadRotationX = this.currentHeadRotationX;
+            this.oldHeadRotationY = this.currentHeadRotationY;
+
+        }
+    }
+
 
     private Vector2f getLookAtTargetAngles(){
+
+        if (container.getControllersMode() == HeadControllerContainer.Mode.ANIMATION){
+            return new Vector2f();
+        }
+
         Player player = entity.level().getNearestPlayer(entity, 30);
 
         if (player == null) return new Vector2f();
 
+        AnimationSystem system = entity.getAnimationSystem();
+        fdModel.resetTransformations();
+        system.applyAnimations(fdModel, 0);
+        float yRot = entity.getYRot();
+        fdModel.main.addYRot(-yRot);
+        FDModelPart head = fdModel.getModelPart(headBone);
+        head.setXRot(head.initRotation.x);
+        head.setYRot(head.initRotation.y);
+        head.setZRot(head.initRotation.z);
 
-
-        Matrix4f transform = entity.getModelPartTransformation(entity, headBone, fdModel, 0);
+        Matrix4f transform = fdModel.getModelPartTransformation(head);
 
         Vector3f position = transform.transformPosition(new Vector3f());
         Vector3f wposition = position.add(
@@ -119,8 +151,9 @@ public class HeadController<T extends Mob & IHasHead<T> & AnimatedObject> {
                     currentRotation -= this.getHeadTransitionSpeed();
                     if (currentRotation < -180){
                         currentRotation += 360;
-                        return Mth.clamp(currentRotation, -Integer.MAX_VALUE, targetY);
+                        return Mth.clamp(currentRotation, targetY, Integer.MAX_VALUE);
                     }
+                    return Mth.clamp(currentRotation, -Integer.MAX_VALUE, targetY);
                 }else{
                     return Mth.clamp(currentRotation + this.getHeadTransitionSpeed(), -Integer.MAX_VALUE, targetY);
                 }
@@ -130,14 +163,14 @@ public class HeadController<T extends Mob & IHasHead<T> & AnimatedObject> {
                     currentRotation += this.getHeadTransitionSpeed();
                     if (currentRotation > 180){
                         currentRotation -= 360;
-                        return Mth.clamp(currentRotation, targetY, Integer.MAX_VALUE);
+                        return Mth.clamp(currentRotation, -Integer.MAX_VALUE, targetY);
                     }
+                    return Mth.clamp(currentRotation, targetY, Integer.MAX_VALUE);
                 }else{
                     return Mth.clamp(currentRotation - this.getHeadTransitionSpeed(), targetY, Integer.MAX_VALUE);
                 }
             }
         }
-        return 0;
     }
 
     public float getCurrentHeadRotationX() {
