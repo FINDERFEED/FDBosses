@@ -1,0 +1,14 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"test_malkuth": {
+			"loop": true,
+			"animation_length": 2,
+			"bones": {
+				"head": {
+					"rotation": ["math.sin(query.anim_time * 180) * 20 ", "math.sin(query.anim_time * 180) * 100", 0]
+				}
+			}
+		}
+	}
+}

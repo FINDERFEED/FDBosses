@@ -78,4 +78,10 @@ public class BossAnims {
     public static DeferredHolder<Animation,Animation> RAY_REFLECTOR_ACTIVATE = ANIMATIONS.register("ray_reflector_activate", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_ray_reflector_animations"));
     });
+
+
+    //MALKUTH
+    public static DeferredHolder<Animation,Animation> MALKUTH_TEST = ANIMATIONS.register("test_malkuth", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
+    });
 }

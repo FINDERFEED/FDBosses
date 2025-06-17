@@ -2,12 +2,17 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.HeadController;
+import com.finderfeed.fdbosses.IHasHead;
+import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.init.FDRenderTypes;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.ModelSystem;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.BaseModelAttachmentData;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.instances.fdmodel.FDModelAttachmentData;
+import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -15,7 +20,10 @@ import net.minecraft.world.level.Level;
 
 import java.util.UUID;
 
-public class MalkuthEntity extends FDMob {
+public class MalkuthEntity extends FDMob implements IHasHead {
+
+    private static FDModel SERVER_MODEL;
+    private static FDModel CLIENT_MODEL;
 
     public static final UUID FIRE_SWORD_UUID = UUID.fromString("7a6d1a24-599a-4717-baa3-42d9e3293896");
     public static final UUID FIRE_SWORD_EMISSIVE_UUID = UUID.fromString("cd95b81b-4a3f-4ef0-9b46-f0b3503ed7fb");
@@ -26,11 +34,16 @@ public class MalkuthEntity extends FDMob {
     public static final ResourceLocation MALKUTH_ICE_SWORD = FDBosses.location("textures/item/malkuth_sword_ice_emissive.png");
     public static final ResourceLocation MALKUTH_FIRE_SWORD = FDBosses.location("textures/item/malkuth_sword_fire_emissive.png");
 
-    private HeadController headController;
+    private HeadController<MalkuthEntity> headController;
 
     public MalkuthEntity(EntityType<? extends FDMob> type, Level level) {
         super(type, level);
-        this.headController = new HeadController(this);
+        if (level.isClientSide){
+            CLIENT_MODEL = new FDModel(BossModels.MALKUTH.get());
+        }else{
+            SERVER_MODEL = new FDModel(BossModels.MALKUTH.get());
+        }
+        this.headController = new HeadController<>(CLIENT_MODEL, "head",this);
     }
 
     @Override
@@ -38,9 +51,21 @@ public class MalkuthEntity extends FDMob {
         if (!level().isClientSide && firstTick){
             this.attachSwords();
         }
+
         super.tick();
         if (level().isClientSide){
-            this.headController.tickClient();
+
+            if (this.level().getGameTime() % 300 > 120){
+                this.getAnimationSystem().startAnimation("TEST", AnimationTicker.builder(BossAnims.MALKUTH_TEST)
+                                .setToNullTransitionTime(20)
+                        .build());
+                this.headController.rotateToLookTarget(false);
+            }else{
+                this.getAnimationSystem().stopAnimation("TEST");
+                this.headController.rotateToLookTarget(true);
+            }
+
+            this.headController.clientTick();
         }else{
             this.setYRot(this.yBodyRot);
             Player player = this.level().getNearestPlayer(this, 30);
@@ -105,4 +130,8 @@ public class MalkuthEntity extends FDMob {
         return super.getHeadRotSpeed();
     }
 
+    @Override
+    public HeadController getHeadController() {
+        return headController;
+    }
 }

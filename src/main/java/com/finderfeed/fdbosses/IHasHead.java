@@ -1,7 +1,10 @@
 package com.finderfeed.fdbosses;
 
-public interface IHasHead {
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimatedObject;
+import net.minecraft.world.entity.Mob;
 
-    HeadController getHeadController();
+public interface IHasHead<T extends Mob & AnimatedObject & IHasHead<T>> {
+
+    HeadController<T> getHeadController();
 
 }

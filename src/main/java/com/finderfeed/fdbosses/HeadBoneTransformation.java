@@ -8,7 +8,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.Mob;
 
-public class HeadBoneTransformation<T extends Mob & AnimatedObject> implements BoneTransformationController<T> {
+public class HeadBoneTransformation<T extends Mob & AnimatedObject & IHasHead<T>> implements BoneTransformationController<T> {
 
     @Override
     public void transformBone(T t, FDModelPart fdModelPart, PoseStack poseStack, MultiBufferSource multiBufferSource, int light, int overlay, float v) {
@@ -17,9 +17,20 @@ public class HeadBoneTransformation<T extends Mob & AnimatedObject> implements B
         float yHeadRot = t.getViewYRot(v);
         float xHeadRot = t.getViewXRot(v);
 
+        HeadController<T> headController = t.getHeadController();
 
-        fdModelPart.addYRot(yBodyRot - yHeadRot);
-        fdModelPart.addXRot(-xHeadRot);
+        if (!headController.hasReachedDestination()){
+            var rot = headController.getCurrentRotation(v);
+            fdModelPart.setXRot(yBodyRot - rot.x);
+            fdModelPart.setYRot(rot.y);
+        }else {
+            if (headController.isTransitioningToLookTarget()) {
+                fdModelPart.setYRot(yBodyRot - yHeadRot);
+                fdModelPart.setXRot(-xHeadRot);
+            }
+        }
+
+        fdModelPart.setXRot(0);
 
     }
 
