@@ -20,7 +20,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.UUID;
 
-public class MalkuthEntity extends FDMob implements IHasHead {
+public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity> {
 
     private static FDModel SERVER_MODEL;
     private static FDModel CLIENT_MODEL;
@@ -47,6 +47,11 @@ public class MalkuthEntity extends FDMob implements IHasHead {
     }
 
     @Override
+    public double getEyeY() {
+        return super.getEyeY();
+    }
+
+    @Override
     public void tick() {
         if (!level().isClientSide && firstTick){
             this.attachSwords();
@@ -55,15 +60,15 @@ public class MalkuthEntity extends FDMob implements IHasHead {
         super.tick();
         if (level().isClientSide){
 
-            if (this.level().getGameTime() % 300 > 120){
+//            if (this.level().getGameTime() % 300 > 120){
                 this.getAnimationSystem().startAnimation("TEST", AnimationTicker.builder(BossAnims.MALKUTH_TEST)
                                 .setToNullTransitionTime(20)
                         .build());
-                this.headController.rotateToLookTarget(false);
-            }else{
-                this.getAnimationSystem().stopAnimation("TEST");
-                this.headController.rotateToLookTarget(true);
-            }
+//                this.headController.rotateToLookTarget(false);
+//            }else{
+//                this.getAnimationSystem().stopAnimation("TEST");
+//                this.headController.rotateToLookTarget(true);
+//            }
 
             this.headController.clientTick();
         }else{
@@ -71,7 +76,7 @@ public class MalkuthEntity extends FDMob implements IHasHead {
             Player player = this.level().getNearestPlayer(this, 30);
 
             if (player != null){
-                this.getLookControl().setLookAt(player);
+//                this.getLookControl().setLookAt(player);
             }
         }
     }

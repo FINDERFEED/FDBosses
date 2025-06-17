@@ -8,7 +8,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Mob;
 import org.joml.Vector2f;
 
-public class HeadController<T extends Mob & IHasHead & AnimatedObject> {
+public class HeadController<T extends Mob & IHasHead<T> & AnimatedObject> {
 
     private FDModel fdModel;
     private T entity;
@@ -38,16 +38,16 @@ public class HeadController<T extends Mob & IHasHead & AnimatedObject> {
 
     public void rotateToLookTarget(boolean rotate){
         if (entity.level().isClientSide) {
+            entity.getAnimationSystem().applyAnimations(fdModel, 0f);
+            FDModelPart modelPart = fdModel.getModelPart(headBone);
             if (rotate && !rotatesToHeadTarget) {
                 rotatesToHeadTarget = true;
                 reachedDestination = false;
-                entity.getAnimationSystem().applyAnimations(fdModel, 0.5f);
-                FDModelPart modelPart = fdModel.getModelPart(headBone);
                 this.setCurrentRotation(modelPart.getXRot(),modelPart.getYRot());
             }else if (!rotate && rotatesToHeadTarget){
                 rotatesToHeadTarget = false;
                 reachedDestination = false;
-                this.setCurrentRotation(entity.getXRot(), entity.getYRot() - entity.getYHeadRot());
+                this.setCurrentRotation(-entity.getXRot() + modelPart.initRotation.x, entity.getYRot() - entity.getYHeadRot() + modelPart.initRotation.y);
             }
             oldRotationX = this.getCurrentRotationX();
             oldRotationY = this.getCurrentRotationY();
@@ -64,7 +64,7 @@ public class HeadController<T extends Mob & IHasHead & AnimatedObject> {
     }
 
     public Vector2f getCurrentRotation(float pticks){
-        float rotx = currentRotationX;
+        float rotx = FDMathUtil.lerpAround(oldRotationX,currentRotationX,-180,180,pticks);
         float roty = FDMathUtil.lerpAround(oldRotationY,currentRotationY,-180,180,pticks);
 
         return new Vector2f(
@@ -74,14 +74,14 @@ public class HeadController<T extends Mob & IHasHead & AnimatedObject> {
 
     //XY
     public Vector2f getTargetRotation(){
+        entity.getAnimationSystem().applyAnimations(fdModel, 0f);
+        FDModelPart modelPart = fdModel.getModelPart(headBone);
         if (rotatesToHeadTarget){
             return new Vector2f(
-                    entity.getXRot(),
-                    FDMathUtil.convertMCYRotationToNormal(entity.getYRot() - entity.getYHeadRot())
+                    -entity.getXRot() + modelPart.initRotation.x,
+                    FDMathUtil.convertMCYRotationToNormal(entity.getYRot() - entity.getYHeadRot() + modelPart.initRotation.y)
             );
         }else{
-            entity.getAnimationSystem().applyAnimations(fdModel, 0.5f);
-            FDModelPart modelPart = fdModel.getModelPart(headBone);
             return new Vector2f(
                     modelPart.getXRot(),
                     FDMathUtil.convertMCYRotationToNormal(modelPart.getYRot())
@@ -103,60 +103,65 @@ public class HeadController<T extends Mob & IHasHead & AnimatedObject> {
         this.rotateY(targetY);
         this.rotateX(targetX);
 
-        if (Math.abs(targetY - currentRotationY) < 0.05){
+        if (Math.abs(targetY - currentRotationY) < 0.05 && Math.abs(targetX - currentRotationX) < 0.05){
             this.reachedDestination = true;
         }
     }
 
     private void rotateX(float targetX){
-
+        float newRotation = this.getRotation(currentRotationX, targetX);
+        currentRotationX = newRotation;
     }
 
     //-180 -> 180
     private void rotateY(float targetY){
+        float newRotation = this.getRotation(currentRotationY, targetY);
+        currentRotationY = newRotation;
+    }
 
-        if (currentRotationY >= 0 && targetY >= 0 || currentRotationY < 0 && targetY < 0){
+    private float getRotation(float currentRotation, float targetY){
+        if (currentRotation >= 0 && targetY >= 0 || currentRotation < 0 && targetY < 0){
             int direction = targetY - currentRotationY > 0 ? 1 : -1;
 
-            if (currentRotationY >= 0) {
+            if (currentRotation >= 0) {
                 if (direction == 1){
-                    currentRotationY = Mth.clamp(currentRotationY + this.getHeadTransitionSpeed() * direction, -Integer.MAX_VALUE,targetY);
+                    return Mth.clamp(currentRotation + this.getHeadTransitionSpeed() * direction, -Integer.MAX_VALUE,targetY);
                 }else{
-                    currentRotationY = Mth.clamp(currentRotationY + this.getHeadTransitionSpeed() * direction, targetY, Integer.MAX_VALUE);
+                    return Mth.clamp(currentRotation + this.getHeadTransitionSpeed() * direction, targetY, Integer.MAX_VALUE);
                 }
             }else{
                 if (direction == 1){
-                    currentRotationY = Mth.clamp(currentRotationY + this.getHeadTransitionSpeed() * direction, -Integer.MAX_VALUE,targetY);
+                    return Mth.clamp(currentRotation + this.getHeadTransitionSpeed() * direction, -Integer.MAX_VALUE,targetY);
                 }else{
-                    currentRotationY = Mth.clamp(currentRotationY + this.getHeadTransitionSpeed() * direction, targetY, Integer.MAX_VALUE);
+                    return Mth.clamp(currentRotation + this.getHeadTransitionSpeed() * direction, targetY, Integer.MAX_VALUE);
                 }
             }
         }else{
-            if (currentRotationY < 0){
-                float dist = -currentRotationY + targetY;
+            if (currentRotation < 0){
+                float dist = -currentRotation + targetY;
                 if (dist > 180){
-                    currentRotationY -= this.getHeadTransitionSpeed();
-                    if (currentRotationY < -180){
-                        currentRotationY += 360;
-                        currentRotationY = Mth.clamp(currentRotationY, -Integer.MAX_VALUE, targetY);
+                    currentRotation -= this.getHeadTransitionSpeed();
+                    if (currentRotation < -180){
+                        currentRotation += 360;
+                        return Mth.clamp(currentRotation, -Integer.MAX_VALUE, targetY);
                     }
                 }else{
-                    currentRotationY = Math.clamp(currentRotationY + this.getHeadTransitionSpeed(), -Integer.MAX_VALUE, targetY);
+                    return Mth.clamp(currentRotation + this.getHeadTransitionSpeed(), -Integer.MAX_VALUE, targetY);
                 }
             }else{
-                float dist = -targetY + currentRotationY;
+                float dist = -targetY + currentRotation;
                 if (dist > 180){
-                    currentRotationY += this.getHeadTransitionSpeed();
-                    if (currentRotationY > 180){
-                        currentRotationY -= 360;
-                        currentRotationY = Mth.clamp(currentRotationY, targetY, Integer.MAX_VALUE);
+                    currentRotation += this.getHeadTransitionSpeed();
+                    if (currentRotation > 180){
+                        currentRotation -= 360;
+                        return Mth.clamp(currentRotation, targetY, Integer.MAX_VALUE);
                     }
                 }else{
-                    currentRotationY = Mth.clamp(currentRotationY - this.getHeadTransitionSpeed(), targetY, Integer.MAX_VALUE);
+                    return Mth.clamp(currentRotation - this.getHeadTransitionSpeed(), targetY, Integer.MAX_VALUE);
                 }
             }
         }
-
+        return 0;
     }
 
     public boolean isTransitioningToLookTarget(){
@@ -180,6 +185,7 @@ public class HeadController<T extends Mob & IHasHead & AnimatedObject> {
     }
 
     public float getHeadTransitionSpeed() {
+        if (true) return 2;
         return headTransitionSpeed;
     }
 

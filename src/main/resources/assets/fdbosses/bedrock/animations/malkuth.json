@@ -3,10 +3,10 @@
 	"animations": {
 		"test_malkuth": {
 			"loop": true,
-			"animation_length": 2,
+			"animation_length": 4,
 			"bones": {
-				"head": {
-					"rotation": ["math.sin(query.anim_time * 180) * 20 ", "math.sin(query.anim_time * 180) * 100", 0]
+				"chest": {
+					"rotation": ["math.sin(query.anim_time * 90) * 45", 0, "math.cos(query.anim_time * 90) * 45"]
 				}
 			}
 		}
