@@ -58,6 +58,7 @@ public class MalkuthHorizontalSlashParticle extends Particle {
                 .direction(options.getSlashDirection().reverse())
                 .verticalRendering()
                 .renderBack()
+                .rotationDegrees(options.getRotation())
                 .color(1f,1f,1f,(0.8f - p * 0.8f))
                 .render();
 

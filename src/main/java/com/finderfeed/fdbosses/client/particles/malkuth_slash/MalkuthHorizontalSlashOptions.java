@@ -22,10 +22,11 @@ public class MalkuthHorizontalSlashOptions implements ParticleOptions {
             FDByteBufCodecs.VEC3,v->v.slashDirection,
             ByteBufCodecs.FLOAT,v->v.slashWidth,
             ByteBufCodecs.INT,v->v.lifetime,
-            (type,dir,width,lifetime)->{
+            ByteBufCodecs.FLOAT,v->v.rotation,
+            (type,dir,width,lifetime,rotation)->{
                 MalkuthHorizontalSlashOptions options = new MalkuthHorizontalSlashOptions(
                         MalkuthAttackType.valueOf(type),
-                        dir,width,lifetime
+                        dir,width,rotation,lifetime
                 );
                 return options;
             }
@@ -35,11 +36,12 @@ public class MalkuthHorizontalSlashOptions implements ParticleOptions {
             Codec.STRING.fieldOf("attackType").forGetter(v->v.attackType.name()),
             FDCodecs.VEC3.fieldOf("slashDirection").forGetter(v->v.slashDirection),
             Codec.FLOAT.fieldOf("slashWidth").forGetter(v->v.slashWidth),
-            Codec.INT.fieldOf("lifetime").forGetter(v->v.lifetime)
-    ).apply(p,(type,dir,width,lifetime)->{
+            Codec.INT.fieldOf("lifetime").forGetter(v->v.lifetime),
+            Codec.FLOAT.fieldOf("rotation").forGetter(v->v.rotation)
+    ).apply(p,(type,dir,width,lifetime,rotation)->{
         MalkuthHorizontalSlashOptions options = new MalkuthHorizontalSlashOptions(
                 MalkuthAttackType.valueOf(type),
-                dir,width,lifetime
+                dir,width,rotation,lifetime
         );
         return options;
     }));
@@ -47,13 +49,20 @@ public class MalkuthHorizontalSlashOptions implements ParticleOptions {
     private MalkuthAttackType attackType;
     private Vec3 slashDirection;
     private float slashWidth;
+    private float rotation;
     private int lifetime;
 
-    public MalkuthHorizontalSlashOptions(MalkuthAttackType malkuthAttackType, Vec3 slashDirection, float slashWidth,int lifetime){
+
+    public MalkuthHorizontalSlashOptions(MalkuthAttackType malkuthAttackType, Vec3 slashDirection, float slashWidth, float rotation,int lifetime){
         this.attackType = malkuthAttackType;
         this.slashDirection = slashDirection;
         this.slashWidth = slashWidth;
         this.lifetime = lifetime;
+        this.rotation = rotation;
+    }
+
+    public float getRotation() {
+        return rotation;
     }
 
     public int getLifetime() {

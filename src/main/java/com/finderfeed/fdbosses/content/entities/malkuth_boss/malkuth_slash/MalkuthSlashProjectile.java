@@ -26,6 +26,9 @@ import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.joml.AxisAngle4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3d;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +38,7 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
     public static final float HEIGHT_SIZE_MODIFIER = 0.3461538f;
 
     public static final EntityDataAccessor<Float> SLASH_SIZE = SynchedEntityData.defineId(MalkuthSlashProjectile.class, EntityDataSerializers.FLOAT);
+    public static final EntityDataAccessor<Float> ROTATION = SynchedEntityData.defineId(MalkuthSlashProjectile.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<MalkuthAttackType> ATTACK_TYPE = SynchedEntityData.defineId(MalkuthSlashProjectile.class, BossEntityDataSerializers.MALKUTH_ATTACK_TYPE.get());
 
     @SerializableField
@@ -44,13 +48,14 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
         super(type, level);
     }
 
-    public static MalkuthSlashProjectile summon(Level level, Vec3 pos, Vec3 speed, MalkuthAttackType malkuthAttackType, float damage, float slashSize){
+    public static MalkuthSlashProjectile summon(Level level, Vec3 pos, Vec3 speed, MalkuthAttackType malkuthAttackType, float damage, float slashSize, float rotation){
         MalkuthSlashProjectile malkuthSlashProjectile = new MalkuthSlashProjectile(BossEntities.MALKUTH_SLASH.get(), level);
         malkuthSlashProjectile.setPos(pos);
         malkuthSlashProjectile.setDeltaMovement(speed);
         malkuthSlashProjectile.setAttackType(malkuthAttackType);
         malkuthSlashProjectile.setSlashSize(slashSize);
         malkuthSlashProjectile.damage = damage;
+        malkuthSlashProjectile.setRotation(rotation);
         level.addFreshEntity(malkuthSlashProjectile);
         return malkuthSlashProjectile;
     }
@@ -97,7 +102,7 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
 
             pos = pos.add(nmovement.reverse().multiply(offset,offset,offset));
 
-            MalkuthHorizontalSlashOptions options = new MalkuthHorizontalSlashOptions(this.getAttackType(), this.getDeltaMovement(), this.getSlashSize() * 0.9f, 5);
+            MalkuthHorizontalSlashOptions options = new MalkuthHorizontalSlashOptions(this.getAttackType(), this.getDeltaMovement(), this.getSlashSize() * 0.9f,this.getRotation(), 5);
             level().addParticle(options, true, pos.x, pos.y, pos.z, -n.x,-n.y,-n.z);
         }
     }
@@ -117,12 +122,26 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
 
         Vec3 nmovement = movement.normalize();
 
+        Quaternionf quaternionf = new Quaternionf(new AxisAngle4f(
+                (float) Math.toRadians(-this.getRotation()),(float) nmovement.x,(float) nmovement.y,(float) nmovement.z
+        ));
+
+        Vector3d leftd = new Vector3d(left.x,left.y,left.z);
+        quaternionf.transform(leftd);
+
+        left = new Vec3(leftd.x,leftd.y,leftd.z);
+
+
+
 
         float slashLeftOffset = 0.3f;
 
         float height = this.getSlashSize() * HEIGHT_SIZE_MODIFIER;
 
         for (float i = 0; i <= this.getSlashSize(); i += slashLeftOffset){
+
+
+
 
             Vec3 offsetPos = pos.add(left.multiply(i,i,i));
             Vec3 offsetPos2 = pos.add(left.multiply(-i,-i,-i));
@@ -136,6 +155,10 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
                 Vec3 n = nmovement.multiply(-l,-l,-l).add(noffset).add(nmovement.reverse().multiply(height,height,height));
 
                 float lmult = random.nextFloat() * slashLeftOffset - slashLeftOffset/2;
+
+
+
+
                 Vec3 offsetPos12 = offsetPos.add(n)
                         .add(
                                 left.multiply(lmult,lmult,lmult)
@@ -202,6 +225,18 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
 
         Vec3 left = movement.cross(new Vec3(0,1,0)).normalize();
 
+        Vec3 nmovement = movement.normalize();
+
+        Quaternionf quaternionf = new Quaternionf(new AxisAngle4f(
+                (float) Math.toRadians(-this.getRotation()),(float) nmovement.x,(float) nmovement.y,(float) nmovement.z
+        ));
+
+        Vector3d leftd = new Vector3d(left.x,left.y,left.z);
+        quaternionf.transform(leftd);
+
+        left = new Vec3(leftd.x,leftd.y,leftd.z);
+
+
         List<Entity> damagedEntities = new ArrayList<>();
 
         for (float i = 0; i < this.getSlashSize(); i+= 0.2f){
@@ -253,6 +288,14 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
         this.entityData.set(SLASH_SIZE,size);
     }
 
+    public float getRotation(){
+        return this.entityData.get(ROTATION);
+    }
+
+    public void setRotation(float rotation){
+        this.entityData.set(ROTATION,rotation);
+    }
+
     public MalkuthAttackType getAttackType(){
         return this.entityData.get(ATTACK_TYPE);
     }
@@ -273,6 +316,7 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
     protected void defineSynchedData(SynchedEntityData.Builder p_326181_) {
         super.defineSynchedData(p_326181_);
         p_326181_.define(SLASH_SIZE, 1f);
+        p_326181_.define(ROTATION, 0f);
         p_326181_.define(ATTACK_TYPE, MalkuthAttackType.FIRE);
     }
 
@@ -280,6 +324,7 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putFloat("slashSize",this.getSlashSize());
+        tag.putFloat("rotation",this.getRotation());
         tag.putString("attackType",this.getAttackType().name());
         this.autoSave(tag);
     }
@@ -287,6 +332,7 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+        this.setRotation(tag.getFloat("rotation"));
         this.setSlashSize(tag.getFloat("slashSize"));
         if (tag.contains("attackType")) {
             this.setAttackType(MalkuthAttackType.valueOf(tag.getString("attackType")));

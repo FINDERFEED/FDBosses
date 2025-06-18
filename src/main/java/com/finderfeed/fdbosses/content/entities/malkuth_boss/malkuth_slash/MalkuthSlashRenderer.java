@@ -37,6 +37,7 @@ public class MalkuthSlashRenderer extends EntityRenderer<MalkuthSlashProjectile>
                 .pose(matrices)
                 .renderBack()
                 .verticalRendering()
+                .rotationDegrees(projectile.getRotation())
                 .render();
 
 

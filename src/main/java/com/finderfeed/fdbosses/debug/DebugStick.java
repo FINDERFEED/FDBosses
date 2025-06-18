@@ -46,7 +46,7 @@ public class DebugStick extends Item {
             MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level, player.position(), player.getLookAngle().multiply(speed,speed,speed),
 
                     level.random.nextFloat() > 0.5 ? MalkuthAttackType.FIRE : MalkuthAttackType.ICE
-                    , 0, 2);
+                    , 0, 2,-30);
 
 
 //            UUID uuid1 = UUID.fromString("87b5dfdc-ed5b-4c04-9bcd-394cb7e47851");
