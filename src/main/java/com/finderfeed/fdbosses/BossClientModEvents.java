@@ -27,6 +27,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
 import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
+import com.finderfeed.fdbosses.ik_2d.InverseKinematics2BoneTransform;
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.content.projectiles.renderers.BlockProjectileRenderer;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.head.HeadBoneTransformation;
@@ -47,6 +48,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -159,16 +161,38 @@ public class BossClientModEvents {
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
 
+        var rightLegIK = new InverseKinematics2BoneTransform<MalkuthEntity>(
+                Direction.Axis.X,
+                "leg_right_control_start",
+                "leg_right_control_end",
+                "leg_right",
+                "leg_right_lower",
+                "leg_right_boot",
+                false
+        );
+        var leftLegIK = new InverseKinematics2BoneTransform<MalkuthEntity>(
+                Direction.Axis.X,
+                "leg_left_control_start",
+                "leg_left_control_end",
+                "leg_left",
+                "leg_left_lower",
+                "leg_left_boot",
+                false
+        );
         event.registerEntityRenderer(BossEntities.MALKUTH.get(), FDEntityRendererBuilder.<MalkuthEntity>builder()
                         .addLayer(FDEntityRenderLayerOptions.<MalkuthEntity>builder()
                                 .model(BossModels.MALKUTH)
                                 .renderType(RenderType.entityCutoutNoCull(FDBosses.location("textures/entities/malkuth/malkuth_solid.png")))
                                 .addBoneController("head", new HeadBoneTransformation<>())
+                                .addBoneController("leg_right_holder", rightLegIK)
+                                .addBoneController("leg_left_holder", leftLegIK)
                                 .build())
                         .addLayer(FDEntityRenderLayerOptions.<MalkuthEntity>builder()
                                 .model(BossModels.MALKUTH)
                                 .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/malkuth/malkuth_emissive.png")))
                                 .addBoneController("head", new HeadBoneTransformation<>())
+                                .addBoneController("leg_right_holder", rightLegIK)
+                                .addBoneController("leg_left_holder", leftLegIK)
                                 .light(LightTexture.FULL_BRIGHT)
                                 .build())
                 .build());
