@@ -14,6 +14,7 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
@@ -88,6 +89,11 @@ public class RushParticle extends Particle {
     @Override
     public ParticleRenderType getRenderType() {
         return RENDER_TYPE;
+    }
+
+    @Override
+    protected int getLightColor(float p_107249_) {
+        return LightTexture.FULL_BRIGHT;
     }
 
     public static final FDParticleRenderType RENDER_TYPE = new FDParticleRenderType() {

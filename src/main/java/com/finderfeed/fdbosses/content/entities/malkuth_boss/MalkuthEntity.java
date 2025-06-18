@@ -1,13 +1,13 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
 import com.finderfeed.fdbosses.FDBosses;
-import com.finderfeed.fdbosses.head_stuff.HeadControllerContainer;
-import com.finderfeed.fdbosses.head_stuff.IHasHead;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.init.FDRenderTypes;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.head.HeadControllerContainer;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.head.IHasHead;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.ModelSystem;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.BaseModelAttachmentData;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.instances.fdmodel.FDModelAttachmentData;
@@ -60,24 +60,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity> {
 
         super.tick();
         if (level().isClientSide){
-
-            if (this.level().getGameTime() % 300 > 120){
-                this.getAnimationSystem().startAnimation("TEST", AnimationTicker.builder(BossAnims.MALKUTH_TEST)
-                                .setToNullTransitionTime(0)
-                        .build());
-                this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION_AND_LOOK);
-            }else{
-                this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
-                this.getAnimationSystem().stopAnimation("TEST");
-            }
-
             this.headControllerContainer.clientTick();
         }else{
             this.setYRot(this.yBodyRot);
             Player player = this.level().getNearestPlayer(this, 30);
 
             if (player != null){
-//                this.getLookControl().setLookAt(player);
+                this.getLookControl().setLookAt(player);
             }
         }
     }

@@ -1,18 +1,20 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash;
 
-import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.client.particles.malkuth_slash.MalkuthHorizontalSlashOptions;
+import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBuddy;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdlib.FDHelpers;
-import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -29,6 +31,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializable {
+
+    public static final float HEIGHT_SIZE_MODIFIER = 0.3461538f;
 
     public static final EntityDataAccessor<Float> SLASH_SIZE = SynchedEntityData.defineId(MalkuthSlashProjectile.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<MalkuthAttackType> ATTACK_TYPE = SynchedEntityData.defineId(MalkuthSlashProjectile.class, BossEntityDataSerializers.MALKUTH_ATTACK_TYPE.get());
@@ -51,14 +55,50 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
         return malkuthSlashProjectile;
     }
 
+    private double distanceTravelled;
+    private double distanceTravelledO;
+
     @Override
     public void tick() {
-
+        Vec3 oldPos = this.position();
         super.tick();
+        Vec3 newPos = this.position();
         if (!level().isClientSide){
             this.tickDamage();
         }else{
+
+            distanceTravelledO = distanceTravelled;
+            distanceTravelled += newPos.subtract(oldPos).length();
+
+            this.slashParticles();
             this.tickParticles();
+        }
+    }
+
+    private void slashParticles() {
+        Vec3 movement = this.getDeltaMovement();
+        double distance = distanceTravelled - distanceTravelledO;
+
+        float height = this.getSlashSize() * HEIGHT_SIZE_MODIFIER;
+
+        Vec3 pos = FDMathUtil.interpolateVectors(this.position(),new Vec3(xo,yo,zo),0.5f).add(0,this.getBbHeight()/2,0);
+
+        Vec3 n = movement.normalize().reverse().multiply(0.025f,0.025f,0.025f);
+
+        for (double i = 0; i < distance - height * movement.length(); i += height) {
+
+
+
+            Vec3 nmovement = movement.normalize();
+
+
+            double offset = height + i;
+
+
+            pos = pos.add(nmovement.reverse().multiply(offset,offset,offset));
+
+            MalkuthHorizontalSlashOptions options = new MalkuthHorizontalSlashOptions(this.getAttackType(), this.getDeltaMovement(), this.getSlashSize() * 0.9f, 5);
+            level().addParticle(options, true, pos.x, pos.y, pos.z, -n.x,-n.y,-n.z);
         }
     }
 
@@ -80,7 +120,7 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
 
         float slashLeftOffset = 0.3f;
 
-        float height = this.getSlashSize() * 0.3461538f;
+        float height = this.getSlashSize() * HEIGHT_SIZE_MODIFIER;
 
         for (float i = 0; i <= this.getSlashSize(); i += slashLeftOffset){
 
@@ -104,6 +144,8 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
                         left.multiply(lmult,lmult,lmult)
                 );
 
+                ParticleOptions particleOptions;
+
                 if (this.getAttackType() == MalkuthAttackType.FIRE) {
                     r = 0.8f + 0.2f * random.nextFloat();
                     g = 0.3f + 0.2f * random.nextFloat();
@@ -114,22 +156,35 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
                     b = 0.8f + 0.2f * random.nextFloat();
                 }
 
-                BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
-                        .size(0.05f)
-                        .scalingOptions(0,0,3)
-                        .color(r,g,b)
-                        .build();
+                if (random.nextFloat() > 0.1f) {
 
-                level().addParticle(ballParticleOptions, offsetPos12.x,offsetPos12.y,offsetPos12.z,
+                    particleOptions = BallParticleOptions.builder()
+                            .size(0.05f + random.nextFloat() * 0.05f)
+                            .scalingOptions(0, 0, 3)
+                            .color(r, g, b)
+                            .build();
+
+
+                }else{
+
+                    particleOptions = new RushParticleOptions(movement.reverse(),
+                            new FDColor(r,g,b,1f),
+                            random.nextFloat() * 0.5f + 0.25f,
+                            0.05f + random.nextFloat() * 0.025f,
+                            2 + random.nextInt(2));
+                }
+
+                level().addParticle(particleOptions,true, offsetPos12.x, offsetPos12.y, offsetPos12.z,
                         random.nextFloat() * 0.05f - 0.025f,
                         random.nextFloat() * 0.05f - 0.025f,
                         random.nextFloat() * 0.05f - 0.025f
                 );
-                level().addParticle(ballParticleOptions, offsetPos22.x,offsetPos22.y,offsetPos22.z,
+                level().addParticle(particleOptions,true, offsetPos22.x, offsetPos22.y, offsetPos22.z,
                         random.nextFloat() * 0.05f - 0.025f,
                         random.nextFloat() * 0.05f - 0.025f,
                         random.nextFloat() * 0.05f - 0.025f
                 );
+
 
             }
 

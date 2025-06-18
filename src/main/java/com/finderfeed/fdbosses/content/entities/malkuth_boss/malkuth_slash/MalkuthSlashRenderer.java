@@ -32,7 +32,7 @@ public class MalkuthSlashRenderer extends EntityRenderer<MalkuthSlashProjectile>
         QuadRenderer.start(src.getBuffer(RenderType.eyes(this.getTextureLocation(projectile))))
                 .direction(projectile.getDeltaMovement().reverse())
                 .translate(0,projectile.getBbHeight()/2,0)
-                .sizeY(slashSize * 0.3461538f)
+                .sizeY(slashSize * MalkuthSlashProjectile.HEIGHT_SIZE_MODIFIER)
                 .sizeX(slashSize)
                 .pose(matrices)
                 .renderBack()

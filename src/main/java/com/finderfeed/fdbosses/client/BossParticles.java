@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.client;
 
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
+import com.finderfeed.fdbosses.client.particles.malkuth_slash.MalkuthHorizontalSlashOptions;
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
@@ -84,6 +85,19 @@ public class BossParticles {
             return RushParticleOptions.STREAM_CODEC;
         }
     });
+
+    public static final Supplier<ParticleType<MalkuthHorizontalSlashOptions>> MALKUTH_HORIZONTAL_SLASH = PARTICLES.register("malkuth_horizontal_slash",()->new ParticleType<MalkuthHorizontalSlashOptions>(true) {
+        @Override
+        public MapCodec<MalkuthHorizontalSlashOptions> codec() {
+            return MalkuthHorizontalSlashOptions.CODEC;
+        }
+
+        @Override
+        public StreamCodec<? super RegistryFriendlyByteBuf, MalkuthHorizontalSlashOptions> streamCodec() {
+            return MalkuthHorizontalSlashOptions.STREAM_CODEC;
+        }
+    });
+
 
 
 
