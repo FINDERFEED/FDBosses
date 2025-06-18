@@ -62,6 +62,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity> {
         if (level().isClientSide){
             this.headControllerContainer.clientTick();
         }else{
+
+            this.getAnimationSystem().startAnimation("POSE", AnimationTicker.builder(BossAnims.MALKUTH_IDLE)
+                            .setToNullTransitionTime(20)
+                    .build());
+
             this.setYRot(this.yBodyRot);
             Player player = this.level().getNearestPlayer(this, 30);
 

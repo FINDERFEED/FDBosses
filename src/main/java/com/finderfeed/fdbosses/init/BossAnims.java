@@ -84,4 +84,8 @@ public class BossAnims {
     public static DeferredHolder<Animation,Animation> MALKUTH_TEST = ANIMATIONS.register("test_malkuth", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
     });
+
+    public static DeferredHolder<Animation,Animation> MALKUTH_IDLE = ANIMATIONS.register("malkuth_idle", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
+    });
 }
