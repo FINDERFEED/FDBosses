@@ -65,6 +65,10 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
         double d1 = this.distanceBetweenModelParts(fdModel, firstPart, secondPart);
         double d2 = this.distanceBetweenModelParts(fdModel, secondPart, endPart);
 
+        firstPart.x = controllerBoneStart.x;
+        firstPart.y = controllerBoneStart.y;
+        firstPart.z = controllerBoneStart.z;
+
         if (d <= d1 + d2){
             double angle1 = Math.toDegrees(Math.acos(
                     (d1 * d1 + d * d - d2 * d2) / (2 * d1 * d)
@@ -79,18 +83,21 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
                 angle2 = -angle2;
             }
 
-            firstPart.x = controllerBoneStart.x;
-            firstPart.y = controllerBoneStart.y;
-            firstPart.z = controllerBoneStart.z;
+            double endPartAngle = -angle1 - angle2;
 
             switch (legRotateAroundAxis){
                 case X -> {
                     firstPart.setXRot((float)angle1);
                     firstPart.setYRot((float)0);
                     firstPart.setZRot((float)0);
+
                     secondPart.setXRot((float)angle2);
                     secondPart.setYRot((float)0);
                     secondPart.setZRot((float)0);
+
+                    endPart.setXRot(controllerBoneEnd.getXRot() + (float)endPartAngle);
+                    endPart.setYRot(controllerBoneEnd.getYRot());
+                    endPart.setZRot(controllerBoneEnd.getZRot());
                 }
                 case Y -> {
                     firstPart.setXRot((float)0);
@@ -99,6 +106,8 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
                     secondPart.setXRot((float)0);
                     secondPart.setYRot((float)angle2);
                     secondPart.setZRot((float)0);
+
+                    endPart.setYRot(controllerBoneEnd.getYRot() + (float)endPartAngle);
                 }
                 case Z -> {
                     firstPart.setXRot((float)0);
@@ -107,6 +116,9 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
                     secondPart.setXRot((float)0);
                     secondPart.setYRot((float)0);
                     secondPart.setZRot((float)angle2);
+
+
+                    endPart.setZRot(controllerBoneEnd.getZRot() + (float)endPartAngle);
                 }
             }
 
@@ -117,12 +129,10 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
             secondPart.setXRot(0);
             secondPart.setYRot(0);
             secondPart.setZRot(0);
+            endPart.setXRot(controllerBoneEnd.getXRot());
+            endPart.setYRot(controllerBoneEnd.getYRot());
+            endPart.setZRot(controllerBoneEnd.getZRot());
         }
-
-
-        endPart.setXRot(controllerBoneEnd.getXRot());
-        endPart.setYRot(controllerBoneEnd.getYRot());
-        endPart.setZRot(controllerBoneEnd.getZRot());
     }
 
     private double distanceBetweenModelParts(FDModel model, FDModelPart part1, FDModelPart part2){
