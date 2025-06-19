@@ -162,6 +162,7 @@ public class BossClientModEvents {
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
 
         var rightLegIK = new InverseKinematics2BoneTransform<MalkuthEntity>(
+                Direction.Axis.Z,
                 Direction.Axis.X,
                 "leg_right_control_start",
                 "leg_right_control_end",
@@ -171,6 +172,7 @@ public class BossClientModEvents {
                 false
         );
         var leftLegIK = new InverseKinematics2BoneTransform<MalkuthEntity>(
+                Direction.Axis.Z,
                 Direction.Axis.X,
                 "leg_left_control_start",
                 "leg_left_control_end",

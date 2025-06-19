@@ -21,6 +21,7 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
     private String end;
 
     private Direction.Axis legRotateAroundAxis;
+    private Direction.Axis legForwardAxis;
 
     private boolean negateAngles;
 
@@ -45,7 +46,7 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
      *
      * Basically do not animate first second and end parts, animate only start controller bone parent and controller bones
      */
-    public InverseKinematics2BoneTransform(Direction.Axis legRotateAroundAxis,String controllerBoneStart, String controllerBoneEnd, String first, String second, String end, boolean negateAngles){
+    public InverseKinematics2BoneTransform(Direction.Axis legForwardAxis, Direction.Axis legRotateAroundAxis,String controllerBoneStart, String controllerBoneEnd, String first, String second, String end, boolean negateAngles){
         this.controllerBoneEnd = controllerBoneEnd;
         this.controllerBoneStart = controllerBoneStart;
         this.legRotateAroundAxis = legRotateAroundAxis;
@@ -53,6 +54,7 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
         this.second = second;
         this.end = end;
         this.negateAngles = negateAngles;
+        this.legForwardAxis = legForwardAxis;
     }
 
     @Override
@@ -73,10 +75,28 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
         firstPart.y = controllerBoneStart.y;
         firstPart.z = controllerBoneStart.z;
 
+        double distBetweenControllers = 0;
+
+        switch (legForwardAxis){
+            case X -> {
+                distBetweenControllers = Math.abs(controllerBoneEnd.x - controllerBoneStart.x);
+            }
+            case Y -> {
+                distBetweenControllers = Math.abs(controllerBoneEnd.y - controllerBoneStart.y);
+            }
+            case Z -> {
+                distBetweenControllers = Math.abs(controllerBoneEnd.z - controllerBoneStart.z);
+            }
+        }
+        distBetweenControllers /= 16;
+
+        double cos = Math.toDegrees(Math.sin(distBetweenControllers  /  d));
+
+
         if (d <= d1 + d2){
             double angle1 = Math.toDegrees(Math.acos(
                     (d1 * d1 + d * d - d2 * d2) / (2 * d1 * d)
-            ));
+            )) + cos;
 
             double angle2 = Math.toDegrees(Math.acos(
                     (d1 * d1 + d2 * d2 - d * d) / (2 * d1 * d2)
@@ -101,8 +121,8 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
                     firstPart.setXRot((float)0);
                     firstPart.setYRot((float)angle1);
                     firstPart.setZRot((float)0);
-                    secondPart.setXRot((float)0);
 
+                    secondPart.setXRot((float)0);
                     secondPart.setYRot((float)angle2);
                     secondPart.setZRot((float)0);
                 }

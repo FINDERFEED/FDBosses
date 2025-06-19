@@ -122,7 +122,7 @@
 					"parent": "leg_left_holder",
 					"pivot": [4, 5, 0],
 					"cubes": [
-						{"origin": [3, 0, -1], "size": [2, 6, 2], "uv": [85, 87]}
+						{"origin": [3, 0, -3], "size": [2, 6, 4], "uv": [83, 85]}
 					]
 				},
 				{
