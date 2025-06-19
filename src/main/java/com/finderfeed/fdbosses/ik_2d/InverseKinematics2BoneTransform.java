@@ -29,6 +29,8 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
      *
      * "Controller" bones should be children of the same bone as first second and end bones!
      *
+     * End bone should have the same parent as controller bones
+     *
      * Controller bones should only be changing in the same plane as their parent dictates!
      *
      * Rotation of the end controller bone will be given to end bone (for example to control how feet rotates)
@@ -40,6 +42,8 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
      * Animations SHOULD NOT INTERFERE WITH POSITIONS OF FIRST SECOND AND END BONES.
      *
      * Otherwise everything will blow up!
+     *
+     * Basically do not animate first second and end parts, animate only start controller bone parent and controller bones
      */
     public InverseKinematics2BoneTransform(Direction.Axis legRotateAroundAxis,String controllerBoneStart, String controllerBoneEnd, String first, String second, String end, boolean negateAngles){
         this.controllerBoneEnd = controllerBoneEnd;
@@ -83,8 +87,6 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
                 angle2 = -angle2;
             }
 
-            double endPartAngle = -angle1 - angle2;
-
             switch (legRotateAroundAxis){
                 case X -> {
                     firstPart.setXRot((float)angle1);
@@ -94,31 +96,24 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
                     secondPart.setXRot((float)angle2);
                     secondPart.setYRot((float)0);
                     secondPart.setZRot((float)0);
-
-                    endPart.setXRot(controllerBoneEnd.getXRot() + (float)endPartAngle);
-                    endPart.setYRot(controllerBoneEnd.getYRot());
-                    endPart.setZRot(controllerBoneEnd.getZRot());
                 }
                 case Y -> {
                     firstPart.setXRot((float)0);
                     firstPart.setYRot((float)angle1);
                     firstPart.setZRot((float)0);
                     secondPart.setXRot((float)0);
+
                     secondPart.setYRot((float)angle2);
                     secondPart.setZRot((float)0);
-
-                    endPart.setYRot(controllerBoneEnd.getYRot() + (float)endPartAngle);
                 }
                 case Z -> {
                     firstPart.setXRot((float)0);
                     firstPart.setYRot((float)0);
                     firstPart.setZRot((float)angle1);
+
                     secondPart.setXRot((float)0);
                     secondPart.setYRot((float)0);
                     secondPart.setZRot((float)angle2);
-
-
-                    endPart.setZRot(controllerBoneEnd.getZRot() + (float)endPartAngle);
                 }
             }
 
@@ -126,24 +121,32 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
             firstPart.setXRot(0);
             firstPart.setYRot(0);
             firstPart.setZRot(0);
-            secondPart.setXRot(0);
-            secondPart.setYRot(0);
-            secondPart.setZRot(0);
-            endPart.setXRot(controllerBoneEnd.getXRot());
-            endPart.setYRot(controllerBoneEnd.getYRot());
-            endPart.setZRot(controllerBoneEnd.getZRot());
         }
+
+        endPart.x = controllerBoneEnd.x;
+        endPart.y = controllerBoneEnd.y;
+        endPart.z = controllerBoneEnd.z;
+
+        endPart.setXRot(controllerBoneEnd.getXRot());
+        endPart.setYRot(controllerBoneEnd.getYRot());
+        endPart.setZRot(controllerBoneEnd.getZRot());
+
+        endPart.xScale = controllerBoneEnd.xScale;
+        endPart.yScale = controllerBoneEnd.yScale;
+        endPart.zScale = controllerBoneEnd.zScale;
+
+
     }
 
     private double distanceBetweenModelParts(FDModel model, FDModelPart part1, FDModelPart part2){
         Matrix4f t1 = model.getModelPartTransformation(part1);
         Matrix4f t2 = model.getModelPartTransformation(part2);
 
+
         Vector3f p1 = t1.transformPosition(new Vector3f());
         Vector3f p2 = t2.transformPosition(new Vector3f());
 
         return p1.distance(p2);
     }
-
 
 }
