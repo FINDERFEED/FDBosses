@@ -27,6 +27,9 @@ public abstract class GravityOptionsParticle extends TextureSheetParticle {
         this.xd = xd;
         this.yd = yd;
         this.zd = zd;
+        this.roll = leve.random.nextFloat() * FDMathUtil.FPI * 2;
+        this.particleRoll = this.roll;
+        this.particleRollO = this.roll;
         this.gravity = gravityParticleOptions.getGravity();
         this.quadSize = options.getQuadSize();
         this.particleQuadSize = gravityParticleOptions.getQuadSize();
@@ -54,7 +57,8 @@ public abstract class GravityOptionsParticle extends TextureSheetParticle {
 
     @Override
     public void render(VertexConsumer consumer, Camera camera, float pticks) {
-        this.roll = FDMathUtil.lerp(particleRollO,particleRoll, pticks);
+        this.roll = particleRoll;
+        this.oRoll = particleRollO;
         if (options.isFadeOut()) {
             this.quadSize = this.particleQuadSize * (1 - (this.age + pticks) / this.lifetime);
         }
