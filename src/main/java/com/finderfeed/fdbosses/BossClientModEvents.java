@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.client.boss_screen.text_block_processors.BossConf
 import com.finderfeed.fdbosses.client.boss_screen.text_block_processors.MobEffectTextProcessor;
 import com.finderfeed.fdbosses.client.overlay.ElectrifiedOverlay;
 import com.finderfeed.fdbosses.client.particles.FlameWithStoneParticle;
+import com.finderfeed.fdbosses.client.particles.IceChunkParticle;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningParticle;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedAttackRayParticle;
 import com.finderfeed.fdbosses.client.particles.malkuth_slash.MalkuthHorizontalSlashParticle;
@@ -156,6 +157,7 @@ public class BossClientModEvents {
         event.registerSpriteSet(BossParticles.BIS_SMOKE.get(), BigSmokeParticle.Factory::new);
         event.registerSpriteSet(BossParticles.SONIC_PARTICLE.get(), SonicParticle.Factory::new);
         event.registerSpriteSet(BossParticles.FLAME_WITH_STONE.get(), FlameWithStoneParticle.Factory::new);
+        event.registerSpriteSet(BossParticles.ICE_CHUNK.get(), IceChunkParticle.Factory::new);
         event.registerSpecial(BossParticles.ARC_LIGHTNING.get(), new ArcLightningParticle.Factory());
         event.registerSpecial(BossParticles.CHESED_RAY_ATTACK.get(), new ChesedAttackRayParticle.Factory());
         event.registerSpecial(BossParticles.MALKUTH_HORIZONTAL_SLASH.get(), new MalkuthHorizontalSlashParticle.Factory());

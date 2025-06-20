@@ -101,6 +101,7 @@ public class BossParticles {
     });
 
     public static final Supplier<ParticleType<GravityParticleOptions>> FLAME_WITH_STONE = PARTICLES.register("flame_with_stone",()->new GravityOptionsParticleType(true));
+    public static final Supplier<ParticleType<GravityParticleOptions>> ICE_CHUNK = PARTICLES.register("ice_chunk",()->new GravityOptionsParticleType(true));
 
 
 

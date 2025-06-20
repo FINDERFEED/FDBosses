@@ -111,7 +111,8 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
                 float m = dist + random.nextFloat() * 0.5f;
                 Vector2d randomAngle = this.randomAngle(angle,currentAngle);
 
-                if (random.nextFloat() > 0.5f) {
+
+                if (random.nextFloat() > 0.66f) {
                     level().addParticle(ParticleTypes.LAVA, true,
                             this.getX() + randomAngle.x * m,
                             this.getY(),
@@ -120,10 +121,17 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
                     );
                 }else{
 
-                    ParticleOptions particleOptions = new GravityParticleOptions(BossParticles.FLAME_WITH_STONE.get(),20 + random.nextInt(4),0.5f + random.nextFloat() * 0.2f,
-                            (float)Mob.DEFAULT_BASE_GRAVITY * 20,2f,true);
+                    ParticleOptions particleOptions;
 
-                    float hspeed = (0.1f + random.nextFloat() * 0.1f);
+                    if (random.nextFloat() > 0.5f){
+                        particleOptions = new GravityParticleOptions(BossParticles.FLAME_WITH_STONE.get(),20 + random.nextInt(4),0.5f + random.nextFloat() * 0.2f,
+                                (float)Mob.DEFAULT_BASE_GRAVITY * 20,2f,true);
+                    }else{
+                        particleOptions = new GravityParticleOptions(BossParticles.ICE_CHUNK.get(),20 + random.nextInt(4),0.5f + random.nextFloat() * 0.2f,
+                                (float)Mob.DEFAULT_BASE_GRAVITY * 20,2f,true);
+                    }
+
+                    float hspeed = (0.1f + random.nextFloat() * 0.05f);
                     float vspeed = (0.4f + random.nextFloat() * 0.25f);
                     level().addParticle(particleOptions,true,
                             this.getX() + randomAngle.x * m,
