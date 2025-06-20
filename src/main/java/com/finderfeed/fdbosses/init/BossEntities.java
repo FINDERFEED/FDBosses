@@ -18,6 +18,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.Ra
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -146,13 +147,14 @@ public class BossEntities {
             .build("flying_sword"));
 
 
+
+    //MALKUTH
+
     public static final Supplier<EntityType<MalkuthEntity>> MALKUTH = ENTITIES.register("malkuth",()->EntityType.Builder.of(
             MalkuthEntity::new, MobCategory.CREATURE
     )
             .sized(1f,4f)
             .build("malkuth"));
-
-
 
     public static final Supplier<EntityType<MalkuthSlashProjectile>> MALKUTH_SLASH = ENTITIES.register("malkuth_slash",()->EntityType.Builder.of(
             MalkuthSlashProjectile::new, MobCategory.MISC
@@ -160,6 +162,12 @@ public class BossEntities {
             .updateInterval(1)
             .sized(0.2f,0.2f)
             .build("malkuth_slash"));
+
+    public static final Supplier<EntityType<MalkuthCrushAttack>> MALKUTH_CRUSH = ENTITIES.register("malkuth_crush",()->EntityType.Builder.of(
+            MalkuthCrushAttack::new, MobCategory.MISC
+    )
+            .sized(0.2f,0.2f)
+            .build("malkuth_crush"));
 
 
     @SubscribeEvent

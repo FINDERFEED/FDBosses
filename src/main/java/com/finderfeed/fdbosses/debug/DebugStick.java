@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.debug;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.FDHelpers;
@@ -43,10 +44,8 @@ public class DebugStick extends Item {
 
             float speed = 2f;
 
-            MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level, player.position(), player.getLookAngle().multiply(speed,speed,speed),
+            MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level, player.position(), 1);
 
-                    level.random.nextFloat() > 0.5 ? MalkuthAttackType.FIRE : MalkuthAttackType.ICE
-                    , 0, 2,-30);
 
 
 //            UUID uuid1 = UUID.fromString("87b5dfdc-ed5b-4c04-9bcd-394cb7e47851");

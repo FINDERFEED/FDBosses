@@ -1,5 +1,7 @@
 package com.finderfeed.fdbosses.client;
 
+import com.finderfeed.fdbosses.client.particles.GravityOptionsParticleType;
+import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
 import com.finderfeed.fdbosses.client.particles.malkuth_slash.MalkuthHorizontalSlashOptions;
@@ -97,6 +99,8 @@ public class BossParticles {
             return MalkuthHorizontalSlashOptions.STREAM_CODEC;
         }
     });
+
+    public static final Supplier<ParticleType<GravityParticleOptions>> FLAME_WITH_STONE = PARTICLES.register("flame_with_stone",()->new GravityOptionsParticleType(true));
 
 
 

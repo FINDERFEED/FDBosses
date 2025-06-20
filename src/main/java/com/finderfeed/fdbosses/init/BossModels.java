@@ -27,5 +27,6 @@ public class BossModels {
     //Malkuth
     public static final Supplier<FDModelInfo> MALKUTH = INFOS.register("malkuth",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"),1f));
     public static final Supplier<FDModelInfo> MALKUTH_SWORD = INFOS.register("malkuth_sword",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_sword"),1f));
+    public static final Supplier<FDModelInfo> MALKUTH_CRUSH_ATTACK = INFOS.register("malkuth_crush_attack",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_crush_attack"),1f));
 
 }

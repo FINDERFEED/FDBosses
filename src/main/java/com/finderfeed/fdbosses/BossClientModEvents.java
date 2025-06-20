@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.boss_screen.text_block_processors.BossConfigFloatValueProcessor;
 import com.finderfeed.fdbosses.client.boss_screen.text_block_processors.MobEffectTextProcessor;
 import com.finderfeed.fdbosses.client.overlay.ElectrifiedOverlay;
+import com.finderfeed.fdbosses.client.particles.FlameWithStoneParticle;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningParticle;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedAttackRayParticle;
 import com.finderfeed.fdbosses.client.particles.malkuth_slash.MalkuthHorizontalSlashParticle;
@@ -24,6 +25,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayReflectorRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
 import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
@@ -153,6 +155,7 @@ public class BossClientModEvents {
         event.registerSpecial(BossParticles.RUSH_PARTICLE.get(), new RushParticle.Factory());
         event.registerSpriteSet(BossParticles.BIS_SMOKE.get(), BigSmokeParticle.Factory::new);
         event.registerSpriteSet(BossParticles.SONIC_PARTICLE.get(), SonicParticle.Factory::new);
+        event.registerSpriteSet(BossParticles.FLAME_WITH_STONE.get(), FlameWithStoneParticle.Factory::new);
         event.registerSpecial(BossParticles.ARC_LIGHTNING.get(), new ArcLightningParticle.Factory());
         event.registerSpecial(BossParticles.CHESED_RAY_ATTACK.get(), new ChesedAttackRayParticle.Factory());
         event.registerSpecial(BossParticles.MALKUTH_HORIZONTAL_SLASH.get(), new MalkuthHorizontalSlashParticle.Factory());
@@ -196,6 +199,14 @@ public class BossClientModEvents {
                                 .addBoneController("leg_right_holder", rightLegIK)
                                 .addBoneController("leg_left_holder", leftLegIK)
                                 .light(LightTexture.FULL_BRIGHT)
+                                .build())
+                .build());
+
+        event.registerEntityRenderer(BossEntities.MALKUTH_CRUSH.get(), FDEntityRendererBuilder.<MalkuthCrushAttack>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<MalkuthCrushAttack>builder()
+                                .light(LightTexture.FULL_BRIGHT)
+                                .model(BossModels.MALKUTH_CRUSH_ATTACK)
+                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_crash.png")))
                                 .build())
                 .build());
 
