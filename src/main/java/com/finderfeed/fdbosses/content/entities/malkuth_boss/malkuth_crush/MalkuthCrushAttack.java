@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush;
 
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
+import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
@@ -146,6 +147,35 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
 
             }
 
+
+            if (true){
+
+                Vector2d randomAngle = this.randomAngle(angle,currentAngle);
+
+                int cr = random.nextInt(50);
+
+                BigSmokeParticleOptions smokeParticleOptions = BigSmokeParticleOptions.builder()
+                        .size(1f + random.nextFloat() * 0.5f)
+                        .friction(0.75f)
+                        .minSpeed(0.025f)
+                        .color(50 + cr,50 + cr,50 + cr)
+                        .lifetime(0,5,30 + random.nextInt(5))
+                        .build();
+
+                float rndOffs = random.nextFloat() * 0.5f;
+                float rndSpeed = random.nextFloat() * 1 + 0.25f;
+
+                level().addParticle(smokeParticleOptions, true,
+                        this.getX() + randomAngle.x * rndOffs,
+                        this.getY() + random.nextFloat() * 0.5f,
+                        this.getZ() + randomAngle.y * rndOffs,
+                        randomAngle.x * rndSpeed,
+                        random.nextFloat() * 0.025f + 0.025f,
+                        randomAngle.y * rndSpeed
+                        );
+
+
+            }
 
 
         }

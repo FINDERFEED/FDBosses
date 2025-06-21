@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.Malku
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossModels;
+import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.init.FDRenderTypes;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
@@ -20,10 +21,14 @@ import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
+import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -31,6 +36,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -218,8 +224,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
 
-        if (true) return true;
-
         return false;
     }
 
@@ -239,9 +243,25 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             if (tick == 5){
                 this.jumpCrushAttackMovementPath = this.createJumpCrushAttackMovementPath(15);
                 this.lookAt(EntityAnchorArgument.Anchor.FEET, this.jumpCrushAttackMovementPath.getPositions().getLast());
+
                 inst.nextStage();
             }
         }else if (stage == 1){
+
+            if (tick == 1){
+                SlamParticlesPacket packet = new SlamParticlesPacket(
+                        new SlamParticlesPacket.SlamData(this.getOnPos(),this.position().add(0,-2.5,0),new Vec3(1,0,0))
+                                .maxAngle(FDMathUtil.FPI * 2)
+                                .maxSpeed(0.3f)
+                                .collectRadius(2)
+                                .maxParticleLifetime(30)
+                                .count(20)
+                                .maxVerticalSpeedEdges(0.15f)
+                                .maxVerticalSpeedCenter(0.15f)
+                );
+                PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+            }
+
             this.setNoGravity(true);
             this.noPhysics = true;
             this.jumpCrushAttackMovementPath.tick(this);
@@ -260,6 +280,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 }else{
                     this.setDeltaMovement(between.multiply(0.5,0.5,0.5));
                 }
+            }else{
+                if (tick < 20 && this.getTarget() != null){
+
+                    this.jumpCrushAttackMovementPath.getPositions().set(this.jumpCrushAttackMovementPath.getPositions().size() - 1, this.getTarget().position());
+
+                }
             }
         }else if (stage == 2){
 
@@ -273,13 +299,19 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
                         .build());
 
-            }else if (tick == 5){
+            }else if (tick >= 5){
                 MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level(), this.position().add(this.getForward().multiply(1,0,1).normalize()), 1);
-            }
+                PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                        .frequency(5)
+                        .amplitude(5f)
+                        .inTime(0)
+                        .stayTime(0)
+                        .outTime(5)
+                        .build(),malkuthCrushAttack.position(),120);
 
-            if (tick == 60){
                 return true;
             }
+
         }
 
         return false;
