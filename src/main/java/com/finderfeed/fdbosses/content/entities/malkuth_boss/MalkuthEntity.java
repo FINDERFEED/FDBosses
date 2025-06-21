@@ -1,6 +1,8 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.content.entities.base.IFirstSetPosListener;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossModels;
@@ -18,6 +20,8 @@ import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
+import com.finderfeed.fdlib.util.ProjectileMovementPath;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffects;
@@ -32,13 +36,14 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.UUID;
 
-public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy {
+public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, IFirstSetPosListener {
 
     public static final String MAIN_LAYER = "MAIN";
 
     public static final float ENRAGE_RADIUS = 20;
 
     public static final String SLASH_ATTACK = "slash";
+    public static final String JUMP_CRUSH = "jump_crush";
 
     private static FDModel SERVER_MODEL;
     private static FDModel CLIENT_MODEL;
@@ -56,6 +61,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private AttackChain attackChain;
 
+    private Vec3 spawnPosition;
+
     public MalkuthEntity(EntityType<? extends FDMob> type, Level level) {
         super(type, level);
         if (level.isClientSide){
@@ -70,7 +77,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         this.attackChain = new AttackChain(this.getRandom())
                 .registerAttack(SLASH_ATTACK,this::aerialSlashAttack)
-                .addAttack(0,SLASH_ATTACK)
+                .registerAttack(JUMP_CRUSH,this::jumpCrushAttack)
+                .addAttack(0, SLASH_ATTACK)
+                .addAttack(1, JUMP_CRUSH)
                 .attackListener(this::attackListener)
         ;
 
@@ -92,7 +101,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 animationSystem.startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
             }
 
-//            this.attackChain.tick();
+            this.attackChain.tick();
 
             if (this.getTarget() != null) {
 
@@ -209,11 +218,100 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
 
+        if (true) return true;
 
         return false;
     }
 
+    private ProjectileMovementPath jumpCrushAttackMovementPath;
 
+    private boolean jumpCrushAttack(AttackInstance inst){
+
+        int stage = inst.stage;
+        int tick = inst.tick;
+
+        if (stage == 0){
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_CRUSH_ATTACK_START)
+                            .setLoopMode(Animation.LoopMode.ONCE)
+                            .setToNullTransitionTime(20)
+                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_JUMP_CRUSH_ATTACK_MIDAIR).build())
+                    .build());
+            if (tick == 5){
+                this.jumpCrushAttackMovementPath = this.createJumpCrushAttackMovementPath(15);
+                this.lookAt(EntityAnchorArgument.Anchor.FEET, this.jumpCrushAttackMovementPath.getPositions().getLast());
+                inst.nextStage();
+            }
+        }else if (stage == 1){
+            this.setNoGravity(true);
+            this.noPhysics = true;
+            this.jumpCrushAttackMovementPath.tick(this);
+            this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
+            if (this.jumpCrushAttackMovementPath.isFinished()){
+
+                Vec3 lastPos = this.jumpCrushAttackMovementPath.getPositions().getLast();
+
+                Vec3 between = lastPos.subtract(this.position());
+
+                double dist = between.length();
+
+                if (dist < 0.5) {
+
+                    inst.nextStage();
+                }else{
+                    this.setDeltaMovement(between.multiply(0.5,0.5,0.5));
+                }
+            }
+        }else if (stage == 2){
+
+            this.setNoGravity(false);
+            this.noPhysics = false;
+
+            if (tick == 2) {
+
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_CRUSH_ATTACK_END)
+                                .setToNullTransitionTime(20)
+                        .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
+                        .build());
+
+            }else if (tick == 5){
+                MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level(), this.position().add(this.getForward().multiply(1,0,1).normalize()), 1);
+            }
+
+            if (tick == 60){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private ProjectileMovementPath createJumpCrushAttackMovementPath(int flyTime){
+
+        Vec3 target;
+
+        if (this.getTarget() != null){
+            target = this.getTarget().position();
+        }else{
+            target = this.position().add(this.getForward().multiply(1,0,1).normalize().multiply(10,0,10));
+        }
+
+        Vec3 begin = this.position();
+
+        Vec3 between = target.subtract(begin);
+
+        Vec3 pos1 = this.position().add(between.multiply(0.25f,0.25f,0.25f)).add(0,10,0);
+        Vec3 pos2 = this.position().add(between.multiply(0.33f,0.33f,0.33f)).add(0,15,0);
+        Vec3 pos3 = this.position().add(between.multiply(0.5f,0.5f,0.5f)).add(0,10,0);
+
+        ProjectileMovementPath path = new ProjectileMovementPath(begin, flyTime, false)
+                .addPos(pos1)
+                .addPos(pos2)
+                .addPos(pos3)
+                .addPos(target)
+                ;
+
+        return path;
+    }
 
 
 
@@ -359,5 +457,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     @Override
     public HeadControllerContainer<MalkuthEntity> getHeadControllerContainer() {
         return headControllerContainer;
+    }
+
+    @Override
+    public Vec3 setFirstPosition(Vec3 pos) {
+        return this.spawnPosition = pos;
     }
 }

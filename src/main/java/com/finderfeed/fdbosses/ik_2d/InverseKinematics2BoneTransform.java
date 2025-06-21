@@ -79,13 +79,13 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
 
         switch (legForwardAxis){
             case X -> {
-                distBetweenControllers = Math.abs(controllerBoneEnd.x - controllerBoneStart.x);
+                distBetweenControllers = controllerBoneStart.x - controllerBoneEnd.x;
             }
             case Y -> {
-                distBetweenControllers = Math.abs(controllerBoneEnd.y - controllerBoneStart.y);
+                distBetweenControllers = controllerBoneStart.y - controllerBoneEnd.y;
             }
             case Z -> {
-                distBetweenControllers = Math.abs(controllerBoneEnd.z - controllerBoneStart.z);
+                distBetweenControllers = controllerBoneStart.z - controllerBoneEnd.z;
             }
         }
         distBetweenControllers /= 16;
@@ -93,55 +93,49 @@ public class InverseKinematics2BoneTransform<T extends AnimatedObject> implement
         double cos = Math.toDegrees(Math.sin(distBetweenControllers  /  d));
 
 
-        if (d <= d1 + d2){
-            double angle1 = Math.toDegrees(Math.acos(
-                    (d1 * d1 + d * d - d2 * d2) / (2 * d1 * d)
-            )) + cos;
 
-            double angle2 = Math.toDegrees(Math.acos(
-                    (d1 * d1 + d2 * d2 - d * d) / (2 * d1 * d2)
-            )) - 180;
-
-            if (negateAngles){
-                angle1 = -angle1;
-                angle2 = -angle2;
-            }
-
-            switch (legRotateAroundAxis){
-                case X -> {
-                    firstPart.setXRot((float)angle1);
-                    firstPart.setYRot((float)0);
-                    firstPart.setZRot((float)0);
-
-                    secondPart.setXRot((float)angle2);
-                    secondPart.setYRot((float)0);
-                    secondPart.setZRot((float)0);
-                }
-                case Y -> {
-                    firstPart.setXRot((float)0);
-                    firstPart.setYRot((float)angle1);
-                    firstPart.setZRot((float)0);
-
-                    secondPart.setXRot((float)0);
-                    secondPart.setYRot((float)angle2);
-                    secondPart.setZRot((float)0);
-                }
-                case Z -> {
-                    firstPart.setXRot((float)0);
-                    firstPart.setYRot((float)0);
-                    firstPart.setZRot((float)angle1);
-
-                    secondPart.setXRot((float)0);
-                    secondPart.setYRot((float)0);
-                    secondPart.setZRot((float)angle2);
-                }
-            }
-
-        }else{
-            firstPart.setXRot(0);
-            firstPart.setYRot(0);
-            firstPart.setZRot(0);
+        double angle1 = Math.toDegrees(Math.acos(
+                (d1 * d1 + d * d - d2 * d2) / (2 * d1 * d)
+        )) + cos;
+        double angle2 = Math.toDegrees(Math.acos(
+                (d1 * d1 + d2 * d2 - d * d) / (2 * d1 * d2)
+        )) - 180;
+        if (d > d1 + d2){
+            angle1 = cos;
+            angle2 = 0;
         }
+        if (negateAngles){
+            angle1 = -angle1;
+            angle2 = -angle2;
+        }
+        switch (legRotateAroundAxis){
+            case X -> {
+                firstPart.setXRot((float)angle1);
+                firstPart.setYRot((float)0);
+                firstPart.setZRot((float)0);
+                secondPart.setXRot((float)angle2);
+                secondPart.setYRot((float)0);
+                secondPart.setZRot((float)0);
+            }
+            case Y -> {
+                firstPart.setXRot((float)0);
+                firstPart.setYRot((float)angle1);
+                firstPart.setZRot((float)0);
+                secondPart.setXRot((float)0);
+                secondPart.setYRot((float)angle2);
+                secondPart.setZRot((float)0);
+            }
+            case Z -> {
+                firstPart.setXRot((float)0);
+                firstPart.setYRot((float)0);
+                firstPart.setZRot((float)angle1);
+                secondPart.setXRot((float)0);
+                secondPart.setYRot((float)0);
+                secondPart.setZRot((float)angle2);
+            }
+        }
+
+
 
         endPart.x = controllerBoneEnd.x;
         endPart.y = controllerBoneEnd.y;

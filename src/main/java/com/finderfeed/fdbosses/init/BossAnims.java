@@ -97,7 +97,19 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
     });
 
-    public static DeferredHolder<Animation,Animation> MALKUTH_JUMP_PREPARE = ANIMATIONS.register("malkuth_jump_prepare", ()->{
+    public static DeferredHolder<Animation,Animation> MALKUTH_JUMP_FORWARD_PREPARE = ANIMATIONS.register("malkuth_jump_forward_prepare", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
+    });
+
+    public static DeferredHolder<Animation,Animation> MALKUTH_JUMP_CRUSH_ATTACK_START = ANIMATIONS.register("malkuth_jump_crush_attack_start", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
+    });
+
+    public static DeferredHolder<Animation,Animation> MALKUTH_JUMP_CRUSH_ATTACK_MIDAIR = ANIMATIONS.register("malkuth_jump_crush_attack_midair", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
+    });
+
+    public static DeferredHolder<Animation,Animation> MALKUTH_JUMP_CRUSH_ATTACK_END = ANIMATIONS.register("malkuth_jump_crush_attack_end", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
     });
 
