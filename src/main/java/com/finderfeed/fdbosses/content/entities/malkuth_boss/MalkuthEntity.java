@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.base.IFirstSetPosListener;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.MalkuthChargeSwordPacket;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
@@ -72,9 +73,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public MalkuthEntity(EntityType<? extends FDMob> type, Level level) {
         super(type, level);
         if (level.isClientSide){
-            CLIENT_MODEL = new FDModel(BossModels.MALKUTH.get());
+            if (CLIENT_MODEL == null) {
+                CLIENT_MODEL = new FDModel(BossModels.MALKUTH.get());
+            }
         }else{
-            SERVER_MODEL = new FDModel(BossModels.MALKUTH.get());
+            if (SERVER_MODEL == null) {
+                SERVER_MODEL = new FDModel(BossModels.MALKUTH.get());
+            }
         }
 
         this.headControllerContainer = new HeadControllerContainer<>(this)
@@ -84,11 +89,18 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         this.attackChain = new AttackChain(this.getRandom())
                 .registerAttack(SLASH_ATTACK,this::aerialSlashAttack)
                 .registerAttack(JUMP_CRUSH,this::jumpCrushAttack)
-                .addAttack(0, SLASH_ATTACK)
+//                .addAttack(0, SLASH_ATTACK)
                 .addAttack(1, JUMP_CRUSH)
                 .attackListener(this::attackListener)
         ;
 
+    }
+
+    public static FDModel getClientModel(){
+        if (CLIENT_MODEL == null){
+            CLIENT_MODEL = new FDModel(BossModels.MALKUTH.get());
+        }
+        return CLIENT_MODEL;
     }
 
     @Override
@@ -157,6 +169,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private boolean aerialSlashAttack(AttackInstance inst){
 
+
         int stage = inst.stage;
 
         int tick = inst.tick;
@@ -165,6 +178,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
         if (localStage == 0){
+            this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
+
             this.slashAttackType = MalkuthAttackType.getRandom(this.getRandom());
 
             Animation animation = this.getSlashAttackAnimation(this.slashAttackType);
@@ -209,6 +224,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             }else if (tick >= 40){
                 inst.nextStage();
+            }else if (tick == 8){
+                this.causeSwordChargeParticles(slashAttackType);
             }
 
         }else if (localStage == 2){
@@ -299,7 +316,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
                         .build());
 
-            }else if (tick >= 5){
+            }else if (tick == 5){
                 MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level(), this.position().add(this.getForward().multiply(1,0,1).normalize()), 1);
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                         .frequency(5)
@@ -308,7 +325,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         .stayTime(0)
                         .outTime(5)
                         .build(),malkuthCrushAttack.position(),120);
-
+            }else if (tick >= 105){
                 return true;
             }
 
@@ -349,6 +366,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
     //=============================================================================OTHER================================================================================================
+
+    private void causeSwordChargeParticles(MalkuthAttackType attackType){
+        PacketDistributor.sendToPlayersTrackingEntity(this, new MalkuthChargeSwordPacket(this,attackType));
+    }
 
 
     @Nullable

@@ -7,7 +7,10 @@ import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleO
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
+import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
 import com.finderfeed.fdlib.util.FDUtil;
@@ -27,9 +30,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
+import org.joml.*;
 
+import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -48,6 +51,87 @@ public class BossClientPackets {
         BaseBossScreen baseBossScreen = BossScreens.getScreen(bossType,bossSpawner.getId());
         if (baseBossScreen != null){
             Minecraft.getInstance().setScreen(baseBossScreen);
+        }
+    }
+
+    public static void malkuthSwordCharge(MalkuthAttackType malkuthAttackType, int entityId){
+
+        Level level = FDClientHelpers.getClientLevel();
+
+        if (level.getEntity(entityId) instanceof MalkuthEntity malkuthEntity){
+
+            String name = malkuthAttackType.isFire() ? "fire_sword_place" : "ice_sword_place";
+
+            Matrix4f t = malkuthEntity.getModelPartTransformation(malkuthEntity, name, MalkuthEntity.getClientModel());
+
+            Vector3f v1 = t.transformPosition(new Vector3f());
+            Vector3f v2 = t.transformDirection(new Vector3f(0,1,0));
+            Vector3d direction = new Vector3d(
+                    v2.x,
+                    v2.y,
+                    v2.z
+            );
+            Vector3d start = new Vector3d(
+                    malkuthEntity.getX() + v1.x,
+                    malkuthEntity.getY() + v1.y,
+                    malkuthEntity.getZ() + v1.z
+            );
+            Vector3d end = start.add(direction.mul(3, new Vector3d()),new Vector3d());
+            Vector3d left = direction.cross(new Vector3d(0,1,0),new Vector3d());
+            Vector3d between = end.sub(start,new Vector3d());
+
+            int steps = 40;
+
+            for (int i = 0; i < steps;i++){
+
+                float p = (i + random.nextFloat()) / (float) steps;
+
+
+                float r;
+                float g;
+                float b;
+
+                if (malkuthAttackType.isIce()){
+                    r = random.nextFloat() * 0.2f;
+                    g = 0.7f + random.nextFloat() * 0.1f;
+                    b = 0.9f + random.nextFloat() * 0.1f;
+                }else{
+                    r = 0.9f + random.nextFloat() * 0.1f;
+                    g = 0.2f + random.nextFloat() * 0.2f;
+                    b = random.nextFloat() * 0.2f;
+                }
+
+                BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                        .size(0.2f + random.nextFloat() * 0.1f)
+                        .color(r,g,b)
+                        .scalingOptions(0,0,10 + random.nextInt(4))
+                        .friction(0.6f)
+                        .build();
+
+                float rndAngle = FDMathUtil.FPI * 2 * random.nextFloat();
+
+                Quaterniond quaterniond = new Quaterniond(new AxisAngle4d(rndAngle, direction));
+                Vector3d particleDirection = quaterniond.transform(left,new Vector3d());
+
+                Vector3d position = start.add(between.mul(p,new Vector3d()),new Vector3d())
+                        .add(
+                                particleDirection.x * 0.5f,
+                                particleDirection.y * 0.5f,
+                                particleDirection.z * 0.5f,
+                                new Vector3d()
+                        );
+
+                level.addParticle(ballParticleOptions,true, position.x,position.y,position.z,
+                        particleDirection.x * 0.8f,
+                        particleDirection.y * 0.8f,
+                        particleDirection.z * 0.8f
+                );
+
+
+            }
+
+
+
         }
     }
 
@@ -73,6 +157,8 @@ public class BossClientPackets {
             }
         }
     }
+
+
 
     public static void chesedRayReflectParticles(){
 
