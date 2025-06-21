@@ -92,7 +92,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 animationSystem.startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
             }
 
-            this.attackChain.tick();
+//            this.attackChain.tick();
 
             if (this.getTarget() != null) {
 
