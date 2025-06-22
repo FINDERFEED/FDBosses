@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.base.IFirstSetPosListener;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.MalkuthChargeSwordPacket;
@@ -31,6 +32,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -51,6 +53,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     public static final String SLASH_ATTACK = "slash";
     public static final String JUMP_CRUSH = "jump_crush";
+    public static final String PULL_AND_PUNCH = "pull_and_punch";
 
     private static FDModel SERVER_MODEL;
     private static FDModel CLIENT_MODEL;
@@ -88,9 +91,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         this.attackChain = new AttackChain(this.getRandom())
                 .registerAttack(SLASH_ATTACK,this::aerialSlashAttack)
+                .registerAttack(PULL_AND_PUNCH,this::pullAndPunch)
                 .registerAttack(JUMP_CRUSH,this::jumpCrushAttack)
 //                .addAttack(0, SLASH_ATTACK)
-                .addAttack(1, JUMP_CRUSH)
+//                .addAttack(1, JUMP_CRUSH)
+                .addAttack(2, PULL_AND_PUNCH)
                 .attackListener(this::attackListener)
         ;
 
@@ -364,6 +369,28 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
 
+    private boolean pullAndPunch(AttackInstance inst){
+
+        int stage = inst.stage;
+        int tick = inst.tick;
+
+        if (stage == 0){
+            if (tick >= 150) {
+                Vec3 pullToPos = this.position().add(0, 1.5, 0).add(this.getForward().multiply(1, 0, 1).normalize().multiply(2, 2, 2));
+
+                MalkuthChainEntity malkuthChainEntity = MalkuthChainEntity.summon(level(), this, MalkuthAttackType.ICE, pullToPos, this.getTarget(), 100, 100);
+
+                inst.nextStage();
+            }
+        }else if (stage == 1){
+            if (tick >= 600){
+                this.level().getEntitiesOfClass(MalkuthChainEntity.class, this.getBoundingBox().inflate(20,20,20)).forEach(Entity::kill);
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     //=============================================================================OTHER================================================================================================
 
@@ -435,13 +462,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-
+        this.attackChain.save(tag);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
-
+        this.attackChain.load(tag);
     }
 
     private void attachSwords(){
@@ -516,4 +543,25 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public Vec3 setFirstPosition(Vec3 pos) {
         return this.spawnPosition = pos;
     }
+
+    @Override
+    public void push(double p_20286_, double p_20287_, double p_20288_) {
+
+    }
+
+    @Override
+    public void push(Entity p_21294_) {
+
+    }
+
+    @Override
+    public void push(Vec3 p_347665_) {
+
+    }
+
+    @Override
+    protected void pushEntities() {
+
+    }
+
 }

@@ -5,7 +5,8 @@
   "refmap": "fdbosses.refmap.json",
   "mixins": [
     "CraftingMenuMixin",
-    "EntityMixin"
+    "EntityMixin",
+    "PlayerMixin"
   ],
   "minVersion": "0.8",
   "client": [
