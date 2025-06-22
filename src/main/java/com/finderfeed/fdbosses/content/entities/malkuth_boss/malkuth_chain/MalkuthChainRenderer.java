@@ -46,7 +46,7 @@ public class MalkuthChainRenderer extends EntityRenderer<MalkuthChainEntity> {
 
         Matrix4f m = matrices.last().pose();
 
-        float width = 0.05f;
+        float width = 0.1f;
 
         matrices.mulPose(Axis.YP.rotationDegrees(-135));
 

@@ -155,12 +155,12 @@ public class MalkuthChainEntity extends LivingEntity implements AutoSerializable
     }
 
     public Vec3 getTargetAttachmentPos(LivingEntity target){
-        return target.position().add(0,target.getBbHeight()/2,0);
+        return target.position().add(0,target.getBbHeight()/2 + 0.25,0);
     }
 
     @Override
     public Vec3 getPassengerRidingPosition(Entity entity) {
-        return this.position().add(0,-entity.getBbHeight()/2,0);
+        return this.position().add(0,-entity.getBbHeight()/2 + 0.25,0);
     }
 
     public LivingEntity getTarget(){

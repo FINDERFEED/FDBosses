@@ -385,16 +385,28 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     .build());
             inst.nextStage();
         }else if (stage == 1){
+
+            this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
             if (tick == 6){
                 this.causeSwordChargeParticles(MalkuthAttackType.ICE);
                 this.deattachIceSword();
             }else if (tick == 10){
+
+                if (this.getTarget() == null){
+                    this.causeSwordChargeParticles(MalkuthAttackType.ICE);
+                    this.attachIceSword();
+                    this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
+                    return true;
+                }
+
                 Vec3 pullToPos = this.position().add(0, 2.5, 0).add(this.getForward().multiply(1, 0, 1).normalize().multiply(2, 2, 2));
                 MalkuthChainEntity malkuthChainEntity = MalkuthChainEntity.summon(level(), this, MalkuthAttackType.ICE, pullToPos, this.getTarget(), 10, 10);
                 inst.nextStage();
             }
         }else if (stage == 2){
-            if (tick == 24){
+            if (tick == 10){
+                this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
+            }else if (tick == 24){
                 for (var chain : this.level().getEntitiesOfClass(MalkuthChainEntity.class, this.getBoundingBox().inflate(20,20,20))){
                     var passengers = new ArrayList<>(chain.getPassengers());
                     chain.ejectPassengers();
@@ -421,6 +433,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }else if (tick == 35){
                 this.causeSwordChargeParticles(MalkuthAttackType.ICE);
                 this.attachIceSword();
+                this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
             } else if (tick >= 100){
                 return true;
             }
