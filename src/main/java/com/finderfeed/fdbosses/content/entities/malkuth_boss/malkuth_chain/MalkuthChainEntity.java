@@ -138,6 +138,7 @@ public class MalkuthChainEntity extends LivingEntity implements AutoSerializable
 
                 if (tickCount == catchTime){
                     this.startingPos = targetAttachmentPos;
+                    this.setPos(targetAttachmentPos);
                 }
 
             }else {

@@ -9,6 +9,8 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.MalkuthChar
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
+import com.finderfeed.fdlib.FDHelpers;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDRenderTypes;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
@@ -25,12 +27,14 @@ import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
+import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -42,6 +46,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -375,19 +380,52 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         int tick = inst.tick;
 
         if (stage == 0){
-            if (tick >= 150) {
-                Vec3 pullToPos = this.position().add(0, 1.5, 0).add(this.getForward().multiply(1, 0, 1).normalize().multiply(2, 2, 2));
-
-                MalkuthChainEntity malkuthChainEntity = MalkuthChainEntity.summon(level(), this, MalkuthAttackType.ICE, pullToPos, this.getTarget(), 100, 100);
-
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_PULL_AND_PUNCH)
+                            .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
+                    .build());
+            inst.nextStage();
+        }else if (stage == 1){
+            if (tick == 6){
+                this.causeSwordChargeParticles(MalkuthAttackType.ICE);
+                this.deattachIceSword();
+            }else if (tick == 10){
+                Vec3 pullToPos = this.position().add(0, 2.5, 0).add(this.getForward().multiply(1, 0, 1).normalize().multiply(2, 2, 2));
+                MalkuthChainEntity malkuthChainEntity = MalkuthChainEntity.summon(level(), this, MalkuthAttackType.ICE, pullToPos, this.getTarget(), 10, 10);
                 inst.nextStage();
             }
-        }else if (stage == 1){
-            if (tick >= 600){
-                this.level().getEntitiesOfClass(MalkuthChainEntity.class, this.getBoundingBox().inflate(20,20,20)).forEach(Entity::kill);
+        }else if (stage == 2){
+            if (tick == 24){
+                for (var chain : this.level().getEntitiesOfClass(MalkuthChainEntity.class, this.getBoundingBox().inflate(20,20,20))){
+                    var passengers = new ArrayList<>(chain.getPassengers());
+                    chain.ejectPassengers();
+                    chain.setRemoved(RemovalReason.DISCARDED);
+
+                    Vec3 forward = this.getForward().multiply(1,0,1).normalize();
+
+                    for (var e : passengers){
+                        if (e instanceof LivingEntity livingEntity){
+                            livingEntity.hurt(livingEntity.damageSources().generic(),1);
+
+                            Vec3 speed = forward.multiply(2,2,2);
+
+                            if (livingEntity instanceof ServerPlayer player){
+                                FDLibCalls.setServerPlayerSpeed(player, speed);
+                            }else{
+                                livingEntity.setDeltaMovement(speed);
+                            }
+
+                        }
+                    }
+
+                }
+            }else if (tick == 35){
+                this.causeSwordChargeParticles(MalkuthAttackType.ICE);
+                this.attachIceSword();
+            } else if (tick >= 100){
                 return true;
             }
         }
+
 
         return false;
     }
