@@ -14,6 +14,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_sy
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.instances.item_stack.ItemStackAttachmentData;
 import com.finderfeed.fdlib.systems.render_types.FDRenderType;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -26,7 +27,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
+import org.joml.SimplexNoise;
 
 import java.util.List;
 import java.util.UUID;
@@ -44,7 +47,88 @@ public class DebugStick extends Item {
 
             float speed = 2f;
 
-            MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level, player.position(), 1);
+//            MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level, player.position(), 1);
+
+            var value = 1;
+
+            var result =Math.sin( Math.abs(Math.sin(0.25 * value)) + Math.abs(Math.sin(value * 4) + Math.abs(Math.sin(2.5 * value))) );
+
+//            int mountainDiameter = 40;
+//
+//
+//            for (int x = 0; x <= mountainDiameter; x++){
+//                for (int z = 0; z <= mountainDiameter; z++){
+//
+//                    double xd = x - mountainDiameter/2f;
+//                    double zd = z - mountainDiameter/2f;
+//
+//                    double radMod = 1 - Math.sqrt(xd * xd + zd * zd) / (mountainDiameter / 2f);
+//
+//                    radMod = FDEasings.easeOut(FDEasings.easeOut((float) radMod));
+//
+//                    double xv = (x / (float)mountainDiameter) * Math.PI;
+//                    double zv = (z / (float)mountainDiameter) * Math.PI;
+//
+//                    double res1 = Math.sin(xv) * ( Math.abs(Math.sin(0.25 * xv)) + Math.abs(Math.sin(xv)) + Math.abs(Math.sin(2.5 * xv)) );
+//                    double res2 = Math.sin(zv) * ( Math.abs(Math.sin(0.25 * zv)) + Math.abs(Math.sin(zv)) + Math.abs(Math.sin(2.5 * zv)) );
+//
+//                    double noiseValue = (SimplexNoise.noise((float) xv * 1f,(float) zv * 1f) / 2 + 1) * 2;
+//
+//                    int height = (int) Math.round((res1 + res2 + noiseValue)/2 * 10 * radMod);
+//
+//                    BlockPos base = new BlockPos(x,0,z).offset(player.getOnPos());
+//
+//                    for (int y = 0; y < height;y++){
+//
+//                        level.setBlock(base.offset(0,y,0),Blocks.BLACKSTONE.defaultBlockState(),Block.UPDATE_CLIENTS);
+//
+//
+//                    }
+//
+//                }
+//            }
+
+            int radiusStart = 30;
+            int radiusEnd = 80;
+            float between = radiusEnd - radiusStart;
+
+            int maxHeight = 30;
+
+            float noiseModifier = 0.05337f;
+
+            float noiseOffset = 4332.43f;
+
+            for (int x = -radiusEnd; x <= radiusEnd;x++){
+
+
+                for (int z = -radiusEnd; z <= radiusEnd;z++){
+                    double d = Math.sqrt(x * x + z * z);
+                    if (d < radiusStart || d > radiusEnd) continue;
+
+                    double angle = Math.atan2(z,x);
+
+                    float sinval = 0.7f + 0.3f * FDEasings.easeInOut(( float) Math.abs(Math.cos(angle * 4)));
+
+
+
+                    float radval = 1 - Math.abs( (float)d - radiusStart - between/2 ) / between * 2; radval = FDEasings.easeOut(radval);
+
+
+                    float noise = SimplexNoise.noise(x * noiseModifier + noiseOffset, z * noiseModifier + noiseOffset) * 0.5f + 1f;
+
+                    int height = Math.round(sinval * maxHeight * (noise * 0.4f + 0.6f) * radval);
+
+                    for (int y = 0; y < height;y++){
+
+                        level.setBlock(player.getOnPos().offset(x,y,z), Blocks.BLACKSTONE.defaultBlockState(), 2);
+
+                    }
+
+
+                }
+
+            }
+
 
 
 
