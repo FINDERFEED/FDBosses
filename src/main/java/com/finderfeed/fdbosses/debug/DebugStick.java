@@ -23,12 +23,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import org.joml.SimplexNoise;
 
 import java.util.List;
@@ -89,14 +91,18 @@ public class DebugStick extends Item {
 //            }
 
             int radiusStart = 30;
-            int radiusEnd = 80;
+            int radiusEnd = 90;
+            int fixedRadiusEnd = radiusEnd;
             float between = radiusEnd - radiusStart;
 
+
             int maxHeight = 30;
+            int startMountainPeakHeight = 18;
 
             float noiseModifier = 0.05337f;
 
             float noiseOffset = 4332.43f;
+            noiseOffset = 15435.324f;
 
             for (int x = -radiusEnd; x <= radiusEnd;x++){
 
@@ -109,23 +115,90 @@ public class DebugStick extends Item {
 
                     float sinval = 0.7f + 0.3f * FDEasings.easeInOut(( float) Math.abs(Math.cos(angle * 4)));
 
-
-
                     float radval = 1 - Math.abs( (float)d - radiusStart - between/2 ) / between * 2; radval = FDEasings.easeOut(radval);
 
 
                     float noise = SimplexNoise.noise(x * noiseModifier + noiseOffset, z * noiseModifier + noiseOffset) * 0.5f + 1f;
 
+
                     int height = Math.round(sinval * maxHeight * (noise * 0.4f + 0.6f) * radval);
+
 
                     for (int y = 0; y < height;y++){
 
-                        level.setBlock(player.getOnPos().offset(x,y,z), Blocks.BLACKSTONE.defaultBlockState(), 2);
+                        BlockPos pos = player.getOnPos().offset(x,y,z);
+                        BlockState state = Blocks.BLACKSTONE.defaultBlockState();
+
+
+                        double peakheightsin = Math.abs(Math.sin(angle * 8 + Math.PI/4)) * 6;
+
+                        if (y == height - 1 && height >= startMountainPeakHeight - peakheightsin){
+
+                            float currentDegrees = (float)Math.toDegrees((float) angle + FDMathUtil.FPI) ;
+                            float zh = currentDegrees % 90;
+
+                            if (zh > 20 && zh < 70){
+
+                                state = Blocks.SNOW_BLOCK.defaultBlockState();
+                                level.setBlock(pos.below(),Blocks.BLUE_ICE.defaultBlockState(),2);
+
+                            }else{
+                                float ch = player.getRandom().nextFloat();
+                                if (ch > 0.75){
+                                    state = Blocks.MAGMA_BLOCK.defaultBlockState();
+                                }
+
+                            }
+
+
+                        }
+
+                        level.setBlock(pos, state, 2);
 
                     }
 
 
                 }
+
+
+
+
+
+
+
+
+            }
+
+
+            int craterRadius = 8;
+
+            for (int i = 0; i < 4;i++){
+
+                Vec3 d = new Vec3(radiusStart + between/2,0,0).yRot(i * FDMathUtil.FPI / 2);
+
+                Vec3 posDown = player.position().add(d);
+                Vec3 posUp = posDown.add(0,maxHeight,0);
+
+                ClipContext clipContext = new ClipContext(posUp,posDown, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+
+                var ctx = level.clip(clipContext);
+
+                BlockPos craterPosStart = ctx.getBlockPos();
+
+                for (int x = -craterRadius;x < craterRadius;x++){
+                    for (int y = -craterRadius;y < craterRadius;y++){
+                        for (int z = -craterRadius;z < craterRadius;z++){
+
+                            if (Math.sqrt(x*x + y*y + z*z) > craterRadius) continue;
+
+                            BlockPos removePos = craterPosStart.offset(x,y,z);
+
+                            level.removeBlock(removePos, false);
+
+                        }
+                    }
+                }
+
 
             }
 
