@@ -46,10 +46,11 @@ public class MalkuthChainRenderer extends EntityRenderer<MalkuthChainEntity> {
 
         Matrix4f m = matrices.last().pose();
 
-        float width = 0.1f;
+        float width = 0.2f;
 
-        matrices.mulPose(Axis.YP.rotationDegrees(-135));
-
+        if (!chain.getPassengers().isEmpty()) {
+            matrices.mulPose(Axis.YP.rotationDegrees(-135));
+        }
         b.addVertex(m, -width,0,0).setColor(1f,1f,1f,1f).setUv(0,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
         b.addVertex(m, -width,length,0).setColor(1f,1f,1f,1f).setUv(length * 4,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
         b.addVertex(m, width,length,0).setColor(1f,1f,1f,1f).setUv(length * 4,1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
