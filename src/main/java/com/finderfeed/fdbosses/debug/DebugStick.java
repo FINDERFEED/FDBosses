@@ -34,6 +34,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import org.joml.SimplexNoise;
 
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 public class DebugStick extends Item {
@@ -96,6 +97,9 @@ public class DebugStick extends Item {
             float between = radiusEnd - radiusStart;
 
 
+            float minDoughnutRadius = 5;
+            float maxDougnutRadius = 17;
+
             int maxHeight = 30;
             int startMountainPeakHeight = 18;
 
@@ -104,6 +108,11 @@ public class DebugStick extends Item {
             float noiseOffset = 4332.43f;
             noiseOffset = 15435.324f;
 
+            int deepslateHeight = 6;
+
+            Random r1 = new Random(432432);
+            Random r2 = new Random(8454534);
+
             for (int x = -radiusEnd; x <= radiusEnd;x++){
 
 
@@ -111,7 +120,19 @@ public class DebugStick extends Item {
                     double d = Math.sqrt(x * x + z * z);
                     if (d < radiusStart || d > radiusEnd) continue;
 
+
+
+
+
                     double angle = Math.atan2(z,x);
+
+                    float doughnutSinVal = (float) Math.abs(Math.cos(angle * 4));
+                    doughnutSinVal = (float) Math.pow(doughnutSinVal,2);
+
+
+                    float currentDougnutRad = FDMathUtil.lerp(minDoughnutRadius,maxDougnutRadius,doughnutSinVal);
+
+
 
                     float sinval = 0.7f + 0.3f * FDEasings.easeInOut(( float) Math.abs(Math.cos(angle * 4)));
 
@@ -126,11 +147,20 @@ public class DebugStick extends Item {
 
                     for (int y = 0; y < height;y++){
 
+                        Vec3 doughnutCenterLine = new Vec3(x,0,z).normalize().multiply(radiusStart + between/2, radiusStart + between/2,radiusStart + between/2);
+                        Vec3 blockAboutToPlacePos = new Vec3(x,y,z);
+                        Vec3 b = blockAboutToPlacePos.subtract(doughnutCenterLine);
+                        if (b.length() < currentDougnutRad){
+                            continue;
+                        }
+
                         BlockPos pos = player.getOnPos().offset(x,y,z);
                         BlockState state = Blocks.BLACKSTONE.defaultBlockState();
 
 
                         double peakheightsin = Math.abs(Math.sin(angle * 8 + Math.PI/4)) * 6;
+
+                        int dheight = deepslateHeight + (int) Math.round(Math.abs(Math.cos(angle * 4)) * 5);
 
                         if (y == height - 1 && height >= startMountainPeakHeight - peakheightsin){
 
@@ -143,13 +173,24 @@ public class DebugStick extends Item {
                                 level.setBlock(pos.below(),Blocks.BLUE_ICE.defaultBlockState(),2);
 
                             }else{
-                                float ch = player.getRandom().nextFloat();
+                                float ch = r1.nextFloat();
                                 if (ch > 0.75){
                                     state = Blocks.MAGMA_BLOCK.defaultBlockState();
                                 }
 
                             }
 
+
+                        }else if (y < dheight){
+
+                            float chanceToBlackstone = y / (float) dheight;
+                            chanceToBlackstone = chanceToBlackstone * chanceToBlackstone;
+
+                            float p = r2.nextFloat();
+
+                            if (p > chanceToBlackstone){
+                                state = Blocks.DEEPSLATE.defaultBlockState();
+                            }
 
                         }
 
@@ -201,6 +242,11 @@ public class DebugStick extends Item {
 
 
             }
+
+
+
+
+
 
 
 
