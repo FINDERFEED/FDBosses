@@ -114,15 +114,9 @@ public class DebugStick extends Item {
             Random r2 = new Random(8454534);
 
             for (int x = -radiusEnd; x <= radiusEnd;x++){
-
-
                 for (int z = -radiusEnd; z <= radiusEnd;z++){
                     double d = Math.sqrt(x * x + z * z);
                     if (d < radiusStart || d > radiusEnd) continue;
-
-
-
-
 
                     double angle = Math.atan2(z,x);
 
@@ -147,11 +141,13 @@ public class DebugStick extends Item {
 
                     for (int y = 0; y < height;y++){
 
-                        Vec3 doughnutCenterLine = new Vec3(x,0,z).normalize().multiply(radiusStart + between/2, radiusStart + between/2,radiusStart + between/2);
-                        Vec3 blockAboutToPlacePos = new Vec3(x,y,z);
-                        Vec3 b = blockAboutToPlacePos.subtract(doughnutCenterLine);
-                        if (b.length() < currentDougnutRad){
-                            continue;
+                        if (y >= 1) {
+                            Vec3 doughnutCenterLine = new Vec3(x, 0, z).normalize().multiply(radiusStart + between / 2, radiusStart + between / 2, radiusStart + between / 2).add(0,1,0);
+                            Vec3 blockAboutToPlacePos = new Vec3(x, y, z);
+                            Vec3 b = blockAboutToPlacePos.subtract(doughnutCenterLine);
+                            if (b.length() < currentDougnutRad) {
+                                continue;
+                            }
                         }
 
                         BlockPos pos = player.getOnPos().offset(x,y,z);

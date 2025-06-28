@@ -99,8 +99,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(PULL_AND_PUNCH,this::pullAndPunch)
                 .registerAttack(JUMP_CRUSH,this::jumpCrushAttack)
 //                .addAttack(0, SLASH_ATTACK)
-//                .addAttack(1, JUMP_CRUSH)
-                .addAttack(2, PULL_AND_PUNCH)
+                .addAttack(1, JUMP_CRUSH)
+//                .addAttack(2, PULL_AND_PUNCH)
                 .attackListener(this::attackListener)
         ;
 
@@ -264,8 +264,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         if (stage == 0){
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_CRUSH_ATTACK_START)
                             .setLoopMode(Animation.LoopMode.ONCE)
+                            .setSpeed(1.25f)
                             .setToNullTransitionTime(20)
-                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_JUMP_CRUSH_ATTACK_MIDAIR).build())
+                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_JUMP_CRUSH_ATTACK_MIDAIR)
+                            .setSpeed(1.5f).build())
                     .build());
             if (tick == 5){
                 this.jumpCrushAttackMovementPath = this.createJumpCrushAttackMovementPath(15);
@@ -319,10 +321,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.setNoGravity(false);
             this.noPhysics = false;
 
-            if (tick == 2) {
+            if (tick == 1) {
 
                 this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_CRUSH_ATTACK_END)
                                 .setToNullTransitionTime(20)
+                                .setSpeed(1.25f)
                         .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
                         .build());
 
@@ -358,9 +361,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         Vec3 between = target.subtract(begin);
 
-        Vec3 pos1 = this.position().add(between.multiply(0.25f,0.25f,0.25f)).add(0,10,0);
-        Vec3 pos2 = this.position().add(between.multiply(0.33f,0.33f,0.33f)).add(0,15,0);
-        Vec3 pos3 = this.position().add(between.multiply(0.5f,0.5f,0.5f)).add(0,10,0);
+        Vec3 pos1 = this.position().add(between.multiply(0.25f,0.25f,0.25f)).add(0,9,0);
+        Vec3 pos2 = this.position().add(between.multiply(0.33f,0.33f,0.33f)).add(0,13,0);
+        Vec3 pos3 = this.position().add(between.multiply(0.5f,0.5f,0.5f)).add(0,9,0);
 
         ProjectileMovementPath path = new ProjectileMovementPath(begin, flyTime, false)
                 .addPos(pos1)
