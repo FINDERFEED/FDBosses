@@ -35,6 +35,44 @@ public class BossUtil {
     public static final int CHESED_RAY_ATTACK_SMOKE = 5;
     public static final int CHESED_BOOM_PARTICLES = 6;
 
+    /**
+     * Air Friction? What?
+     * We don't do that here
+     * *Insert Black Panther meme*
+     */
+    public static Vec3 calculateMortarProjectileVelocity(Vec3 startPos, Vec3 endPos, double gravity, double desiredHeightCeiling, int tickTravelTime){
+
+        Vec3 between = endPos.subtract(startPos);
+
+        double horizontalDistance = Math.sqrt(between.x * between.x + between.z * between.z);
+
+        double verticalDistance;
+
+            // Target below start pos
+        if (between.y < 0){
+            verticalDistance = -between.y + desiredHeightCeiling * 2;
+            //Target above start pos
+        }else{
+            if (desiredHeightCeiling > between.y){
+                verticalDistance = desiredHeightCeiling * 2 - between.y;
+            }else{
+                verticalDistance = between.y;
+            }
+        }
+
+        double horizontalSpeed = horizontalDistance / tickTravelTime;
+
+        //d = vt + at^2 * 1/2
+        //v = ((at^2 * 1/2) - d) / (-t)
+
+        double verticalSpeed = ((gravity * tickTravelTime * tickTravelTime / 2) - verticalDistance) / (-tickTravelTime);
+
+
+        Vec3 result = between.multiply(1,0,1).normalize().multiply(horizontalSpeed,0,horizontalSpeed).add(0,verticalSpeed,0);
+
+        return result;
+    }
+
     public static float transformDamage(Level level, float damage){
         Difficulty difficulty = level.getDifficulty();
         switch (difficulty){

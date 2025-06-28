@@ -18,6 +18,8 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.Ra
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
@@ -176,6 +178,18 @@ public class BossEntities {
             .sized(0.2f,0.2f)
             .build("malkuth_chain"));
 
+    public static final Supplier<EntityType<MalkuthCannonProjectile>> MALKUTH_CANNON_PROJECTILE = ENTITIES.register("malkuth_cannon_projectile",()->EntityType.Builder.of(
+            MalkuthCannonProjectile::new, MobCategory.MISC
+    )
+            .sized(0.5f,0.5f)
+            .build("malkuth_cannon_projectile"));
+
+    public static final Supplier<EntityType<MalkuthCannonEntity>> MALKUTH_CANNON = ENTITIES.register("malkuth_cannon",()->EntityType.Builder.of(
+            MalkuthCannonEntity::new, MobCategory.MISC
+    )
+            .sized(2f,2f)
+            .build("malkuth_cannon"));
+
 
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event){
@@ -187,6 +201,7 @@ public class BossEntities {
 
         event.put(MALKUTH_CHAIN.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
         event.put(MALKUTH.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,20).build());
+        event.put(MALKUTH_CANNON.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
     }
 
 
