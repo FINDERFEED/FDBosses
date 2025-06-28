@@ -181,6 +181,7 @@ public class BossEntities {
     public static final Supplier<EntityType<MalkuthCannonProjectile>> MALKUTH_CANNON_PROJECTILE = ENTITIES.register("malkuth_cannon_projectile",()->EntityType.Builder.of(
             MalkuthCannonProjectile::new, MobCategory.MISC
     )
+            .updateInterval(1)
             .sized(0.5f,0.5f)
             .build("malkuth_cannon_projectile"));
 

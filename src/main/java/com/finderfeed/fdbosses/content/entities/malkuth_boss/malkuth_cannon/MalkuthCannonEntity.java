@@ -50,7 +50,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
     public void shoot(List<Vec3> targets){
         if (level().isClientSide) return;
         if (shootTargets.isEmpty()){
-            this.shootTargets = targets;
+            this.shootTargets = new ArrayList<>(targets);
             this.shootTickCount = 20;
         }
     }
@@ -71,9 +71,8 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
 
                     for (Vec3 target : this.shootTargets){
 
-                        double randomAdditionalHeight = random.nextDouble() * 2 + 5;
-                        Vec3 speed = BossUtil.calculateMortarProjectileVelocity(summonPos, target, -(float)LivingEntity.DEFAULT_BASE_GRAVITY, randomAdditionalHeight, 40);
-                        MalkuthCannonProjectile.summon(level(), summonPos, speed, 1000);
+                        Vec3 speed = BossUtil.calculateMortarProjectileVelocity(summonPos, target, -(float)LivingEntity.DEFAULT_BASE_GRAVITY, 40);
+                        MalkuthCannonProjectile.summon(level(), summonPos, speed, 1000, malkuthCannonType);
 
                     }
 

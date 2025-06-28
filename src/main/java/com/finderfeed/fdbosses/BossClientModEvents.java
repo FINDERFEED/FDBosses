@@ -26,6 +26,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayReflectorRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonProjectileRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
@@ -166,6 +167,14 @@ public class BossClientModEvents {
 
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
+
+        event.registerEntityRenderer(BossEntities.MALKUTH_CANNON.get(), FDEntityRendererBuilder.builder()
+                        .addLayer(FDEntityRenderLayerOptions.builder()
+                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_cannon.png")))
+                                .model(BossModels.MALKUTH_CANNON)
+                                .ignoreHurtOverlay(true)
+                                .build())
+                .build());
 
         var rightLegIK = new InverseKinematics2BoneTransform<MalkuthEntity>(
                 Direction.Axis.Z,
@@ -445,5 +454,6 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.FLYING_SWORD.get(), FlyingSwordRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_SLASH.get(), MalkuthSlashRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_CHAIN.get(), MalkuthChainRenderer::new);
+        event.registerEntityRenderer(BossEntities.MALKUTH_CANNON_PROJECTILE.get(), MalkuthCannonProjectileRenderer::new);
     }
 }

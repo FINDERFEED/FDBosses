@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.debug;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.init.BossModels;
@@ -29,6 +30,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.joml.SimplexNoise;
@@ -52,9 +54,20 @@ public class DebugStick extends Item {
 
 //            MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level, player.position(), 1);
 
-            var value = 1;
+            for (MalkuthCannonEntity cannon : level.getEntitiesOfClass(MalkuthCannonEntity.class, player.getBoundingBox().inflate(10,10,10))){
 
-            var result =Math.sin( Math.abs(Math.sin(0.25 * value)) + Math.abs(Math.sin(value * 4) + Math.abs(Math.sin(2.5 * value))) );
+                Vec3 startPos = player.position().add(0,player.getEyeHeight(),0);
+
+                Vec3 endPos = startPos.add(player.getLookAngle().multiply(100,100,100));
+
+                BlockHitResult blockHitResult = level.clip(new ClipContext(startPos,endPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
+
+
+                cannon.shoot(List.of(blockHitResult.getLocation()));
+
+            }
+
+            if (true) return InteractionResultHolder.consume(player.getItemInHand(hand));
 
 //            int mountainDiameter = 40;
 //

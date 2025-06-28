@@ -122,7 +122,7 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_crush_attack"));
     });
 
-    public static DeferredHolder<Animation,Animation> MALKUTH_CANNON_SHOOT = ANIMATIONS.register("malkuth_crush_attack_attack", ()->{
+    public static DeferredHolder<Animation,Animation> MALKUTH_CANNON_SHOOT = ANIMATIONS.register("malkuth_cannon_shoot", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_cannon"));
     });
 

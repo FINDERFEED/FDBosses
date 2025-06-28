@@ -24,18 +24,19 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
     private MalkuthAttackType malkuthAttackType = MalkuthAttackType.FIRE;
 
     @SerializableField
-    private int reversedAge = 300;
+    private int reversedAge = 3000;
 
     public MalkuthCannonProjectile(EntityType<? extends AbstractHurtingProjectile> type, Level level) {
         super(type, level);
         this.setNoGravity(false);
     }
 
-    public static MalkuthCannonProjectile summon(Level level, Vec3 pos, Vec3 speed, int lifetime){
+    public static MalkuthCannonProjectile summon(Level level, Vec3 pos, Vec3 speed, int lifetime, MalkuthAttackType projectileDamageType){
         MalkuthCannonProjectile malkuthCannonProjectile = new MalkuthCannonProjectile(BossEntities.MALKUTH_CANNON_PROJECTILE.get(), level);
         malkuthCannonProjectile.setPos(pos);
         malkuthCannonProjectile.setDeltaMovement(speed);
         malkuthCannonProjectile.reversedAge = lifetime;
+        malkuthCannonProjectile.setMalkuthAttackType(projectileDamageType);
         level.addFreshEntity(malkuthCannonProjectile);
         return malkuthCannonProjectile;
     }
@@ -91,5 +92,11 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
     @Override
     protected double getDefaultGravity() {
         return LivingEntity.DEFAULT_BASE_GRAVITY;
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(MALKUTH_ATTACK_TYPE, MalkuthAttackType.FIRE);
     }
 }
