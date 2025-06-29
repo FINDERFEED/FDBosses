@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.base.IFirstSetPosListener;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
@@ -12,6 +13,8 @@ import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDRenderTypes;
+import com.finderfeed.fdlib.nbt.AutoSerializable;
+import com.finderfeed.fdlib.nbt.FDTagHelper;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
@@ -48,10 +51,11 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, IFirstSetPosListener {
+public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, IFirstSetPosListener, AutoSerializable {
 
     public static final String MAIN_LAYER = "MAIN";
 
@@ -82,6 +86,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     @SerializableField
     private MalkuthBossInitializer malkuthBossInitializer;
+
+    @SerializableField
+    private boolean lookAtTarget = true;
 
     public MalkuthEntity(EntityType<? extends FDMob> type, Level level) {
         super(type, level);
@@ -150,7 +157,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 this.checkTarget(target);
 
-                this.getLookControl().setLookAt(target);
+                if (lookAtTarget) {
+                    this.getLookControl().setLookAt(target);
+                }
 
             }else{
 
@@ -291,17 +300,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }else if (stage == 1){
 
             if (tick == 1){
-                SlamParticlesPacket packet = new SlamParticlesPacket(
-                        new SlamParticlesPacket.SlamData(this.getOnPos(),this.position().add(0,-2.5,0),new Vec3(1,0,0))
-                                .maxAngle(FDMathUtil.FPI * 2)
-                                .maxSpeed(0.3f)
-                                .collectRadius(2)
-                                .maxParticleLifetime(30)
-                                .count(20)
-                                .maxVerticalSpeedEdges(0.15f)
-                                .maxVerticalSpeedCenter(0.15f)
-                );
-                PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+                this.doJumpStartParticles(-1);
             }
 
             this.setNoGravity(true);
@@ -463,12 +462,17 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private boolean jumpAndCommandCannons(AttackInstance attackInstance){
 
+        this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
+
+        this.lookAtTarget = false;
+
         int stage = attackInstance.stage;
         int tick = attackInstance.tick;
 
         if (stage == 0){
+            this.getLookControl().setLookAt(this.position().add(0,0,-1000));
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_BACK_ON_WALL)
-                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_SWORD_FORWARD).build()).build());
+                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
             this.jumpOnWallPath = this.makeJumpOnWallPath(20,false);
             attackInstance.nextStage();
         }else if (stage == 1){
@@ -478,20 +482,44 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             if (tick >= 6) {
                 if (tick == 6){
+                    this.doJumpStartParticles(0);
+                }
+                this.jumpOnWallPath.tick(this);
+                this.noPhysics = true;
+                this.setNoGravity(true);
+            }
 
-                    SlamParticlesPacket packet = new SlamParticlesPacket(
-                            new SlamParticlesPacket.SlamData(this.getOnPos(),this.position().add(0,0,0),new Vec3(1,0,0))
-                                    .maxAngle(FDMathUtil.FPI * 2)
-                                    .maxSpeed(0.3f)
-                                    .collectRadius(2)
-                                    .maxParticleLifetime(30)
-                                    .count(20)
-                                    .maxVerticalSpeedEdges(0.15f)
-                                    .maxVerticalSpeedCenter(0.15f)
-                    );
-                    PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+            if (this.jumpOnWallPath.isFinished()){
+                this.setNoGravity(false);
+                this.noPhysics = false;
+                attackInstance.nextStage();
+                this.getAnimationSystem().startAnimation(MAIN_LAYER,AnimationTicker.builder(BossAnims.MALKUTH_SWORD_FORWARD).build());
+            }
+        }else if (stage == 2){
+            int start = 6;
+            int t = tick - start;
 
+            if (t >= 160) {
+                attackInstance.nextStage();
+            }
 
+            if (t % 40 == 0){
+                this.shootCannons();
+            }
+
+        }else if (stage == 3){
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_BACK_ON_WALL)
+                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
+            this.jumpOnWallPath = this.makeJumpOnWallPath(20,true);
+            attackInstance.nextStage();
+        }else if (stage == 4){
+            if (this.jumpOnWallPath == null){
+                this.jumpOnWallPath = this.makeJumpOnWallPath(20,true);
+            }
+
+            if (tick >= 6) {
+                if (tick == 6){
+                    this.doJumpStartParticles(0);
                 }
                 this.jumpOnWallPath.tick(this);
                 this.noPhysics = true;
@@ -501,20 +529,64 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 this.setNoGravity(false);
                 this.noPhysics = false;
                 attackInstance.nextStage();
-            }
-        }else if (stage == 2){
+                this.setDeltaMovement(0,0,0);
+                this.teleportTo(this.spawnPosition.x,this.spawnPosition.y,this.spawnPosition.z);
 
-            if (tick == 100){
-                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
-                this.setPos(this.spawnPosition);
-            }else if (tick > 200){
+                this.doJumpStartParticles(0);
+            }
+        }else if (stage == 5){
+            if (tick > 60){
+                lookAtTarget = true;
+                this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
                 return true;
             }
-
+            return false;
         }
 
 
         return false;
+    }
+
+    private void shootCannons(){
+        int attackPerCombatant = 6;
+        var cannons = this.getCannons();
+        if (cannons.isEmpty()){
+            //summon them
+            return;
+        }
+        var combatants = this.getCombatants(true);
+
+        List<Vec3> positions = new ArrayList<>();
+        for (var combatant : combatants){
+
+            float randomAngleStart = FDMathUtil.FPI / 4 * random.nextInt(4);
+            Vec3 base = combatant.position();
+            positions.add(base);
+
+            for (int i = 0; i < attackPerCombatant;i++){
+                float angle = randomAngleStart + FDMathUtil.FPI / 4 * i;
+                float rad = random.nextFloat() * 5 + 2;
+                Vec3 v = new Vec3(1,0,0)
+                        .yRot(angle - FDMathUtil.FPI / 4 + FDMathUtil.FPI / 2 * random.nextFloat())
+                        .multiply(rad,rad,rad)
+                        .add(combatant.position());
+
+                positions.add(v);
+            }
+        }
+        HashMap<MalkuthCannonEntity, List<Vec3>> cannonTargets = new HashMap<>();
+        int currentCannon = 0;
+        while (!positions.isEmpty()){
+            Vec3 pos = positions.removeFirst();
+            MalkuthCannonEntity cannon = cannons.get(currentCannon);
+            cannonTargets.computeIfAbsent(cannon, c->new ArrayList<>()).add(pos);
+            currentCannon = (currentCannon + 1) % cannons.size();
+        }
+
+        for (var entry : cannonTargets.entrySet()){
+            var cannon = entry.getKey();
+            cannon.shoot(entry.getValue());
+        }
     }
 
     private ProjectileMovementPath makeJumpOnWallPath(int time, boolean reversed){
@@ -546,6 +618,20 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
         return path;
+    }
+
+    private void doJumpStartParticles(float verticalOffset){
+        SlamParticlesPacket packet = new SlamParticlesPacket(
+                new SlamParticlesPacket.SlamData(this.getOnPos(),this.position().add(0,verticalOffset,0),new Vec3(1,0,0))
+                        .maxAngle(FDMathUtil.FPI * 2)
+                        .maxSpeed(0.3f)
+                        .collectRadius(2)
+                        .maxParticleLifetime(30)
+                        .count(20)
+                        .maxVerticalSpeedEdges(0.15f)
+                        .maxVerticalSpeedCenter(0.15f)
+        );
+        PacketDistributor.sendToPlayersTrackingEntity(this,packet);
     }
 
     //=============================================================================OTHER================================================================================================
@@ -622,6 +708,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         ).move(offset);
     }
 
+    private List<MalkuthCannonEntity> getCannons(){
+        AABB box = new AABB(-20,-20,-10,20,10,10);
+        return this.level().getEntitiesOfClass(MalkuthCannonEntity.class, box.move(this.position()));
+    }
+
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
@@ -632,11 +723,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         if (this.jumpOnWallPath != null){
             this.jumpOnWallPath.autoSave("jumpOnWallPath",tag);
         }
+        this.autoSave(tag);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+        this.autoLoad(tag);
         this.attackChain.load(tag);
         if (tag.contains("jumpCrushAttackMovementPath")){
             this.jumpCrushAttackMovementPath = new ProjectileMovementPath();

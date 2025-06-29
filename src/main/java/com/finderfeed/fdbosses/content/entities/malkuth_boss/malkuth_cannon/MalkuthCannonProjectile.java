@@ -16,9 +16,12 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 
 public class MalkuthCannonProjectile extends FDProjectile implements AutoSerializable {
+
+    public static final int PROJECITLE_INVULNERABILITY_TIME = 10;
 
     public static final EntityDataAccessor<MalkuthAttackType> MALKUTH_ATTACK_TYPE = SynchedEntityData.defineId(MalkuthCannonProjectile.class, BossEntityDataSerializers.MALKUTH_ATTACK_TYPE.get());
 
@@ -57,7 +60,6 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
         if (!level().isClientSide){
             this.setMalkuthAttackType(this.malkuthAttackType);
             this.applyGravity();
-
             if (reversedAge-- <= 0){
                 this.explode();
             }
@@ -133,13 +135,20 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
     @Override
     protected void onHitBlock(BlockHitResult res) {
         super.onHitBlock(res);
-        if (!level().isClientSide){
+        if (!level().isClientSide && this.tickCount > PROJECITLE_INVULNERABILITY_TIME){
+            this.explode();
+        }
+    }
+
+    @Override
+    protected void onHitEntity(EntityHitResult res) {
+        super.onHitEntity(res);
+        if (!level().isClientSide && this.tickCount > PROJECITLE_INVULNERABILITY_TIME){
             this.explode();
         }
     }
 
     private void explode(){
-
         this.remove(RemovalReason.DISCARDED);
     }
 
