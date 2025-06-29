@@ -50,6 +50,8 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
 
             MalkuthCannonEntity.summon(boss.level(),pos, pos.add(0,0,-100), sppos.second);
 
+        }else if (tick >= 60){
+            this.setFinished();
         }
 
 

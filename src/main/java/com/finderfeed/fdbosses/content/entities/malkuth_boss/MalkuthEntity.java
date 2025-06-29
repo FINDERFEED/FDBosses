@@ -60,6 +60,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public static final String SLASH_ATTACK = "slash";
     public static final String JUMP_CRUSH = "jump_crush";
     public static final String PULL_AND_PUNCH = "pull_and_punch";
+    public static final String JUMP_ON_WALL_COMMAND_CANNONS = "jump_on_wall_command_cannons";
 
     private static FDModel SERVER_MODEL;
     private static FDModel CLIENT_MODEL;
@@ -104,9 +105,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(SLASH_ATTACK,this::aerialSlashAttack)
                 .registerAttack(PULL_AND_PUNCH,this::pullAndPunch)
                 .registerAttack(JUMP_CRUSH,this::jumpCrushAttack)
+                .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
 //                .addAttack(0, SLASH_ATTACK)
-                .addAttack(1, JUMP_CRUSH)
+//                .addAttack(1, JUMP_CRUSH)
 //                .addAttack(2, PULL_AND_PUNCH)
+                .addAttack(3, JUMP_ON_WALL_COMMAND_CANNONS)
                 .attackListener(this::attackListener)
         ;
 
@@ -456,6 +459,95 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         return false;
     }
 
+    private ProjectileMovementPath jumpOnWallPath = null;
+
+    private boolean jumpAndCommandCannons(AttackInstance attackInstance){
+
+        int stage = attackInstance.stage;
+        int tick = attackInstance.tick;
+
+        if (stage == 0){
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_BACK_ON_WALL)
+                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_SWORD_FORWARD).build()).build());
+            this.jumpOnWallPath = this.makeJumpOnWallPath(20,false);
+            attackInstance.nextStage();
+        }else if (stage == 1){
+            if (this.jumpOnWallPath == null){
+                this.jumpOnWallPath = this.makeJumpOnWallPath(20,false);
+            }
+
+            if (tick >= 6) {
+                if (tick == 6){
+
+                    SlamParticlesPacket packet = new SlamParticlesPacket(
+                            new SlamParticlesPacket.SlamData(this.getOnPos(),this.position().add(0,0,0),new Vec3(1,0,0))
+                                    .maxAngle(FDMathUtil.FPI * 2)
+                                    .maxSpeed(0.3f)
+                                    .collectRadius(2)
+                                    .maxParticleLifetime(30)
+                                    .count(20)
+                                    .maxVerticalSpeedEdges(0.15f)
+                                    .maxVerticalSpeedCenter(0.15f)
+                    );
+                    PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+
+
+                }
+                this.jumpOnWallPath.tick(this);
+                this.noPhysics = true;
+                this.setNoGravity(true);
+            }
+            if (this.jumpOnWallPath.isFinished()){
+                this.setNoGravity(false);
+                this.noPhysics = false;
+                attackInstance.nextStage();
+            }
+        }else if (stage == 2){
+
+            if (tick == 100){
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
+                this.setPos(this.spawnPosition);
+            }else if (tick > 200){
+                return true;
+            }
+
+        }
+
+
+        return false;
+    }
+
+    private ProjectileMovementPath makeJumpOnWallPath(int time, boolean reversed){
+
+        Vec3 start = this.spawnPosition;
+
+        Vec3 offset = new Vec3(0, 13.0, 27.85);
+
+        Vec3 end = start.add(offset);
+
+        Vec3 hoffset = offset.multiply(1,0,1);
+        Vec3 v1 = start.add(hoffset.multiply(0.25,0.25,0.25).add(0,10,0));
+        Vec3 v2 = start.add(hoffset.multiply(0.5,0.5,0.5).add(0,17,0));
+        Vec3 v3 = start.add(hoffset.multiply(0.75,0.75,0.75).add(0,15,0));
+
+        ProjectileMovementPath path = new ProjectileMovementPath(time,false);
+        if (!reversed){
+            path.addPos(start);
+            path.addPos(v1);
+            path.addPos(v2);
+            path.addPos(v3);
+            path.addPos(end);
+        }else{
+            path.addPos(end);
+            path.addPos(v3);
+            path.addPos(v2);
+            path.addPos(v1);
+            path.addPos(start);
+        }
+
+        return path;
+    }
+
     //=============================================================================OTHER================================================================================================
 
     private void causeSwordChargeParticles(MalkuthAttackType attackType){
@@ -505,9 +597,16 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     }
 
+    @Override
+    public void setPos(double x, double y, double z) {
+        super.setPos(x, y, z);
+        if (this.spawnPosition == null && x != 0 && y != 0 && z != 0){
+            this.spawnPosition = new Vec3(x,y,z);
+        }
+    }
 
     private List<Player> getCombatants(boolean includeCreativeAndSpectator){
-        return this.level().getEntitiesOfClass(Player.class, this.createEnrageRadiusAABB(this.position()),player->{
+        return this.level().getEntitiesOfClass(Player.class, this.createEnrageRadiusAABB(this.spawnPosition),player->{
             return includeCreativeAndSpectator || (!player.isCreative() && !player.isSpectator());
         });
     }
@@ -527,12 +626,26 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         this.attackChain.save(tag);
+        if (this.jumpCrushAttackMovementPath != null){
+            this.jumpCrushAttackMovementPath.autoSave("jumpCrushAttackMovementPath",tag);
+        }
+        if (this.jumpOnWallPath != null){
+            this.jumpOnWallPath.autoSave("jumpOnWallPath",tag);
+        }
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         this.attackChain.load(tag);
+        if (tag.contains("jumpCrushAttackMovementPath")){
+            this.jumpCrushAttackMovementPath = new ProjectileMovementPath();
+            this.jumpCrushAttackMovementPath.autoLoad("jumpCrushAttackMovementPath",tag);
+        }
+        if (tag.contains("jumpOnWallPath")){
+            this.jumpOnWallPath = new ProjectileMovementPath();
+            this.jumpOnWallPath.autoLoad("jumpOnWallPath",tag);
+        }
     }
 
     private void attachSwords(){
