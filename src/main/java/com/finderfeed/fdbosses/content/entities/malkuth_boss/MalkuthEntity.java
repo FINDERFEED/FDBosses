@@ -12,6 +12,7 @@ import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDRenderTypes;
+import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
@@ -78,6 +79,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private Vec3 spawnPosition;
 
+    @SerializableField
+    private MalkuthBossInitializer malkuthBossInitializer;
+
     public MalkuthEntity(EntityType<? extends FDMob> type, Level level) {
         super(type, level);
         if (level.isClientSide){
@@ -89,6 +93,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 SERVER_MODEL = new FDModel(BossModels.MALKUTH.get());
             }
         }
+
+        malkuthBossInitializer = new MalkuthBossInitializer(this);
 
         this.headControllerContainer = new HeadControllerContainer<>(this)
                 .addHeadController(CLIENT_MODEL, "head");
@@ -129,7 +135,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 animationSystem.startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
             }
 
-            this.attackChain.tick();
+            if (malkuthBossInitializer.isFinished()) {
+                this.attackChain.tick();
+            }else{
+                malkuthBossInitializer.tick();
+            }
 
             if (this.getTarget() != null) {
 
@@ -616,6 +626,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     @Override
     protected void pushEntities() {
 
+    }
+
+    @Override
+    public boolean isPersistenceRequired() {
+        return true;
     }
 
 }

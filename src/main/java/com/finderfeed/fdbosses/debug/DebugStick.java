@@ -40,10 +40,13 @@ import java.util.Random;
 import java.util.UUID;
 
 public class DebugStick extends Item {
+
+    private Vec3 p1;
+    private Vec3 p2;
+
     public DebugStick(Properties p_41383_) {
         super(p_41383_);
     }
-
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
@@ -54,24 +57,34 @@ public class DebugStick extends Item {
 
 //            MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level, player.position(), 1);
 
-            for (MalkuthCannonEntity cannon : level.getEntitiesOfClass(MalkuthCannonEntity.class, player.getBoundingBox().inflate(10,10,10))){
+//            for (MalkuthCannonEntity cannon : level.getEntitiesOfClass(MalkuthCannonEntity.class, player.getBoundingBox().inflate(10,10,10))){
+//
+//                Vec3 startPos = player.position().add(0,player.getEyeHeight(),0);
+//
+//                Vec3 endPos = startPos.add(player.getLookAngle().multiply(100,100,100));
+//
+//                BlockHitResult blockHitResult = level.clip(new ClipContext(startPos,endPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
+//
+//
+//                cannon.shoot(List.of(blockHitResult.getLocation(),
+//
+//                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
+//                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
+//                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
+//                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
+//                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10)
+//                        ));
+//
+//            }
 
-                Vec3 startPos = player.position().add(0,player.getEyeHeight(),0);
-
-                Vec3 endPos = startPos.add(player.getLookAngle().multiply(100,100,100));
-
-                BlockHitResult blockHitResult = level.clip(new ClipContext(startPos,endPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
-
-
-                cannon.shoot(List.of(blockHitResult.getLocation(),
-
-                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
-                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
-                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
-                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
-                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10)
-                        ));
-
+            if (p1 == null){
+                p1 = player.position();
+            }else if (p2 == null){
+                p2 = player.position();
+            }else{
+                System.out.println(p2.subtract(p1));
+                p1 = null;
+                p2 = null;
             }
 
             if (true) return InteractionResultHolder.consume(player.getItemInHand(hand));

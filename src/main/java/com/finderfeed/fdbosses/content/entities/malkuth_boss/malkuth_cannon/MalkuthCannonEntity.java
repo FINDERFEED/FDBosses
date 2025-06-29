@@ -40,7 +40,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
         this.getAnimationSystem().startAnimation("SUMMON", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_SUMMON).build());
     }
 
-    public MalkuthCannonEntity summon(Level level, Vec3 pos, Vec3 lookAt, MalkuthAttackType malkuthAttackType){
+    public static MalkuthCannonEntity summon(Level level, Vec3 pos, Vec3 lookAt, MalkuthAttackType malkuthAttackType){
         MalkuthCannonEntity malkuthCannonEntity = new MalkuthCannonEntity(BossEntities.MALKUTH_CANNON.get(), level);
         malkuthCannonEntity.setPos(pos);
         malkuthCannonEntity.malkuthCannonType = malkuthAttackType;
@@ -74,7 +74,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
                     BossUtil.malkuthCannonShoot((ServerLevel) level(), this.malkuthCannonType, summonPos, frwd.add(0,0.6f,0), 100);
 
                     for (Vec3 target : this.shootTargets){
-                        Vec3 speed = BossUtil.calculateMortarProjectileVelocity(summonPos, target, -(float)LivingEntity.DEFAULT_BASE_GRAVITY, 40);
+                        Vec3 speed = BossUtil.calculateMortarProjectileVelocity(summonPos, target, -(float)LivingEntity.DEFAULT_BASE_GRAVITY, 35 + random.nextInt(10));
                         MalkuthCannonProjectile.summon(level(), summonPos, speed, 1000, malkuthCannonType);
                     }
 
@@ -140,4 +140,5 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
         this.autoSave(tag);
         this.shootTargets = FDTagHelper.loadVec3List(tag, "targets");
     }
+
 }
