@@ -11,6 +11,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.Animatio
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
@@ -34,6 +35,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
 
     public MalkuthCannonEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
+        malkuthCannonType = MalkuthAttackType.ICE;
         this.setNoGravity(true);
         this.getAnimationSystem().startAnimation("SUMMON", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_SUMMON).build());
     }
@@ -63,17 +65,17 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
 
                 if (shootTickCount == 20){
                     this.getAnimationSystem().startAnimation("SHOOT", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_SHOOT).build());
-                }else if (shootTickCount == 15){
+                }else if (shootTickCount == 16){
 
                     Vec3 frwd = this.getForward().multiply(1,0,1).normalize();
 
-                    Vec3 summonPos = this.position().add(frwd.x,1,frwd.z);
+                    Vec3 summonPos = this.position().add(frwd.x * 1.2,1.75,frwd.z * 1.2);
+
+                    BossUtil.malkuthCannonShoot((ServerLevel) level(), this.malkuthCannonType, summonPos, frwd.add(0,0.6f,0), 100);
 
                     for (Vec3 target : this.shootTargets){
-
                         Vec3 speed = BossUtil.calculateMortarProjectileVelocity(summonPos, target, -(float)LivingEntity.DEFAULT_BASE_GRAVITY, 40);
                         MalkuthCannonProjectile.summon(level(), summonPos, speed, 1000, malkuthCannonType);
-
                     }
 
                 }else if (shootTickCount <= 0){

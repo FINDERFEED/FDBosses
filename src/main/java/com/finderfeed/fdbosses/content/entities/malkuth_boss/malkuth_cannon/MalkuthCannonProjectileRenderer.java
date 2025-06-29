@@ -42,15 +42,19 @@ public class MalkuthCannonProjectileRenderer extends EntityRenderer<MalkuthCanno
 
         FDRenderUtil.applyMovementMatrixRotations(matrices, projectile.getDeltaMovement());
 
-        matrices.mulPose(Axis.YP.rotationDegrees(10 * (projectile.tickCount + pticks) + projectile.getId()));
+        int rotationDir = projectile.getId() % 2 == 0 ? 1 : -1;
+
+        matrices.mulPose(Axis.YP.rotationDegrees(rotationDir * 10 * (projectile.tickCount + pticks) + projectile.getId() * 434.5435f ));
 
         BlockRenderDispatcher blockRenderDispatcher = Minecraft.getInstance().getBlockRenderer();
 
-        matrices.pushPose();
-        matrices.mulPose(Axis.ZN.rotationDegrees(180));
-        matrices.translate(-0.5,0.5,-0.5);
-        blockRenderDispatcher.renderSingleBlock(Blocks.FIRE.defaultBlockState(), matrices, src, LightTexture.FULL_BRIGHT,OverlayTexture.NO_OVERLAY, ModelData.EMPTY,null);
-        matrices.popPose();
+        if (projectile.getMalkuthAttackType().isFire()) {
+            matrices.pushPose();
+            matrices.mulPose(Axis.ZN.rotationDegrees(180));
+            matrices.translate(-0.5, 0.5, -0.5);
+            blockRenderDispatcher.renderSingleBlock(Blocks.FIRE.defaultBlockState(), matrices, src, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, ModelData.EMPTY, null);
+            matrices.popPose();
+        }
         this.model.render(matrices, vertexConsumer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f ,1f);
 
         matrices.popPose();

@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.config.BossConfig;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdlib.util.FDUtil;
@@ -34,6 +35,7 @@ public class BossUtil {
     public static final int CHESED_RAY_EXPLOSION = 4;
     public static final int CHESED_RAY_ATTACK_SMOKE = 5;
     public static final int CHESED_BOOM_PARTICLES = 6;
+    public static final int MALKUTH_CANNON_SHOOT = 7;
 
     /**
      * Air Friction? What?
@@ -89,6 +91,15 @@ public class BossUtil {
             double z = pos.z - entity.getZ();
             return x * x + z * z <= radius * radius;
         };
+    }
+
+    public static void malkuthCannonShoot(ServerLevel serverLevel, MalkuthAttackType malkuthAttackType, Vec3 pos, Vec3 direction, double radius){
+        int data = FDUtil.encodeDirection(direction);
+        data <<= 1;
+        if (malkuthAttackType.isFire()){
+            data += 0b1;
+        }
+        posEvent(serverLevel,pos,MALKUTH_CANNON_SHOOT, data, radius);
     }
 
     public static void chesedRaySmoke(ServerLevel level,Vec3 pos,Vec3 direction,double radius){

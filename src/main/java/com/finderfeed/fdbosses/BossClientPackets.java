@@ -24,6 +24,7 @@ import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -155,9 +156,133 @@ public class BossClientPackets {
             case BossUtil.CHESED_BOOM_PARTICLES -> {
                 chesedBoomParticles(pos,data);
             }
+            case BossUtil.MALKUTH_CANNON_SHOOT -> {
+                malkuthCannonShoot(pos, data);
+            }
         }
     }
 
+
+    public static void malkuthCannonShoot(Vec3 pos, int data){
+        MalkuthAttackType malkuthAttackType = (data & 0b1) == 0 ? MalkuthAttackType.ICE : MalkuthAttackType.FIRE;
+
+        int directionData = data >> 1;
+
+        Vec3 direction = FDUtil.decodeDirection(directionData);
+
+        Vec3 left = direction.cross(new Vec3(0,1,0)).normalize();
+
+        Level level = FDClientHelpers.getClientLevel();
+
+        int steps = 20;
+        int totalParticlesPerAnglestep = 6;
+        float anglestep = FDMathUtil.FPI * 2f / steps;
+
+        for (float angle = 0; angle <= FDMathUtil.FPI * 2; angle += anglestep){
+
+            for (int i = 0; i < totalParticlesPerAnglestep;i++) {
+
+                float p = (i / (float)(totalParticlesPerAnglestep - 1));
+
+                float cangle = angle + (random.nextFloat() - 0.5f) * anglestep;
+
+                Quaternionf quaternionf = new Quaternionf(new AxisAngle4f(cangle,
+                        (float) direction.x,
+                        (float) direction.y,
+                        (float) direction.z
+                ));
+
+                Vector3f particleDirection = quaternionf.transform(new Vector3f(
+                        (float) left.x,
+                        (float) left.y,
+                        (float) left.z
+                ));
+
+                float col = 0.2f + random.nextFloat() * 0.2f;
+
+                BigSmokeParticleOptions bigSmokeParticleOptions = BigSmokeParticleOptions.builder()
+                        .size(1.0f + random.nextFloat() * 0.5f)
+                        .color(col,col,col)
+                        .lifetime(0,2,30)
+                        .friction(0.8f)
+                        .minSpeed(0.025f)
+                        .build();
+
+                float dirspeed = 0.05f + random.nextFloat() * (0.5f + FDEasings.easeIn(p) * 0.25f); dirspeed *= 1.5f;
+                float sidespeed = 0.025f + FDEasings.easeIn(p) * 0.2f; sidespeed *= 1.5f;
+
+                level.addParticle(bigSmokeParticleOptions, true, pos.x,pos.y,pos.z,
+                        particleDirection.x * sidespeed + direction.x * dirspeed,
+                        particleDirection.y * sidespeed + direction.y * dirspeed,
+                        particleDirection.z * sidespeed + direction.z * dirspeed
+                );
+
+            }
+
+
+        }
+
+
+
+        int coloredParticlesCount = 30;
+
+        for (int i = 0;i < coloredParticlesCount;i++){
+
+            float p = (float) i / (coloredParticlesCount - 1);
+
+            float r;
+            float g;
+            float b;
+
+            if (malkuthAttackType.isFire()){
+                r = 0.8f + random.nextFloat() * 0.2f;
+                g = 0.3f + p * 0.5f;
+                b = 0.1f + random.nextFloat() * 0.05f;
+            }else{
+                r = 0.1f + random.nextFloat() * 0.05f;
+                g = 0.8f - p * 0.3f;
+                b = 0.8f + random.nextFloat() * 0.2f;
+            }
+
+            ParticleOptions options;
+
+            if (random.nextFloat() > 0.75f) {
+                options = BigSmokeParticleOptions.builder()
+                        .size(1.0f + random.nextFloat() * 0.5f)
+                        .color(r, g, b)
+                        .lifetime(0, 2, 0)
+                        .friction(0.8f)
+                        .minSpeed(0.015f)
+                        .build();
+            }else {
+                options = BallParticleOptions.builder()
+                        .size(1.0f + random.nextFloat() * 0.5f)
+                        .color(r, g, b)
+                        .scalingOptions(0, 2, 0)
+                        .friction(0.8f)
+                        .build();
+            }
+
+            Vec3 rnd = new Vec3(
+                    random.nextFloat() * 2 - 1,
+                    random.nextFloat() * 2 - 1,
+                    random.nextFloat() * 2 - 1
+            ).normalize();
+
+            float dirmod = 0.05f + p * 0.5f * 5;
+            float rndmod = 0.05f + p * 0.2f * 5;
+
+            Vec3 d = direction.multiply(dirmod,dirmod,dirmod).add(rnd.multiply(rndmod,rndmod,rndmod));
+
+            level.addParticle(options, true, pos.x,pos.y,pos.z,
+                    d.x,
+                    d.y,
+                    d.z
+            );
+        }
+
+
+    }
 
 
     public static void chesedRayReflectParticles(){
