@@ -63,7 +63,14 @@ public class DebugStick extends Item {
                 BlockHitResult blockHitResult = level.clip(new ClipContext(startPos,endPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
 
 
-                cannon.shoot(List.of(blockHitResult.getLocation()));
+                cannon.shoot(List.of(blockHitResult.getLocation(),
+
+                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
+                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
+                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
+                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
+                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10)
+                        ));
 
             }
 

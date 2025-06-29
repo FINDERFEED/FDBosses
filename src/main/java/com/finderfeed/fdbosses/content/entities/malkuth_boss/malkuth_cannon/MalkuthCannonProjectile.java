@@ -1,11 +1,13 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon;
 
+import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.util.FDProjectile;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -61,6 +63,71 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
             }
         }
         super.tick();
+        if (level().isClientSide){
+            this.spawnParticles();
+        }
+    }
+
+    private void spawnParticles(){
+
+        Vec3 between = new Vec3(
+                 xo - this.getX() ,
+                 yo - this.getY() ,
+                 zo - this.getZ()
+        );
+
+        float dist = (float) between.length();
+
+        between = between.normalize();
+
+        for (float i = 0; i <= dist;i+=0.5f){
+
+            float  p = i / dist;
+
+            for (int count = 0; count < 4;count++){
+                float r;
+                float g;
+                float b;
+                if (this.getMalkuthAttackType().isFire()){
+                    r = 0.8f + random.nextFloat() * 0.2f;
+                    g = 0.3f + random.nextFloat() * 0.5f;
+                    b = 0.1f + random.nextFloat() * 0.05f;
+                }else{
+                    r = 0.1f + random.nextFloat() * 0.05f;
+                    g = 0.8f - random.nextFloat() * 0.3f;
+                    b = 0.8f + random.nextFloat() * 0.2f;
+                }
+
+                BallParticleOptions options = BallParticleOptions.builder()
+                        .size(0.15f + random.nextFloat() * 0.1f)
+                        .color(r,g,b)
+                        .scalingOptions(0,0,10)
+                        .build();
+
+                level().addParticle(options,true,
+                        this.getX() + between.x + (between.x) * p + random.nextFloat() - .5f,
+                        this.getY() + between.y + (between.y) * p + random.nextFloat() - .5f,
+                        this.getZ() + between.z + (between.z) * p + random.nextFloat() - .5f,
+                        0,0,0
+                );
+            }
+
+            float c = random.nextFloat() * 0.2f + 0.2f;
+
+            BigSmokeParticleOptions bigSmokeParticleOptions = BigSmokeParticleOptions.builder()
+                    .color(c,c,c)
+                    .lifetime(0,0,10)
+                    .size(1f + 0.1f * random.nextFloat())
+                    .build();
+            level().addParticle(bigSmokeParticleOptions,true,
+                    this.getX() + between.x * p,
+                    this.getY() + between.y * p,
+                    this.getZ() + between.z * p,
+                    0,0,0
+            );
+        }
+
+
     }
 
     @Override

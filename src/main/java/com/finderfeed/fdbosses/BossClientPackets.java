@@ -246,6 +246,8 @@ public class BossClientPackets {
 
             ParticleOptions options;
 
+
+
             if (random.nextFloat() > 0.75f) {
                 options = BigSmokeParticleOptions.builder()
                         .size(1.0f + random.nextFloat() * 0.5f)
