@@ -7,16 +7,20 @@ import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleO
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
+import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
@@ -24,6 +28,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class MalkuthCannonProjectile extends FDProjectile implements AutoSerializable {
 
@@ -67,7 +72,7 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
             this.setMalkuthAttackType(this.malkuthAttackType);
             this.applyGravity();
             if (reversedAge-- <= 0){
-                this.explode();
+                this.explode(this.position());
             }
         }
         super.tick();
@@ -155,7 +160,7 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
     protected void onHitBlock(BlockHitResult res) {
         super.onHitBlock(res);
         if (!level().isClientSide && this.tickCount > PROJECITLE_INVULNERABILITY_TIME){
-            this.explode();
+            this.explode(res.getLocation());
         }
     }
 
@@ -163,12 +168,42 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
     protected void onHitEntity(EntityHitResult res) {
         super.onHitEntity(res);
         if (!level().isClientSide && this.tickCount > PROJECITLE_INVULNERABILITY_TIME){
-            this.explode();
+            this.explode(res.getLocation());
         }
     }
 
-    private void explode(){
-        this.remove(RemovalReason.DISCARDED);
+    private void explode(Vec3 pos){
+        if (!level().isClientSide) {
+
+            float c = random.nextFloat() * 0.2f + 0.2f;
+
+            BigSmokeParticleOptions bigSmokeParticleOptions = BigSmokeParticleOptions.builder()
+                    .color(c,c,c)
+                    .lifetime(0,0,10)
+                    .size(1f + 0.1f * random.nextFloat())
+                    .friction(0.7f)
+                    .build();
+            ((ServerLevel)level()).sendParticles(bigSmokeParticleOptions,
+                    pos.x,pos.y,pos.z,20,
+                    0,0,0,0.25f
+            );
+
+
+            SlamParticlesPacket packet = new SlamParticlesPacket(
+                    new SlamParticlesPacket.SlamData(new BlockPos((int)pos.x,(int)pos.y,(int)pos.z),pos.add(0,0,0),new Vec3(1,0,0))
+                            .maxAngle(FDMathUtil.FPI * 2)
+                            .maxSpeed(0.3f)
+                            .collectRadius(2)
+                            .maxParticleLifetime(30)
+                            .count(20)
+                            .maxVerticalSpeedEdges(0.15f)
+                            .maxVerticalSpeedCenter(0.15f)
+            );
+            PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+
+            this.remove(RemovalReason.DISCARDED);
+
+        }
     }
 
     @Override
