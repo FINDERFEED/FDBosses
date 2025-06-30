@@ -59,7 +59,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     public static final String MAIN_LAYER = "MAIN";
 
-    public static final float ENRAGE_RADIUS = 20;
+    public static final float ENRAGE_RADIUS = 30;
 
     public static final String SLASH_ATTACK = "slash";
     public static final String JUMP_CRUSH = "jump_crush";
@@ -466,16 +466,19 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         this.lookAtTarget = false;
 
+
+        this.getLookControl().setLookAt(this.position().add(0,0,-100));
+
         int stage = attackInstance.stage;
         int tick = attackInstance.tick;
 
         if (stage == 0){
-            this.getLookControl().setLookAt(this.position().add(0,0,-1000));
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_BACK_ON_WALL)
                     .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
             this.jumpOnWallPath = this.makeJumpOnWallPath(20,false);
             attackInstance.nextStage();
         }else if (stage == 1){
+
             if (this.jumpOnWallPath == null){
                 this.jumpOnWallPath = this.makeJumpOnWallPath(20,false);
             }
@@ -574,13 +577,23 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 positions.add(v);
             }
         }
+
+        int baseAmountPerCannon = positions.size() / cannons.size();
+        int spreadAmount = baseAmountPerCannon * cannons.size();
+
+
         HashMap<MalkuthCannonEntity, List<Vec3>> cannonTargets = new HashMap<>();
+
         int currentCannon = 0;
         while (!positions.isEmpty()){
             Vec3 pos = positions.removeFirst();
             MalkuthCannonEntity cannon = cannons.get(currentCannon);
             cannonTargets.computeIfAbsent(cannon, c->new ArrayList<>()).add(pos);
             currentCannon = (currentCannon + 1) % cannons.size();
+            spreadAmount--;
+            if (spreadAmount <= 0){
+                currentCannon = random.nextInt(cannons.size());
+            }
         }
 
         for (var entry : cannonTargets.entrySet()){

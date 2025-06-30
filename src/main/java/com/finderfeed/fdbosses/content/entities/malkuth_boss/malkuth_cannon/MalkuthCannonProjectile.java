@@ -1,5 +1,8 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon;
 
+import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdbosses.client.particles.GravityOptionsParticleType;
+import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.init.BossEntities;
@@ -8,6 +11,9 @@ import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -100,21 +106,34 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
                     b = 0.8f + random.nextFloat() * 0.2f;
                 }
 
-                BallParticleOptions options = BallParticleOptions.builder()
-                        .size(0.15f + random.nextFloat() * 0.1f)
-                        .color(r,g,b)
-                        .scalingOptions(0,0,10)
-                        .build();
+                ParticleOptions options;
+
+                if (random.nextFloat() > 0.5){
+                    options = BallParticleOptions.builder()
+                            .size(0.15f + random.nextFloat() * 0.1f)
+                            .color(r,g,b)
+                            .scalingOptions(0,0,10)
+                            .build();
+                }else{
+
+                    if (this.getMalkuthAttackType().isFire()){
+                        options = ParticleTypes.SMOKE;
+                    }else{
+                        options = new GravityParticleOptions(BossParticles.ICE_CHUNK.get(),10,0.25f, 0, 5f, true);
+                    }
+
+
+                }
 
                 level().addParticle(options,true,
-                        this.getX() + between.x + (between.x) * p + random.nextFloat() - .5f,
-                        this.getY() + between.y + (between.y) * p + random.nextFloat() - .5f,
-                        this.getZ() + between.z + (between.z) * p + random.nextFloat() - .5f,
+                        this.getX() + between.x * 1.5f + (between.x) * p + random.nextFloat() - .5f,
+                        this.getY() + between.y * 1.5f + (between.y) * p + random.nextFloat() - .5f,
+                        this.getZ() + between.z * 1.5f + (between.z) * p + random.nextFloat() - .5f,
                         0,0,0
                 );
             }
 
-            float c = random.nextFloat() * 0.2f + 0.2f;
+            float c = random.nextFloat() * 0.4f + 0.2f;
 
             BigSmokeParticleOptions bigSmokeParticleOptions = BigSmokeParticleOptions.builder()
                     .color(c,c,c)
@@ -122,9 +141,9 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
                     .size(1f + 0.1f * random.nextFloat())
                     .build();
             level().addParticle(bigSmokeParticleOptions,true,
-                    this.getX() + between.x * p,
-                    this.getY() + between.y * p,
-                    this.getZ() + between.z * p,
+                    this.getX() + between.x * p + between.x,
+                    this.getY() + between.y * p + between.y,
+                    this.getZ() + between.z * p + between.z,
                     0,0,0
             );
         }

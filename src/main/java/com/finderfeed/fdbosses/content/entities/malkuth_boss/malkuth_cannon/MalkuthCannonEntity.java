@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.FDTagHelper;
 import com.finderfeed.fdlib.nbt.SerializableField;
@@ -11,6 +12,8 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.Animatio
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -24,6 +27,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializable {
+
+    public static final EntityDataAccessor<MalkuthAttackType> MALKUTH_ATTACK_TYPE = SynchedEntityData.defineId(MalkuthCannonEntity.class, BossEntityDataSerializers.MALKUTH_ATTACK_TYPE.get());
 
     private List<Vec3> shootTargets = new ArrayList<>();
 
@@ -43,7 +48,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
     public static MalkuthCannonEntity summon(Level level, Vec3 pos, Vec3 lookAt, MalkuthAttackType malkuthAttackType){
         MalkuthCannonEntity malkuthCannonEntity = new MalkuthCannonEntity(BossEntities.MALKUTH_CANNON.get(), level);
         malkuthCannonEntity.setPos(pos);
-        malkuthCannonEntity.malkuthCannonType = malkuthAttackType;
+        malkuthCannonEntity.setCannonType(malkuthAttackType);
         malkuthCannonEntity.lookAt(EntityAnchorArgument.Anchor.FEET, lookAt);
         level.addFreshEntity(malkuthCannonEntity);
         return malkuthCannonEntity;
@@ -85,6 +90,21 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
                 shootTickCount--;
             }
         }
+    }
+
+    private void setCannonType(MalkuthAttackType malkuthAttackType){
+        this.entityData.set(MALKUTH_ATTACK_TYPE,malkuthAttackType);
+        this.malkuthCannonType = malkuthAttackType;
+    }
+
+    public MalkuthAttackType getCannonType(){
+        return this.entityData.get(MALKUTH_ATTACK_TYPE);
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(MALKUTH_ATTACK_TYPE, MalkuthAttackType.FIRE);
     }
 
     @Override
@@ -132,6 +152,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
         super.readAdditionalSaveData(tag);
         this.autoLoad(tag);
         FDTagHelper.saveVec3List(tag, "targets", this.shootTargets);
+        this.setCannonType(this.malkuthCannonType);
     }
 
     @Override
@@ -139,6 +160,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
         super.addAdditionalSaveData(tag);
         this.autoSave(tag);
         this.shootTargets = FDTagHelper.loadVec3List(tag, "targets");
+        this.setCannonType(this.malkuthCannonType);
     }
 
 }

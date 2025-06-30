@@ -26,6 +26,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayReflectorRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonProjectileRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
@@ -168,9 +169,15 @@ public class BossClientModEvents {
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
 
-        event.registerEntityRenderer(BossEntities.MALKUTH_CANNON.get(), FDEntityRendererBuilder.builder()
-                        .addLayer(FDEntityRenderLayerOptions.builder()
-                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_cannon.png")))
+        event.registerEntityRenderer(BossEntities.MALKUTH_CANNON.get(), FDEntityRendererBuilder.<MalkuthCannonEntity>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<MalkuthCannonEntity>builder()
+                                .renderType((entity,pticks)->{
+                                    if (entity.getCannonType().isFire()) {
+                                        return RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_cannon.png"));
+                                    }else{
+                                        return RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_cannon_ice.png"));
+                                    }
+                                })
                                 .model(BossModels.MALKUTH_CANNON)
                                 .ignoreHurtOverlay(true)
                                 .build())
