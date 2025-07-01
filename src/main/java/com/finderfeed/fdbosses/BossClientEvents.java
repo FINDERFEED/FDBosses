@@ -1,17 +1,27 @@
 package com.finderfeed.fdbosses;
 
+import com.finderfeed.fdbosses.client.util.BossRenderTypes;
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.init.BossItems;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
+import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.shaders.FogShape;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -22,8 +32,12 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
+import org.lwjgl.opengl.GL11;
 
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID,bus = EventBusSubscriber.Bus.GAME,value = Dist.CLIENT)
@@ -169,5 +183,98 @@ public class BossClientEvents {
         return p;
     }
 
+
+
+
+
+    @SubscribeEvent
+    public static void renderLevelStageEvent(RenderLevelStageEvent event){
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_SKY){
+            renderHellscapeSkybox(event);
+        }
+    }
+
+
+    public static final ResourceLocation HELL_BASE = FDBosses.location("textures/skyboxes/hellscape/hell_base.png");
+    public static final ResourceLocation HELL_LIGHT = FDBosses.location("textures/skyboxes/hellscape/hell_light.png");
+
+    private static void renderHellscapeSkybox(RenderLevelStageEvent event){
+        PoseStack matrices = event.getPoseStack();
+        Level level = Minecraft.getInstance().level;
+
+        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP);
+
+
+        RenderSystem.enableBlend();
+        RenderSystem.setShader(GameRenderer::getPositionColorTexLightmapShader);
+        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        FDRenderUtil.bindTexture(HELL_BASE);
+
+        matrices.pushPose();
+
+        Matrix4f mat = event.getModelViewMatrix();
+        matrices.mulPose(mat);
+
+
+
+        renderSkybox(matrices, builder, 100, 1f, 1f ,1f, 1f);
+
+
+        BufferUploader.drawWithShader(builder.build());
+
+
+        RenderSystem.disableBlend();
+        RenderSystem.defaultBlendFunc();
+
+        matrices.popPose();
+    }
+
+
+    private static void renderSkybox(PoseStack matrices, VertexConsumer vertexConsumer, float boxRadius, float r, float g, float b, float a){
+
+        Matrix4f m = matrices.last().pose();
+
+
+        //back (z is back)
+        vertexConsumer.addVertex(m, -boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0,0).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,0).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, boxRadius,boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,0.25f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, -boxRadius,boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0,0.25f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+
+
+        //front
+        vertexConsumer.addVertex(m, -boxRadius,boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.5f,0.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, boxRadius,boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.0f,0.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.0f,0.25f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, -boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.5f,0.25f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+
+        //left
+        vertexConsumer.addVertex(m, boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,0.25f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(1f,0.25f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, boxRadius,boxRadius,boxRadius).setColor(r,g,b,a).setUv(1f,0.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, boxRadius,boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,0.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+
+
+        //right
+        vertexConsumer.addVertex(m, -boxRadius,boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,0.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, -boxRadius,boxRadius,boxRadius).setColor(r,g,b,a).setUv(0f,0.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, -boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(0f,0.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, -boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,0.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+
+
+        //down (but for some reason its up)
+        vertexConsumer.addVertex(m, boxRadius,boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0f,1f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, boxRadius,boxRadius,boxRadius).setColor(r,g,b,a).setUv(0f,.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, -boxRadius,boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.5f,.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, -boxRadius,boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,1f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+
+        //up (but for some reason its down
+        vertexConsumer.addVertex(m, -boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(1f,.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, -boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(1f,.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.5f,.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.addVertex(m, boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(.5f,.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+
+
+    }
 
 }

@@ -1,9 +1,15 @@
 package com.finderfeed.fdbosses.client.util;
 
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.Util;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
+
+import java.util.function.Function;
 
 public class BossRenderTypes extends RenderType{
 
@@ -26,6 +32,29 @@ public class BossRenderTypes extends RenderType{
                     .setCullState(RenderStateShard.NO_CULL)
                     .createCompositeState(false)
     );
+
+
+    public static final RenderStateShard.TransparencyStateShard FD_ADDITIVE_TRANSPARENCY = new RenderStateShard.TransparencyStateShard(
+            "fd_additive_transparency", () -> {
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+    }, () -> {
+        RenderSystem.disableBlend();
+        RenderSystem.defaultBlendFunc();
+    }
+    );
+
+    public static Function<ResourceLocation, RenderType> TEXT_ADDITIVE = Util.memoize(BossRenderTypes::textAdditive);
+
+    public static RenderType textAdditive(ResourceLocation locationIn) {
+        var rendertype$state = RenderType.CompositeState.builder()
+                .setShaderState(RenderType.RENDERTYPE_TEXT_SHADER)
+                .setTextureState(new TextureStateShard(locationIn,false,false))
+                .setTransparencyState(FD_ADDITIVE_TRANSPARENCY)
+                .setLightmapState(RenderType.LIGHTMAP)
+                .createCompositeState(false);
+        return RenderType.create("neoforge_text", DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP, VertexFormat.Mode.QUADS, 256, false, true, rendertype$state);
+    }
 
 
 }
