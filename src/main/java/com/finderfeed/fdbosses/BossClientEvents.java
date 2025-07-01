@@ -11,6 +11,7 @@ import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Axis;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -189,40 +190,78 @@ public class BossClientEvents {
 
     @SubscribeEvent
     public static void renderLevelStageEvent(RenderLevelStageEvent event){
-        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_SKY){
-            renderHellscapeSkybox(event);
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL){
+            //TODO: sky
+//            renderHellscapeSkybox(event);
+
         }
     }
 
 
-    public static final ResourceLocation HELL_BASE = FDBosses.location("textures/skyboxes/hellscape/hell_base.png");
-    public static final ResourceLocation HELL_LIGHT = FDBosses.location("textures/skyboxes/hellscape/hell_light.png");
+    public static final ResourceLocation HELL_FROST_LIGHT = FDBosses.location("textures/skyboxes/hellscape/hell_frost_light.png");
+    public static final ResourceLocation HELL_FIRE_LIGHT = FDBosses.location("textures/skyboxes/hellscape/hell_light.png");
 
     private static void renderHellscapeSkybox(RenderLevelStageEvent event){
         PoseStack matrices = event.getPoseStack();
         Level level = Minecraft.getInstance().level;
 
-        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP);
+        //back    *empty*
+        //front   left
+        //right   top
+        //bottom  *empty*
+
+        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+
+
+        float time = (level.getGameTime() + event.getPartialTick().getGameTimeDeltaPartialTick(false));
+
+        float flash = (float) (Math.sin(time * 0.025f) + 1) / 2;
+        flash = flash * 0.8f + 0.2f;
+
+        float flashCounter = (float) (Math.sin(time * 0.025f + FDMathUtil.FPI) + 1) / 2;
+        flashCounter = flashCounter * 0.8f + 0.2f;
 
 
         RenderSystem.enableBlend();
-        RenderSystem.setShader(GameRenderer::getPositionColorTexLightmapShader);
-        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        FDRenderUtil.bindTexture(HELL_BASE);
+        RenderSystem.enableDepthTest();
+        RenderSystem.depthMask(false);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+        FDRenderUtil.bindTexture(HELL_FIRE_LIGHT);
 
         matrices.pushPose();
 
         Matrix4f mat = event.getModelViewMatrix();
         matrices.mulPose(mat);
+        matrices.pushPose();
+        matrices.mulPose(Axis.ZP.rotationDegrees(-90));
+        matrices.mulPose(Axis.XP.rotationDegrees( time * 0.015f));
+        matrices.mulPose(Axis.YP.rotationDegrees( 20));
 
 
-
-        renderSkybox(matrices, builder, 100, 1f, 1f ,1f, 1f);
-
-
+        renderSkybox(matrices, builder, 500, 1f, 1f ,1f, 0.5f);
+        renderSkybox(matrices, builder, 500, 1f, 1f ,1f, flash);
         BufferUploader.drawWithShader(builder.build());
+        matrices.popPose();
 
 
+        matrices.pushPose();
+        builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        FDRenderUtil.bindTexture(HELL_FROST_LIGHT);
+        matrices.mulPose(Axis.XP.rotationDegrees( 180));
+        matrices.mulPose(Axis.YP.rotationDegrees( time * 0.015f + 90));
+        matrices.mulPose(Axis.ZP.rotationDegrees(30));
+
+
+
+        renderSkybox(matrices, builder, 499f, 1f, 1f ,1f, 0.5f);
+        renderSkybox(matrices, builder, 499f, 1f, 1f ,1f, flashCounter * 0.8f);
+        BufferUploader.drawWithShader(builder.build());
+        matrices.popPose();
+
+
+        RenderSystem.disableDepthTest();
+        RenderSystem.depthMask(true);
         RenderSystem.disableBlend();
         RenderSystem.defaultBlendFunc();
 

@@ -565,8 +565,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         for (var combatant : combatants){
 
             float randomAngleStart = FDMathUtil.FPI / 4 * random.nextInt(4);
-            Vec3 base = combatant.position();
-            positions.add(base);
+            Vec3 base = combatant.position().add(0,combatant.getBbHeight()/2,0);
+
 
             for (int i = 0; i < attackPerCombatant;i++){
                 float angle = randomAngleStart + FDMathUtil.FPI / 4 * i;
@@ -578,6 +578,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 positions.add(v);
             }
+            positions.add(base);
         }
 
         int baseAmountPerCannon = positions.size() / cannons.size();
