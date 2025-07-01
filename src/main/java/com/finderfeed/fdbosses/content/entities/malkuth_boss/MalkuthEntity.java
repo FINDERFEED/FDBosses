@@ -1,7 +1,8 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
 import com.finderfeed.fdbosses.FDBosses;
-import com.finderfeed.fdbosses.content.entities.base.IFirstSetPosListener;
+import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
+import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
@@ -55,7 +56,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, IFirstSetPosListener, AutoSerializable {
+public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, AutoSerializable, BossSpawnerContextAssignable {
 
     public static final String MAIN_LAYER = "MAIN";
 
@@ -824,11 +825,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     @Override
-    public Vec3 setFirstPosition(Vec3 pos) {
-        return this.spawnPosition = pos;
-    }
-
-    @Override
     public void push(double p_20286_, double p_20287_, double p_20288_) {
 
     }
@@ -851,6 +847,21 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     @Override
     public boolean isPersistenceRequired() {
         return true;
+    }
+
+    @Override
+    public void setSpawnedBy(BossSpawnerEntity bossSpawnerEntity) {
+
+    }
+
+    @Override
+    public void setSpawnPosition(Vec3 spawnPosition) {
+        this.spawnPosition = spawnPosition;
+    }
+
+    @Override
+    public BossSpawnerEntity getSpawner() {
+        return null;
     }
 
 }

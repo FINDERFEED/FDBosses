@@ -26,6 +26,8 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayReflectorRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawnerRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonProjectileRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainRenderer;
@@ -168,6 +170,11 @@ public class BossClientModEvents {
 
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
+
+        event.registerEntityRenderer(BossEntities.MALKUTH_BOSS_SPAWNER.get(), FDEntityRendererBuilder.<MalkuthBossSpawner>builder()
+                        .freeRender(new MalkuthBossSpawnerRenderer())
+                        .shouldRender(((malkuthBossSpawner, frustum, v, v1, v2) -> true))
+                .build());
 
         event.registerEntityRenderer(BossEntities.MALKUTH_CANNON.get(), FDEntityRendererBuilder.<MalkuthCannonEntity>builder()
                         .addLayer(FDEntityRenderLayerOptions.<MalkuthCannonEntity>builder()

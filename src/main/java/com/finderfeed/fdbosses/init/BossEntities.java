@@ -18,6 +18,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.Ra
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
@@ -190,6 +191,12 @@ public class BossEntities {
     )
             .sized(2f,2f)
             .build("malkuth_cannon"));
+
+    public static final Supplier<EntityType<MalkuthBossSpawner>> MALKUTH_BOSS_SPAWNER = ENTITIES.register("malkuth_boss_spawner",()->EntityType.Builder.of(
+                    MalkuthBossSpawner::new, MobCategory.MISC
+            )
+            .sized(2f,2f)
+            .build("malkuth_boss_spawner"));
 
 
     @SubscribeEvent

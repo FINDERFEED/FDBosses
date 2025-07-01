@@ -3161,6 +3161,11 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     }
 
     @Override
+    public void setSpawnPosition(Vec3 spawnPosition) {
+
+    }
+
+    @Override
     public BossSpawnerEntity getSpawner() {
         if (level() instanceof ServerLevel serverLevel){
             return (BossSpawnerEntity) serverLevel.getEntity(this.bossSpawnerUUID);
