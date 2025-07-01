@@ -1,7 +1,8 @@
 package com.finderfeed.fdbosses;
 
-import com.finderfeed.fdbosses.client.util.BossRenderTypes;
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
+import com.finderfeed.fdbosses.content.util.GainLoseValue;
 import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.init.BossItems;
@@ -12,15 +13,11 @@ import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -28,6 +25,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -37,7 +35,6 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
 import org.lwjgl.opengl.GL11;
 
 
@@ -54,6 +51,7 @@ public class BossClientEvents {
     public static int chesedDarkenEffectTickO = 0;
     public static int chesedDarkenEffectTickMax = 10;
 
+    private static GainLoseValue hellscapeSkyValue = new GainLoseValue(0,100);
 
     @SubscribeEvent
     public static void collectTooltips(ItemTooltipEvent event){
@@ -75,6 +73,7 @@ public class BossClientEvents {
             tickChesedDarken(player);
             lowerGammaWhenAnyDarkenEffect(player);
         }
+        tickHellscapeSky();
     }
 
     private static void lowerGammaWhenAnyDarkenEffect(Player player){
@@ -191,18 +190,54 @@ public class BossClientEvents {
     @SubscribeEvent
     public static void renderLevelStageEvent(RenderLevelStageEvent event){
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL){
-            //TODO: sky
-//            renderHellscapeSkybox(event);
+            renderHellscapeSkybox(event);
 
         }
     }
 
+    private static void tickHellscapeSky(){
+
+        Player player = Minecraft.getInstance().player;
+
+        if (player  == null) {
+            hellscapeSkyValue.reset();
+            return;
+        }
+
+        float rad = 30;
+
+        AABB box = new AABB(-rad,-rad,-rad,rad,rad,rad).move(player.position());
+
+        Level level = player.level();
+
+        if (level.isDay()){
+            hellscapeSkyValue.backward();
+            return;
+        }
+
+        var spawners = level.getEntitiesOfClass(MalkuthBossSpawner.class, box, e->{
+            return e.position().distanceTo(player.position()) <= rad;
+        });
+
+        if (spawners.isEmpty()) {
+            hellscapeSkyValue.backward();
+        }else{
+            hellscapeSkyValue.forward();
+        }
+
+    }
 
     public static final ResourceLocation HELL_FROST_LIGHT = FDBosses.location("textures/skyboxes/hellscape/hell_frost_light.png");
     public static final ResourceLocation HELL_FIRE_LIGHT = FDBosses.location("textures/skyboxes/hellscape/hell_light.png");
 
     private static void renderHellscapeSkybox(RenderLevelStageEvent event){
+        float alpha;
+        if ((alpha = hellscapeSkyValue.getPercent(event.getPartialTick().getGameTimeDeltaPartialTick(false))) == 0) return;
+
+
+
         PoseStack matrices = event.getPoseStack();
+
         Level level = Minecraft.getInstance().level;
 
         //back    *empty*
@@ -239,8 +274,8 @@ public class BossClientEvents {
         matrices.mulPose(Axis.YP.rotationDegrees( 20));
 
 
-        renderSkybox(matrices, builder, 500, 1f, 1f ,1f, 0.5f);
-        renderSkybox(matrices, builder, 500, 1f, 1f ,1f, flash);
+        renderSkybox(matrices, builder, 500, 1f, 1f ,1f, 0.5f * alpha);
+        renderSkybox(matrices, builder, 500, 1f, 1f ,1f, flash * alpha);
         BufferUploader.drawWithShader(builder.build());
         matrices.popPose();
 
@@ -250,12 +285,12 @@ public class BossClientEvents {
         FDRenderUtil.bindTexture(HELL_FROST_LIGHT);
         matrices.mulPose(Axis.XP.rotationDegrees( 180));
         matrices.mulPose(Axis.YP.rotationDegrees( time * 0.015f + 90));
-        matrices.mulPose(Axis.ZP.rotationDegrees(30));
+        matrices.mulPose(Axis.ZP.rotationDegrees(20));
 
 
 
-        renderSkybox(matrices, builder, 499f, 1f, 1f ,1f, 0.5f);
-        renderSkybox(matrices, builder, 499f, 1f, 1f ,1f, flashCounter * 0.8f);
+        renderSkybox(matrices, builder, 499f, 1f, 1f ,1f, 0.5f * alpha);
+        renderSkybox(matrices, builder, 499f, 1f, 1f ,1f, flashCounter * 0.8f * alpha);
         BufferUploader.drawWithShader(builder.build());
         matrices.popPose();
 
