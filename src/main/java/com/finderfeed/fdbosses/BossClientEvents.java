@@ -210,7 +210,8 @@ public class BossClientEvents {
 
         Level level = player.level();
 
-        if (level.isDay()){
+        long time = level.getDayTime() % 24000;
+        if (time < 13000 || time > 23000){
             hellscapeSkyValue.backward();
             return;
         }

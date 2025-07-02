@@ -19,6 +19,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -37,9 +38,15 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
 
     public static final float HEIGHT_SIZE_MODIFIER = 0.3461538f;
 
-    public static final EntityDataAccessor<Float> SLASH_SIZE = SynchedEntityData.defineId(MalkuthSlashProjectile.class, EntityDataSerializers.FLOAT);
+    public static final EntityDataAccessor<Integer> INCREMENT_SIZE_TIME = SynchedEntityData.defineId(MalkuthSlashProjectile.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Float> MAX_SLASH_SIZE = SynchedEntityData.defineId(MalkuthSlashProjectile.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Float> ROTATION = SynchedEntityData.defineId(MalkuthSlashProjectile.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<MalkuthAttackType> ATTACK_TYPE = SynchedEntityData.defineId(MalkuthSlashProjectile.class, BossEntityDataSerializers.MALKUTH_ATTACK_TYPE.get());
+
+    private int currentIncrementSizeTime = 0;
+
+    private float slashSizeOld = 0;
+    private float slashSizeCurrent = 0;
 
     @SerializableField
     private float damage = 2;
@@ -48,12 +55,15 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
         super(type, level);
     }
 
-    public static MalkuthSlashProjectile summon(Level level, Vec3 pos, Vec3 speed, MalkuthAttackType malkuthAttackType, float damage, float slashSize, float rotation){
+    public static MalkuthSlashProjectile summon(Level level, Vec3 pos, Vec3 speed, MalkuthAttackType malkuthAttackType, float damage, float slashSize, float rotation, int incrementSizeTime){
         MalkuthSlashProjectile malkuthSlashProjectile = new MalkuthSlashProjectile(BossEntities.MALKUTH_SLASH.get(), level);
         malkuthSlashProjectile.setPos(pos);
         malkuthSlashProjectile.setDeltaMovement(speed);
         malkuthSlashProjectile.setAttackType(malkuthAttackType);
-        malkuthSlashProjectile.setSlashSize(slashSize);
+
+        malkuthSlashProjectile.entityData.set(INCREMENT_SIZE_TIME, incrementSizeTime);
+        malkuthSlashProjectile.setMaxSlashSize(slashSize);
+
         malkuthSlashProjectile.damage = damage;
         malkuthSlashProjectile.setRotation(rotation);
         level.addFreshEntity(malkuthSlashProjectile);
@@ -67,10 +77,12 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
     public void tick() {
         Vec3 oldPos = this.position();
         super.tick();
+        this.tickSizeIncrement();
         Vec3 newPos = this.position();
         if (!level().isClientSide){
             this.tickDamage();
         }else{
+
 
             distanceTravelledO = distanceTravelled;
             distanceTravelled += newPos.subtract(oldPos).length();
@@ -80,7 +92,26 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
         }
     }
 
+    private void tickSizeIncrement(){
+        this.slashSizeOld = this.slashSizeCurrent;
+        int incrementSizeTime = this.entityData.get(INCREMENT_SIZE_TIME);
+        if (incrementSizeTime == 0){
+            this.slashSizeCurrent = this.getMaxSlashSize();
+            this.slashSizeOld = this.getMaxSlashSize();
+            return;
+        }else{
+            float p = Math.clamp(this.currentIncrementSizeTime / (float) incrementSizeTime,0,1);
+            float size = this.getMaxSlashSize() * p;
+            this.slashSizeCurrent = size;
+            this.currentIncrementSizeTime = Mth.clamp(this.currentIncrementSizeTime + 1,0, incrementSizeTime);
+        }
+
+    }
+
     private void slashParticles() {
+
+        if (this.getSlashSize() == 0 || tickCount < 5) return;
+
         Vec3 movement = this.getDeltaMovement();
         double distance = distanceTravelled - distanceTravelledO;
 
@@ -90,7 +121,7 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
 
         Vec3 n = movement.normalize().reverse().multiply(0.025f,0.025f,0.025f);
 
-        for (double i = 0; i < distance - height * movement.length(); i += height) {
+        for (double i = 0; i <= distance - height * movement.length(); i += height) {
 
 
 
@@ -108,6 +139,8 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
     }
 
     private void tickParticles(){
+
+        if (this.getSlashSize() == 0) return;
 
         Vec3 pos = FDMathUtil.interpolateVectors(this.position(),new Vec3(xo,yo,zo),0.5f).add(0,this.getBbHeight()/2,0);
         Vec3 movement = this.getDeltaMovement();
@@ -277,15 +310,29 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
     @Override
     protected void onHitBlock(BlockHitResult p_37258_) {
         super.onHitBlock(p_37258_);
-        this.remove(RemovalReason.KILLED);
+        if (tickCount > 3) {
+            this.remove(RemovalReason.KILLED);
+        }
+    }
+
+    public float getMaxSlashSize(){
+        return this.entityData.get(MAX_SLASH_SIZE);
     }
 
     public float getSlashSize(){
-        return this.entityData.get(SLASH_SIZE);
+        return slashSizeCurrent;
     }
 
-    public void setSlashSize(float size){
-        this.entityData.set(SLASH_SIZE,size);
+    public float getSlashSize(float partialTicks){
+        if (!level().isClientSide){
+            return this.getSlashSize();
+        }else{
+            return FDMathUtil.lerp(this.slashSizeOld, this.getSlashSize(), partialTicks);
+        }
+    }
+
+    public void setMaxSlashSize(float size){
+        this.entityData.set(MAX_SLASH_SIZE,size);
     }
 
     public float getRotation(){
@@ -313,11 +360,12 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder p_326181_) {
-        super.defineSynchedData(p_326181_);
-        p_326181_.define(SLASH_SIZE, 1f);
-        p_326181_.define(ROTATION, 0f);
-        p_326181_.define(ATTACK_TYPE, MalkuthAttackType.FIRE);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(MAX_SLASH_SIZE, 1f);
+        builder.define(INCREMENT_SIZE_TIME, 0);
+        builder.define(ROTATION, 0f);
+        builder.define(ATTACK_TYPE, MalkuthAttackType.FIRE);
     }
 
     @Override
@@ -326,6 +374,7 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
         tag.putFloat("slashSize",this.getSlashSize());
         tag.putFloat("rotation",this.getRotation());
         tag.putString("attackType",this.getAttackType().name());
+        tag.putInt("incrementSizeTime",this.entityData.get(INCREMENT_SIZE_TIME));
         this.autoSave(tag);
     }
 
@@ -333,10 +382,11 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         this.setRotation(tag.getFloat("rotation"));
-        this.setSlashSize(tag.getFloat("slashSize"));
+        this.setMaxSlashSize(tag.getFloat("slashSize"));
         if (tag.contains("attackType")) {
             this.setAttackType(MalkuthAttackType.valueOf(tag.getString("attackType")));
         }
+        this.entityData.set(INCREMENT_SIZE_TIME, tag.getInt("incrementSizeTime"));
         this.autoLoad(tag);
     }
 

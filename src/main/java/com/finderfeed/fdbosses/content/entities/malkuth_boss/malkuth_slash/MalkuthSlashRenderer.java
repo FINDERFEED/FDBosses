@@ -25,9 +25,7 @@ public class MalkuthSlashRenderer extends EntityRenderer<MalkuthSlashProjectile>
     public void render(MalkuthSlashProjectile projectile, float idk, float pticks, PoseStack matrices, MultiBufferSource src, int light) {
 
 
-        float slashSize = projectile.getSlashSize();
-
-
+        float slashSize = projectile.getSlashSize(pticks);
 
         QuadRenderer.start(src.getBuffer(RenderType.eyes(this.getTextureLocation(projectile))))
                 .direction(projectile.getDeltaMovement().reverse())

@@ -67,6 +67,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public static final String JUMP_CRUSH = "jump_crush";
     public static final String PULL_AND_PUNCH = "pull_and_punch";
     public static final String JUMP_ON_WALL_COMMAND_CANNONS = "jump_on_wall_command_cannons";
+    public static final String CAROUSEL_SLASHES = "carousel_slashes";
 
     private static FDModel SERVER_MODEL;
     private static FDModel CLIENT_MODEL;
@@ -115,11 +116,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(SLASH_ATTACK,this::aerialSlashAttack)
                 .registerAttack(PULL_AND_PUNCH,this::pullAndPunch)
                 .registerAttack(JUMP_CRUSH,this::jumpCrushAttack)
+                .registerAttack(CAROUSEL_SLASHES,this::carouselSlashesAttack)
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
 //                .addAttack(2, PULL_AND_PUNCH)
-                .addAttack(3, JUMP_ON_WALL_COMMAND_CANNONS)
+//                .addAttack(3, JUMP_ON_WALL_COMMAND_CANNONS)
+                .addAttack(4, CAROUSEL_SLASHES)
                 .attackListener(this::attackListener)
         ;
 
@@ -141,14 +144,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         super.tick();
         if (level().isClientSide){
             this.headControllerContainer.clientTick();
-            if (level().getGameTime() % 60 == 0){
-                ArcAttackPreparationParticleOptions options = new ArcAttackPreparationParticleOptions(this.getForward(), 30, FDMathUtil.FPI / 8,30,10,10, 1f, 0f, 0f ,0.25f);
-                this.level().addParticle(options,this.getX(),this.getY() - 0.99,this.getZ(),0,0,0);
-            }
         }else{
-
-
-
             AnimationSystem animationSystem = this.getAnimationSystem();
             if (animationSystem.getTicker(MAIN_LAYER) == null){
                 animationSystem.startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
@@ -261,7 +257,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 float rotation = this.slashAttackType.isFire() ? 25 : -25;
 
-                MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level(),spawnPos,speedv,this.slashAttackType, 1, 2, rotation);
+                MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level(),spawnPos,speedv,this.slashAttackType, 1, 2, rotation,0);
 
             }else if (tick >= 40){
                 inst.nextStage();
@@ -657,6 +653,104 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         .maxVerticalSpeedCenter(0.15f)
         );
         PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+    }
+
+    private MalkuthAttackType currentStartCarouselSlash = MalkuthAttackType.FIRE;
+
+    private boolean carouselSlashesAttack(AttackInstance attackInstance){
+
+        int stage = attackInstance.stage;
+        int tick = attackInstance.tick;
+
+        int preparationTime = 40;
+
+        float radius = 30;
+
+        Vec3 startVec = new Vec3(1,0,0);
+
+        int slashesAmount = 10;
+
+        if (tick == 0){
+
+            float angle = FDMathUtil.FPI / slashesAmount;
+
+            MalkuthAttackType localCarouselSlash = this.currentStartCarouselSlash;
+
+            for (int i = 0; i < slashesAmount;i++){
+
+                Vec3 direction = startVec.yRot(i * angle + angle / 2);
+
+
+                float r;
+                float g;
+                float b;
+
+                if (localCarouselSlash.isFire()){
+                    r = 1f;
+                    g = 0.4f;
+                    b = 0.1f;
+                }else{
+                    r = 0.1f;
+                    g = 0.8f;
+                    b = 1f;
+                }
+
+                ArcAttackPreparationParticleOptions options = new ArcAttackPreparationParticleOptions(direction, radius, angle/2, preparationTime, 10, 10, r,g,b,0.25f);
+
+                ((ServerLevel)level()).sendParticles(options, this.getX(),this.getY() - 0.99, this.getZ(),1, 0, 0,0,0);
+
+                if (localCarouselSlash.isFire()){
+                    localCarouselSlash = MalkuthAttackType.ICE;
+                }else{
+                    localCarouselSlash = MalkuthAttackType.FIRE;
+                }
+            }
+
+
+        } else if (tick == preparationTime){
+
+
+            float angle = FDMathUtil.FPI / slashesAmount;
+
+            float maxSlashSize = (float) Math.sqrt(2 * radius * radius * (1 - (float) Math.cos(angle))) / 2;
+
+            float slashSpeed = 1.5f;
+
+            int reachDestinationTime = Math.round(radius / slashSpeed);
+
+            float verticalSpeed = -1f / reachDestinationTime;
+
+            MalkuthAttackType localCarouselSlash = this.currentStartCarouselSlash;
+
+            for (int i = 0; i < slashesAmount;i++){
+
+                Vec3 direction = startVec.yRot(i * angle + angle / 2);
+
+                Vec3 speed = direction.multiply(slashSpeed,slashSpeed,slashSpeed);
+                speed = speed.add(0,verticalSpeed,0);
+
+
+                MalkuthSlashProjectile.summon(level(),this.position().add(0,0.5,0), speed, localCarouselSlash, 1, maxSlashSize, 0, reachDestinationTime);
+
+                if (localCarouselSlash.isFire()){
+                    localCarouselSlash = MalkuthAttackType.ICE;
+                }else{
+                    localCarouselSlash = MalkuthAttackType.FIRE;
+                }
+
+            }
+
+            if (currentStartCarouselSlash.isFire()){
+                currentStartCarouselSlash = MalkuthAttackType.ICE;
+            }else{
+                currentStartCarouselSlash = MalkuthAttackType.FIRE;
+            }
+
+        }else if (tick >= preparationTime + 20){
+            return true;
+        }
+
+        return false;
     }
 
     //=============================================================================OTHER================================================================================================

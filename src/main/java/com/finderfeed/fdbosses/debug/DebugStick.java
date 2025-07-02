@@ -54,6 +54,10 @@ public class DebugStick extends Item {
         if (!level.isClientSide){
 
             float speed = 2f;
+            MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level, player.position().add(0,player.getBbHeight()/2,0),player.getLookAngle().multiply(speed,speed,speed),
+                    MalkuthAttackType.FIRE, 1, 10f, 0, 10);
+
+
 
 //            MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level, player.position(), 1);
 
@@ -77,15 +81,15 @@ public class DebugStick extends Item {
 //
 //            }
 
-            if (p1 == null){
-                p1 = player.position();
-            }else if (p2 == null){
-                p2 = player.position();
-            }else{
-                System.out.println(p2.subtract(p1));
-                p1 = null;
-                p2 = null;
-            }
+//            if (p1 == null){
+//                p1 = player.position();
+//            }else if (p2 == null){
+//                p2 = player.position();
+//            }else{
+//                System.out.println(p2.subtract(p1));
+//                p1 = null;
+//                p2 = null;
+//            }
 
             if (true) return InteractionResultHolder.consume(player.getItemInHand(hand));
 
