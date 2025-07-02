@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.client.overlay.ElectrifiedOverlay;
 import com.finderfeed.fdbosses.client.particles.FlameWithStoneParticle;
 import com.finderfeed.fdbosses.client.particles.IceChunkParticle;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningParticle;
+import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticle;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedAttackRayParticle;
 import com.finderfeed.fdbosses.client.particles.malkuth_slash.MalkuthHorizontalSlashParticle;
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticle;
@@ -166,6 +167,7 @@ public class BossClientModEvents {
         event.registerSpecial(BossParticles.ARC_LIGHTNING.get(), new ArcLightningParticle.Factory());
         event.registerSpecial(BossParticles.CHESED_RAY_ATTACK.get(), new ChesedAttackRayParticle.Factory());
         event.registerSpecial(BossParticles.MALKUTH_HORIZONTAL_SLASH.get(), new MalkuthHorizontalSlashParticle.Factory());
+        event.registerSpecial(BossParticles.ARC_ATTACK_PREPARATION_PARTICLE.get(), new ArcAttackPreparationParticle.Factory());
     }
 
     @SubscribeEvent

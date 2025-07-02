@@ -3,6 +3,8 @@ package com.finderfeed.fdbosses.client;
 import com.finderfeed.fdbosses.client.particles.GravityOptionsParticleType;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
+import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticle;
+import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
 import com.finderfeed.fdbosses.client.particles.malkuth_slash.MalkuthHorizontalSlashOptions;
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOptions;
@@ -97,6 +99,18 @@ public class BossParticles {
         @Override
         public StreamCodec<? super RegistryFriendlyByteBuf, MalkuthHorizontalSlashOptions> streamCodec() {
             return MalkuthHorizontalSlashOptions.STREAM_CODEC;
+        }
+    });
+
+    public static final Supplier<ParticleType<ArcAttackPreparationParticleOptions>> ARC_ATTACK_PREPARATION_PARTICLE = PARTICLES.register("arc_attack_preparation_particle",()->new ParticleType<ArcAttackPreparationParticleOptions>(true) {
+        @Override
+        public MapCodec<ArcAttackPreparationParticleOptions> codec() {
+            return ArcAttackPreparationParticleOptions.CODEC;
+        }
+
+        @Override
+        public StreamCodec<? super RegistryFriendlyByteBuf, ArcAttackPreparationParticleOptions> streamCodec() {
+            return ArcAttackPreparationParticleOptions.STREAM_CODEC;
         }
     });
 

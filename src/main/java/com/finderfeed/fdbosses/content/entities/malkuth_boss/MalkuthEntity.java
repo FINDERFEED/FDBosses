@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
@@ -140,7 +141,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         super.tick();
         if (level().isClientSide){
             this.headControllerContainer.clientTick();
+            if (level().getGameTime() % 60 == 0){
+                ArcAttackPreparationParticleOptions options = new ArcAttackPreparationParticleOptions(this.getForward(), 30, FDMathUtil.FPI / 8,30,10,10, 1f, 0f, 0f ,0.25f);
+                this.level().addParticle(options,this.getX(),this.getY() - 0.99,this.getZ(),0,0,0);
+            }
         }else{
+
+
 
             AnimationSystem animationSystem = this.getAnimationSystem();
             if (animationSystem.getTicker(MAIN_LAYER) == null){
@@ -463,6 +470,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     private ProjectileMovementPath jumpOnWallPath = null;
 
     private boolean jumpAndCommandCannons(AttackInstance attackInstance){
+
+        if (true) return true;
 
         this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
 
