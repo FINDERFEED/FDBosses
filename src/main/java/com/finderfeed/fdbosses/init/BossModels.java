@@ -30,5 +30,6 @@ public class BossModels {
     public static final Supplier<FDModelInfo> MALKUTH_CRUSH_ATTACK = INFOS.register("malkuth_crush_attack",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_crush_attack"),1f));
     public static final Supplier<FDModelInfo> MALKUTH_CANNON = INFOS.register("malkuth_cannon",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_cannon"),1f));
     public static final Supplier<FDModelInfo> MALKUTH_CANNON_PROJECTILE = INFOS.register("malkuth_cannon_projectile",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_cannon_projectile"),1f));
+    public static final Supplier<FDModelInfo> MALKUTH_EARTHQUAKE_PART = INFOS.register("malkuth_earthquake_part",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_earthquake_part"),1f));
 
 }
