@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.FDHelpers;
@@ -53,33 +54,11 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            float speed = 2f;
-            MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level, player.position().add(0,player.getBbHeight()/2,0),player.getLookAngle().multiply(speed,speed,speed),
-                    MalkuthAttackType.FIRE, 1, 10f, 0, 10);
+            MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level, MalkuthAttackType.ICE,player.position(), player.getLookAngle().multiply(1,0,1).normalize().multiply(10,10,10),10,
+                    FDMathUtil.FPI / 6, 1);
 
 
 
-//            MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level, player.position(), 1);
-
-//            for (MalkuthCannonEntity cannon : level.getEntitiesOfClass(MalkuthCannonEntity.class, player.getBoundingBox().inflate(10,10,10))){
-//
-//                Vec3 startPos = player.position().add(0,player.getEyeHeight(),0);
-//
-//                Vec3 endPos = startPos.add(player.getLookAngle().multiply(100,100,100));
-//
-//                BlockHitResult blockHitResult = level.clip(new ClipContext(startPos,endPos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
-//
-//
-//                cannon.shoot(List.of(blockHitResult.getLocation(),
-//
-//                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
-//                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
-//                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
-//                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10),
-//                        blockHitResult.getLocation().add(level.random.nextFloat() * 20 - 1,0,level.random.nextFloat() * 20 - 10)
-//                        ));
-//
-//            }
 
 //            if (p1 == null){
 //                p1 = player.position();

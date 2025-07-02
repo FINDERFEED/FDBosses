@@ -23,6 +23,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.Malk
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -178,6 +179,12 @@ public class BossEntities {
     )
             .sized(0.2f,0.2f)
             .build("malkuth_chain"));
+
+    public static final Supplier<EntityType<MalkuthEarthquake>> MALKUTH_EARTHQUAKE = ENTITIES.register("malkuth_earthquake",()->EntityType.Builder.of(
+            MalkuthEarthquake::new, MobCategory.MISC
+    )
+            .sized(0.2f,0.2f)
+            .build("malkuth_earthquake"));
 
     public static final Supplier<EntityType<MalkuthCannonProjectile>> MALKUTH_CANNON_PROJECTILE = ENTITIES.register("malkuth_cannon_projectile",()->EntityType.Builder.of(
             MalkuthCannonProjectile::new, MobCategory.MISC

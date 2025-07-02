@@ -35,6 +35,10 @@ public class MalkuthEarthquakeSegment {
         this.offset = offset;
     }
 
+    public float getAngle() {
+        return angle;
+    }
+
     public Vec3 getOffset() {
         return offset;
     }

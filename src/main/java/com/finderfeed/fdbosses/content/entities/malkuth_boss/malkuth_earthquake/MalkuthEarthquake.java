@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake;
 
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.init.FDEDataSerializers;
@@ -31,8 +32,18 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
 
     private List<MalkuthEarthquakeSegment> segments = new ArrayList<>();
 
-    public static void summon(){
+    public static MalkuthEarthquake summon(Level level, MalkuthAttackType malkuthAttackType,Vec3 pos, Vec3 direction, int time, float arcAngle, float damage){
+        MalkuthEarthquake malkuthEarthquake = new MalkuthEarthquake(BossEntities.MALKUTH_EARTHQUAKE.get(), level);
 
+        malkuthEarthquake.setEarthquakeTime(time);
+        malkuthEarthquake.setDirectionAndLength(direction);
+        malkuthEarthquake.setAngle(arcAngle);
+        malkuthEarthquake.setMalkuthAttackType(malkuthAttackType);
+        malkuthEarthquake.setPos(pos);
+        malkuthEarthquake.damage = damage;
+
+        level.addFreshEntity(malkuthEarthquake);
+        return malkuthEarthquake;
     }
 
     public MalkuthEarthquake(EntityType<?> entityType, Level level) {
@@ -44,13 +55,20 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
         super.tick();
 
         if (level().isClientSide){
+            this.summonSegments();
             this.manageSegments();
-
+        }else{
+            if (this.tickCount > this.getEarthquakeTime() + 20){
+                this.remove(RemovalReason.DISCARDED);
+            }
         }
 
 
     }
 
+    public List<MalkuthEarthquakeSegment> getSegments() {
+        return segments;
+    }
 
     private Pair<Float,Float> getCurrentDamageRadius(){
 
@@ -75,6 +93,8 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
 
     private void summonSegments(){
 
+        if (this.tickCount > this.getEarthquakeTime()) return;
+
         var pair = this.getCurrentDamageRadius();
 
         Vec3 direction = this.getDirectionAndLength();
@@ -84,7 +104,7 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
         float start = pair.first;
         float end = pair.second;
 
-        float sizeOfSegment = 0.5f;
+        float sizeOfSegment = 0.75f;
 
         Vec3 ndir = direction.normalize();
 
@@ -93,41 +113,43 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
 
         for (float i = start + 0.01f; i <= end;i += sizeOfSegment){
 
-            int randomizer = 0;
-
             float lengthOfCircle = FDMathUtil.FPI * 2 * i;
 
             float anglePercent = sizeOfSegment / lengthOfCircle;
 
             float sizeInAngle = anglePercent * FDMathUtil.FPI * 2;
 
-            for (float b = 0; b <= angle; b += sizeInAngle){
+            for (float b = random.nextFloat() * sizeInAngle/2; b <= angle; b += sizeInAngle){
 
                 float rot = reverse ? (angle - b) : b;
 
-                Vec3 offset = ndir.multiply(i,i,i).yRot(rot - angle / 2);
+                float f = i + sizeOfSegment * random.nextFloat() / 2;
 
-                MalkuthEarthquakeSegment.Type segmentType = this.getRandomSegmentType(randomizer % 2);
+                Vec3 offset = ndir.multiply(f,f,f).yRot(rot - angle / 2);
 
-                float segmentAngle = FDMathUtil.FPI / 4 + (random.nextFloat() * 2 - 1) * FDMathUtil.FPI / 16;
+                MalkuthEarthquakeSegment.Type segmentType = this.getRandomSegmentType(random.nextInt(2));
+
+                float segmentAngle = FDMathUtil.FPI / 4
+                        - random.nextFloat() * FDMathUtil.FPI / 6
+
+                        ;
 
                 MalkuthEarthquakeSegment malkuthEarthquakeSegment = new MalkuthEarthquakeSegment(segmentType, offset, segmentAngle, 20);
 
                 this.segments.add(malkuthEarthquakeSegment);
 
-                if (this.getEarthquakeType().isIce() && random.nextFloat() > 0.25f){
+                if (this.getEarthquakeType().isIce() && random.nextFloat() > 0.6f){
 
                     float additionalAngle = (reverse ? -1 : 1) * random.nextFloat() * sizeInAngle;
 
                     offset = ndir.yRot(rot - angle / 2 + additionalAngle).multiply(i,i,i);
 
-                    MalkuthEarthquakeSegment s = new MalkuthEarthquakeSegment(MalkuthEarthquakeSegment.Type.ICE_SPIKE, offset, random.nextFloat() * 5,20);
+                    MalkuthEarthquakeSegment s = new MalkuthEarthquakeSegment(MalkuthEarthquakeSegment.Type.ICE_SPIKE, offset, random.nextFloat() * FDMathUtil.FPI / 32,20);
 
                     this.segments.add(s);
 
                 }
 
-                randomizer++;
             }
 
             reverse = true;
@@ -223,4 +245,16 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
         tag.putString("earthquake_type",this.entityData.get(MALKUTH_ATTACK_TYPE).name());
         tag.putInt("time",this.entityData.get(TIME));
     }
+
+
+    @Override
+    public boolean shouldRender(double p_20296_, double p_20297_, double p_20298_) {
+        return true;
+    }
+
+    @Override
+    public boolean shouldRenderAtSqrDistance(double p_19883_) {
+        return true;
+    }
+
 }
