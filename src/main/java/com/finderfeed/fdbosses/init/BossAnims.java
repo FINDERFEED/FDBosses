@@ -137,4 +137,8 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
     });
 
+    public static DeferredHolder<Animation,Animation> MALKUTH_CAROUSEL_SLASH_1 = ANIMATIONS.register("malkuth_carousel_slash_1", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
+    });
+
 }

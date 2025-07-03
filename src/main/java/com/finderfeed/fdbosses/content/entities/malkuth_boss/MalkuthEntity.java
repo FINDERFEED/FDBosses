@@ -121,11 +121,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(JUMP_BACK_ON_SPAWN,this::jumpBackOnSpawn)
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
 //                .addAttack(0, SLASH_ATTACK)
-                .addAttack(1, JUMP_CRUSH)
-                .addAttack(2, JUMP_BACK_ON_SPAWN)
+//                .addAttack(1, JUMP_CRUSH)
+//                .addAttack(2, JUMP_BACK_ON_SPAWN)
 //                .addAttack(2, PULL_AND_PUNCH)
 //                .addAttack(3, JUMP_ON_WALL_COMMAND_CANNONS)
-//                .addAttack(4, CAROUSEL_SLASHES)
+                .addAttack(4, CAROUSEL_SLASHES)
                 .attackListener(this::attackListener)
         ;
 
@@ -729,7 +729,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         int stage = attackInstance.stage;
         int tick = attackInstance.tick;
 
-        int preparationTime = 40;
+        int preparationTime = 20;
 
         float radius = 30;
 
@@ -737,7 +737,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         int slashesAmount = 10;
 
+        this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
+
         if (tick == 0){
+
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_CAROUSEL_SLASH_1)
+                            .important()
+                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
 
             float angle = FDMathUtil.FPI / slashesAmount;
 
@@ -781,7 +787,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             float maxSlashSize = (float) Math.sqrt(2 * radius * radius * (1 - (float) Math.cos(angle))) / 2;
 
-            float slashSpeed = 1.5f;
+            float slashSpeed = 2.5f;
 
             int reachDestinationTime = Math.round(radius / slashSpeed);
 
@@ -797,7 +803,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 speed = speed.add(0,verticalSpeed,0);
 
 
-                MalkuthSlashProjectile.summon(level(),this.position().add(0,0.5,0), speed, localCarouselSlash, 1, maxSlashSize, 0, reachDestinationTime);
+                MalkuthSlashProjectile.summon(level(),this.position().add(0,0.25,0), speed, localCarouselSlash, 1, maxSlashSize, 0, reachDestinationTime);
 
                 if (localCarouselSlash.isFire()){
                     localCarouselSlash = MalkuthAttackType.ICE;
