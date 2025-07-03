@@ -164,7 +164,7 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
 
                 for (int k = 0; k < 1; k++){
 
-                    float vspeed = 0.2f;
+                    float hspeed = 0.4f;
                     ParticleOptions options;
 
                     if (this.getEarthquakeType().isFire()){
@@ -184,7 +184,7 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
                                     .friction(0.7f)
                                     .build();
 
-                            vspeed = 0.5f;
+                            hspeed = 0.75f;
 
                         } else{
                             options = ParticleTypes.LAVA;
@@ -205,7 +205,7 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
                                     .scalingOptions(0,0,20)
                                     .friction(0.7f)
                                     .build();
-                            vspeed = 0.5f;
+                            hspeed = 0.75f;
                         }
                     }
 
@@ -216,9 +216,9 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
                     );
 
                     level().addParticle(options,true, pos.x,pos.y,pos.z,
-                            ndir.x * vspeed,
-                            random.nextFloat() * 0.5 + 0.1,
-                            ndir.z * vspeed
+                            ndir.x * hspeed,
+                            random.nextFloat() * 0.75 + 0.1,
+                            ndir.z * hspeed
                             );
 
                 }

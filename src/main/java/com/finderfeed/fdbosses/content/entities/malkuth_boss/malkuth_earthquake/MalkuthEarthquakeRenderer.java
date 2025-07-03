@@ -46,7 +46,7 @@ public class MalkuthEarthquakeRenderer extends EntityRenderer<MalkuthEarthquake>
 
             float p = segment.getUpPercent(pticks);
 
-            float up = -1.5f + 1.25f * p;
+            float up = -2f + 2f * p;
 
             matrices.translate(0, up,0);
 
@@ -76,7 +76,7 @@ public class MalkuthEarthquakeRenderer extends EntityRenderer<MalkuthEarthquake>
                 QuadRenderer.start(vertexConsumer)
                         .pose(matrices)
                         .translate(0,1,0)
-                        .size(1f)
+                        .size(1.5f)
                         .light(LightTexture.FULL_BRIGHT)
                         .renderBack()
                         .direction(new Vec3(1,0,0))

@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.MalkuthChargeSwordPacket;
 import com.finderfeed.fdbosses.init.BossAnims;
@@ -48,6 +49,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -120,11 +122,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(JUMP_BACK_ON_SPAWN_WITH_CRUSH,v->this.jumpBackOnSpawn(v,true))
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
 //                .addAttack(0, SLASH_ATTACK)
-//                .addAttack(1, JUMP_CRUSH)
-//                .addAttack(2, JUMP_BACK_ON_SPAWN)
+                .addAttack(1, JUMP_CRUSH)
+                .addAttack(2, JUMP_BACK_ON_SPAWN_WITH_CRUSH)
 //                .addAttack(2, PULL_AND_PUNCH)
 //                .addAttack(3, JUMP_ON_WALL_COMMAND_CANNONS)
-                .addAttack(4, CAROUSEL_SLASHES)
+//                .addAttack(4, CAROUSEL_SLASHES)
                 .attackListener(this::attackListener)
         ;
 
@@ -228,12 +230,28 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             attackInstance.nextStage();
         }
 
+        int earthquakesCount = 5;
+
+        float angle = FDMathUtil.FPI / earthquakesCount;
+
+        float radius = 28;
+
         if (stage == 1) {
             Vec3 lastpos = this.jumpBackOnSpawnPath.getPositions().getLast();
+            if (crush){
+                if (tick == 10){
+                    this.jumpEndEarthquakePrepareParticles(lastpos.add(0,-0.99,0),earthquakesCount,angle,radius);
+                }
+            }
             if (tick == 0){
-                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
-                        .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
-                this.lookAt(EntityAnchorArgument.Anchor.FEET, lastpos);
+                if (!crush) {
+                    this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
+                            .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
+                }else{
+                    this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_CRUSH)
+                            .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
+                }
+//                this.lookAt(EntityAnchorArgument.Anchor.FEET, lastpos);
             }else if (tick > 5) {
 
                 this.noPhysics = true;
@@ -242,17 +260,25 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 lookAtTarget = false;
 
                 if (path.isFinished()) {
+                    this.setDeltaMovement(Vec3.ZERO);
+                    this.teleportTo(lastpos.x, lastpos.y, lastpos.z);
                     this.noPhysics = false;
                     this.setNoGravity(false);
+                    lookAtTarget = true;
                     attackInstance.nextStage();
-                    this.teleportTo(lastpos.x, lastpos.y, lastpos.z);
                 } else {
                     path.tick(this);
                 }
             }
         }else if (stage == 2){
+
+            if (tick == 3){
+                this.jumpEarthquake(this.position().add(0,-0.99,0), earthquakesCount, angle, radius);
+            }
+
             this.noPhysics = false;
             this.setNoGravity(false);
+            lookAtTarget = true;
             if (tick >= 40){
                 this.jumpBackOnSpawnPath = null;
                 return true;
@@ -261,6 +287,61 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         return false;
     }
+
+    private void jumpEndEarthquakePrepareParticles(Vec3 lastpos, int earthquakesCount, float angle, float radius){
+
+        MalkuthAttackType localType = MalkuthAttackType.FIRE;
+
+        for (int i = 0; i < earthquakesCount; i++) {
+
+            float currentAngle = i * angle + angle / 2;
+
+            Vector3f col = this.getMalkuthAttackPreparationParticleColor(localType);
+
+            Vec3 v = new Vec3(1,0,0).yRot(currentAngle);
+
+            ArcAttackPreparationParticleOptions options = new ArcAttackPreparationParticleOptions(v, radius, angle/2, 20,5,10,col.x,col.y,col.z,0.25f);
+            ((ServerLevel)level()).sendParticles(options, lastpos.x,lastpos.y,lastpos.z,1,0,0,0,0);
+
+            if (localType.isFire()){
+                localType = MalkuthAttackType.ICE;
+            }else{
+                localType = MalkuthAttackType.FIRE;
+            }
+
+        }
+
+    }
+
+    private void jumpEarthquake(Vec3 lastpos, int earthquakesCount, float angle, float radius){
+
+        MalkuthAttackType localType = MalkuthAttackType.FIRE;
+
+        for (int i = 0; i < earthquakesCount; i++) {
+
+            float currentAngle = i * angle + angle / 2;
+
+            Vec3 v = new Vec3(radius,0,0).yRot(currentAngle);
+
+            MalkuthEarthquake earthquake = MalkuthEarthquake.summon(level(), localType, lastpos, v, 40, angle, 1);
+            if (localType.isFire()){
+                localType = MalkuthAttackType.ICE;
+            }else{
+                localType = MalkuthAttackType.FIRE;
+            }
+        }
+
+        PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                .frequency(5)
+                .amplitude(5f)
+                .inTime(0)
+                .stayTime(0)
+                .outTime(5)
+                .build(),lastpos,120);
+
+    }
+
+
 
     private MalkuthAttackType slashAttackType = MalkuthAttackType.FIRE;
 
@@ -755,21 +836,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 Vec3 direction = startVec.yRot(i * angle + angle / 2);
 
 
-                float r;
-                float g;
-                float b;
+                Vector3f col = this.getMalkuthAttackPreparationParticleColor(localCarouselSlash);
 
-                if (localCarouselSlash.isFire()){
-                    r = 1f;
-                    g = 0.4f;
-                    b = 0.1f;
-                }else{
-                    r = 0.1f;
-                    g = 0.8f;
-                    b = 1f;
-                }
-
-                ArcAttackPreparationParticleOptions options = new ArcAttackPreparationParticleOptions(direction, radius, angle/2, preparationTime, 10, 10, r,g,b,0.25f);
+                ArcAttackPreparationParticleOptions options = new ArcAttackPreparationParticleOptions(direction, radius, angle/2, preparationTime, 10, 10, col.x,col.y,col.z,0.25f);
 
                 ((ServerLevel)level()).sendParticles(options, this.getX(),this.getY() - 0.99, this.getZ(),1, 0, 0,0,0);
 
@@ -825,6 +894,24 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
         return false;
+    }
+
+    private Vector3f getMalkuthAttackPreparationParticleColor(MalkuthAttackType attackType){
+        float r;
+        float g;
+        float b;
+
+        if (attackType.isFire()){
+            r = 1f;
+            g = 0.4f;
+            b = 0.1f;
+        }else{
+            r = 0.1f;
+            g = 0.8f;
+            b = 1f;
+        }
+
+        return new Vector3f(r,g,b);
     }
 
     //=============================================================================OTHER================================================================================================
