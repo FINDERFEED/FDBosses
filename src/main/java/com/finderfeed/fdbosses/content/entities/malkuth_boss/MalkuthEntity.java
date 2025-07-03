@@ -12,11 +12,9 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.MalkuthChar
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
-import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDRenderTypes;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
-import com.finderfeed.fdlib.nbt.FDTagHelper;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
@@ -33,7 +31,6 @@ import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
-import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
@@ -69,6 +66,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public static final String JUMP_ON_WALL_COMMAND_CANNONS = "jump_on_wall_command_cannons";
     public static final String CAROUSEL_SLASHES = "carousel_slashes";
     public static final String JUMP_BACK_ON_SPAWN = "jump_back_on_spawn";
+    public static final String JUMP_BACK_ON_SPAWN_WITH_CRUSH = "jump_back_on_spawn_with_crush";
 
     private static FDModel SERVER_MODEL;
     private static FDModel CLIENT_MODEL;
@@ -118,7 +116,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(PULL_AND_PUNCH,this::pullAndPunch)
                 .registerAttack(JUMP_CRUSH,this::jumpCrushAttack)
                 .registerAttack(CAROUSEL_SLASHES,this::carouselSlashesAttack)
-                .registerAttack(JUMP_BACK_ON_SPAWN,this::jumpBackOnSpawn)
+                .registerAttack(JUMP_BACK_ON_SPAWN,v->this.jumpBackOnSpawn(v,false))
+                .registerAttack(JUMP_BACK_ON_SPAWN_WITH_CRUSH,v->this.jumpBackOnSpawn(v,true))
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
@@ -199,7 +198,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private ProjectileMovementPath jumpBackOnSpawnPath;
 
-    private boolean jumpBackOnSpawn(AttackInstance attackInstance){
+    private boolean jumpBackOnSpawn(AttackInstance attackInstance, boolean crush){
 
         int stage = attackInstance.stage;
         int tick = attackInstance.tick;
@@ -230,16 +229,18 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
         if (stage == 1) {
+            Vec3 lastpos = this.jumpBackOnSpawnPath.getPositions().getLast();
             if (tick == 0){
-                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_BACK_ON_WALL)
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
                         .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
+                this.lookAt(EntityAnchorArgument.Anchor.FEET, lastpos);
             }else if (tick > 5) {
+
                 this.noPhysics = true;
                 this.setNoGravity(true);
-                Vec3 lastpos = this.jumpBackOnSpawnPath.getPositions().getLast();
                 this.getLookControl().setLookAt(lastpos);
                 lookAtTarget = false;
-//                this.lookAt(EntityAnchorArgument.Anchor.FEET, lastpos);
+
                 if (path.isFinished()) {
                     this.noPhysics = false;
                     this.setNoGravity(false);
@@ -547,7 +548,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         int tick = attackInstance.tick;
 
         if (stage == 0){
-            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_BACK_ON_WALL)
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
                     .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
             this.jumpOnWallPath = this.makeJumpOnWallPath(20,false);
             attackInstance.nextStage();
@@ -585,7 +586,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
         }else if (stage == 3){
-            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_BACK_ON_WALL)
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
                     .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
             this.jumpOnWallPath = this.makeJumpOnWallPath(20,true);
             attackInstance.nextStage();
