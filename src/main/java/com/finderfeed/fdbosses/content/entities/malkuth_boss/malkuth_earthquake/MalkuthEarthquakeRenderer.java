@@ -52,33 +52,33 @@ public class MalkuthEarthquakeRenderer extends EntityRenderer<MalkuthEarthquake>
 
             MalkuthEarthquakeSegment.Type type = segment.getType();
 
-            VertexConsumer vertexConsumer = src.getBuffer(RenderType.entityTranslucent(type.getTexture()));
+
 
             if (type.isModel()){
                 var model = type.getModel().get();
 
-
+                VertexConsumer vertexConsumer = src.getBuffer(RenderType.entityTranslucent(type.getTexture()));
 
                 model.render(matrices, vertexConsumer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,1f ,1f ,1f, 1f);
             }else{
 
-                float a = (float) FDMathUtil.angleBetweenVectors(offset,entity.getDirectionAndLength()) * 2;
-
                 Vec3 cr = offset.normalize().cross(entity.getDirectionAndLength().normalize());
 
-                a = Math.clamp(a, FDMathUtil.FPI/8,FDMathUtil.FPI/4);
 
                 if (cr.y < 0) {
-                    matrices.mulPose(Axis.YP.rotation(a));
+                    matrices.mulPose(Axis.YP.rotationDegrees(10));
                 }else{
-                    matrices.mulPose(Axis.YP.rotation(-a));
+                    matrices.mulPose(Axis.YP.rotationDegrees(-10));
                 }
+                VertexConsumer vertexConsumer = src.getBuffer(RenderType.text(type.getTexture()));
+
 
                 QuadRenderer.start(vertexConsumer)
                         .pose(matrices)
                         .translate(0,1,0)
                         .size(1f)
                         .light(LightTexture.FULL_BRIGHT)
+                        .renderBack()
                         .direction(new Vec3(1,0,0))
                         .render();
             }

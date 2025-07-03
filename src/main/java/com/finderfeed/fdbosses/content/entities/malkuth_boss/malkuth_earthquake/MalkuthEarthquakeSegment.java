@@ -76,19 +76,25 @@ public class MalkuthEarthquakeSegment {
 
     public enum Type {
 
-        FIRE_1(FDBosses.location("textures/entities/malkuth/malkuth_earthquake_fire_1.png"), MalkuthEarthquakeSegment::getBaseModel),
-        FIRE_2(FDBosses.location("textures/entities/malkuth/malkuth_earthquake_fire_2.png"), MalkuthEarthquakeSegment::getBaseModel),
-        ICE_1(FDBosses.location("textures/entities/malkuth/malkuth_earthquake_ice_1.png"), MalkuthEarthquakeSegment::getBaseModel),
-        ICE_2(FDBosses.location("textures/entities/malkuth/malkuth_earthquake_ice_2.png"), MalkuthEarthquakeSegment::getBaseModel),
-        ICE_SPIKE(FDBosses.location("textures/entities/malkuth/malkuth_big_ice_spike.png"), null)
+        FIRE_1(0,FDBosses.location("textures/entities/malkuth/malkuth_earthquake_fire_1.png"), MalkuthEarthquakeSegment::getBaseModel),
+        FIRE_2(1,FDBosses.location("textures/entities/malkuth/malkuth_earthquake_fire_2.png"), MalkuthEarthquakeSegment::getBaseModel),
+        ICE_1(2,FDBosses.location("textures/entities/malkuth/malkuth_earthquake_ice_1.png"), MalkuthEarthquakeSegment::getBaseModel),
+        ICE_2(3,FDBosses.location("textures/entities/malkuth/malkuth_earthquake_ice_2.png"), MalkuthEarthquakeSegment::getBaseModel),
+        ICE_SPIKE(4,FDBosses.location("textures/entities/malkuth/malkuth_big_ice_spike.png"), null)
         ;
 
         private ResourceLocation texture;
         private Supplier<FDModel> model;
+        private int id;
 
-        Type(ResourceLocation texture, Supplier<FDModel> model){
+        Type(int id, ResourceLocation texture, Supplier<FDModel> model){
             this.texture = texture;
             this.model = model;
+            this.id = id;
+        }
+
+        public int getId() {
+            return id;
         }
 
         public Supplier<FDModel> getModel() {

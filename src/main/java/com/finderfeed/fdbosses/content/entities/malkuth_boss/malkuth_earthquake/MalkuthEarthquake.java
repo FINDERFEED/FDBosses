@@ -1,5 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake;
 
+import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
@@ -7,17 +9,22 @@ import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.init.FDEDataSerializers;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class MalkuthEarthquake extends Entity implements AutoSerializable {
@@ -91,6 +98,7 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
         return fullLength / this.getEarthquakeTime();
     }
 
+
     private void summonSegments(){
 
         if (this.tickCount > this.getEarthquakeTime()) return;
@@ -104,7 +112,7 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
         float start = pair.first;
         float end = pair.second;
 
-        float sizeOfSegment = 0.75f;
+        float sizeOfSegment = 1.25f;
 
         Vec3 ndir = direction.normalize();
 
@@ -134,7 +142,9 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
 
                         ;
 
-                MalkuthEarthquakeSegment malkuthEarthquakeSegment = new MalkuthEarthquakeSegment(segmentType, offset, segmentAngle, 20);
+                int segmentTime = 10;
+
+                MalkuthEarthquakeSegment malkuthEarthquakeSegment = new MalkuthEarthquakeSegment(segmentType, offset, segmentAngle, segmentTime);
 
                 this.segments.add(malkuthEarthquakeSegment);
 
@@ -144,9 +154,72 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
 
                     offset = ndir.yRot(rot - angle / 2 + additionalAngle).multiply(i,i,i);
 
-                    MalkuthEarthquakeSegment s = new MalkuthEarthquakeSegment(MalkuthEarthquakeSegment.Type.ICE_SPIKE, offset, random.nextFloat() * FDMathUtil.FPI / 32,20);
+                    MalkuthEarthquakeSegment s = new MalkuthEarthquakeSegment(MalkuthEarthquakeSegment.Type.ICE_SPIKE, offset, random.nextFloat() * FDMathUtil.FPI / 32,segmentTime);
 
                     this.segments.add(s);
+
+                }
+
+                this.segments.sort(Comparator.comparingInt(v->v.getType().getId()));
+
+                for (int k = 0; k < 1; k++){
+
+                    float vspeed = 0.2f;
+                    ParticleOptions options;
+
+                    if (this.getEarthquakeType().isFire()){
+                        float rnd = random.nextFloat();
+                        if (rnd > 0.66){
+                            options = new GravityParticleOptions(BossParticles.FLAME_WITH_STONE.get(),20 + random.nextInt(4),0.15f + random.nextFloat() * 0.2f,
+                                    (float)Mob.DEFAULT_BASE_GRAVITY * 20,2f,true);
+                        } else if (rnd > 0.33){
+
+                            float rc = 0.9f + random.nextFloat() * 0.1f;
+                            float gc = 0.2f + random.nextFloat() * 0.2f;
+                            float bc = random.nextFloat() * 0.2f;
+                            options = BallParticleOptions.builder()
+                                    .color(rc,gc,bc)
+                                    .size(0.2f + random.nextFloat() * 0.2f)
+                                    .scalingOptions(0,0,20)
+                                    .friction(0.7f)
+                                    .build();
+
+                            vspeed = 0.5f;
+
+                        } else{
+                            options = ParticleTypes.LAVA;
+                        }
+                    }else{
+                        if (random.nextFloat() > 0.5) {
+                            options = new GravityParticleOptions(BossParticles.ICE_CHUNK.get(), 20 + random.nextInt(4), 0.5f + random.nextFloat() * 0.2f,
+                                    (float) Mob.DEFAULT_BASE_GRAVITY * 20, 2f, true);
+                        }else{
+
+                            float rc = random.nextFloat() * 0.2f;
+                            float gc = 0.7f + random.nextFloat() * 0.1f;
+                            float bc = 0.9f + random.nextFloat() * 0.1f;
+
+                            options = BallParticleOptions.builder()
+                                    .color(rc,gc,bc)
+                                    .size(0.2f + random.nextFloat() * 0.2f)
+                                    .scalingOptions(0,0,20)
+                                    .friction(0.7f)
+                                    .build();
+                            vspeed = 0.5f;
+                        }
+                    }
+
+                    Vec3 pos = offset.add(this.position()).add(
+                            random.nextFloat() * 0.8 - 0.4,
+                            random.nextFloat() * 0.8 - 0.4,
+                            random.nextFloat() * 0.8 - 0.4
+                    );
+
+                    level().addParticle(options,true, pos.x,pos.y,pos.z,
+                            ndir.x * vspeed,
+                            random.nextFloat() * 0.5 + 0.1,
+                            ndir.z * vspeed
+                            );
 
                 }
 

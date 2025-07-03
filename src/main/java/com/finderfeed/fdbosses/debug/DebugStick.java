@@ -54,8 +54,8 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level, MalkuthAttackType.ICE,player.position(), player.getLookAngle().multiply(1,0,1).normalize().multiply(10,10,10),10,
-                    FDMathUtil.FPI / 6, 1);
+            MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level, MalkuthAttackType.ICE,player.position(), player.getLookAngle().multiply(1,0,1).normalize().multiply(30,30,30),20,
+                    FDMathUtil.FPI, 1);
 
 
 
