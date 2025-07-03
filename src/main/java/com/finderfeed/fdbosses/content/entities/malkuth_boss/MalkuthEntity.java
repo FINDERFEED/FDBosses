@@ -68,6 +68,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public static final String PULL_AND_PUNCH = "pull_and_punch";
     public static final String JUMP_ON_WALL_COMMAND_CANNONS = "jump_on_wall_command_cannons";
     public static final String CAROUSEL_SLASHES = "carousel_slashes";
+    public static final String JUMP_BACK_ON_SPAWN = "jump_back_on_spawn";
 
     private static FDModel SERVER_MODEL;
     private static FDModel CLIENT_MODEL;
@@ -117,12 +118,14 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(PULL_AND_PUNCH,this::pullAndPunch)
                 .registerAttack(JUMP_CRUSH,this::jumpCrushAttack)
                 .registerAttack(CAROUSEL_SLASHES,this::carouselSlashesAttack)
+                .registerAttack(JUMP_BACK_ON_SPAWN,this::jumpBackOnSpawn)
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
 //                .addAttack(0, SLASH_ATTACK)
-//                .addAttack(1, JUMP_CRUSH)
+                .addAttack(1, JUMP_CRUSH)
+                .addAttack(2, JUMP_BACK_ON_SPAWN)
 //                .addAttack(2, PULL_AND_PUNCH)
 //                .addAttack(3, JUMP_ON_WALL_COMMAND_CANNONS)
-                .addAttack(4, CAROUSEL_SLASHES)
+//                .addAttack(4, CAROUSEL_SLASHES)
                 .attackListener(this::attackListener)
         ;
 
@@ -193,6 +196,70 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     //============================================================================ATTACKS==============================================================================================
+
+    private ProjectileMovementPath jumpBackOnSpawnPath;
+
+    private boolean jumpBackOnSpawn(AttackInstance attackInstance){
+
+        int stage = attackInstance.stage;
+        int tick = attackInstance.tick;
+
+        ProjectileMovementPath path = jumpBackOnSpawnPath;
+
+        if (jumpBackOnSpawnPath == null){
+            Vec3 thisPos = this.position();
+            Vec3 target = this.spawnPosition;
+
+            Vec3 between = target.subtract(thisPos);
+
+            Vec3 pos1 = thisPos.add(between.multiply(0.25,0.25,0.25).add(0,5,0));
+            Vec3 pos2 = thisPos.add(between.multiply(0.5,0.5,0.5).add(0,8,0));
+            Vec3 pos3 = thisPos.add(between.multiply(0.75,0.75,0.75).add(0,5,0));
+
+            path = new ProjectileMovementPath(20, false)
+                    .addPos(thisPos)
+                    .addPos(pos1)
+                    .addPos(pos2)
+                    .addPos(pos3)
+                    .addPos(target);
+
+            jumpBackOnSpawnPath = path;
+
+            attackInstance.stage = 0;
+            attackInstance.nextStage();
+        }
+
+        if (stage == 1) {
+            if (tick == 0){
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_BACK_ON_WALL)
+                        .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
+            }else if (tick > 5) {
+                this.noPhysics = true;
+                this.setNoGravity(true);
+                Vec3 lastpos = this.jumpBackOnSpawnPath.getPositions().getLast();
+                this.getLookControl().setLookAt(lastpos);
+                lookAtTarget = false;
+//                this.lookAt(EntityAnchorArgument.Anchor.FEET, lastpos);
+                if (path.isFinished()) {
+                    this.noPhysics = false;
+                    this.setNoGravity(false);
+                    attackInstance.nextStage();
+                    this.teleportTo(lastpos.x, lastpos.y, lastpos.z);
+                } else {
+                    path.tick(this);
+                }
+            }
+        }else if (stage == 2){
+            this.noPhysics = false;
+            this.setNoGravity(false);
+            if (tick >= 40){
+                this.jumpBackOnSpawnPath = null;
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private MalkuthAttackType slashAttackType = MalkuthAttackType.FIRE;
 
@@ -355,7 +422,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         .stayTime(0)
                         .outTime(5)
                         .build(),malkuthCrushAttack.position(),120);
-            }else if (tick >= 105){
+            }else if (tick >= 30){
                 return true;
             }
 
