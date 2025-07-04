@@ -55,7 +55,11 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            MalkuthGiantSwordSlash malkuthGiantSwordSlash = MalkuthGiantSwordSlash.summon(level, player.position(), player.getLookAngle(), MalkuthAttackType.ICE);
+            Vec3 f = player.getLookAngle().multiply(1,0,1).normalize().multiply(10,10,10);
+
+
+            MalkuthGiantSwordSlash malkuthGiantSwordSlash = MalkuthGiantSwordSlash.summon(level, player.position().add(f.yRot(FDMathUtil.FPI/2)), player.getLookAngle(), MalkuthAttackType.ICE);
+            MalkuthGiantSwordSlash malkuthGiantSwordSlash2 = MalkuthGiantSwordSlash.summon(level, player.position().add(f.yRot(-FDMathUtil.FPI/2)), player.getLookAngle(), MalkuthAttackType.FIRE);
 
 //            MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level, MalkuthAttackType.ICE,player.position(), player.getLookAngle().multiply(1,0,1).normalize().multiply(30,30,30),20,
 //                    FDMathUtil.FPI, 1);

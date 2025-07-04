@@ -35,6 +35,7 @@ public class MalkuthGiantSwordSlash extends Entity {
 
     public static int TIME_TO_RISE = 60;
     public static int TIME_TO_HIT = 30;
+    public static int DISSOLVE_TIME = 30;
 
 
     public static final EntityDataAccessor<MalkuthAttackType> MALKUTH_ATTACK_TYPE = SynchedEntityData.defineId(MalkuthGiantSwordSlash.class, BossEntityDataSerializers.MALKUTH_ATTACK_TYPE.get());
@@ -70,8 +71,9 @@ public class MalkuthGiantSwordSlash extends Entity {
             if (tickCount == TIME_TO_HIT + TIME_TO_RISE){
                 this.impactBlocks();
 
+            }else if (tickCount >= TIME_TO_HIT + TIME_TO_RISE + DISSOLVE_TIME){
+                this.remove(RemovalReason.DISCARDED);
             }
-
         }
     }
 
@@ -90,7 +92,7 @@ public class MalkuthGiantSwordSlash extends Entity {
                 .inTime(0)
                 .stayTime(0)
                 .outTime(10)
-                .build(),this.position().add(direction.x * ( (end - start) / 2),direction.y * ( (end - start) / 2),direction.z * ( (end - start) / 2)),40);
+                .build(),this.position().add(direction.x * ( (end - start) / 2),direction.y * ( (end - start) / 2),direction.z * ( (end - start) / 2)),100);
 
         float step = 0.5f;
 
@@ -244,6 +246,10 @@ public class MalkuthGiantSwordSlash extends Entity {
 
     public float getCurrentHitTime(float pticks){
         return Math.clamp(this.tickCount - TIME_TO_RISE + pticks, 0, TIME_TO_HIT);
+    }
+
+    public float getDissolveTime(float pticks){
+        return Math.clamp(this.tickCount - TIME_TO_RISE - TIME_TO_HIT + pticks,0, DISSOLVE_TIME);
     }
 
     public MalkuthAttackType getAttackType(){

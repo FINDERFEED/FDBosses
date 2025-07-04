@@ -32,6 +32,7 @@ public class MalkuthGiantSwordSlashRenderer extends EntityRenderer<MalkuthGiantS
 
         matrices.pushPose();
 
+        float dissolvePercent = 1 - slash.getDissolveTime(pticks) / MalkuthGiantSwordSlash.DISSOLVE_TIME;
         float riseTime = slash.getCurrentMoveUpTime(pticks);
         float hitTime = slash.getCurrentHitTime(pticks);
 
@@ -55,15 +56,25 @@ public class MalkuthGiantSwordSlashRenderer extends EntityRenderer<MalkuthGiantS
 
         matrices.scale(scale,scale,scale);
 
-        model.render(matrices, src.getBuffer(RenderType.entityCutoutNoCull(MalkuthEntity.MALKUTH_SWORD_SOLID)), light, OverlayTexture.NO_OVERLAY, 1f ,1f ,1f ,1f);
+        model.render(matrices, src.getBuffer(RenderType.entityTranslucent(MalkuthEntity.MALKUTH_SWORD_SOLID)), light, OverlayTexture.NO_OVERLAY, 1f ,1f ,1f ,dissolvePercent);
 
         if (slash.getAttackType().isFire()){
-            model.render(matrices, src.getBuffer(RenderType.text(MalkuthEntity.MALKUTH_FIRE_SWORD)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1f ,1f ,1f ,1f);
+            model.render(matrices, src.getBuffer(RenderType.text(MalkuthEntity.MALKUTH_FIRE_SWORD)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1f ,1f ,1f ,dissolvePercent);
         }else{
-            model.render(matrices, src.getBuffer(RenderType.text(MalkuthEntity.MALKUTH_ICE_SWORD)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1f ,1f ,1f ,1f);
+            model.render(matrices, src.getBuffer(RenderType.text(MalkuthEntity.MALKUTH_ICE_SWORD)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1f ,1f ,1f ,dissolvePercent);
         }
 
+
         matrices.popPose();
+
+
+
+        matrices.pushPose();
+
+
+
+        matrices.popPose();
+
 
     }
 
