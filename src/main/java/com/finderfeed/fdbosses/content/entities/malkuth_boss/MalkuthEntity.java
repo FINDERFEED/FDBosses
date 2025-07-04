@@ -123,7 +123,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
 //                .addAttack(0, SLASH_ATTACK)
                 .addAttack(1, JUMP_CRUSH)
-                .addAttack(2, JUMP_BACK_ON_SPAWN_WITH_CRUSH)
+                .addAttack(2, JUMP_BACK_ON_SPAWN)
 //                .addAttack(2, PULL_AND_PUNCH)
 //                .addAttack(3, JUMP_ON_WALL_COMMAND_CANNONS)
 //                .addAttack(4, CAROUSEL_SLASHES)
@@ -272,7 +272,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
         }else if (stage == 2){
 
-            if (tick == 3){
+            if (tick == 3 && crush){
                 this.jumpEarthquake(this.position().add(0,-0.99,0), earthquakesCount, angle, radius);
             }
 
@@ -438,11 +438,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         int tick = inst.tick;
 
         if (stage == 0){
-            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_CRUSH_ATTACK_START)
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_CRUSH_ATTACK_FULL)
                             .setLoopMode(Animation.LoopMode.ONCE)
-                            .setSpeed(1.25f)
-                            .setToNullTransitionTime(20)
-                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_JUMP_CRUSH_ATTACK_MIDAIR)
+                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE)
                             .setSpeed(1.5f).build())
                     .build());
             if (tick == 5){
@@ -454,7 +452,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }else if (stage == 1){
 
             if (tick == 1){
-                this.doJumpStartParticles(-1);
+                this.doJumpStartParticles(-2f);
             }
 
             this.setNoGravity(true);
@@ -487,15 +485,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.setNoGravity(false);
             this.noPhysics = false;
 
-            if (tick == 1) {
-
-                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_CRUSH_ATTACK_END)
-                                .setToNullTransitionTime(20)
-                                .setSpeed(1.25f)
-                        .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
-                        .build());
-
-            }else if (tick == 5){
+            if (tick == 5){
                 MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level(), this.position().add(this.getForward().multiply(1,0,1).normalize()), 1);
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                         .frequency(5)
@@ -615,8 +605,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     private ProjectileMovementPath jumpOnWallPath = null;
 
     private boolean jumpAndCommandCannons(AttackInstance attackInstance){
-
-        if (true) return true;
 
         this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
 
