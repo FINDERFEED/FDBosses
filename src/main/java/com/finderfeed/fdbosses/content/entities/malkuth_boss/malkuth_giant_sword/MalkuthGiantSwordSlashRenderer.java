@@ -8,6 +8,7 @@ import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -38,26 +39,28 @@ public class MalkuthGiantSwordSlashRenderer extends EntityRenderer<MalkuthGiantS
         float risePn = FDEasings.easeOut(riseTime / MalkuthGiantSwordSlash.TIME_TO_RISE);
         float hitP = BossUtil.easeInBack(hitTime / MalkuthGiantSwordSlash.TIME_TO_HIT);
 
-        float scale = 20;
+        float scale = 14;
 
-        float riseHeight = 10;
+        float riseHeight = 12;
 
-        matrices.mulPose(Axis.YP.rotationDegrees(yaw));
+        matrices.mulPose(Axis.YN.rotationDegrees(yaw));
 
-        matrices.translate(0, riseP * riseHeight - riseHeight,0);
+        matrices.translate(0, riseP * riseHeight - riseHeight + 2,0);
 
         float rotation = hitP * 90 + (float) Math.sin(risePn * FDMathUtil.FPI * 2) * 2f;
 
         matrices.mulPose(Axis.XP.rotationDegrees(rotation));
+
+        matrices.mulPose(Axis.YP.rotationDegrees(180));
 
         matrices.scale(scale,scale,scale);
 
         model.render(matrices, src.getBuffer(RenderType.entityCutoutNoCull(MalkuthEntity.MALKUTH_SWORD_SOLID)), light, OverlayTexture.NO_OVERLAY, 1f ,1f ,1f ,1f);
 
         if (slash.getAttackType().isFire()){
-            model.render(matrices, src.getBuffer(RenderType.eyes(MalkuthEntity.MALKUTH_FIRE_SWORD)), light, OverlayTexture.NO_OVERLAY, 1f ,1f ,1f ,1f);
+            model.render(matrices, src.getBuffer(RenderType.text(MalkuthEntity.MALKUTH_FIRE_SWORD)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1f ,1f ,1f ,1f);
         }else{
-            model.render(matrices, src.getBuffer(RenderType.eyes(MalkuthEntity.MALKUTH_ICE_SWORD)), light, OverlayTexture.NO_OVERLAY, 1f ,1f ,1f ,1f);
+            model.render(matrices, src.getBuffer(RenderType.text(MalkuthEntity.MALKUTH_ICE_SWORD)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1f ,1f ,1f ,1f);
         }
 
         matrices.popPose();
@@ -73,4 +76,5 @@ public class MalkuthGiantSwordSlashRenderer extends EntityRenderer<MalkuthGiantS
     public boolean shouldRender(MalkuthGiantSwordSlash p_114491_, Frustum p_114492_, double p_114493_, double p_114494_, double p_114495_) {
         return true;
     }
+
 }

@@ -901,7 +901,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         return false;
     }
 
-    private Vector3f getMalkuthAttackPreparationParticleColor(MalkuthAttackType attackType){
+    public static Vector3f getMalkuthAttackPreparationParticleColor(MalkuthAttackType attackType){
         float r;
         float g;
         float b;

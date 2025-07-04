@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlash;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.FDHelpers;
@@ -54,8 +55,10 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level, MalkuthAttackType.ICE,player.position(), player.getLookAngle().multiply(1,0,1).normalize().multiply(30,30,30),20,
-                    FDMathUtil.FPI, 1);
+            MalkuthGiantSwordSlash malkuthGiantSwordSlash = MalkuthGiantSwordSlash.summon(level, player.position(), player.getLookAngle(), MalkuthAttackType.ICE);
+
+//            MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level, MalkuthAttackType.ICE,player.position(), player.getLookAngle().multiply(1,0,1).normalize().multiply(30,30,30),20,
+//                    FDMathUtil.FPI, 1);
 
 
 
