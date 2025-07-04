@@ -13,6 +13,7 @@ import com.finderfeed.fdbosses.client.particles.malkuth_slash.MalkuthHorizontalS
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticle;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticle;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticle;
+import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticle;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedRenderer;
@@ -169,6 +170,7 @@ public class BossClientModEvents {
         event.registerSpecial(BossParticles.CHESED_RAY_ATTACK.get(), new ChesedAttackRayParticle.Factory());
         event.registerSpecial(BossParticles.MALKUTH_HORIZONTAL_SLASH.get(), new MalkuthHorizontalSlashParticle.Factory());
         event.registerSpecial(BossParticles.ARC_ATTACK_PREPARATION_PARTICLE.get(), new ArcAttackPreparationParticle.Factory());
+        event.registerSpecial(BossParticles.RECTANGLE_PREPARATION_PARTICLE.get(), new RectanglePreparationParticle.Factory());
     }
 
     @SubscribeEvent

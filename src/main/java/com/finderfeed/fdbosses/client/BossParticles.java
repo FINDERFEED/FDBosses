@@ -12,6 +12,7 @@ import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleO
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
 import com.finderfeed.fdbosses.FDBosses;
 
+import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ParticleType;
 
@@ -111,6 +112,18 @@ public class BossParticles {
         @Override
         public StreamCodec<? super RegistryFriendlyByteBuf, ArcAttackPreparationParticleOptions> streamCodec() {
             return ArcAttackPreparationParticleOptions.STREAM_CODEC;
+        }
+    });
+
+    public static final Supplier<ParticleType<RectanglePreparationParticleOptions>> RECTANGLE_PREPARATION_PARTICLE = PARTICLES.register("rectangle_preparation_particle",()->new ParticleType<RectanglePreparationParticleOptions>(true) {
+        @Override
+        public MapCodec<RectanglePreparationParticleOptions> codec() {
+            return RectanglePreparationParticleOptions.CODEC;
+        }
+
+        @Override
+        public StreamCodec<? super RegistryFriendlyByteBuf, RectanglePreparationParticleOptions> streamCodec() {
+            return RectanglePreparationParticleOptions.STREAM_CODEC;
         }
     });
 

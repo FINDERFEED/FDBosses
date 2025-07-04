@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
+import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
@@ -114,6 +115,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         this.lookControl = this.headControllerContainer;
 
         this.attackChain = new AttackChain(this.getRandom())
+                .registerAttack("nothing",this::doNothing)
                 .registerAttack(SLASH_ATTACK,this::aerialSlashAttack)
                 .registerAttack(PULL_AND_PUNCH,this::pullAndPunch)
                 .registerAttack(JUMP_CRUSH,this::jumpCrushAttack)
@@ -121,15 +123,20 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(JUMP_BACK_ON_SPAWN,v->this.jumpBackOnSpawn(v,false))
                 .registerAttack(JUMP_BACK_ON_SPAWN_WITH_CRUSH,v->this.jumpBackOnSpawn(v,true))
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
+                .addAttack(-1,"nothing")
 //                .addAttack(0, SLASH_ATTACK)
-                .addAttack(1, JUMP_CRUSH)
-                .addAttack(2, JUMP_BACK_ON_SPAWN)
+//                .addAttack(1, JUMP_CRUSH)
+//                .addAttack(2, JUMP_BACK_ON_SPAWN)
 //                .addAttack(2, PULL_AND_PUNCH)
 //                .addAttack(3, JUMP_ON_WALL_COMMAND_CANNONS)
 //                .addAttack(4, CAROUSEL_SLASHES)
                 .attackListener(this::attackListener)
         ;
 
+    }
+
+    private boolean doNothing(AttackInstance instance){
+        return true;
     }
 
     public static FDModel getClientModel(){
@@ -148,6 +155,16 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         super.tick();
         if (level().isClientSide){
             this.headControllerContainer.clientTick();
+
+            if (level().getGameTime() % 40 == 0){
+
+                RectanglePreparationParticleOptions options = new RectanglePreparationParticleOptions(this.getForward().multiply(1,0,1), 10, 2, 20,10,10,1f,0,0,0.25f);
+
+                level().addParticle(options, this.getX(),this.getY(),this.getZ(),0,0,0);
+
+            }
+
+
         }else{
             AnimationSystem animationSystem = this.getAnimationSystem();
             if (animationSystem.getTicker(MAIN_LAYER) == null){
