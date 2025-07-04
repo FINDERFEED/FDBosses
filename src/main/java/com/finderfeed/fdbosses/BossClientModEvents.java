@@ -35,6 +35,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.Malk
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquakeRenderer;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlashRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
 import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
@@ -474,6 +475,7 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.MALKUTH_SLASH.get(), MalkuthSlashRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_CHAIN.get(), MalkuthChainRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_CANNON_PROJECTILE.get(), MalkuthCannonProjectileRenderer::new);
+        event.registerEntityRenderer(BossEntities.MALKUTH_GIANT_SWORD.get(), MalkuthGiantSwordSlashRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_EARTHQUAKE.get(), MalkuthEarthquakeRenderer::new);
     }
 }

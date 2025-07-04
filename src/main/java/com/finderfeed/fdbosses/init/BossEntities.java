@@ -24,6 +24,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.Malk
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlash;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -204,6 +205,12 @@ public class BossEntities {
             )
             .sized(2f,2f)
             .build("malkuth_boss_spawner"));
+
+    public static final Supplier<EntityType<MalkuthGiantSwordSlash>> MALKUTH_GIANT_SWORD = ENTITIES.register("malkuth_giant_sword_slash",()->EntityType.Builder.of(
+                    MalkuthGiantSwordSlash::new, MobCategory.MISC
+            )
+            .sized(2f,2f)
+            .build("malkuth_giant_sword_slash"));
 
 
     @SubscribeEvent
