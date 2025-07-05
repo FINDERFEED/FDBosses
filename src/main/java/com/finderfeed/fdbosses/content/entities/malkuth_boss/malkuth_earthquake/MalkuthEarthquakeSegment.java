@@ -1,12 +1,14 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Random;
 import java.util.function.Supplier;
 
 public class MalkuthEarthquakeSegment {
@@ -108,6 +110,31 @@ public class MalkuthEarthquakeSegment {
         public ResourceLocation getTexture() {
             return texture;
         }
+
+        public static Type getRandomBaseSegment(MalkuthAttackType attackType, Random random, boolean includeRockInIce){
+            int id = random.nextInt(2);
+            if (attackType.isFire()){
+                if (id == 0){
+                    return FIRE_1;
+                }else{
+                    return FIRE_2;
+                }
+            }else{
+
+                if (includeRockInIce){
+                    if (random.nextInt(2) == 1){
+                        return FIRE_2;
+                    }
+                }
+
+                if (id == 0){
+                    return ICE_1;
+                }else{
+                    return ICE_2;
+                }
+            }
+        }
+
     }
 
 }

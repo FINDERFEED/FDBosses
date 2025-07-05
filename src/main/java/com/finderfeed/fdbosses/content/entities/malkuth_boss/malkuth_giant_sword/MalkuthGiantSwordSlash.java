@@ -94,7 +94,7 @@ public class MalkuthGiantSwordSlash extends Entity {
                 .outTime(10)
                 .build(),this.position().add(direction.x * ( (end - start) / 2),direction.y * ( (end - start) / 2),direction.z * ( (end - start) / 2)),100);
 
-        float step = 0.5f;
+        float step = 0.4f;
 
         for (float i = start; i <= end;i += step){
 
@@ -139,6 +139,8 @@ public class MalkuthGiantSwordSlash extends Entity {
         float end = 40;
 
         Vec3 direction = new Vec3(0,0,1).yRot(-(float)Math.toRadians(this.getYRot()));
+
+        int bigsmokerows = 4;
 
         float step = 0.5f;
 
@@ -203,6 +205,52 @@ public class MalkuthGiantSwordSlash extends Entity {
                 float speedm = 2;
 
                 level().addParticle(particleOptions, true, p.x,p.y,p.z, speed.x * speedm,speed.y * speedm,speed.z * speedm);
+
+            }
+
+            for (int g = 0; g <= bigsmokerows; g++){
+
+                float p = g / (bigsmokerows - 1f);
+
+                Vec3 dir1 = direction.yRot(FDMathUtil.FPI/2);
+                Vec3 dir2 = direction.yRot(-FDMathUtil.FPI/2);
+
+                float v = random.nextFloat() * step - step/2;
+                float v2 = random.nextFloat() * step - step/2;
+
+                Vec3 ppos = pos.add(direction.multiply(v,v,v));
+                Vec3 ppos2 = pos.add(direction.multiply(v2,v2,v2));
+
+                ParticleOptions options;
+                if (random.nextFloat() > 0.1f) {
+
+                    float col = random.nextFloat() * 0.4f + 0.2f;
+
+                    options = BigSmokeParticleOptions.builder()
+                            .lifetime(0, 0, 60 + random.nextInt(20))
+                            .friction(0.9f - p * 0.1f)
+                            .size(4f - p * 2f)
+                            .color(col, col, col)
+                            .minSpeed(0.05f)
+                            .build();
+                }else {
+
+                    Vector3f col = MalkuthEntity.getMalkuthAttackPreparationParticleColor(this.getAttackType());
+
+                    options = BallParticleOptions.builder()
+                            .size(4f - p * 2f)
+                            .color(col.x, col.y + 0.2f, col.z)
+                            .friction(0.9f - p * 0.1f)
+                            .scalingOptions(0, 0, 40 + random.nextInt(20))
+                            .build();
+                }
+
+                float speed = p * 2f + 0.15f + random.nextFloat() * 1.5f * (p + 0.5f);
+                float rndy = random.nextFloat() * (1 - p) * 0.25f;
+                float rndy2 = random.nextFloat() * (1 - p) * 0.25f;
+                level().addParticle(options, true, ppos.x,ppos.y + rndy,ppos.z, dir1.x * speed,dir1.y * speed,dir1.z * speed);
+                level().addParticle(options, true, ppos2.x,ppos2.y + rndy2,ppos2.z, dir2.x * speed,dir2.y * speed,dir2.z * speed);
+
 
             }
 
