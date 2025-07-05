@@ -149,4 +149,8 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
     });
 
+    public static DeferredHolder<Animation,Animation> MALKUTH_GIANT_SWORD_ATTACK = ANIMATIONS.register("malkuth_giant_sword_attack", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
+    });
+
 }

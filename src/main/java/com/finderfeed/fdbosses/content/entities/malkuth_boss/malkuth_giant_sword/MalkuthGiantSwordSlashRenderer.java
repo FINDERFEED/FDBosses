@@ -48,7 +48,7 @@ public class MalkuthGiantSwordSlashRenderer extends EntityRenderer<MalkuthGiantS
 
         float scale = 14;
 
-        float riseHeight = 12;
+        float riseHeight = 60;
 
         matrices.mulPose(Axis.YN.rotationDegrees(yaw));
 

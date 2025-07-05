@@ -11,6 +11,7 @@ import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.BoundToEntityProcessor;
+import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
@@ -86,13 +87,27 @@ public class MalkuthGiantSwordSlash extends Entity {
 
 
 
-        PositionedScreenShakePacket.send((ServerLevel) level(),FDShakeData.builder()
-                .frequency(20)
-                .amplitude(5f)
+//        PositionedScreenShakePacket.send((ServerLevel) level(),FDShakeData.builder()
+//                .frequency(20)
+//                .amplitude(5f)
+//                .inTime(0)
+//                .stayTime(0)
+//                .outTime(10)
+//                .build(),this.position().add(direction.x * ( (end - start) / 2),direction.y * ( (end - start) / 2),direction.z * ( (end - start) / 2)),100);
+
+        DefaultShakePacket.send((ServerLevel) level(), this.position(), 60, FDShakeData.builder()
+                .amplitude(0.25f)
+                .inTime(0)
+                .stayTime(30)
+                .outTime(100)
+                .build());
+        PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                .frequency(50)
+                .amplitude(4f)
                 .inTime(0)
                 .stayTime(0)
-                .outTime(10)
-                .build(),this.position().add(direction.x * ( (end - start) / 2),direction.y * ( (end - start) / 2),direction.z * ( (end - start) / 2)),100);
+                .outTime(50)
+                .build(), this.position().add(direction.x * ( (end - start) / 2),direction.y * ( (end - start) / 2),direction.z * ( (end - start) / 2)), 60);
 
         float step = 0.4f;
 
@@ -229,7 +244,7 @@ public class MalkuthGiantSwordSlash extends Entity {
                     options = BigSmokeParticleOptions.builder()
                             .lifetime(0, 0, 60 + random.nextInt(20))
                             .friction(0.9f - p * 0.1f)
-                            .size(4f - p * 2f)
+                            .size(3f - p * 1.5f)
                             .color(col, col, col)
                             .minSpeed(0.05f)
                             .build();
@@ -238,7 +253,7 @@ public class MalkuthGiantSwordSlash extends Entity {
                     Vector3f col = MalkuthEntity.getMalkuthAttackPreparationParticleColor(this.getAttackType());
 
                     options = BallParticleOptions.builder()
-                            .size(4f - p * 2f)
+                            .size(3f - p * 1.5f)
                             .color(col.x, col.y + 0.2f, col.z)
                             .friction(0.9f - p * 0.1f)
                             .scalingOptions(0, 0, 40 + random.nextInt(20))

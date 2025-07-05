@@ -9,6 +9,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.Malk
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlash;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.MalkuthChargeSwordPacket;
 import com.finderfeed.fdbosses.init.BossAnims;
@@ -31,6 +32,7 @@ import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
+import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
@@ -70,6 +72,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public static final String CAROUSEL_SLASHES = "carousel_slashes";
     public static final String JUMP_BACK_ON_SPAWN = "jump_back_on_spawn";
     public static final String JUMP_BACK_ON_SPAWN_WITH_CRUSH = "jump_back_on_spawn_with_crush";
+    public static final String GIANT_SWORDS_ULTIMATE = "giant_swords_attack";
 
     private static FDModel SERVER_MODEL;
     private static FDModel CLIENT_MODEL;
@@ -123,7 +126,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(JUMP_BACK_ON_SPAWN,v->this.jumpBackOnSpawn(v,false))
                 .registerAttack(JUMP_BACK_ON_SPAWN_WITH_CRUSH,v->this.jumpBackOnSpawn(v,true))
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
-                .addAttack(-1,"nothing")
+                .registerAttack(GIANT_SWORDS_ULTIMATE,this::giantSwordUltimate)
+                .addAttack(-1,GIANT_SWORDS_ULTIMATE)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
 //                .addAttack(2, JUMP_BACK_ON_SPAWN)
@@ -155,15 +159,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         super.tick();
         if (level().isClientSide){
             this.headControllerContainer.clientTick();
-
-            if (level().getGameTime() % 40 == 0){
-
-                RectanglePreparationParticleOptions options = new RectanglePreparationParticleOptions(this.getForward().multiply(1,0,1), 10, 2, 20,10,10,1f,0,0,0.25f);
-
-                level().addParticle(options, this.getX(),this.getY(),this.getZ(),0,0,0);
-
-            }
-
 
         }else{
             AnimationSystem animationSystem = this.getAnimationSystem();
@@ -917,6 +912,91 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
         return new Vector3f(r,g,b);
+    }
+
+    public boolean giantSwordUltimate(AttackInstance inst){
+
+//        if (true) return  true;
+
+        int stage = inst.stage;
+        int tick = inst.tick;
+
+        if (stage == 0) {
+
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_GIANT_SWORD_ATTACK)
+                    .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
+                    .build());
+
+            this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
+
+            inst.nextStage();
+
+
+
+
+        }else if (stage == 1){
+
+
+            int swordSpawnTick = 20;
+
+            if (tick == swordSpawnTick - 5){
+
+                Vector3f red = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.FIRE);
+                Vector3f blue = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.ICE);
+
+                RectanglePreparationParticleOptions rectanglePreparationParticleOptions1 =
+                        new RectanglePreparationParticleOptions(new Vec3(0,0,-1),30, 14,60,20,10, red.x,red.y,red.z, 0.25f);
+
+                RectanglePreparationParticleOptions rectanglePreparationParticleOptions2 =
+                        new RectanglePreparationParticleOptions(new Vec3(0,0,-1),30, 14,60,20,10, blue.x,blue.y,blue.z, 0.25f);
+
+                Vec3 pos1 = new Vec3(14,-0.99,0.5).add(this.position());
+                Vec3 pos2 = new Vec3(-14,-0.99,0.5).add(this.position());
+
+                FDLibCalls.sendParticles((ServerLevel) level(), rectanglePreparationParticleOptions1, pos1,100);
+                FDLibCalls.sendParticles((ServerLevel) level(), rectanglePreparationParticleOptions2, pos2,100);
+
+
+            } else if (tick == swordSpawnTick){
+
+                Vec3 offs1 = new Vec3(10, -1, 11);
+                Vec3 offs2 = new Vec3(-10, -1, 11);
+
+                Vec3 pos1 = this.position().add(offs1);
+                Vec3 pos2 = this.position().add(offs2);
+
+                MalkuthGiantSwordSlash.summon(level(), pos1, new Vec3(0,0,-1), MalkuthAttackType.FIRE);
+                MalkuthGiantSwordSlash.summon(level(), pos2, new Vec3(0,0,-1), MalkuthAttackType.ICE);
+
+
+            }else if (tick == MalkuthGiantSwordSlash.TIME_TO_HIT + MalkuthGiantSwordSlash.TIME_TO_RISE + swordSpawnTick - 2){
+                ImpactFrame base = new ImpactFrame(0.5f, 0.1f, 1, false);
+                FDLibCalls.sendImpactFrames((ServerLevel) level(), this.position(), 30,
+                        base,
+                        new ImpactFrame(base).setDuration(1).setInverted(true),
+                        new ImpactFrame(base).setDuration(1),
+                        new ImpactFrame(base).setDuration(1).setInverted(true),
+                        new ImpactFrame(base).setDuration(1),
+                        new ImpactFrame(base).setDuration(1).setInverted(true)
+                );
+
+                inst.nextStage();
+            }
+
+        }else if (stage == 2){
+
+            if (tick == 0){
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
+                this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
+                lookAtTarget = true;
+            }
+            if (tick > 200){
+                return true;
+            }
+        }
+
+        return false;
+
     }
 
     //=============================================================================OTHER================================================================================================
