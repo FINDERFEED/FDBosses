@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Random;
 
 public class MalkuthBoulderRenderer extends EntityRenderer<MalkuthBoulderEntity> {
 
@@ -59,10 +60,10 @@ public class MalkuthBoulderRenderer extends EntityRenderer<MalkuthBoulderEntity>
 
         float time = (entity.level().getGameTime() + pticks);
 
-        int dir = entity.getId() % 2 == 0 ? -1 : 1;
+        int dir = new Random(entity.getId() * 42L).nextInt(2) == 0 ? 1 : -1;
 
-        matrices.mulPose(Axis.ZP.rotationDegrees(time * 5 * dir));
-        matrices.mulPose(Axis.XP.rotationDegrees(time * 5 * dir));
+        matrices.mulPose(Axis.ZP.rotationDegrees(time * 10 * dir));
+        matrices.mulPose(Axis.XP.rotationDegrees(time * 10 * dir));
 
         model.render(matrices, src.getBuffer(RenderType.entityCutout(texture)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,1f, 1f ,1f ,1f);
 

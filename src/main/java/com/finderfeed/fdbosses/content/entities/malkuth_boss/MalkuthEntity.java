@@ -48,9 +48,11 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -122,7 +124,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         this.attackChain = new AttackChain(this.getRandom())
                 .registerAttack("nothing",this::doNothing)
                 .registerAttack(SLASH_ATTACK,this::aerialSlashAttack)
-                .registerAttack(PULL_AND_PUNCH,this::pullAndPunch)
+                .registerAttack(PULL_AND_PUNCH,this::pullAndPunch) //combos and anti flight
                 .registerAttack(JUMP_CRUSH,this::jumpCrushAttack)
                 .registerAttack(CAROUSEL_SLASHES,this::carouselSlashesAttack)
                 .registerAttack(JUMP_BACK_ON_SPAWN,v->this.jumpBackOnSpawn(v,false))
@@ -130,6 +132,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
                 .registerAttack(GIANT_SWORDS_ULTIMATE,this::giantSwordUltimate)
                 .registerAttack(SUMMON_AND_THROW_SIDE_ROCKS,this::summonAndThrowSideRocks)
+
                 .addAttack(-1,SUMMON_AND_THROW_SIDE_ROCKS)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
@@ -213,42 +216,94 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     //============================================================================ATTACKS==============================================================================================
 
-    private MalkuthBoulderEntity malkuthBoulderEntityTest;
+    private MalkuthAttackType sideRocksCurrentType = MalkuthAttackType.FIRE;
 
     private boolean summonAndThrowSideRocks(AttackInstance inst){
-
 
         int stage = inst.stage;
         int tick = inst.tick;
 
-
         if (stage == 0){
-            Vec3 summonPos = this.position().add(this.getForward().multiply(1,0,1).normalize())
-                    .add(0,2,0);
-
-
-            Vec3 target = summonPos.add(this.getForward().multiply(1,0,1).normalize().multiply(10,10,10));
-
-
-            ProjectileMovementPath moveToTargetPath = new ProjectileMovementPath(100, false)
-                    .addPos(summonPos)
-                    .addPos(target);
-
-            malkuthBoulderEntityTest = MalkuthBoulderEntity.summon(level(), summonPos, 40, 4, moveToTargetPath, MalkuthAttackType.ICE);
             inst.nextStage();
         }else if (stage == 1){
 
-            if (tick == 100){
+            if (tick == 20){
 
-                if (malkuthBoulderEntityTest == null) return true;
-                malkuthBoulderEntityTest.setShouldMoveToTarget(true);
-            }else if (tick >= 200){
+                int count = 8;
+                float distForOne = 3.4f;
+
+                Vec3 startPos = this.position().add(0,0.1,-1);
+
+                int h = random.nextInt(2);
+
+                MalkuthAttackType currentType = this.sideRocksCurrentType;
+
+                for (int i = 0; i < count; i++){
+
+                    int k = h % 2 == 0 ? 1 : -1;
+
+                    Vec3 clipdir = new Vec3(k * 30, 0,0);
+                    Vec3 cliplastpos = startPos.add(clipdir);
+
+                    ClipContext clipContext = new ClipContext(startPos, cliplastpos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+
+                    var ctx = level().clip(clipContext);
+
+                    Vec3 location = ctx.getLocation();
+
+                    double x = location.x - k;
+                    double r = startPos.x - x;
+                    double y = this.getY() - 1;
+                    double z = startPos.z;
+
+                    Vec3 summonPos = new Vec3(x,y,z);
+                    Vec3 moveToPos = new Vec3(x + r * 2,y,z);
+
+                    ProjectileMovementPath movementPath = new ProjectileMovementPath(summonPos, 10, false)
+                            .addPos(moveToPos);
+
+                    MalkuthBoulderEntity malkuthBoulderEntity = MalkuthBoulderEntity.summon(level(), summonPos, 10,3, movementPath, currentType);
+
+
+                    Vector3f col = getMalkuthAttackPreparationParticleColor(currentType);
+
+                    RectanglePreparationParticleOptions rectanglePreparationParticleOptions = new RectanglePreparationParticleOptions(new Vec3(-k,0,0), 56, distForOne/2, 20, 10,10,col.x,col.y,col.z,0.25f);
+                    Vec3 ppos = new Vec3(this.getX() + k * 28,y + 0.01f,z);
+
+                    FDLibCalls.sendParticles(((ServerLevel) level()),rectanglePreparationParticleOptions, ppos, 60);
+
+
+                    if (currentType.isFire()){
+                        currentType = MalkuthAttackType.ICE;
+                    }else{
+                        currentType = MalkuthAttackType.FIRE;
+                    }
+
+
+
+                    startPos = startPos.add(0,0,-distForOne);
+                    h++;
+                }
+
+                if (this.sideRocksCurrentType.isFire()){
+                    this.sideRocksCurrentType = MalkuthAttackType.ICE;
+                }else{
+                    this.sideRocksCurrentType = MalkuthAttackType.FIRE;
+                }
+
+            }else if (tick > 40){
+
+                var l = this.level().getEntitiesOfClass(MalkuthBoulderEntity.class, new AABB(-30,-30,-30,30,30,30).move(this.position()));
+
+                for (var b : l){
+                    b.setShouldMoveToTarget(true);
+                }
+
                 inst.nextStage();
             }
 
-
         }else if (stage == 2){
-            if (tick >= 100){
+            if (tick >= 20){
                 return true;
             }
         }

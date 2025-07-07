@@ -216,7 +216,8 @@ public class BossEntities {
     public static final Supplier<EntityType<MalkuthBoulderEntity>> MALKUTH_BOULDER = ENTITIES.register("malkuth_boulder",()->EntityType.Builder.of(
                     MalkuthBoulderEntity::new, MobCategory.MISC
             )
-            .sized(2f,2f)
+            .clientTrackingRange(30)
+            .sized(3f,3f)
             .build("malkuth_boulder"));
 
 

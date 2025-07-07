@@ -1,20 +1,29 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boulder;
 
+import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
+import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializable {
 
@@ -27,6 +36,8 @@ public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializab
 
     @SerializableField
     private boolean shouldMoveToTarget = false;
+
+    private boolean removeNextTick = false;
 
     public static MalkuthBoulderEntity summon(Level level, Vec3 pos, int prepareTime, float prepareHeight, ProjectileMovementPath movementPath, MalkuthAttackType malkuthAttackType){
         MalkuthBoulderEntity malkuthBoulderEntity = new MalkuthBoulderEntity(BossEntities.MALKUTH_BOULDER.get(), level);
@@ -47,16 +58,102 @@ public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializab
 
     @Override
     public void tick() {
+        if (!level().isClientSide && removeNextTick){
+            this.remove(RemovalReason.DISCARDED);
+        }
         super.tick();
         if (level().isClientSide){
+
+            Vec3 between = this.position().subtract(new Vec3(
+                    xo,yo,zo
+            ));
+            Vec3 nb = between.normalize();
+
+            double dist = 0;
+            double b = between.length();
+            do {
+                if (this.tickCount > this.getPrepareTime() / 2) {
+
+                    int particleCount = this.getDeltaMovement().length() > 0 ? 20 : 5;
+
+                    for (int i = 0; i < particleCount; i++) {
+                        ParticleOptions options;
+
+                        if (this.getMalkuthAttackType().isFire()) {
+                            float rnd = random.nextFloat();
+                            if (rnd > 0.5) {
+                                options = new GravityParticleOptions(BossParticles.FLAME_WITH_STONE.get(), 20 + random.nextInt(4), 0.15f + random.nextFloat() * 0.2f,
+                                        (float) Mob.DEFAULT_BASE_GRAVITY * 20, 2f, true);
+                            } else {
+                                options = ParticleTypes.LAVA;
+                            }
+                        } else {
+                            options = new GravityParticleOptions(BossParticles.ICE_CHUNK.get(), 20 + random.nextInt(4), 0.5f + random.nextFloat() * 0.2f,
+                                    (float) Mob.DEFAULT_BASE_GRAVITY * 20, 2f, true);
+                        }
+
+                        if (this.getDeltaMovement().length() > 0 && random.nextFloat() > 0.3f){
+                            if (this.getMalkuthAttackType().isIce()){
+                                float rc = random.nextFloat() * 0.2f;
+                                float gc = 0.7f + random.nextFloat() * 0.1f;
+                                float bc = 0.9f + random.nextFloat() * 0.1f;
+
+                                options = BallParticleOptions.builder()
+                                        .color(rc,gc,bc)
+                                        .size(0.2f + random.nextFloat() * 0.2f)
+                                        .scalingOptions(0,0,20)
+                                        .friction(0.7f)
+                                        .build();
+                            }else{
+                                float rc = 0.9f + random.nextFloat() * 0.1f;
+                                float gc = 0.2f + random.nextFloat() * 0.2f;
+                                float bc = random.nextFloat() * 0.2f;
+                                options = BallParticleOptions.builder()
+                                        .color(rc,gc,bc)
+                                        .size(0.2f + random.nextFloat() * 0.2f)
+                                        .scalingOptions(0,0,20)
+                                        .friction(0.8f)
+                                        .build();
+                            }
+                        }
+
+                        Vec3 rnd = this.position().add(
+                                random.nextFloat() * 3.5 - 1.75,
+                                random.nextFloat() * 3.5 - 1.75,
+                                random.nextFloat() * 3.5 - 1.75
+                        ).add(nb.reverse().multiply(dist,dist,dist));
+
+                        Vec3 speed = this.getDeltaMovement().multiply(0.15f,0.15f,0.15f);
+
+                        level().addParticle(options, rnd.x, rnd.y, rnd.z, speed.x,speed.y,speed.z);
+                    }
+                }
+                dist += 1.75f;
+            } while (dist < b);
 
         }else{
             if (this.isAllowedToMoveToTarget()){
                 if (!this.movementPath.isFinished()) {
                     this.movementPath.tick(this);
                 }else{
-                    this.remove(RemovalReason.DISCARDED);
+                    this.removeNextTick = true;
                 }
+            }
+
+
+
+            if (tickCount == 1){
+                SlamParticlesPacket packet = new SlamParticlesPacket(
+                        new SlamParticlesPacket.SlamData(this.getOnPos(),this.position().add(0,0.5f,0),new Vec3(1,0,0))
+                                .maxAngle(FDMathUtil.FPI * 2)
+                                .maxSpeed(0.3f)
+                                .collectRadius(2)
+                                .maxParticleLifetime(30)
+                                .count(20)
+                                .maxVerticalSpeedEdges(0.15f)
+                                .maxVerticalSpeedCenter(0.15f)
+                );
+                PacketDistributor.sendToPlayersTrackingEntity(this,packet);
             }
         }
     }
