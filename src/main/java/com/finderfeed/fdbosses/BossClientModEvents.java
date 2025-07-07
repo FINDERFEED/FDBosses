@@ -30,6 +30,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRen
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawnerRenderer;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boulder.MalkuthBoulderRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonProjectileRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainRenderer;
@@ -476,6 +477,7 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.MALKUTH_CHAIN.get(), MalkuthChainRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_CANNON_PROJECTILE.get(), MalkuthCannonProjectileRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_GIANT_SWORD.get(), MalkuthGiantSwordSlashRenderer::new);
+        event.registerEntityRenderer(BossEntities.MALKUTH_BOULDER.get(), MalkuthBoulderRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_EARTHQUAKE.get(), MalkuthEarthquakeRenderer::new);
     }
 }

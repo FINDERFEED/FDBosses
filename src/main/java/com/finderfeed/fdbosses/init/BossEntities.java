@@ -19,6 +19,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boulder.MalkuthBoulderEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
@@ -211,6 +212,12 @@ public class BossEntities {
             )
             .sized(2f,2f)
             .build("malkuth_giant_sword_slash"));
+
+    public static final Supplier<EntityType<MalkuthBoulderEntity>> MALKUTH_BOULDER = ENTITIES.register("malkuth_boulder",()->EntityType.Builder.of(
+                    MalkuthBoulderEntity::new, MobCategory.MISC
+            )
+            .sized(2f,2f)
+            .build("malkuth_boulder"));
 
 
     @SubscribeEvent

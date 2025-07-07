@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAtta
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boulder.MalkuthBoulderEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
@@ -73,6 +74,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public static final String JUMP_BACK_ON_SPAWN = "jump_back_on_spawn";
     public static final String JUMP_BACK_ON_SPAWN_WITH_CRUSH = "jump_back_on_spawn_with_crush";
     public static final String GIANT_SWORDS_ULTIMATE = "giant_swords_attack";
+    public static final String SUMMON_AND_THROW_SIDE_ROCKS = "summon_and_throw_side_rocks";
 
     private static FDModel SERVER_MODEL;
     private static FDModel CLIENT_MODEL;
@@ -127,7 +129,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(JUMP_BACK_ON_SPAWN_WITH_CRUSH,v->this.jumpBackOnSpawn(v,true))
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
                 .registerAttack(GIANT_SWORDS_ULTIMATE,this::giantSwordUltimate)
-                .addAttack(-1,GIANT_SWORDS_ULTIMATE)
+                .registerAttack(SUMMON_AND_THROW_SIDE_ROCKS,this::summonAndThrowSideRocks)
+                .addAttack(-1,SUMMON_AND_THROW_SIDE_ROCKS)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
 //                .addAttack(2, JUMP_BACK_ON_SPAWN)
@@ -209,6 +212,49 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     //============================================================================ATTACKS==============================================================================================
+
+    private MalkuthBoulderEntity malkuthBoulderEntityTest;
+
+    private boolean summonAndThrowSideRocks(AttackInstance inst){
+
+
+        int stage = inst.stage;
+        int tick = inst.tick;
+
+
+        if (stage == 0){
+            Vec3 summonPos = this.position().add(this.getForward().multiply(1,0,1).normalize())
+                    .add(0,2,0);
+
+
+            Vec3 target = summonPos.add(this.getForward().multiply(1,0,1).normalize().multiply(10,10,10));
+
+
+            ProjectileMovementPath moveToTargetPath = new ProjectileMovementPath(100, false)
+                    .addPos(summonPos)
+                    .addPos(target);
+
+            malkuthBoulderEntityTest = MalkuthBoulderEntity.summon(level(), summonPos, 40, 4, moveToTargetPath, MalkuthAttackType.ICE);
+            inst.nextStage();
+        }else if (stage == 1){
+
+            if (tick == 100){
+
+                if (malkuthBoulderEntityTest == null) return true;
+                malkuthBoulderEntityTest.setShouldMoveToTarget(true);
+            }else if (tick >= 200){
+                inst.nextStage();
+            }
+
+
+        }else if (stage == 2){
+            if (tick >= 100){
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     private ProjectileMovementPath jumpBackOnSpawnPath;
 
