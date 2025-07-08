@@ -133,7 +133,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(GIANT_SWORDS_ULTIMATE,this::giantSwordUltimate)
                 .registerAttack(SUMMON_AND_THROW_SIDE_ROCKS,this::summonAndThrowSideRocks)
 
-                .addAttack(-1,SUMMON_AND_THROW_SIDE_ROCKS)
+                .addAttack(-1, SUMMON_AND_THROW_SIDE_ROCKS)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
 //                .addAttack(2, JUMP_BACK_ON_SPAWN)
@@ -224,10 +224,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         int tick = inst.tick;
 
         if (stage == 0){
+            this.deattachSwords();
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SUMMON_THROW_SIDE_STONES)
+                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
             inst.nextStage();
         }else if (stage == 1){
 
-            if (tick == 20){
+            if (tick == 10){
 
                 int count = 8;
                 float distForOne = 3.4f;
@@ -291,7 +294,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     this.sideRocksCurrentType = MalkuthAttackType.FIRE;
                 }
 
-            }else if (tick > 40){
+            }else if (tick > 30){
 
                 var l = this.level().getEntitiesOfClass(MalkuthBoulderEntity.class, new AABB(-30,-30,-30,30,30,30).move(this.position()));
 

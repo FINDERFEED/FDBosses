@@ -95,12 +95,12 @@ public class MalkuthGiantSwordSlash extends Entity {
 //                .outTime(10)
 //                .build(),this.position().add(direction.x * ( (end - start) / 2),direction.y * ( (end - start) / 2),direction.z * ( (end - start) / 2)),100);
 
-        DefaultShakePacket.send((ServerLevel) level(), this.position(), 60, FDShakeData.builder()
-                .amplitude(0.25f)
-                .inTime(0)
-                .stayTime(30)
-                .outTime(100)
-                .build());
+//        DefaultShakePacket.send((ServerLevel) level(), this.position(), 60, FDShakeData.builder()
+//                .amplitude(0.25f)
+//                .inTime(0)
+//                .stayTime(30)
+//                .outTime(100)
+//                .build());
         PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                 .frequency(50)
                 .amplitude(4f)
