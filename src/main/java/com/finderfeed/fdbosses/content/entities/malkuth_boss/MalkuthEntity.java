@@ -33,6 +33,7 @@ import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
+import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
@@ -77,6 +78,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public static final String JUMP_BACK_ON_SPAWN_WITH_CRUSH = "jump_back_on_spawn_with_crush";
     public static final String GIANT_SWORDS_ULTIMATE = "giant_swords_attack";
     public static final String SUMMON_AND_THROW_SIDE_ROCKS = "summon_and_throw_side_rocks";
+    public static final String ATTACH_SWORDS = "attach_swords";
+    public static final String DEATTACH_SWORDS = "deattach_swords";
+    public static final String NOTHING_20_TICKS = "nothing_20_ticks";
+    public static final String SUMMON_EARTHQUAKE = "summon_earthquake";
 
     private static FDModel SERVER_MODEL;
     private static FDModel CLIENT_MODEL;
@@ -121,8 +126,17 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .addHeadController(CLIENT_MODEL, "head");
         this.lookControl = this.headControllerContainer;
 
+        AttackOptions sideRocks = AttackOptions.builder()
+                .setPreAttack(DEATTACH_SWORDS)
+                .addAttack(SUMMON_AND_THROW_SIDE_ROCKS)
+                .setNextAttack(ATTACH_SWORDS)
+                .build();
+
         this.attackChain = new AttackChain(this.getRandom())
-                .registerAttack("nothing",this::doNothing)
+                .registerAttack(NOTHING_20_TICKS,this::doNothing20Ticks)//not an attack
+                .registerAttack(DEATTACH_SWORDS, v->this.attachSwordsAttack(v,false)) //not an attack
+                .registerAttack(ATTACH_SWORDS, v->this.attachSwordsAttack(v,true)) //not an attack
+
                 .registerAttack(SLASH_ATTACK,this::aerialSlashAttack)
                 .registerAttack(PULL_AND_PUNCH,this::pullAndPunch) //combos and anti flight
                 .registerAttack(JUMP_CRUSH,this::jumpCrushAttack)
@@ -132,8 +146,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
                 .registerAttack(GIANT_SWORDS_ULTIMATE,this::giantSwordUltimate)
                 .registerAttack(SUMMON_AND_THROW_SIDE_ROCKS,this::summonAndThrowSideRocks)
-
-                .addAttack(-1, SUMMON_AND_THROW_SIDE_ROCKS)
+                .addAttack(-2,NOTHING_20_TICKS)
+//                .addAttack(-1, sideRocks)
+//                .addAttack(0, NOTHING_20_TICKS)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
 //                .addAttack(2, JUMP_BACK_ON_SPAWN)
@@ -145,7 +160,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     }
 
-    private boolean doNothing(AttackInstance instance){
+    private boolean doNothing20Ticks(AttackInstance instance){
         return true;
     }
 
@@ -216,19 +231,35 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     //============================================================================ATTACKS==============================================================================================
 
+    private boolean attachSwordsAttack(AttackInstance instance, boolean attach){
+        if (attach){
+            this.attachSwords();
+            this.causeSwordChargeParticles(MalkuthAttackType.FIRE);
+            this.causeSwordChargeParticles(MalkuthAttackType.ICE);
+        }else{
+            this.deattachSwords();
+            this.causeSwordChargeParticles(MalkuthAttackType.FIRE);
+            this.causeSwordChargeParticles(MalkuthAttackType.ICE);
+        }
+        return true;
+    }
+
     private MalkuthAttackType sideRocksCurrentType = MalkuthAttackType.FIRE;
 
     private boolean summonAndThrowSideRocks(AttackInstance inst){
 
+
         int stage = inst.stage;
+        int lstage = stage % 3;
         int tick = inst.tick;
 
-        if (stage == 0){
+        if (lstage == 0){
             this.deattachSwords();
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SUMMON_THROW_SIDE_STONES)
+                            .important()
                     .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
             inst.nextStage();
-        }else if (stage == 1){
+        }else if (lstage == 1){
 
             if (tick == 10){
 
@@ -305,9 +336,14 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 inst.nextStage();
             }
 
-        }else if (stage == 2){
-            if (tick >= 20){
-                return true;
+        }else if (lstage == 2){
+            if (tick >= 15){
+                if (stage >= 12) {
+                    return true;
+                }else{
+                    inst.nextStage();
+                    return false;
+                }
             }
         }
         return false;
