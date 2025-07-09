@@ -146,7 +146,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
                 .registerAttack(GIANT_SWORDS_ULTIMATE,this::giantSwordUltimate)
                 .registerAttack(SUMMON_AND_THROW_SIDE_ROCKS,this::summonAndThrowSideRocks)
-                .addAttack(-2,NOTHING_20_TICKS)
+                .registerAttack(SUMMON_EARTHQUAKE,this::summonEartquake)
+                .addAttack(-2,SUMMON_EARTHQUAKE)
 //                .addAttack(-1, sideRocks)
 //                .addAttack(0, NOTHING_20_TICKS)
 //                .addAttack(0, SLASH_ATTACK)
@@ -230,6 +231,70 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     //============================================================================ATTACKS==============================================================================================
+
+    private MalkuthAttackType earthquakeToSummon = MalkuthAttackType.FIRE;
+
+    private boolean summonEartquake(AttackInstance inst){
+
+        int stage = inst.stage;
+        int tick = inst.tick;
+
+        if (stage == 0){
+            this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
+            lookAtTarget = true;
+            earthquakeToSummon = MalkuthAttackType.getRandom(random);
+            if (earthquakeToSummon.isFire()){
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SINGLE_EARTHQUAKE_FIRE)
+                                .important()
+                                .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
+                        .build());
+            }else{
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SINGLE_EARTHQUAKE_ICE)
+                                .important()
+                                .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
+                        .build());
+            }
+            inst.nextStage();
+        }else if (stage == 1){
+
+            if (tick == 8){
+
+                SlamParticlesPacket packet = new SlamParticlesPacket(
+                        new SlamParticlesPacket.SlamData(this.getOnPos(),this.position().add(0,0.5f,0),new Vec3(1,0,0))
+                                .maxAngle(FDMathUtil.FPI * 2)
+                                .maxSpeed(0.3f)
+                                .collectRadius(2)
+                                .maxParticleLifetime(30)
+                                .count(40)
+                                .maxVerticalSpeedEdges(0.15f)
+                                .maxVerticalSpeedCenter(0.15f)
+                );
+                PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+
+                PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                        .frequency(5)
+                        .amplitude(2.5f)
+                        .inTime(0)
+                        .stayTime(0)
+                        .outTime(5)
+                        .build(),this.position(),60);
+
+                Vec3 targetPos = this.getTarget().position();
+
+                Vec3 direction = targetPos.subtract(this.position()).multiply(1.5f,0,1.5f);
+
+                double dist = direction.length();
+
+                int time = (int) Math.ceil(dist);
+
+                MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(),earthquakeToSummon, this.position(), direction, time, FDMathUtil.FPI / 9, 1);
+            }else if (tick >= 40){
+                this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
+                return true;
+            }
+        }
+        return false;
+    }
 
     private boolean attachSwordsAttack(AttackInstance instance, boolean attach){
         if (attach){

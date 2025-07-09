@@ -153,6 +153,14 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
     });
 
+    public static DeferredHolder<Animation,Animation> MALKUTH_SINGLE_EARTHQUAKE_FIRE = ANIMATIONS.register("malkuth_single_earthquake_fire", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
+    });
+
+    public static DeferredHolder<Animation,Animation> MALKUTH_SINGLE_EARTHQUAKE_ICE = ANIMATIONS.register("malkuth_single_earthquake_ice", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
+    });
+
 
     public static DeferredHolder<Animation,Animation> MALKUTH_SUMMON_THROW_SIDE_STONES = ANIMATIONS.register("malkuth_summon_throw_side_stones", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
