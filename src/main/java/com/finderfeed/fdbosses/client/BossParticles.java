@@ -13,6 +13,7 @@ import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOpti
 import com.finderfeed.fdbosses.FDBosses;
 
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
+import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ParticleType;
 
@@ -124,6 +125,18 @@ public class BossParticles {
         @Override
         public StreamCodec<? super RegistryFriendlyByteBuf, RectanglePreparationParticleOptions> streamCodec() {
             return RectanglePreparationParticleOptions.STREAM_CODEC;
+        }
+    });
+
+    public static final Supplier<ParticleType<StripeParticleOptions>> STRIPE_PARTICLE = PARTICLES.register("stripe_particle",()->new ParticleType<StripeParticleOptions>(true) {
+        @Override
+        public MapCodec<StripeParticleOptions> codec() {
+            return StripeParticleOptions.CODEC;
+        }
+
+        @Override
+        public StreamCodec<? super RegistryFriendlyByteBuf, StripeParticleOptions> streamCodec() {
+            return StripeParticleOptions.STREAM_CODEC;
         }
     });
 

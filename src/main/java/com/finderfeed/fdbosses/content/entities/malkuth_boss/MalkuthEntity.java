@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
+import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boulder.MalkuthBoulderEntity;
@@ -37,9 +38,11 @@ import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
+import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -182,6 +185,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         if (level().isClientSide){
             this.headControllerContainer.clientTick();
 
+            if (level().getGameTime() % 20 == 0){
+
+                ParticleOptions particleOptions = StripeParticleOptions.createHorizontalCircling(new FDColor(1,1,1,0.25f), new Vec3(1,0,0),0.2f, 19, -2, 5, 2f);
+                level().addParticle(particleOptions, true, this.getX(),this.getY() + 4, this.getZ(),0,0,0);
+            }
+
         }else{
             AnimationSystem animationSystem = this.getAnimationSystem();
             if (animationSystem.getTicker(MAIN_LAYER) == null){
@@ -259,17 +268,30 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             if (tick == 8){
 
+                Vec3 targetPos = this.getTarget().position();
+
+                Vec3 direction = targetPos.subtract(this.position()).multiply(1.5f,0,1.5f);
+
+
                 SlamParticlesPacket packet = new SlamParticlesPacket(
-                        new SlamParticlesPacket.SlamData(this.getOnPos(),this.position().add(0,0.5f,0),new Vec3(1,0,0))
-                                .maxAngle(FDMathUtil.FPI * 2)
-                                .maxSpeed(0.3f)
+                        new SlamParticlesPacket.SlamData(this.getOnPos(),this.position().add(0,0.5f,0),direction.normalize())
+                                .maxAngle(FDMathUtil.FPI)
+                                .maxSpeed(0.5f)
                                 .collectRadius(2)
                                 .maxParticleLifetime(30)
                                 .count(40)
                                 .maxVerticalSpeedEdges(0.15f)
-                                .maxVerticalSpeedCenter(0.15f)
+                                .maxVerticalSpeedCenter(0.4f)
                 );
                 PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+
+
+                double dist = direction.length();
+
+                int time = (int) Math.ceil(dist);
+
+                MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(),earthquakeToSummon, this.position(), direction, time, FDMathUtil.FPI / 9, 1);
+            }else if (tick == 9){
 
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                         .frequency(5)
@@ -278,16 +300,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         .stayTime(0)
                         .outTime(5)
                         .build(),this.position(),60);
-
-                Vec3 targetPos = this.getTarget().position();
-
-                Vec3 direction = targetPos.subtract(this.position()).multiply(1.5f,0,1.5f);
-
-                double dist = direction.length();
-
-                int time = (int) Math.ceil(dist);
-
-                MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(),earthquakeToSummon, this.position(), direction, time, FDMathUtil.FPI / 9, 1);
             }else if (tick >= 40){
                 this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
                 return true;
