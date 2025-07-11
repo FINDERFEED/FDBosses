@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.client.particles.square_preparation_particle.Rect
 import com.finderfeed.fdlib.systems.particle.FDParticleRenderType;
 import com.finderfeed.fdlib.systems.shapes.FD2DShape;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.renderers.ShapeOnCurveRenderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -53,6 +54,12 @@ public class StripeParticle extends Particle {
     @Override
     public void render(VertexConsumer vertex, Camera camera, float pticks) {
 
+        float lifetimeP = (this.age + pticks) / lifetime;
+
+        float startP = FDMathUtil.lerp(-stripeParticleOptions.getStripePercentLength(),1,lifetimeP);
+
+        float endP = startP + stripeParticleOptions.getStripePercentLength();
+
         Vec3 pos = FDMathUtil.interpolateVectors(
                 new Vec3(xo,yo,zo),
                 new Vec3(x,y,z),
@@ -65,6 +72,21 @@ public class StripeParticle extends Particle {
         matrix.translate(pos.x,pos.y,pos.z);
 
         ShapeOnCurveRenderer.start(vertex)
+                .scalingFunction(v->{
+
+                    float distToEnd = endP - v;
+                    float distToStart = v - startP;
+
+                    float p;
+                    if (distToEnd > distToStart){
+                        p =  distToStart / (stripeParticleOptions.getStripePercentLength() / 2) ;
+                    }else{
+                        p =  distToEnd / (stripeParticleOptions.getStripePercentLength()/2);
+                    }
+                    return Math.clamp(FDEasings.easeOut(p),0,1);
+                })
+                .startPercent(startP)
+                .endPercent(endP)
                 .pose(matrix)
                 .shape(shape)
                 .color(stripeParticleOptions.getColor())

@@ -45,6 +45,7 @@ public class StripeParticleOptions implements ParticleOptions {
             FDCodecs.COLOR.fieldOf("color").forGetter(v->v.color),
             Codec.INT.fieldOf("lifetime").forGetter(v->v.lifetime),
             Codec.FLOAT.fieldOf("scale").forGetter(v->v.scale),
+            Codec.FLOAT.fieldOf("stripePercentLength").forGetter(v->v.stripePercentLength),
             Codec.list(FDCodecs.VEC3).fieldOf("offsets").forGetter(v->v.offsets)
     ).apply(p, StripeParticleOptions::new));
 
@@ -52,28 +53,32 @@ public class StripeParticleOptions implements ParticleOptions {
             FDByteBufCodecs.COLOR,v->v.color,
             ByteBufCodecs.INT,v->v.lifetime,
             ByteBufCodecs.FLOAT,v->v.scale,
+            ByteBufCodecs.FLOAT,v->v.stripePercentLength,
             VEC3LIST,v->v.offsets,
             StripeParticleOptions::new
     );
+
+    private float stripePercentLength;
 
     private FDColor color;
     private int lifetime;
     private List<Vec3> offsets;
     private float scale;
 
-    public StripeParticleOptions(FDColor color, int lifetime, float scale, Vec3... offsets){
+    public StripeParticleOptions(FDColor color, int lifetime, float scale, float stripePercentLength, Vec3... offsets){
         this.offsets = List.of(offsets);
         this.color = color;
         this.lifetime = lifetime;
         this.scale = scale;
+        this.stripePercentLength = stripePercentLength;
     }
 
-    public StripeParticleOptions(FDColor color, int lifetime,float scale, List<Vec3> offsets){
-        this(color,lifetime,scale);
+    public StripeParticleOptions(FDColor color, int lifetime,float scale,float stripePercentLength, List<Vec3> offsets){
+        this(color,lifetime,scale,stripePercentLength);
         this.offsets = offsets;
     }
 
-    public static StripeParticleOptions createHorizontalCircling(FDColor color, Vec3 startingHorizontalDirection,float scale, int lifetime, float verticalDistance, float radius, float circlesAmount){
+    public static StripeParticleOptions createHorizontalCircling(FDColor color, Vec3 startingHorizontalDirection,float scale, int lifetime, float verticalDistance, float radius, float circlesAmount, float stripePercentLength, boolean circleDirection, boolean in){
         startingHorizontalDirection = startingHorizontalDirection.multiply(1,0,1).normalize();
 
         float step = FDMathUtil.FPI / 8f;
@@ -84,18 +89,28 @@ public class StripeParticleOptions implements ParticleOptions {
 
         for (float i = 0; i < wholeRotation; i+= step){
 
-            float p = 1 - i / wholeRotation;
+            float p;
+
+            if (in){
+                p = 1 - i / wholeRotation;
+            }else{
+                p = i / wholeRotation;
+            }
 
             float currentRadius = p * radius;
 
             float currentVerticalOffset = verticalDistance * p;
 
-            Vec3 dir = startingHorizontalDirection.multiply(currentRadius,currentRadius,currentRadius).yRot(i);
+            Vec3 dir = startingHorizontalDirection.multiply(currentRadius,currentRadius,currentRadius).yRot(circleDirection ? i : -i);
 
             positions.add(dir.add(0.001f,currentVerticalOffset,0.001f));
 
         }
-        return new StripeParticleOptions(color, lifetime, scale, positions);
+        return new StripeParticleOptions(color, lifetime, scale,stripePercentLength, positions);
+    }
+
+    public float getStripePercentLength() {
+        return stripePercentLength;
     }
 
     public float getScale() {

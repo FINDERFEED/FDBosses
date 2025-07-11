@@ -185,10 +185,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         if (level().isClientSide){
             this.headControllerContainer.clientTick();
 
-            if (level().getGameTime() % 20 == 0){
+            if (level().getGameTime() % 5 == 0){
 
-                ParticleOptions particleOptions = StripeParticleOptions.createHorizontalCircling(new FDColor(1,1,1,0.25f), new Vec3(1,0,0),0.2f, 19, -2, 5, 2f);
-                level().addParticle(particleOptions, true, this.getX(),this.getY() + 4, this.getZ(),0,0,0);
+                ParticleOptions particleOptions = StripeParticleOptions.createHorizontalCircling(new FDColor(1,1,1,0.25f), new Vec3(1,0,0),
+                        0.1f, 20, -2 + random.nextFloat() * 4, 3 + random.nextFloat(), 2f, 0.5f,random.nextBoolean(), true);
+                level().addParticle(particleOptions, true, this.getX(),this.getY()  + 2 + random.nextFloat() * 2 - 1, this.getZ(),0,0,0);
             }
 
         }else{
@@ -245,6 +246,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private boolean summonEartquake(AttackInstance inst){
 
+        if (true) return true;
         int stage = inst.stage;
         int tick = inst.tick;
 
