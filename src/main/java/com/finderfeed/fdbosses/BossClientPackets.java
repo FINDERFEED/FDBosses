@@ -11,6 +11,8 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
 import com.finderfeed.fdlib.util.FDUtil;
@@ -37,6 +39,7 @@ import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.Vector;
 
 public class BossClientPackets {
 
@@ -158,6 +161,81 @@ public class BossClientPackets {
             }
             case BossUtil.MALKUTH_CANNON_SHOOT -> {
                 malkuthCannonShoot(pos, data);
+            }
+            case BossUtil.MALKUTH_SWORD_CHARGE_PARTICLES -> {
+                malkuthSwordChargeParticles(pos, data);
+            }
+        }
+    }
+
+    public static void malkuthSwordChargeParticles(Vec3 encodedMalkuthAttackTypeISAIDDONTJUDGEME, int entityId){
+        Level level = FDClientHelpers.getClientLevel();
+        if (level.getEntity(entityId) instanceof MalkuthEntity malkuthEntity) {
+
+            encodedMalkuthAttackTypeISAIDDONTJUDGEME = encodedMalkuthAttackTypeISAIDDONTJUDGEME.subtract(malkuthEntity.position());
+
+            MalkuthAttackType malkuthAttackType;
+            if (encodedMalkuthAttackTypeISAIDDONTJUDGEME.dot(new Vec3(1, 0, 0)) > 0) {
+                malkuthAttackType = MalkuthAttackType.FIRE;
+            } else {
+                malkuthAttackType = MalkuthAttackType.ICE;
+            }
+
+            Vector3f color = MalkuthEntity.getMalkuthAttackPreparationParticleColor(malkuthAttackType);
+
+            String boneName = MalkuthEntity.getMalkuthSwordPlaceBone(malkuthAttackType);
+
+            FDModel clientModel = MalkuthEntity.getClientModel();
+
+            Matrix4f boneTransform = malkuthEntity.getModelPartTransformation(malkuthEntity, boneName, clientModel);
+
+            Vector3f swordDir = boneTransform.transformDirection(0,1,0,new Vector3f());
+
+            Vector3f swordDirUp = boneTransform.transformDirection(0,0,-1,new Vector3f());
+
+            Vector3f swordPos = boneTransform.transformPosition(0,0,0,new Vector3f());
+
+            int totalParticles = 30;
+
+            float startHeight = 0.5f;
+            float swordBladeHeight = 1.75f;
+            float particleSize = 0.15f;
+
+            Vec3 swordWorldPosition = malkuthEntity.position().add(
+                    swordPos.x,swordPos.y,swordPos.z
+            );
+
+            for (int i = 0; i < totalParticles;i++){
+
+                float p = i / (float) (totalParticles - 1);
+
+                float height = startHeight + p * swordBladeHeight + random.nextFloat() * 0.5f - 0.25f;
+
+                Vec3 center = swordWorldPosition.add(
+                        swordDir.x * startHeight + swordDir.x * height,
+                        swordDir.y * startHeight + swordDir.y * height,
+                        swordDir.z * startHeight + swordDir.z * height
+                );
+
+                Quaternionf quaternionf = new Quaternionf(new AxisAngle4f(FDMathUtil.FPI * 2 * random.nextFloat(), swordDir.x,swordDir.y,swordDir.z));
+
+                Vector3f ppos = quaternionf.transform(swordDirUp,new Vector3f()).add(
+                        (float)center.x,(float)center.y,(float)center.z
+                );
+
+                float r = Math.clamp(color.x + random.nextFloat() * 0.2f, 0, 1);
+                float g = Math.clamp(color.y + random.nextFloat() * 0.4f, 0, 1);
+                float b = Math.clamp(color.z + random.nextFloat() * 0.2f, 0, 1);
+
+                BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                        .color(r,g,b)
+                        .size(particleSize)
+                        .scalingOptions(10,0,5)
+                        .particleProcessor(new CircleParticleProcessor(center, true, true, 1))
+                        .build();
+
+                level.addParticle(ballParticleOptions, true, ppos.x,ppos.y,ppos.z,0,0,0);
+
             }
         }
     }

@@ -20,7 +20,6 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 public class StripeParticleOptions implements ParticleOptions {
 
@@ -45,16 +44,20 @@ public class StripeParticleOptions implements ParticleOptions {
     };
 
     public static final MapCodec<StripeParticleOptions> CODEC = RecordCodecBuilder.mapCodec(p->p.group(
-            FDCodecs.COLOR.fieldOf("color").forGetter(v->v.color),
+            FDCodecs.COLOR.fieldOf("startColor").forGetter(v->v.startColor),
+            FDCodecs.COLOR.fieldOf("endColor").forGetter(v->v.endColor),
             Codec.INT.fieldOf("lifetime").forGetter(v->v.lifetime),
+            Codec.INT.fieldOf("lod").forGetter(v->v.lod),
             Codec.FLOAT.fieldOf("scale").forGetter(v->v.scale),
             Codec.FLOAT.fieldOf("stripePercentLength").forGetter(v->v.stripePercentLength),
             Codec.list(FDCodecs.VEC3).fieldOf("offsets").forGetter(v->v.offsets)
     ).apply(p, StripeParticleOptions::new));
 
-    public static final StreamCodec<? super RegistryFriendlyByteBuf, StripeParticleOptions> STREAM_CODEC = StreamCodec.composite(
-            FDByteBufCodecs.COLOR,v->v.color,
+    public static final StreamCodec<? super RegistryFriendlyByteBuf, StripeParticleOptions> STREAM_CODEC = FDByteBufCodecs.composite(
+            FDByteBufCodecs.COLOR,v->v.startColor,
+            FDByteBufCodecs.COLOR,v->v.endColor,
             ByteBufCodecs.INT,v->v.lifetime,
+            ByteBufCodecs.INT,v->v.lod,
             ByteBufCodecs.FLOAT,v->v.scale,
             ByteBufCodecs.FLOAT,v->v.stripePercentLength,
             VEC3LIST,v->v.offsets,
@@ -63,25 +66,29 @@ public class StripeParticleOptions implements ParticleOptions {
 
     private float stripePercentLength;
 
-    private FDColor color;
+    private FDColor startColor;
+    private FDColor endColor;
     private int lifetime;
     private List<Vec3> offsets;
     private float scale;
+    private int lod;
 
-    public StripeParticleOptions(FDColor color, int lifetime, float scale, float stripePercentLength, Vec3... offsets){
+    public StripeParticleOptions(FDColor startColor,FDColor endColor, int lifetime, int lod,  float scale, float stripePercentLength, Vec3... offsets){
         this.offsets = List.of(offsets);
-        this.color = color;
+        this.endColor = endColor;
+        this.startColor = startColor;
         this.lifetime = lifetime;
         this.scale = scale;
+        this.lod = lod;
         this.stripePercentLength = stripePercentLength;
     }
 
-    public StripeParticleOptions(FDColor color, int lifetime,float scale,float stripePercentLength, List<Vec3> offsets){
-        this(color,lifetime,scale,stripePercentLength);
+    public StripeParticleOptions(FDColor startColor, FDColor endColor, int lifetime, int lod, float scale,float stripePercentLength, List<Vec3> offsets){
+        this(startColor, endColor,lifetime, lod, scale,stripePercentLength);
         this.offsets = offsets;
     }
 
-    public static StripeParticleOptions createHorizontalCircling(FDColor color, Vec3 startingDirection,float scale, int lifetime, float verticalDistance, float radius, float circlesAmount, float stripePercentLength, boolean circleDirection, boolean in){
+    public static StripeParticleOptions createHorizontalCircling(FDColor startColor, FDColor endColor, Vec3 startingDirection,float scale, int lifetime, int lod, float verticalDistance, float radius, float circlesAmount, float stripePercentLength, boolean circleDirection, boolean in){
         startingDirection = startingDirection.normalize();
 
         Vec3 startingHorizontalDirection = startingDirection.multiply(1,0,1).normalize();
@@ -128,7 +135,11 @@ public class StripeParticleOptions implements ParticleOptions {
 
         }
 
-        return new StripeParticleOptions(color, lifetime, scale,stripePercentLength, positions);
+        return new StripeParticleOptions(startColor, endColor, lifetime, lod, scale,stripePercentLength, positions);
+    }
+
+    public int getLOD(){
+        return lod;
     }
 
     public float getStripePercentLength() {
@@ -139,8 +150,12 @@ public class StripeParticleOptions implements ParticleOptions {
         return scale;
     }
 
-    public FDColor getColor() {
-        return color;
+    public FDColor getStartColor() {
+        return startColor;
+    }
+
+    public FDColor getEndColor() {
+        return endColor;
     }
 
     public int getLifetime() {

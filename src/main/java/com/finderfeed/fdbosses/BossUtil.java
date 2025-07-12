@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.config.BossConfig;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdlib.util.FDUtil;
@@ -36,6 +37,7 @@ public class BossUtil {
     public static final int CHESED_RAY_ATTACK_SMOKE = 5;
     public static final int CHESED_BOOM_PARTICLES = 6;
     public static final int MALKUTH_CANNON_SHOOT = 7;
+    public static final int MALKUTH_SWORD_CHARGE_PARTICLES = 8;
 
     /**
      * Air Friction? What?
@@ -100,6 +102,12 @@ public class BossUtil {
             data += 0b1;
         }
         posEvent(serverLevel,pos,MALKUTH_CANNON_SHOOT, data, radius);
+    }
+
+    public static void malkuthSwordChargeParticles(ServerLevel serverLevel, MalkuthAttackType malkuthAttackType, MalkuthEntity malkuthEntity, double radius){
+        Vec3 yesIEncodeEnumIntoVec3DontJudgeMe = malkuthAttackType.isFire() ? new Vec3(1,0,0) : new Vec3(-1,0,0);
+        yesIEncodeEnumIntoVec3DontJudgeMe = yesIEncodeEnumIntoVec3DontJudgeMe.add(malkuthEntity.position());
+        posEvent(serverLevel, yesIEncodeEnumIntoVec3DontJudgeMe, MALKUTH_SWORD_CHARGE_PARTICLES, malkuthEntity.getId(), radius);
     }
 
     public static void chesedRaySmoke(ServerLevel level,Vec3 pos,Vec3 direction,double radius){

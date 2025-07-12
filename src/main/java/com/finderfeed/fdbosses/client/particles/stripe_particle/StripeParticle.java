@@ -1,6 +1,5 @@
 package com.finderfeed.fdbosses.client.particles.stripe_particle;
 
-import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticle;
 import com.finderfeed.fdlib.systems.particle.FDParticleRenderType;
 import com.finderfeed.fdlib.systems.shapes.FD2DShape;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -9,16 +8,18 @@ import com.finderfeed.fdlib.util.rendering.renderers.ShapeOnCurveRenderer;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
@@ -42,7 +43,7 @@ public class StripeParticle extends Particle {
         this.yd = yd;
         this.zd = zd;
         this.lifetime = options.getLifetime();
-        shape = FD2DShape.createSimpleCircleNVertexShape(options.getScale(), 2);
+        shape = FD2DShape.createSimpleCircleNVertexShape(options.getScale(), 3);
         points = stripeParticleOptions.getOffsets().stream().map(v->new Vector3f((float) v.x + 0.001f,(float) v.y + 0.001f,(float) v.z + 0.001f)).toList();
     }
 
@@ -85,8 +86,8 @@ public class StripeParticle extends Particle {
                         p =  distToEnd / (stripeParticleOptions.getStripePercentLength()/2);
                     }
 
-                    float startp = Math.clamp(v / stripeParticleOptions.getStripePercentLength(),0,1);
-                    float endp = Math.clamp((1 - v) / stripeParticleOptions.getStripePercentLength(),0,1);
+                    float startp = Math.clamp(v / stripeParticleOptions.getStripePercentLength() * 4,0,1);
+                    float endp = Math.clamp((1 - v) / stripeParticleOptions.getStripePercentLength() * 4,0,1);
 
                     return Math.clamp(FDEasings.easeOut(p),0,1) * startp * endp;
                 })
@@ -94,14 +95,20 @@ public class StripeParticle extends Particle {
                 .endPercent(endP)
                 .pose(matrix)
                 .shape(shape)
-                .color(stripeParticleOptions.getColor())
+                .startColor(stripeParticleOptions.getStartColor())
+                .endColor(stripeParticleOptions.getEndColor())
                 .curvePositions(points)
-                .lod(100)
+                .lod(Math.clamp(stripeParticleOptions.getLOD(),0,200))
                 .render();
 
         matrix.popPose();
     }
 
+
+    @Override
+    protected int getLightColor(float p_107249_) {
+        return LightTexture.FULL_BRIGHT;
+    }
 
     @Override
     public ParticleRenderType getRenderType() {
@@ -111,6 +118,7 @@ public class StripeParticle extends Particle {
     public static final ParticleRenderType RENDER_TYPE = new FDParticleRenderType() {
         @Override
         public void end() {
+            RenderType.lightning().clearState.run();
             RenderSystem.setShader(GameRenderer::getParticleShader);
             RenderSystem.defaultBlendFunc();
         }
@@ -119,8 +127,16 @@ public class StripeParticle extends Particle {
         @Override
         public BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
 
+            RenderType.lightning().setupState.run();
+
+            if (Minecraft.useShaderTransparency()){
+                Minecraft.getInstance().levelRenderer.getParticlesTarget().bindWrite(false);
+            }else{
+                Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
+            }
+
             RenderSystem.enableBlend();
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            RenderSystem.setShader(GameRenderer::getRendertypeLightningShader);
             RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             RenderSystem.enableCull();
 

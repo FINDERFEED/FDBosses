@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
@@ -59,7 +60,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
+import org.joml.AxisAngle4d;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -1150,10 +1153,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }else if (stage == 1){
 
 
-            int swordSpawnTick = 20;
+            int swordSpawnTick = 15;
 
 
-            if (tick > swordSpawnTick + 5 && tick < swordSpawnTick + 40 && swordSpawnTick % 2 == 0){
+            if (tick > swordSpawnTick && tick < swordSpawnTick + 40 && tick % 3 == 0){
+
+                BossUtil.malkuthSwordChargeParticles((ServerLevel) level(), MalkuthAttackType.FIRE, this, 60);
+                BossUtil.malkuthSwordChargeParticles((ServerLevel) level(), MalkuthAttackType.ICE, this, 60);
 
                 Matrix4f fireTransform = this.getModelPartTransformation(this,"fire_sword_place" , SERVER_MODEL);
                 Matrix4f iceTransform = this.getModelPartTransformation(this,"ice_sword_place" , SERVER_MODEL);
@@ -1164,6 +1170,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 Vector3f fireSwordDirectionUp = fireTransform.transformDirection(0,0,-1,new Vector3f());
                 Vector3f iceSwordDirectionUp = iceTransform.transformDirection(0,0,-1,new Vector3f());
 
+                Quaternionf quaternionf = new Quaternionf(new AxisAngle4d(random.nextFloat() * FDMathUtil.FPI * 2,fireSwordDirection.x,fireSwordDirection.y,fireSwordDirection.z));
+                quaternionf.transform(fireSwordDirectionUp);
+                quaternionf.transform(iceSwordDirectionUp);
+
                 Vector3f fireSwordPosition = fireTransform.transformPosition(0,0,0,new Vector3f());
                 Vector3f iceSwordPosition = iceTransform.transformPosition(0,0,0,new Vector3f());
 
@@ -1173,16 +1183,18 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 Vector3f colFire = getMalkuthAttackPreparationParticleColor(MalkuthAttackType.FIRE);
                 Vector3f colIce = getMalkuthAttackPreparationParticleColor(MalkuthAttackType.ICE);
 
-                FDColor fireColor = new FDColor(colFire.x,colFire.y + random.nextFloat() * 0.1f,colFire.z,0.75f);
-                FDColor iceColor = new FDColor(colIce.x,colIce.y + random.nextFloat() * 0.1f,colIce.z,0.75f);
+                FDColor fireColorStart = new FDColor(colFire.x,colFire.y - random.nextFloat() * 0.1f - 0.3f,colFire.z,0.5f);
+                FDColor fireColor = new FDColor(colFire.x,colFire.y + random.nextFloat() * 0.1f,colFire.z,1f);
+                FDColor iceColorStart = new FDColor(colIce.x,colIce.y - random.nextFloat() * 0.1f - 0.3f,colIce.z,0.5f);
+                FDColor iceColor = new FDColor(colIce.x,colIce.y + random.nextFloat() * 0.1f,colIce.z,0.5f);
 
-                StripeParticleOptions fireOptions = StripeParticleOptions.createHorizontalCircling(fireColor,
-                        new Vec3(fireSwordDirectionUp.x,fireSwordDirectionUp.y,fireSwordDirectionUp.z),0.075f,20,random.nextFloat() * 2f - 1f, 0.75f, 1, 0.5f,
-                        random.nextBoolean(), true);
+                StripeParticleOptions fireOptions = StripeParticleOptions.createHorizontalCircling(fireColorStart, fireColor,
+                        new Vec3(fireSwordDirectionUp.x,fireSwordDirectionUp.y,fireSwordDirectionUp.z),0.025f,10,50,random.nextFloat() * 2f - 1f, 1.25f, 1 + random.nextFloat(), 0.5f,
+                        true, true);
 
-                StripeParticleOptions iceOptions = StripeParticleOptions.createHorizontalCircling(iceColor,
-                        new Vec3(iceSwordDirectionUp.x,iceSwordDirectionUp.y,iceSwordDirectionUp.z),0.075f,20,random.nextFloat() * 2f - 1f, 0.75f, 1, 0.5f,
-                        random.nextBoolean(), true);
+                StripeParticleOptions iceOptions = StripeParticleOptions.createHorizontalCircling(iceColorStart, iceColor,
+                        new Vec3(iceSwordDirectionUp.x,iceSwordDirectionUp.y,iceSwordDirectionUp.z),0.025f,10,50,random.nextFloat() * 2f - 1f, 1.25f, 1 + random.nextFloat(), 0.5f,
+                        true, true);
 
                 Vector3f fireStripeLocation = fireSwordPosition.add(fireSwordDirection.mul(rndHeightFire, new Vector3f()));
                 Vector3f iceStripeLocation = iceSwordPosition.add(iceSwordDirection.mul(rndHeightIce, new Vector3f()));
@@ -1466,6 +1478,14 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     @Override
     public BossSpawnerEntity getSpawner() {
         return null;
+    }
+
+    public static String getMalkuthSwordPlaceBone(MalkuthAttackType type){
+        if (type.isFire()){
+            return "fire_sword_place";
+        }else{
+            return "ice_sword_place";
+        }
     }
 
 }
