@@ -73,7 +73,8 @@ public class StripeParticle extends Particle {
         matrix.pushPose();
         matrix.translate(pos.x,pos.y,pos.z);
 
-        ShapeOnCurveRenderer.start(vertex)
+        for (int i = 0; i < 2;i++)
+            ShapeOnCurveRenderer.start(vertex)
                 .scalingFunction(v->{
 
                     float distToEnd = endP - v;
@@ -137,7 +138,7 @@ public class StripeParticle extends Particle {
 
             RenderSystem.enableBlend();
             RenderSystem.setShader(GameRenderer::getRendertypeLightningShader);
-            RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
             RenderSystem.enableCull();
 
             return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);

@@ -42,6 +42,7 @@ import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
@@ -1153,10 +1154,14 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }else if (stage == 1){
 
 
-            int swordSpawnTick = 15;
+            int swordSpawnTick = 16;
 
+            int particlesStart = swordSpawnTick - 3;
+            int particlesEnd = swordSpawnTick + 40;
 
-            if (tick > swordSpawnTick && tick < swordSpawnTick + 40 && tick % 3 == 0){
+            if (tick >= particlesStart && tick < particlesEnd && tick % 3 == 0){
+
+                float p = (float) (tick - particlesStart) / (particlesEnd - particlesStart);
 
                 BossUtil.malkuthSwordChargeParticles((ServerLevel) level(), MalkuthAttackType.FIRE, this, 60);
                 BossUtil.malkuthSwordChargeParticles((ServerLevel) level(), MalkuthAttackType.ICE, this, 60);
@@ -1189,11 +1194,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 FDColor iceColor = new FDColor(colIce.x,colIce.y + random.nextFloat() * 0.1f,colIce.z,0.5f);
 
                 StripeParticleOptions fireOptions = StripeParticleOptions.createHorizontalCircling(fireColorStart, fireColor,
-                        new Vec3(fireSwordDirectionUp.x,fireSwordDirectionUp.y,fireSwordDirectionUp.z),0.025f,10,50,random.nextFloat() * 2f - 1f, 1.25f, 1 + random.nextFloat(), 0.5f,
+                        new Vec3(fireSwordDirectionUp.x,fireSwordDirectionUp.y,fireSwordDirectionUp.z), 0.015f + 0.06f * FDEasings.easeOut(p),10,50,random.nextFloat() * 2f - 1f, 1.75f, 1 + random.nextFloat(), 0.5f,
                         true, true);
 
                 StripeParticleOptions iceOptions = StripeParticleOptions.createHorizontalCircling(iceColorStart, iceColor,
-                        new Vec3(iceSwordDirectionUp.x,iceSwordDirectionUp.y,iceSwordDirectionUp.z),0.025f,10,50,random.nextFloat() * 2f - 1f, 1.25f, 1 + random.nextFloat(), 0.5f,
+                        new Vec3(iceSwordDirectionUp.x,iceSwordDirectionUp.y,iceSwordDirectionUp.z), 0.015f + 0.06f * FDEasings.easeOut(p),10,50,random.nextFloat() * 2f - 1f, 1.75f, 1 + random.nextFloat(), 0.5f,
                         true, true);
 
                 Vector3f fireStripeLocation = fireSwordPosition.add(fireSwordDirection.mul(rndHeightFire, new Vector3f()));

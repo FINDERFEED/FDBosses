@@ -195,7 +195,7 @@ public class BossClientPackets {
 
             Vector3f swordPos = boneTransform.transformPosition(0,0,0,new Vector3f());
 
-            int totalParticles = 30;
+            int totalParticles = 15;
 
             float startHeight = 0.5f;
             float swordBladeHeight = 1.75f;
@@ -219,7 +219,7 @@ public class BossClientPackets {
 
                 Quaternionf quaternionf = new Quaternionf(new AxisAngle4f(FDMathUtil.FPI * 2 * random.nextFloat(), swordDir.x,swordDir.y,swordDir.z));
 
-                Vector3f ppos = quaternionf.transform(swordDirUp,new Vector3f()).add(
+                Vector3f ppos = quaternionf.transform(swordDirUp,new Vector3f()).mul(1.5f).add(
                         (float)center.x,(float)center.y,(float)center.z
                 );
 
@@ -231,6 +231,7 @@ public class BossClientPackets {
                         .color(r,g,b)
                         .size(particleSize)
                         .scalingOptions(10,0,5)
+                        .brightness(2)
                         .particleProcessor(new CircleParticleProcessor(center, true, true, 1))
                         .build();
 
