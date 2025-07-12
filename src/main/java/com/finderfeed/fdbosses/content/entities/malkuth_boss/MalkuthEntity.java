@@ -1160,53 +1160,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             int particlesEnd = swordSpawnTick + 40;
 
             if (tick >= particlesStart && tick < particlesEnd && tick % 3 == 0){
-
-                float p = (float) (tick - particlesStart) / (particlesEnd - particlesStart);
-
                 BossUtil.malkuthSwordChargeParticles((ServerLevel) level(), MalkuthAttackType.FIRE, this, 60);
                 BossUtil.malkuthSwordChargeParticles((ServerLevel) level(), MalkuthAttackType.ICE, this, 60);
-
-                Matrix4f fireTransform = this.getModelPartTransformation(this,"fire_sword_place" , SERVER_MODEL);
-                Matrix4f iceTransform = this.getModelPartTransformation(this,"ice_sword_place" , SERVER_MODEL);
-
-                Vector3f fireSwordDirection = fireTransform.transformDirection(0,1,0,new Vector3f());
-                Vector3f iceSwordDirection = iceTransform.transformDirection(0,1,0,new Vector3f());
-
-                Vector3f fireSwordDirectionUp = fireTransform.transformDirection(0,0,-1,new Vector3f());
-                Vector3f iceSwordDirectionUp = iceTransform.transformDirection(0,0,-1,new Vector3f());
-
-                Quaternionf quaternionf = new Quaternionf(new AxisAngle4d(random.nextFloat() * FDMathUtil.FPI * 2,fireSwordDirection.x,fireSwordDirection.y,fireSwordDirection.z));
-                quaternionf.transform(fireSwordDirectionUp);
-                quaternionf.transform(iceSwordDirectionUp);
-
-                Vector3f fireSwordPosition = fireTransform.transformPosition(0,0,0,new Vector3f());
-                Vector3f iceSwordPosition = iceTransform.transformPosition(0,0,0,new Vector3f());
-
-                float rndHeightFire = 0.5f + 2 * random.nextFloat();
-                float rndHeightIce = 0.5f + 2 * random.nextFloat();
-
-                Vector3f colFire = getMalkuthAttackPreparationParticleColor(MalkuthAttackType.FIRE);
-                Vector3f colIce = getMalkuthAttackPreparationParticleColor(MalkuthAttackType.ICE);
-
-                FDColor fireColorStart = new FDColor(colFire.x,colFire.y - random.nextFloat() * 0.1f - 0.3f,colFire.z,0.5f);
-                FDColor fireColor = new FDColor(colFire.x,colFire.y + random.nextFloat() * 0.1f,colFire.z,1f);
-                FDColor iceColorStart = new FDColor(colIce.x,colIce.y - random.nextFloat() * 0.1f - 0.3f,colIce.z,0.5f);
-                FDColor iceColor = new FDColor(colIce.x,colIce.y + random.nextFloat() * 0.1f,colIce.z,0.5f);
-
-                StripeParticleOptions fireOptions = StripeParticleOptions.createHorizontalCircling(fireColorStart, fireColor,
-                        new Vec3(fireSwordDirectionUp.x,fireSwordDirectionUp.y,fireSwordDirectionUp.z), 0.015f + 0.06f * FDEasings.easeOut(p),10,50,random.nextFloat() * 2f - 1f, 1.75f, 1 + random.nextFloat(), 0.5f,
-                        true, true);
-
-                StripeParticleOptions iceOptions = StripeParticleOptions.createHorizontalCircling(iceColorStart, iceColor,
-                        new Vec3(iceSwordDirectionUp.x,iceSwordDirectionUp.y,iceSwordDirectionUp.z), 0.015f + 0.06f * FDEasings.easeOut(p),10,50,random.nextFloat() * 2f - 1f, 1.75f, 1 + random.nextFloat(), 0.5f,
-                        true, true);
-
-                Vector3f fireStripeLocation = fireSwordPosition.add(fireSwordDirection.mul(rndHeightFire, new Vector3f()));
-                Vector3f iceStripeLocation = iceSwordPosition.add(iceSwordDirection.mul(rndHeightIce, new Vector3f()));
-
-                FDLibCalls.sendParticles(((ServerLevel) level()), fireOptions, new Vec3(fireStripeLocation.x + this.getX(),fireStripeLocation.y + this.getY(),fireStripeLocation.z + this.getZ()), 60);
-                FDLibCalls.sendParticles(((ServerLevel) level()), iceOptions, new Vec3(iceStripeLocation.x + this.getX(),iceStripeLocation.y + this.getY(),iceStripeLocation.z + this.getZ()), 60);
-
+                float sizeModifier = (float) (tick - particlesStart) / (particlesEnd - particlesStart);
+                this.doSwordChargeStripe(MalkuthAttackType.FIRE,1.75f, sizeModifier);
+                this.doSwordChargeStripe(MalkuthAttackType.ICE,1.75f, sizeModifier);
             }
 
 
@@ -1267,6 +1225,42 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
         return false;
+
+    }
+
+    private void doSwordChargeStripe(MalkuthAttackType sword, float radius, float sizeModifier){
+
+
+
+        Matrix4f swordTransform = this.getModelPartTransformation(this,getMalkuthSwordPlaceBone(sword) , SERVER_MODEL);
+
+        Vector3f fireSwordDirection = swordTransform.transformDirection(0,1,0,new Vector3f());
+
+        Vector3f swordLocation = swordTransform.transformDirection(0,0,-1,new Vector3f());
+
+        Quaternionf quaternionf = new Quaternionf(new AxisAngle4d(random.nextFloat() * FDMathUtil.FPI * 2,fireSwordDirection.x,fireSwordDirection.y,fireSwordDirection.z));
+        quaternionf.transform(swordLocation);
+
+        Vector3f fireSwordPosition = swordTransform.transformPosition(0,0,0,new Vector3f());
+
+        float rndHeightFire = 0.5f + 2 * random.nextFloat();
+
+        Vector3f colFire = getMalkuthAttackPreparationParticleColor(sword);
+
+        FDColor fireColorStart = new FDColor(colFire.x,colFire.y - random.nextFloat() * 0.1f - 0.3f,colFire.z,0.5f);
+        FDColor fireColor = new FDColor(colFire.x,colFire.y + random.nextFloat() * 0.1f,colFire.z,1f);
+
+        StripeParticleOptions fireOptions = StripeParticleOptions.createHorizontalCircling(fireColorStart, fireColor,
+                new Vec3(swordLocation.x,swordLocation.y,swordLocation.z), 0.015f + 0.06f * FDEasings.easeOut(sizeModifier),10,50,random.nextFloat() * 2f - 1f, radius, 1 + random.nextFloat(), 0.5f,
+                true, true);
+
+
+
+        Vector3f fireStripeLocation = fireSwordPosition.add(fireSwordDirection.mul(rndHeightFire, new Vector3f()));
+
+
+        FDLibCalls.sendParticles(((ServerLevel) level()), fireOptions, new Vec3(fireStripeLocation.x + this.getX(),fireStripeLocation.y + this.getY(),fireStripeLocation.z + this.getZ()), 60);
+
 
     }
 

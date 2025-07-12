@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_swor
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
+import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
@@ -11,11 +12,12 @@ import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.BoundToEntityProcessor;
-import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
+import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -68,6 +70,10 @@ public class MalkuthGiantSwordSlash extends Entity {
                 this.impactParticles();
             }
 
+            if (tickCount > 3 && tickCount < TIME_TO_RISE - 20){
+                this.riseParticles();
+            }
+
         }else{
             if (tickCount == TIME_TO_HIT + TIME_TO_RISE){
                 this.impactBlocks();
@@ -78,13 +84,76 @@ public class MalkuthGiantSwordSlash extends Entity {
         }
     }
 
+    private void riseParticles(){
+
+        for (int i = 0; i < 10; i++){
+
+            Vector3f color = MalkuthEntity.getMalkuthAttackPreparationParticleColor(this.getAttackType());
+
+            color.x = Math.clamp(color.x + 0.2f,0,1);
+            color.y = Math.clamp(color.y + 0.2f,0,1);
+            color.z = Math.clamp(color.z + 0.2f,0,1);
+
+
+            float rndRadius = FDEasings.easeOut(random.nextFloat()) * 4f;
+            Vec3 rnd = new Vec3(rndRadius,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat());
+
+            float speedf = 0.05f + random.nextFloat() * 0.8f;
+
+            Vec3 speed = rnd.normalize().multiply(speedf,0,speedf).add(0,speedf * 1.5f,0);
+
+            Vec3 ppos = this.position().add(rnd);
+
+            BallParticleOptions options = BallParticleOptions.builder()
+                    .scalingOptions(5,0,10)
+                    .color(color.x,color.y,color.z)
+                    .size(0.15f + (1 - speedf / 0.85f) * 0.5f)
+                    .friction(0.8f)
+                    .brightness(2)
+                    .build();
+
+            level().addParticle(options,true,ppos.x,ppos.y,ppos.z,speed.x,speed.y,speed.z);
+
+        }
+
+
+
+        float rndRadius = 7 + FDEasings.easeOut(random.nextFloat()) * 3f;
+        Vec3 rnd = new Vec3(rndRadius,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat());
+
+        Vec3 dir = rnd.normalize();
+
+        float startOffsetRand = 3f + random.nextFloat() * 2f;
+        Vec3 startOffset = dir.multiply(startOffsetRand,startOffsetRand,startOffsetRand);
+
+        Vec3 stripePos = this.position().add(startOffset);
+
+        Vector3f colFire = MalkuthEntity.getMalkuthAttackPreparationParticleColor(this.getAttackType());
+
+        FDColor fireColorStart = new FDColor(colFire.x,colFire.y - random.nextFloat() * 0.1f - 0.3f,colFire.z,0.5f);
+        FDColor fireColor = new FDColor(colFire.x,colFire.y + random.nextFloat() * 0.1f,colFire.z,1f);
+
+        float firstPointOffset = 2 + random.nextFloat() * 2;
+        float secondPointOffset = 6 + random.nextFloat() * 2;
+
+        StripeParticleOptions stripeParticleOptions = new StripeParticleOptions(fireColorStart,fireColor, 20, 50, 0.2f, 0.5f,
+                new Vec3(0.01f,0,0),
+                dir.multiply(firstPointOffset,0,firstPointOffset).add(0,3,0),
+                dir.multiply(secondPointOffset,0,secondPointOffset).add(0,7,0),
+                rnd.add(0,12,0)
+        );
+
+        level().addParticle(stripeParticleOptions, true, stripePos.x,stripePos.y,stripePos.z,0,0,0);
+
+
+    }
+
     private void impactBlocks(){
 
         float start = 10;
         float end = 40;
 
         Vec3 direction = new Vec3(0,0,1).yRot(-(float)Math.toRadians(this.getYRot()));
-
 
 
 //        PositionedScreenShakePacket.send((ServerLevel) level(),FDShakeData.builder()
@@ -191,6 +260,7 @@ public class MalkuthGiantSwordSlash extends Entity {
                         .size(size)
                         .color(col.x,col.y + 0.2f,col.z)
                         .friction(0.8f)
+                        .brightness(2)
                         .scalingOptions(0,0, 40 + random.nextInt(20))
                         .build();
 
