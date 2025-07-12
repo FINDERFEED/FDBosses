@@ -59,6 +59,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -150,7 +151,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(GIANT_SWORDS_ULTIMATE,this::giantSwordUltimate)
                 .registerAttack(SUMMON_AND_THROW_SIDE_ROCKS,this::summonAndThrowSideRocks)
                 .registerAttack(SUMMON_EARTHQUAKE,this::summonEartquake)
-                .addAttack(-2,SUMMON_EARTHQUAKE)
+                .addAttack(-2,GIANT_SWORDS_ULTIMATE)
 //                .addAttack(-1, sideRocks)
 //                .addAttack(0, NOTHING_20_TICKS)
 //                .addAttack(0, SLASH_ATTACK)
@@ -184,13 +185,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         super.tick();
         if (level().isClientSide){
             this.headControllerContainer.clientTick();
-
-            if (level().getGameTime() % 5 == 0){
-
-                ParticleOptions particleOptions = StripeParticleOptions.createHorizontalCircling(new FDColor(1,1,1,0.25f), new Vec3(1,0,0),
-                        0.1f, 20, -2 + random.nextFloat() * 4, 3 + random.nextFloat(), 2f, 0.5f,random.nextBoolean(), true);
-                level().addParticle(particleOptions, true, this.getX(),this.getY()  + 2 + random.nextFloat() * 2 - 1, this.getZ(),0,0,0);
-            }
 
         }else{
             AnimationSystem animationSystem = this.getAnimationSystem();
@@ -1157,6 +1151,47 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
             int swordSpawnTick = 20;
+
+
+            if (tick > swordSpawnTick + 5 && tick < swordSpawnTick + 40 && swordSpawnTick % 2 == 0){
+
+                Matrix4f fireTransform = this.getModelPartTransformation(this,"fire_sword_place" , SERVER_MODEL);
+                Matrix4f iceTransform = this.getModelPartTransformation(this,"ice_sword_place" , SERVER_MODEL);
+
+                Vector3f fireSwordDirection = fireTransform.transformDirection(0,1,0,new Vector3f());
+                Vector3f iceSwordDirection = iceTransform.transformDirection(0,1,0,new Vector3f());
+
+                Vector3f fireSwordDirectionUp = fireTransform.transformDirection(0,0,-1,new Vector3f());
+                Vector3f iceSwordDirectionUp = iceTransform.transformDirection(0,0,-1,new Vector3f());
+
+                Vector3f fireSwordPosition = fireTransform.transformPosition(0,0,0,new Vector3f());
+                Vector3f iceSwordPosition = iceTransform.transformPosition(0,0,0,new Vector3f());
+
+                float rndHeightFire = 0.5f + 2 * random.nextFloat();
+                float rndHeightIce = 0.5f + 2 * random.nextFloat();
+
+                Vector3f colFire = getMalkuthAttackPreparationParticleColor(MalkuthAttackType.FIRE);
+                Vector3f colIce = getMalkuthAttackPreparationParticleColor(MalkuthAttackType.ICE);
+
+                FDColor fireColor = new FDColor(colFire.x,colFire.y + random.nextFloat() * 0.1f,colFire.z,0.75f);
+                FDColor iceColor = new FDColor(colIce.x,colIce.y + random.nextFloat() * 0.1f,colIce.z,0.75f);
+
+                StripeParticleOptions fireOptions = StripeParticleOptions.createHorizontalCircling(fireColor,
+                        new Vec3(fireSwordDirectionUp.x,fireSwordDirectionUp.y,fireSwordDirectionUp.z),0.075f,20,random.nextFloat() * 2f - 1f, 0.75f, 1, 0.5f,
+                        random.nextBoolean(), true);
+
+                StripeParticleOptions iceOptions = StripeParticleOptions.createHorizontalCircling(iceColor,
+                        new Vec3(iceSwordDirectionUp.x,iceSwordDirectionUp.y,iceSwordDirectionUp.z),0.075f,20,random.nextFloat() * 2f - 1f, 0.75f, 1, 0.5f,
+                        random.nextBoolean(), true);
+
+                Vector3f fireStripeLocation = fireSwordPosition.add(fireSwordDirection.mul(rndHeightFire, new Vector3f()));
+                Vector3f iceStripeLocation = iceSwordPosition.add(iceSwordDirection.mul(rndHeightIce, new Vector3f()));
+
+                FDLibCalls.sendParticles(((ServerLevel) level()), fireOptions, new Vec3(fireStripeLocation.x + this.getX(),fireStripeLocation.y + this.getY(),fireStripeLocation.z + this.getZ()), 60);
+                FDLibCalls.sendParticles(((ServerLevel) level()), iceOptions, new Vec3(iceStripeLocation.x + this.getX(),iceStripeLocation.y + this.getY(),iceStripeLocation.z + this.getZ()), 60);
+
+            }
+
 
             if (tick == swordSpawnTick - 5){
 

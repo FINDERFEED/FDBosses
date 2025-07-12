@@ -5,6 +5,7 @@ import com.finderfeed.fdlib.util.FDByteBufCodecs;
 import com.finderfeed.fdlib.util.FDCodecs;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -14,10 +15,12 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class StripeParticleOptions implements ParticleOptions {
 
@@ -78,8 +81,10 @@ public class StripeParticleOptions implements ParticleOptions {
         this.offsets = offsets;
     }
 
-    public static StripeParticleOptions createHorizontalCircling(FDColor color, Vec3 startingHorizontalDirection,float scale, int lifetime, float verticalDistance, float radius, float circlesAmount, float stripePercentLength, boolean circleDirection, boolean in){
-        startingHorizontalDirection = startingHorizontalDirection.multiply(1,0,1).normalize();
+    public static StripeParticleOptions createHorizontalCircling(FDColor color, Vec3 startingDirection,float scale, int lifetime, float verticalDistance, float radius, float circlesAmount, float stripePercentLength, boolean circleDirection, boolean in){
+        startingDirection = startingDirection.normalize();
+
+        Vec3 startingHorizontalDirection = startingDirection.multiply(1,0,1).normalize();
 
         float step = FDMathUtil.FPI / 8f;
 
@@ -106,6 +111,23 @@ public class StripeParticleOptions implements ParticleOptions {
             positions.add(dir.add(0.001f,currentVerticalOffset,0.001f));
 
         }
+
+        Matrix4f transform = new Matrix4f();
+
+        Vec3 left = startingDirection.cross(new Vec3(0,1,0));
+        Vec3 transformDirection = left.cross(startingDirection);
+
+        FDRenderUtil.applyMovementMatrixRotations(transform, transformDirection);
+        for (int i = 0; i < positions.size(); i++){
+
+            Vec3 oldpos = positions.get(i);
+
+            Vector3f v = transform.transformPosition((float) oldpos.x,(float) oldpos.y,(float) oldpos.z, new Vector3f());
+
+            positions.set(i,new Vec3(v.x,v.y,v.z));
+
+        }
+
         return new StripeParticleOptions(color, lifetime, scale,stripePercentLength, positions);
     }
 

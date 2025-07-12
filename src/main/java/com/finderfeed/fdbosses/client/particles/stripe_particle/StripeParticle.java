@@ -54,6 +54,7 @@ public class StripeParticle extends Particle {
     @Override
     public void render(VertexConsumer vertex, Camera camera, float pticks) {
 
+
         float lifetimeP = (this.age + pticks) / lifetime;
 
         float startP = FDMathUtil.lerp(-stripeParticleOptions.getStripePercentLength(),1,lifetimeP);
@@ -83,7 +84,11 @@ public class StripeParticle extends Particle {
                     }else{
                         p =  distToEnd / (stripeParticleOptions.getStripePercentLength()/2);
                     }
-                    return Math.clamp(FDEasings.easeOut(p),0,1);
+
+                    float startp = Math.clamp(v / stripeParticleOptions.getStripePercentLength(),0,1);
+                    float endp = Math.clamp((1 - v) / stripeParticleOptions.getStripePercentLength(),0,1);
+
+                    return Math.clamp(FDEasings.easeOut(p),0,1) * startp * endp;
                 })
                 .startPercent(startP)
                 .endPercent(endP)
