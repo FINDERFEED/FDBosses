@@ -162,11 +162,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 //                .addAttack(-1, sideRocks)
 //                .addAttack(0, NOTHING_20_TICKS)
+                .addAttack(0, GIANT_SWORDS_ULTIMATE)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
 //                .addAttack(2, SUMMON_EARTHQUAKE)
 //                .addAttack(3, JUMP_BACK_ON_SPAWN_WITH_CRUSH)
-                .addAttack(2, PULL_AND_PUNCH)
+//                .addAttack(2, PULL_AND_PUNCH)
 //                .addAttack(3, JUMP_ON_WALL_COMMAND_CANNONS)
 //                .addAttack(4, CAROUSEL_SLASHES)
                 .attackListener(this::attackListener)
@@ -774,12 +775,14 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private boolean pullAndPunch(AttackInstance inst){
 
+        if (true) return true;
+
         int stage = inst.stage;
         int tick = inst.tick;
 
         if (stage == 0){
 
-            AABB box = new AABB(-ENRAGE_RADIUS,3,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(this.position());
+            AABB box = new AABB(-ENRAGE_RADIUS,4,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(this.position());
 
             List<Player> players = level().getEntitiesOfClass(Player.class, box);
 

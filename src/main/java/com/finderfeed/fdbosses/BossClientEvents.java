@@ -275,8 +275,8 @@ public class BossClientEvents {
         matrices.mulPose(Axis.YP.rotationDegrees( 20));
 
 
-        renderSkybox(matrices, builder, 500, 1f, 1f ,1f, 0.5f * alpha);
-        renderSkybox(matrices, builder, 500, 1f, 1f ,1f, flash * alpha);
+        renderSkybox(matrices, builder, 300, 1f, 1f ,1f, 0.5f * alpha);
+        renderSkybox(matrices, builder, 300, 1f, 1f ,1f, flash * alpha);
         BufferUploader.drawWithShader(builder.build());
         matrices.popPose();
 
@@ -290,8 +290,8 @@ public class BossClientEvents {
 
 
 
-        renderSkybox(matrices, builder, 499f, 1f, 1f ,1f, 0.5f * alpha);
-        renderSkybox(matrices, builder, 499f, 1f, 1f ,1f, flashCounter * 0.8f * alpha);
+        renderSkybox(matrices, builder, 299f, 1f, 1f ,1f, 0.5f * alpha);
+        renderSkybox(matrices, builder, 299f, 1f, 1f ,1f, flashCounter * 0.8f * alpha);
         BufferUploader.drawWithShader(builder.build());
         matrices.popPose();
 

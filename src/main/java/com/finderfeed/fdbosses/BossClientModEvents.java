@@ -180,6 +180,8 @@ public class BossClientModEvents {
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
 
+        event.registerEntityRenderer(BossEntities.MALKUTH_PLATFORM.get(), NullEntityRenderer::new);
+
         event.registerEntityRenderer(BossEntities.MALKUTH_BOSS_SPAWNER.get(), FDEntityRendererBuilder.<MalkuthBossSpawner>builder()
                         .freeRender(new MalkuthBossSpawnerRenderer())
                         .shouldRender(((malkuthBossSpawner, frustum, v, v1, v2) -> true))

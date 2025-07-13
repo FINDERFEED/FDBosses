@@ -26,6 +26,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.Malku
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlash;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_platform.MalkuthPlatform;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -220,6 +221,15 @@ public class BossEntities {
             .sized(3f,3f)
             .build("malkuth_boulder"));
 
+    public static final Supplier<EntityType<MalkuthPlatform>> MALKUTH_PLATFORM = ENTITIES.register("malkuth_platform",()->EntityType.Builder.of(
+                    MalkuthPlatform::new, MobCategory.MISC
+            )
+            .clientTrackingRange(30)
+            .updateInterval(1)
+            .setShouldReceiveVelocityUpdates(true)
+            .sized(3f,3f)
+            .build("malkuth_platform"));
+
 
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event){
@@ -232,6 +242,7 @@ public class BossEntities {
         event.put(MALKUTH_CHAIN.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
         event.put(MALKUTH.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,20).build());
         event.put(MALKUTH_CANNON.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
+//        event.put(MALKUTH_PLATFORM.get(), LivingEntity.createLivingAttributes().build());
     }
 
 
