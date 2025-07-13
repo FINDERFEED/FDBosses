@@ -119,7 +119,6 @@ public class StripeParticle extends Particle {
     public static final ParticleRenderType RENDER_TYPE = new FDParticleRenderType() {
         @Override
         public void end() {
-            RenderType.lightning().clearState.run();
             RenderSystem.setShader(GameRenderer::getParticleShader);
             RenderSystem.defaultBlendFunc();
         }
@@ -128,7 +127,6 @@ public class StripeParticle extends Particle {
         @Override
         public BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
 
-            RenderType.lightning().setupState.run();
 
             if (Minecraft.useShaderTransparency()){
                 Minecraft.getInstance().levelRenderer.getParticlesTarget().bindWrite(false);

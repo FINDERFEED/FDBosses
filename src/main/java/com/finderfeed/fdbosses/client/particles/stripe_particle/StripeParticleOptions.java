@@ -88,10 +88,10 @@ public class StripeParticleOptions implements ParticleOptions {
         this.offsets = offsets;
     }
 
-    public static StripeParticleOptions createHorizontalCircling(FDColor startColor, FDColor endColor, Vec3 startingDirection,float scale, int lifetime, int lod, float verticalDistance, float radius, float circlesAmount, float stripePercentLength, boolean circleDirection, boolean in){
-        startingDirection = startingDirection.normalize();
+    public static StripeParticleOptions createHorizontalCircling(FDColor startColor, FDColor endColor, Vec3 direction,float startingAngle, float scale, int lifetime, int lod, float verticalDistance, float radius, float circlesAmount, float stripePercentLength, boolean circleDirection, boolean in){
+        direction = direction.normalize();
 
-        Vec3 startingHorizontalDirection = startingDirection.multiply(1,0,1).normalize();
+        Vec3 startingHorizontalDirection = new Vec3(1,0,0).yRot(startingAngle);
 
         float step = FDMathUtil.FPI / 8f;
 
@@ -121,10 +121,7 @@ public class StripeParticleOptions implements ParticleOptions {
 
         Matrix4f transform = new Matrix4f();
 
-        Vec3 left = startingDirection.cross(new Vec3(0,1,0));
-        Vec3 transformDirection = left.cross(startingDirection);
-
-        FDRenderUtil.applyMovementMatrixRotations(transform, transformDirection);
+        FDRenderUtil.applyMovementMatrixRotations(transform, direction);
         for (int i = 0; i < positions.size(); i++){
 
             Vec3 oldpos = positions.get(i);

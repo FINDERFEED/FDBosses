@@ -2,16 +2,20 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boulder;
 
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
+import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -24,6 +28,7 @@ import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.joml.Vector3f;
 
 public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializable {
 
@@ -156,6 +161,37 @@ public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializab
                 PacketDistributor.sendToPlayersTrackingEntity(this,packet);
             }
         }
+    }
+
+
+    private void stripeParticles(MalkuthAttackType type){
+
+
+        float rndRadius = 1 + FDEasings.easeOut(random.nextFloat()) * 4f;
+        Vec3 rnd = new Vec3(rndRadius,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat());
+
+        Vec3 dir = rnd.normalize();
+
+        float startOffsetRand = 0.1f + random.nextFloat() * 0.5f;
+        Vec3 startOffset = dir.multiply(startOffsetRand,startOffsetRand,startOffsetRand);
+
+        Vec3 stripePos = this.position().add(startOffset);
+
+        Vector3f colFire = MalkuthEntity.getMalkuthAttackPreparationParticleColor(type);
+
+        FDColor fireColorStart = new FDColor(colFire.x,colFire.y - random.nextFloat() * 0.1f - 0.3f,colFire.z,0.5f);
+        FDColor fireColor = new FDColor(colFire.x,colFire.y + random.nextFloat() * 0.1f,colFire.z,1f);
+
+        float firstPointOffset = 2f + random.nextFloat() * 1f;
+
+        StripeParticleOptions stripeParticleOptions = new StripeParticleOptions(fireColorStart,fireColor, 5 + random.nextInt(10), 50, 0.05f, 0.75f,
+                new Vec3(0.01f,0,0),
+                dir.multiply(firstPointOffset,0,firstPointOffset).add(0,0.5,0),
+                rnd.add(0,1.5f + random.nextFloat() * 2,0)
+        );
+
+        level().addParticle(stripeParticleOptions, true, stripePos.x,stripePos.y,stripePos.z,0,0,0);
+
     }
 
     public void setShouldMoveToTarget(boolean shouldMoveToTarget) {

@@ -37,18 +37,22 @@ import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
+import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -155,13 +159,14 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(GIANT_SWORDS_ULTIMATE,this::giantSwordUltimate)
                 .registerAttack(SUMMON_AND_THROW_SIDE_ROCKS,this::summonAndThrowSideRocks)
                 .registerAttack(SUMMON_EARTHQUAKE,this::summonEartquake)
-                .addAttack(-2,GIANT_SWORDS_ULTIMATE)
+
 //                .addAttack(-1, sideRocks)
 //                .addAttack(0, NOTHING_20_TICKS)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
-//                .addAttack(2, JUMP_BACK_ON_SPAWN)
-//                .addAttack(2, PULL_AND_PUNCH)
+//                .addAttack(2, SUMMON_EARTHQUAKE)
+//                .addAttack(3, JUMP_BACK_ON_SPAWN_WITH_CRUSH)
+                .addAttack(2, PULL_AND_PUNCH)
 //                .addAttack(3, JUMP_ON_WALL_COMMAND_CANNONS)
 //                .addAttack(4, CAROUSEL_SLASHES)
                 .attackListener(this::attackListener)
@@ -191,6 +196,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.headControllerContainer.clientTick();
 
         }else{
+
             AnimationSystem animationSystem = this.getAnimationSystem();
             if (animationSystem.getTicker(MAIN_LAYER) == null){
                 animationSystem.startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
@@ -244,13 +250,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private boolean summonEartquake(AttackInstance inst){
 
-        if (true) return true;
         int stage = inst.stage;
         int tick = inst.tick;
 
         if (stage == 0){
             this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
             lookAtTarget = true;
+            this.lookAt(EntityAnchorArgument.Anchor.EYES, this.getTarget().position());
             earthquakeToSummon = MalkuthAttackType.getRandom(random);
             if (earthquakeToSummon.isFire()){
                 this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SINGLE_EARTHQUAKE_FIRE)
@@ -300,7 +306,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         .stayTime(0)
                         .outTime(5)
                         .build(),this.position(),60);
-            }else if (tick >= 40){
+            }else if (tick >= 20){
                 this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
                 return true;
             }
@@ -508,7 +514,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.noPhysics = false;
             this.setNoGravity(false);
             lookAtTarget = true;
-            if (tick >= 40){
+            int waitTime = crush ? 30 : 10;
+            if (tick >= waitTime){
                 this.jumpBackOnSpawnPath = null;
                 return true;
             }
@@ -639,8 +646,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             }else if (tick >= 40){
                 inst.nextStage();
-            }else if (tick == 8){
+            }else if (tick == 8) {
                 this.causeSwordChargeParticles(slashAttackType);
+                for (int i = 0; i < 6; i++) {
+                    this.doSwordChargeStripe(slashAttackType, 3f, 0.5f, 0.25f, false);
+                }
             }
 
         }else if (localStage == 2){
@@ -723,7 +733,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         .stayTime(0)
                         .outTime(5)
                         .build(),malkuthCrushAttack.position(),120);
-            }else if (tick >= 30){
+            }else if (tick >= 20){
                 return true;
             }
 
@@ -768,6 +778,15 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         int tick = inst.tick;
 
         if (stage == 0){
+
+            AABB box = new AABB(-ENRAGE_RADIUS,3,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(this.position());
+
+            List<Player> players = level().getEntitiesOfClass(Player.class, box);
+
+            if (players.isEmpty()){
+                return true;
+            }
+
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_PULL_AND_PUNCH)
                             .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
                     .build());
@@ -787,14 +806,31 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     return true;
                 }
 
-                Vec3 pullToPos = this.position().add(0, 2.5, 0).add(this.getForward().multiply(1, 0, 1).normalize().multiply(2, 2, 2));
-                MalkuthChainEntity malkuthChainEntity = MalkuthChainEntity.summon(level(), this, MalkuthAttackType.ICE, pullToPos, this.getTarget(), 10, 10);
+                AABB box = new AABB(-ENRAGE_RADIUS,-2,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(this.position());
+
+                for (Player target : level().getEntitiesOfClass(Player.class, box)) {
+                    Vec3 pullToPos = this.position().add(0, 2.5, 0).add(this.getForward().multiply(1, 0, 1).normalize().multiply(2, 2, 2));
+                    MalkuthChainEntity malkuthChainEntity = MalkuthChainEntity.summon(level(), this, MalkuthAttackType.ICE, pullToPos, target, 10, 10);
+                }
                 inst.nextStage();
             }
         }else if (stage == 2){
             if (tick == 10){
                 this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
             }else if (tick == 24){
+
+                Vector3f pos = this.getModelPartPosition(this, getMalkuthSwordPlaceBone(MalkuthAttackType.ICE),SERVER_MODEL);
+
+                Vector3f col = getMalkuthAttackPreparationParticleColor(MalkuthAttackType.ICE);
+
+                FDLibCalls.sendParticles((ServerLevel) level(), BallParticleOptions.builder()
+                        .size(5f)
+                        .scalingOptions(0, 0, 2)
+                        .color(col.x,col.y,col.z)
+                                .brightness(2)
+                        .build(), this.position().add(pos.x,pos.y,pos.z), 60);
+
+
                 for (var chain : this.level().getEntitiesOfClass(MalkuthChainEntity.class, this.getBoundingBox().inflate(20,20,20))){
                     var passengers = new ArrayList<>(chain.getPassengers());
                     chain.ejectPassengers();
@@ -806,10 +842,23 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         if (e instanceof LivingEntity livingEntity){
                             livingEntity.hurt(livingEntity.damageSources().generic(),1);
 
-                            Vec3 speed = forward.multiply(2,2,2);
+                            Vec3 speed = forward.multiply(6,6,6).add(0,-1,0);
 
                             if (livingEntity instanceof ServerPlayer player){
                                 FDLibCalls.setServerPlayerSpeed(player, speed);
+
+                                player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS,40,0,true,false));
+                                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,40,0,true,false));
+                                player.addEffect(new MobEffectInstance(MobEffects.CONFUSION,100,0,true,false));
+
+                                PacketDistributor.sendToPlayer(player, new DefaultShakePacket(FDShakeData.builder()
+                                        .stayTime(0)
+                                        .inTime(0)
+                                        .outTime(35)
+                                        .amplitude(0.2f)
+                                        .build()));
+
+
                             }else{
                                 livingEntity.setDeltaMovement(speed);
                             }
@@ -822,7 +871,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 this.causeSwordChargeParticles(MalkuthAttackType.ICE);
                 this.attachIceSword();
                 this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
-            } else if (tick >= 100){
+            } else if (tick >= 50){
                 return true;
             }
         }
@@ -1133,8 +1182,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     public boolean giantSwordUltimate(AttackInstance inst){
 
-//        if (true) return  true;
-
         int stage = inst.stage;
         int tick = inst.tick;
 
@@ -1229,6 +1276,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     private void doSwordChargeStripe(MalkuthAttackType sword, float radius, float sizeModifier){
+        this.doSwordChargeStripe(sword,radius,sizeModifier,1 + random.nextFloat(), true);
+
+    }
+
+    private void doSwordChargeStripe(MalkuthAttackType sword, float radius, float sizeModifier,float circleAmount, boolean in){
 
 
 
@@ -1236,12 +1288,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         Vector3f fireSwordDirection = swordTransform.transformDirection(0,1,0,new Vector3f());
 
-        Vector3f swordLocation = swordTransform.transformDirection(0,0,-1,new Vector3f());
-
-        Quaternionf quaternionf = new Quaternionf(new AxisAngle4d(random.nextFloat() * FDMathUtil.FPI * 2,fireSwordDirection.x,fireSwordDirection.y,fireSwordDirection.z));
-        quaternionf.transform(swordLocation);
-
         Vector3f fireSwordPosition = swordTransform.transformPosition(0,0,0,new Vector3f());
+
 
         float rndHeightFire = 0.5f + 2 * random.nextFloat();
 
@@ -1251,8 +1299,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         FDColor fireColor = new FDColor(colFire.x,colFire.y + random.nextFloat() * 0.1f,colFire.z,1f);
 
         StripeParticleOptions fireOptions = StripeParticleOptions.createHorizontalCircling(fireColorStart, fireColor,
-                new Vec3(swordLocation.x,swordLocation.y,swordLocation.z), 0.015f + 0.06f * FDEasings.easeOut(sizeModifier),10,50,random.nextFloat() * 2f - 1f, radius, 1 + random.nextFloat(), 0.5f,
-                true, true);
+                new Vec3(fireSwordDirection.x,fireSwordDirection.y,fireSwordDirection.z), FDMathUtil.FPI * 2 * random.nextFloat(), 0.015f + 0.06f * FDEasings.easeOut(sizeModifier),10,50,random.nextFloat() * 4  - 2, radius, circleAmount, 0.5f,
+                true, in);
 
 
 

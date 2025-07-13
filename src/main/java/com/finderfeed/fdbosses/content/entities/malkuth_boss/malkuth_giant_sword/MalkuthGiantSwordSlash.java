@@ -155,24 +155,9 @@ public class MalkuthGiantSwordSlash extends Entity {
 
         Vec3 direction = new Vec3(0,0,1).yRot(-(float)Math.toRadians(this.getYRot()));
 
-
-//        PositionedScreenShakePacket.send((ServerLevel) level(),FDShakeData.builder()
-//                .frequency(20)
-//                .amplitude(5f)
-//                .inTime(0)
-//                .stayTime(0)
-//                .outTime(10)
-//                .build(),this.position().add(direction.x * ( (end - start) / 2),direction.y * ( (end - start) / 2),direction.z * ( (end - start) / 2)),100);
-
-//        DefaultShakePacket.send((ServerLevel) level(), this.position(), 60, FDShakeData.builder()
-//                .amplitude(0.25f)
-//                .inTime(0)
-//                .stayTime(30)
-//                .outTime(100)
-//                .build());
         PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                 .frequency(50)
-                .amplitude(4f)
+                .amplitude(3f)
                 .inTime(0)
                 .stayTime(0)
                 .outTime(50)
