@@ -43,7 +43,7 @@ public class StripeParticle extends Particle {
         this.yd = yd;
         this.zd = zd;
         this.lifetime = options.getLifetime();
-        shape = FD2DShape.createSimpleCircleNVertexShape(options.getScale(), 3);
+        shape = FD2DShape.createSimpleCircleNVertexShape(options.getScale(), options.getShapeVertices());
         points = stripeParticleOptions.getOffsets().stream().map(v->new Vector3f((float) v.x + 0.001f,(float) v.y + 0.001f,(float) v.z + 0.001f)).toList();
     }
 
@@ -73,12 +73,15 @@ public class StripeParticle extends Particle {
         matrix.pushPose();
         matrix.translate(pos.x,pos.y,pos.z);
 
-        for (int i = 0; i < 2;i++)
+
             ShapeOnCurveRenderer.start(vertex)
                 .scalingFunction(v->{
 
                     float distToEnd = endP - v;
                     float distToStart = v - startP;
+                    if (distToStart < 0){
+                        distToStart = 0;
+                    }
 
                     float p;
                     if (distToEnd > distToStart){
@@ -87,11 +90,14 @@ public class StripeParticle extends Particle {
                         p =  distToEnd / (stripeParticleOptions.getStripePercentLength()/2);
                     }
 
-                    float startp = Math.clamp(v / stripeParticleOptions.getStripePercentLength() * 4,0,1);
-                    float endp = Math.clamp((1 - v) / stripeParticleOptions.getStripePercentLength() * 4,0,1);
+
+                    float startp = Math.clamp(v / stripeParticleOptions.getStartInPercent(),0,1);
+                    float endp = Math.clamp((1 - v) / stripeParticleOptions.getEndOutPercent(),0,1);
+
 
                     return Math.clamp(FDEasings.easeOut(p),0,1) * startp * endp;
                 })
+                    .renderCount(2)
                 .startPercent(startP)
                 .endPercent(endP)
                 .pose(matrix)

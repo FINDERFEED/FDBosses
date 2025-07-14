@@ -111,6 +111,27 @@ public class MalkuthEarthquakeSegment {
             return texture;
         }
 
+        public static Type getRandomBaseSegment(Random random){
+            if (random.nextBoolean()){
+                if (random.nextBoolean()){
+                    return FIRE_1;
+                }else{
+                    return FIRE_2;
+                }
+            }else{
+
+                float rnd = random.nextFloat();
+
+                if (rnd > 0.66f){
+                    return ICE_1;
+                }else if (rnd > 0.33f){
+                    return ICE_2;
+                }else{
+                    return FIRE_2;
+                }
+            }
+        }
+
         public static Type getRandomBaseSegment(MalkuthAttackType attackType, Random random, boolean includeRockInIce){
             int id = random.nextInt(2);
             if (attackType.isFire()){

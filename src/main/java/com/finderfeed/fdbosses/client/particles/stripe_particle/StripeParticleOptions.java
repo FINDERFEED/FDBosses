@@ -47,31 +47,66 @@ public class StripeParticleOptions implements ParticleOptions {
             FDCodecs.COLOR.fieldOf("startColor").forGetter(v->v.startColor),
             FDCodecs.COLOR.fieldOf("endColor").forGetter(v->v.endColor),
             Codec.INT.fieldOf("lifetime").forGetter(v->v.lifetime),
+            Codec.INT.fieldOf("shapeVerties").forGetter(v->v.shapeVertices),
             Codec.INT.fieldOf("lod").forGetter(v->v.lod),
             Codec.FLOAT.fieldOf("scale").forGetter(v->v.scale),
             Codec.FLOAT.fieldOf("stripePercentLength").forGetter(v->v.stripePercentLength),
+            Codec.FLOAT.fieldOf("startInPercent").forGetter(v->v.startInPercent),
+            Codec.FLOAT.fieldOf("endOutPercent").forGetter(v->v.endOutPercent),
             Codec.list(FDCodecs.VEC3).fieldOf("offsets").forGetter(v->v.offsets)
-    ).apply(p, StripeParticleOptions::new));
+    ).apply(p, (startColor,endColor,lifetime, shapeVertices,lod,scale,stripePercentLength,startInPercent,endOutPercent,offsets)->{
+        return StripeParticleOptions.builder()
+                .startColor(startColor)
+                .endColor(endColor)
+                .shapeVertices(shapeVertices)
+                .lifetime(lifetime)
+                .scale(scale)
+                .stripePercentLength(stripePercentLength)
+                .startInPercent(startInPercent)
+                .endOutPercent(endOutPercent)
+                .offsets(offsets)
+                .build();
+    }));
 
     public static final StreamCodec<? super RegistryFriendlyByteBuf, StripeParticleOptions> STREAM_CODEC = FDByteBufCodecs.composite(
             FDByteBufCodecs.COLOR,v->v.startColor,
             FDByteBufCodecs.COLOR,v->v.endColor,
             ByteBufCodecs.INT,v->v.lifetime,
+            ByteBufCodecs.INT,v->v.shapeVertices,
             ByteBufCodecs.INT,v->v.lod,
             ByteBufCodecs.FLOAT,v->v.scale,
             ByteBufCodecs.FLOAT,v->v.stripePercentLength,
+            ByteBufCodecs.FLOAT,v->v.startInPercent,
+            ByteBufCodecs.FLOAT,v->v.endOutPercent,
             VEC3LIST,v->v.offsets,
-            StripeParticleOptions::new
+            (startColor,endColor,lifetime, shapeVertices,lod,scale,stripePercentLength,startInPercent,endOutPercent,offsets)->{
+                return StripeParticleOptions.builder()
+                        .startColor(startColor)
+                        .endColor(endColor)
+                        .lifetime(lifetime)
+                        .scale(scale)
+                        .stripePercentLength(stripePercentLength)
+                        .startInPercent(startInPercent)
+                        .endOutPercent(endOutPercent)
+                        .shapeVertices(shapeVertices)
+                        .offsets(offsets)
+                        .build();
+            }
     );
 
     private float stripePercentLength;
 
-    private FDColor startColor;
-    private FDColor endColor;
-    private int lifetime;
-    private List<Vec3> offsets;
-    private float scale;
-    private int lod;
+    private int shapeVertices = 3;
+    private FDColor startColor = new FDColor(1,1,1,1);
+    private FDColor endColor = new FDColor(1,1,1,1);
+    private int lifetime = 20;
+    private List<Vec3> offsets = new ArrayList<>();
+    private float scale = 1;
+    private int lod = 25;
+    private float startInPercent = 0.5f;
+    private float endOutPercent = 0.5f;
+
+    private StripeParticleOptions(){};
 
     public StripeParticleOptions(FDColor startColor,FDColor endColor, int lifetime, int lod,  float scale, float stripePercentLength, Vec3... offsets){
         this.offsets = List.of(offsets);
@@ -135,6 +170,14 @@ public class StripeParticleOptions implements ParticleOptions {
         return new StripeParticleOptions(startColor, endColor, lifetime, lod, scale,stripePercentLength, positions);
     }
 
+    public float getEndOutPercent() {
+        return endOutPercent;
+    }
+
+    public float getStartInPercent() {
+        return startInPercent;
+    }
+
     public int getLOD(){
         return lod;
     }
@@ -163,9 +206,87 @@ public class StripeParticleOptions implements ParticleOptions {
         return offsets;
     }
 
+    public int getShapeVertices() {
+        return shapeVertices;
+    }
+
     @Override
     public ParticleType<?> getType() {
         return BossParticles.STRIPE_PARTICLE.get();
+    }
+
+    public static Builder builder(){
+        return new Builder();
+    }
+
+    public static class Builder {
+
+        private StripeParticleOptions stripeParticleOptions;
+
+
+        public Builder shapeVertices(int shapeVertices){
+            this.stripeParticleOptions.shapeVertices = shapeVertices;
+            return this;
+        }
+
+        public Builder(){
+            this.stripeParticleOptions = new StripeParticleOptions();
+        }
+
+        public Builder stripePercentLength(float stripePercentLength){
+            this.stripeParticleOptions.stripePercentLength = stripePercentLength;
+            return this;
+        }
+
+        public Builder startColor(FDColor color){
+            this.stripeParticleOptions.startColor = color;
+            return this;
+        }
+
+        public Builder endColor(FDColor color){
+            this.stripeParticleOptions.endColor = color;
+            return this;
+        }
+
+        public Builder lifetime(int lifetime){
+            this.stripeParticleOptions.lifetime = lifetime;
+            return this;
+        }
+
+        public Builder offsets(List<Vec3> offsets){
+            this.stripeParticleOptions.offsets = offsets;
+            return this;
+        }
+
+        public Builder offsets(Vec3... offsets){
+            this.stripeParticleOptions.offsets = List.of(offsets);
+            return this;
+        }
+
+        public Builder scale(float scale){
+            this.stripeParticleOptions.scale = scale;
+            return this;
+        }
+
+        public Builder lod(int lod){
+            this.stripeParticleOptions.lod = lod;
+            return this;
+        }
+
+        public Builder startInPercent(float startPercent){
+            this.stripeParticleOptions.startInPercent = startPercent;
+            return this;
+        }
+
+        public Builder endOutPercent(float endPercent){
+            this.stripeParticleOptions.endOutPercent = endPercent;
+            return this;
+        }
+
+        public StripeParticleOptions build(){
+            return stripeParticleOptions;
+        }
+
     }
 
 }

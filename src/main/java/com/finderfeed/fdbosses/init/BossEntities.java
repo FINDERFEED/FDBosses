@@ -25,6 +25,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.Malk
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_floor.MalkuthFloorEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlash;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_platform.MalkuthPlatform;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
@@ -228,6 +229,12 @@ public class BossEntities {
             .sized(5f,1f)
             .build("malkuth_platform"));
 
+    public static final Supplier<EntityType<MalkuthFloorEntity>> MALKUTH_FLOOR = ENTITIES.register("malkuth_floor",()->EntityType.Builder.of(
+                    MalkuthFloorEntity::new, MobCategory.MISC
+            )
+            .sized(0.3f,0.3f)
+            .build("malkuth_floor"));
+
 
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event){
@@ -240,7 +247,6 @@ public class BossEntities {
         event.put(MALKUTH_CHAIN.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
         event.put(MALKUTH.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,20).build());
         event.put(MALKUTH_CANNON.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
-//        event.put(MALKUTH_PLATFORM.get(), LivingEntity.createLivingAttributes().build());
     }
 
 

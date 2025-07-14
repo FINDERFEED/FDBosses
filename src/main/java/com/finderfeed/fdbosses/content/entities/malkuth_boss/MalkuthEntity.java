@@ -13,9 +13,11 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.Malku
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlash;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_platform.MalkuthPlatform;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.MalkuthChargeSwordPacket;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDLibCalls;
@@ -46,8 +48,6 @@ import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOpti
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
-import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -65,9 +65,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
-import org.joml.AxisAngle4d;
 import org.joml.Matrix4f;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -94,6 +92,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public static final String DEATTACH_SWORDS = "deattach_swords";
     public static final String NOTHING_20_TICKS = "nothing_20_ticks";
     public static final String SUMMON_EARTHQUAKE = "summon_earthquake";
+    public static final String PLATFORMS_N_FIREBALLS = "platforms_n_fireballs";
 
     private static FDModel SERVER_MODEL;
     private static FDModel CLIENT_MODEL;
@@ -159,10 +158,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(GIANT_SWORDS_ULTIMATE,this::giantSwordUltimate)
                 .registerAttack(SUMMON_AND_THROW_SIDE_ROCKS,this::summonAndThrowSideRocks)
                 .registerAttack(SUMMON_EARTHQUAKE,this::summonEartquake)
+                .registerAttack(PLATFORMS_N_FIREBALLS, this::fireballsNPlatforms)
 
 //                .addAttack(-1, sideRocks)
 //                .addAttack(0, NOTHING_20_TICKS)
-                .addAttack(0, GIANT_SWORDS_ULTIMATE)
+                .addAttack(0, PLATFORMS_N_FIREBALLS)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
 //                .addAttack(2, SUMMON_EARTHQUAKE)
@@ -195,7 +195,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         super.tick();
         if (level().isClientSide){
             this.headControllerContainer.clientTick();
-
         }else{
 
             AnimationSystem animationSystem = this.getAnimationSystem();
@@ -246,6 +245,67 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     //============================================================================ATTACKS==============================================================================================
+
+    private static Vec3[] PLATFORM_SPAWN_OFFSETS;
+
+    private boolean fireballsNPlatforms(AttackInstance inst){
+
+        float platformZOffset = 1;
+        PLATFORM_SPAWN_OFFSETS = new Vec3[]{
+                new Vec3(0,5,-10 - platformZOffset),
+                new Vec3(0,5,-18 - platformZOffset),
+
+                new Vec3(8,5,-8 - platformZOffset),
+                new Vec3(-8,5,-8 - platformZOffset),
+
+                new Vec3(8,5,-16 - platformZOffset),
+                new Vec3(-8,5,-16 - platformZOffset),
+
+                new Vec3(-16,5,-6 - platformZOffset),
+                new Vec3(16,5,-6 - platformZOffset),
+
+
+                new Vec3(-16,5,-14 - platformZOffset),
+                new Vec3(16,5,-14 - platformZOffset),
+
+
+        };
+
+        int stage = inst.stage;
+        int tick = inst.tick;
+
+        if (stage == 0){
+            inst.nextStage();
+        }else if (stage == 1){
+            if (tick == 0) {
+                var combatants = this.getCombatants(true);
+                for (var player : combatants) {
+                    if (Math.abs(player.getY() - this.spawnPosition.y) <= 3) {
+                        FDLibCalls.setServerPlayerSpeed((ServerPlayer) player, new Vec3(0, 1.5, 0));
+                    }
+                }
+            }else if (tick == 10) {
+
+                for (Vec3 offset : PLATFORM_SPAWN_OFFSETS) {
+                    Vec3 pos = this.spawnPosition.add(offset);
+                    MalkuthPlatform malkuthPlatform = new MalkuthPlatform(BossEntities.MALKUTH_PLATFORM.get(), level());
+                    malkuthPlatform.setPos(pos);
+                    level().addFreshEntity(malkuthPlatform);
+                }
+                inst.nextStage();
+            }
+        }else if (stage == 2){
+            if (tick == 300){
+                for (var platform : level().getEntitiesOfClass(MalkuthPlatform.class,new AABB(-ENRAGE_RADIUS,-ENRAGE_RADIUS,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(spawnPosition))){
+                    platform.kill();
+                }
+            } else if (tick >= 400) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private MalkuthAttackType earthquakeToSummon = MalkuthAttackType.FIRE;
 

@@ -37,7 +37,9 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.Malk
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquakeRenderer;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_floor.MalkuthFloorRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlashRenderer;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_platform.MalkuthPlatform;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
 import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
@@ -47,6 +49,7 @@ import com.finderfeed.fdbosses.content.projectiles.renderers.BlockProjectileRend
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.head.HeadBoneTransformation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRenderLayerOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRendererBuilder;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityTransformation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDModelItemRenderer;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDModelItemRendererOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockEntityRendererBuilder;
@@ -56,6 +59,7 @@ import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.text_bloc
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.client.NullEntityRenderer;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.LightTexture;
@@ -66,6 +70,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -75,6 +80,7 @@ import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import org.joml.Random;
 import org.joml.Vector3f;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD,value = Dist.CLIENT,modid = FDBosses.MOD_ID)
@@ -180,15 +186,45 @@ public class BossClientModEvents {
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
 
-        event.registerEntityRenderer(BossEntities.MALKUTH_PLATFORM.get(), FDEntityRendererBuilder.builder()
-                .addLayer(FDEntityRenderLayerOptions.builder()
+
+        FDEntityTransformation<MalkuthPlatform> platformTransform = (platform, matrices, v) -> {
+
+            float time = platform.tickCount + v;
+
+            Random random = new Random(platform.getId() * 33L);
+            int timeToRise = 40 + random.nextInt(20);
+            float p = Math.clamp((platform.tickCount + v) / timeToRise,0, 1);
+
+            float platformFloat = FDEasings.easeIn(p) * (float) Math.sin(time/25 + random.nextFloat() * FDMathUtil.FPI * 2) * 0.1f;
+
+            float translation = -5 + 5 * FDEasings.easeOutBack(p) + platformFloat;
+
+            float randomYRot = (platform.getId() % 4) * 90;
+
+            matrices.translate(0,translation,0);
+            matrices.mulPose(Axis.YP.rotationDegrees(randomYRot));
+
+            int d = random.nextInt(2) == 1 ? -1 : 1;
+
+            float someRot = -15 * d + FDEasings.easeOutBack(p) * 15 * d;
+            matrices.mulPose(Axis.XN.rotationDegrees(someRot));
+            matrices.mulPose(Axis.YN.rotationDegrees(someRot));
+
+        };
+        event.registerEntityRenderer(BossEntities.MALKUTH_PLATFORM.get(), FDEntityRendererBuilder.<MalkuthPlatform>builder()
+                .addLayer(FDEntityRenderLayerOptions.<MalkuthPlatform>builder()
                         .model(BossModels.MALKUTH_PLATFORM)
                         .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_platform.png")))
+                        .transformation(platformTransform)
                         .build())
-                .addLayer(FDEntityRenderLayerOptions.builder()
+                .addLayer(FDEntityRenderLayerOptions.<MalkuthPlatform>builder()
                         .model(BossModels.MALKUTH_PLATFORM)
                         .renderType(RenderType.eyes(FDBosses.location("textures/entities/malkuth/malkuth_platform_emissive.png")))
+                        .transformation(platformTransform)
                         .build())
+                        .shouldRender(((malkuthPlatform, frustum, v, v1, v2) -> {
+                            return frustum.isVisible(new AABB(-5,-5,-5,5,5,5).move(malkuthPlatform.position()));
+                        }))
                 .build());
 
         event.registerEntityRenderer(BossEntities.MALKUTH_BOSS_SPAWNER.get(), FDEntityRendererBuilder.<MalkuthBossSpawner>builder()
@@ -492,5 +528,6 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.MALKUTH_GIANT_SWORD.get(), MalkuthGiantSwordSlashRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_BOULDER.get(), MalkuthBoulderRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_EARTHQUAKE.get(), MalkuthEarthquakeRenderer::new);
+        event.registerEntityRenderer(BossEntities.MALKUTH_FLOOR.get(), MalkuthFloorRenderer::new);
     }
 }

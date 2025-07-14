@@ -1,15 +1,11 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_platform;
 
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
-import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-
-import java.util.ArrayList;
 
 public class MalkuthPlatform extends FDEntity {
 
@@ -22,6 +18,11 @@ public class MalkuthPlatform extends FDEntity {
     @Override
     public void tick() {
         super.tick();
+    }
+
+    @Override
+    public void kill() {
+        super.kill();
     }
 
     @Override
