@@ -1185,6 +1185,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     public boolean giantSwordUltimate(AttackInstance inst){
 
+        if (true) return true;
+
         int stage = inst.stage;
         int tick = inst.tick;
 

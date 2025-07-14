@@ -225,9 +225,7 @@ public class BossEntities {
                     MalkuthPlatform::new, MobCategory.MISC
             )
             .clientTrackingRange(30)
-            .updateInterval(1)
-            .setShouldReceiveVelocityUpdates(true)
-            .sized(3f,3f)
+            .sized(5f,1f)
             .build("malkuth_platform"));
 
 

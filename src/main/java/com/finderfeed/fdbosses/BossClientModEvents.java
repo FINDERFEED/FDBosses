@@ -180,7 +180,16 @@ public class BossClientModEvents {
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
 
-        event.registerEntityRenderer(BossEntities.MALKUTH_PLATFORM.get(), NullEntityRenderer::new);
+        event.registerEntityRenderer(BossEntities.MALKUTH_PLATFORM.get(), FDEntityRendererBuilder.builder()
+                .addLayer(FDEntityRenderLayerOptions.builder()
+                        .model(BossModels.MALKUTH_PLATFORM)
+                        .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_platform.png")))
+                        .build())
+                .addLayer(FDEntityRenderLayerOptions.builder()
+                        .model(BossModels.MALKUTH_PLATFORM)
+                        .renderType(RenderType.eyes(FDBosses.location("textures/entities/malkuth/malkuth_platform_emissive.png")))
+                        .build())
+                .build());
 
         event.registerEntityRenderer(BossEntities.MALKUTH_BOSS_SPAWNER.get(), FDEntityRendererBuilder.<MalkuthBossSpawner>builder()
                         .freeRender(new MalkuthBossSpawnerRenderer())
