@@ -285,10 +285,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 var combatants = this.getCombatants(true);
                 for (var player : combatants) {
                     if (Math.abs(player.getY() - this.spawnPosition.y) <= 3) {
-                        FDLibCalls.setServerPlayerSpeed((ServerPlayer) player, new Vec3(0, 1.5, 0));
+                        FDLibCalls.setServerPlayerSpeed((ServerPlayer) player, new Vec3(0, 2, 0));
                     }
                 }
-            }else if (tick == 10) {
+            }else if (tick == 5) {
 
                 for (Vec3 offset : PLATFORM_SPAWN_OFFSETS) {
                     Vec3 pos = this.spawnPosition.add(offset);
@@ -300,7 +300,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
         }else if (stage == 2){
 
-            int localTick = tick % 100;
+            int localTick = tick % 60;
 
             if (localTick == 40){
 
@@ -316,28 +316,28 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                     float angle = FDMathUtil.FPI * p;
 
-                    Vector3f spawnOffset = new Quaternionf(new AxisAngle4d(angle, forward.x,forward.y,forward.z)).transform((float)left.x,(float)left.y,(float)left.z,new Vector3f()).mul(2);
+                    Vector3f spawnOffset = new Quaternionf(new AxisAngle4d(angle, forward.x,forward.y,forward.z)).transform((float)left.x,(float)left.y,(float)left.z,new Vector3f()).mul(5);
 
-                    Vec3 spawnPos = this.position().add(0,2,0);
+                    Vec3 spawnPos = this.position().add(0,10,0);
 
                     Vec3 gotoPos = spawnPos.add(spawnOffset.x,spawnOffset.y,spawnOffset.z);
 
-                    MalkuthFireball malkuthFireball = MalkuthFireball.summon(level(), spawnPos, gotoPos, platformPos.add(0,1.5,0));
+                    MalkuthFireball malkuthFireball = MalkuthFireball.summon(MalkuthAttackType.getRandom(random), level(), spawnPos, gotoPos, platformPos.add(0,1.5,0));
 
                 }
 
-            }else if (localTick == 90){
-                for (var fireball : level().getEntitiesOfClass(MalkuthFireball.class, this.getBoundingBox().inflate(10,10,10))){
-                    fireball.setMoveToTarget();
+            }else if (localTick == 50){
+                for (var fireball : level().getEntitiesOfClass(MalkuthFireball.class, this.getBoundingBox().inflate(20,20,20))){
+                    fireball.setMoveToTarget(10);
                 }
             }
 
-            if (tick > 400){
+            if (tick > 1001){
                 inst.nextStage();
             }
 
         }else if (stage == 3){
-            if (tick == 300){
+            if (tick == 100){
                 for (var platform : level().getEntitiesOfClass(MalkuthPlatform.class,new AABB(-ENRAGE_RADIUS,-ENRAGE_RADIUS,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(spawnPosition))){
                     platform.kill();
                 }
@@ -346,7 +346,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     platform.kill();
                 }
 
-            } else if (tick >= 400) {
+            } else if (tick >= 150) {
                 return true;
             }
         }

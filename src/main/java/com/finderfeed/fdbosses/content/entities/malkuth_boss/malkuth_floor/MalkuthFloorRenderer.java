@@ -78,7 +78,22 @@ public class MalkuthFloorRenderer extends EntityRenderer<MalkuthFloorEntity> {
 
                 matrices.translate(0,currentHeight,0);
 
-                MalkuthEarthquakeSegment.Type type = MalkuthEarthquakeSegment.Type.getRandomBaseSegment(random);
+//                MalkuthEarthquakeSegment.Type type = MalkuthEarthquakeSegment.Type.getRandomBaseSegment(random);
+
+                MalkuthEarthquakeSegment.Type type;
+
+                float rndVal = random.nextFloat();
+                if (rndVal > 0.925){
+                    type = MalkuthEarthquakeSegment.Type.FIRE_1;
+                }else if (rndVal > 0.875f){
+                    if (random.nextBoolean()) {
+                        type = MalkuthEarthquakeSegment.Type.ICE_1;
+                    }else{
+                        type = MalkuthEarthquakeSegment.Type.ICE_2;
+                    }
+                }else{
+                    type = MalkuthEarthquakeSegment.Type.FIRE_2;
+                }
 
                 FDModel model = MalkuthEarthquakeSegment.getBaseModel();
 

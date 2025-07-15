@@ -1,5 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_fireball;
 
+import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossEntities;
@@ -9,10 +11,11 @@ import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -29,11 +32,15 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
     private Vec3 targetPos = Vec3.ZERO;
 
     @SerializableField
-    private boolean movingToTarget = false;
+    private int movingToTargetTime = -1;
 
-    public static MalkuthFireball summon(Level level, Vec3 pos, Vec3 flyToPos, Vec3 targetPos){
+    @SerializableField
+    private int currentMovingToTargetTime = 0;
+
+    public static MalkuthFireball summon(MalkuthAttackType type, Level level, Vec3 pos, Vec3 flyToPos, Vec3 targetPos){
         MalkuthFireball malkuthFireball = new MalkuthFireball(BossEntities.MALKUTH_FIREBALL.get(), level);
 
+        malkuthFireball.setAttackType(type);
         malkuthFireball.setPos(pos);
         malkuthFireball.moveToPos = flyToPos;
         malkuthFireball.targetPos = targetPos;
@@ -63,44 +70,50 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
     }
 
     private void doMove(){
+        if (!this.isMovingToTarget()) {
+            float peakSpeed = 2f;
+            float minspeed = 0.1f;
 
-        float peakSpeed = 0.25f;
-        float minspeed = 0.05f;
-        if (this.isMovingToTarget()){
-            minspeed = peakSpeed;
-        }
-        float maxDist = 5;
+            float maxDist = 10;
 
-        Vec3 pos = this.position();
+            Vec3 pos = this.position();
 
-        Vec3 target;
+            Vec3 target = this.moveToPos;
 
-        if (this.isMovingToTarget()){
-            target = this.targetPos;
+            double dist = pos.distanceTo(target);
+            if (dist >= minspeed) {
+                Vec3 between = target.subtract(pos).normalize();
+
+                float p = (float) Math.clamp(dist / maxDist, 0, 1);
+
+                float speedValue = FDMathUtil.lerp(minspeed, peakSpeed, p);
+
+                Vec3 speed = between.multiply(speedValue, speedValue, speedValue);
+
+                this.setDeltaMovement(speed);
+
+            } else {
+                this.setDeltaMovement(Vec3.ZERO);
+            }
         }else{
-            target = this.moveToPos;
-        }
 
+            if (movingToTargetTime == currentMovingToTargetTime) {
+                Vec3 current = this.position();
+                Vec3 target = this.targetPos;
 
-        double dist = pos.distanceTo(target);
-        if (dist >= minspeed){
+                Vec3 between = target.subtract(current);
 
-            Vec3 between = target.subtract(pos).normalize();
+                double dist = between.length();
 
+                double speed = dist / movingToTargetTime;
 
+                this.setDeltaMovement(between.normalize().multiply(speed, speed, speed));
+            }
 
-            float p = (float) Math.clamp(dist / maxDist, 0, 1);
-
-            float speedValue = FDMathUtil.lerp(minspeed,peakSpeed,p);
-
-            Vec3 speed = between.multiply(speedValue,speedValue,speedValue);
-
-            this.setDeltaMovement(speed);
-
-        }else{
-            if (this.isMovingToTarget()){
+            if (this.currentMovingToTargetTime-- < 0){
                 this.explode();
             }
+
         }
     }
 
@@ -108,40 +121,71 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
         this.remove(RemovalReason.DISCARDED);
     }
 
-    public void setMoveToTarget(){
-        this.movingToTarget = true;
+    public void setMoveToTarget(int moveTime){
+        this.movingToTargetTime = moveTime;
+        this.currentMovingToTargetTime = moveTime;
     }
 
     public boolean isMovingToTarget(){
-        return this.movingToTarget;
+        return this.movingToTargetTime != -1;
     }
 
     private void particles(){
 
+
+        Vec3 between = new Vec3(
+                this.getX() - xo,
+                this.getY() - yo,
+                this.getZ() - zo
+        );
+
+        double length = between.length();
+
+
         Vec3 pos = this.position().add(0, this.getBbHeight()  / 2, 0);
 
-        for (int i = 0; i < 100; i ++){
 
-            Vector3f color = MalkuthEntity.getAndRandomizeColor(this.getAttackType(), random);
+        float maxrad = 0.5f;
 
-            BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
-                    .color(color.x,color.y,color.z)
-                    .scalingOptions(0,0,10 + random.nextInt(4))
-                    .brightness(1)
-                    .build();
+        for (float g = 0; g < length; g+= maxrad) {
 
-            float rndOut = 0.5f + random.nextFloat() * 0.75f;
 
-            Vec3 rndOffs = new Vec3(
-                    random.nextFloat() * 2 - 1,
-                    random.nextFloat() * 2 - 1,
-                    random.nextFloat() * 2 - 1
-            ).normalize().multiply(rndOut,rndOut,rndOut);
+            for (int i = 0; i < 10; i++) {
 
-            Vec3 ppos = pos.add(rndOffs);
+                Vector3f color = MalkuthEntity.getAndRandomizeColor(this.getAttackType(), random);
 
-            level().addParticle(ballParticleOptions, true, ppos.x,ppos.y,ppos.z,0,0,0);
+                ParticleOptions particleOptions;
 
+                if (random.nextFloat() > 0.1f) {
+                    particleOptions = BallParticleOptions.builder()
+                            .color(color.x, color.y, color.z)
+                            .scalingOptions(0, 0, 10 + random.nextInt(4))
+                            .brightness(1)
+                            .build();
+                }else{
+                    if (this.getAttackType().isFire()){
+                        particleOptions = ParticleTypes.FLAME;
+                    }else{
+                        particleOptions = new GravityParticleOptions(BossParticles.ICE_CHUNK.get(), 20 + random.nextInt(4),0.5f + random.nextFloat() * 0.2f,0,2f,true);
+                    }
+                }
+
+                float rndOut = maxrad / 2 + random.nextFloat() * maxrad / 2;
+
+                Vec3 rndOffs = new Vec3(
+                        random.nextFloat() * 2 - 1,
+                        random.nextFloat() * 2 - 1,
+                        random.nextFloat() * 2 - 1
+                ).normalize().multiply(rndOut, rndOut, rndOut);
+
+                Vec3 distOffset = between.normalize().multiply(g,g,g);
+
+                Vec3 ppos = pos.add(rndOffs)
+                        .subtract(distOffset);
+
+                level().addParticle(particleOptions, true, ppos.x, ppos.y, ppos.z, 0, 0, 0);
+
+            }
         }
 
     }

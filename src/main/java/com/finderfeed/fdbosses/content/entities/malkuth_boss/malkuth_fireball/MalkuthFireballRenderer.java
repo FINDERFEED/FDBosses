@@ -66,8 +66,8 @@ public class MalkuthFireballRenderer extends EntityRenderer<MalkuthFireball> {
         matrices.mulPose(Axis.ZP.rotationDegrees(time * dir));
         matrices.mulPose(Axis.XP.rotationDegrees(time1 * dir2));
 
-        this.renderCube(matrices, src.getBuffer(RenderType.lightning()), 0.9f, r,g,b,0.5f,2);
-        this.renderCube(matrices, src.getBuffer(RenderType.lightning()), 1.5f * 0.9f, ri,gi,bi,0.5f,2);
+        this.renderCube(matrices, src.getBuffer(RenderType.lightning()), 0.6f, r,g,b,0.5f,2);
+        this.renderCube(matrices, src.getBuffer(RenderType.lightning()), 0.9f, ri,gi,bi,0.5f,2);
 
         matrices.popPose();
     }

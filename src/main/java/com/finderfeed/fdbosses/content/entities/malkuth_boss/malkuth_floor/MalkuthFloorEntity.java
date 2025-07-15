@@ -30,7 +30,7 @@ public class MalkuthFloorEntity extends Entity {
 
     public static final float RADIUS = 25f;
 
-    public static final int DEATH_TME = 20;
+    public static final int DEATH_TME = 10;
 
     public int deathTicks = DEATH_TME;
 
