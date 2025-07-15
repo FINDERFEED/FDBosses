@@ -11,6 +11,8 @@ import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -24,7 +26,13 @@ import java.util.List;
 
 public class MalkuthFloorEntity extends Entity {
 
+    public static EntityDataAccessor<Boolean> IS_DEAD = SynchedEntityData.defineId(MalkuthFloorEntity.class, EntityDataSerializers.BOOLEAN);
+
     public static final float RADIUS = 25f;
+
+    public static final int DEATH_TME = 20;
+
+    public int deathTicks = DEATH_TME;
 
     public MalkuthFloorEntity(EntityType<?> type, Level level) {
         super(type, level);
@@ -39,6 +47,22 @@ public class MalkuthFloorEntity extends Entity {
             this.summonParticles();
             this.particles();
         }
+
+        if (this.isDead()){
+            if (!level().isClientSide && this.deathTicks <= 0){
+                this.setRemoved(RemovalReason.DISCARDED);
+            }
+            this.deathTicks = Math.clamp(deathTicks - 1,0,DEATH_TME);
+        }
+
+    }
+
+    public boolean isDead(){
+        return this.entityData.get(IS_DEAD);
+    }
+
+    private void setDead(){
+        this.entityData.set(IS_DEAD, true);
     }
 
     private void summonParticles(){
@@ -163,23 +187,28 @@ public class MalkuthFloorEntity extends Entity {
     }
 
     @Override
+    public void kill() {
+        this.setDead();
+    }
+
+    @Override
     public boolean isPickable() {
         return true;
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder p_326003_) {
-
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(IS_DEAD,false);
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag p_20052_) {
-
+    protected void readAdditionalSaveData(CompoundTag tag) {
+        this.entityData.set(IS_DEAD, tag.getBoolean("is_dead"));
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag p_20139_) {
-
+    protected void addAdditionalSaveData(CompoundTag tag) {
+        tag.putBoolean("is_dead", this.entityData.get(IS_DEAD));
     }
 
 
@@ -192,4 +221,6 @@ public class MalkuthFloorEntity extends Entity {
     public AABB getBoundingBoxForCulling() {
         return super.getBoundingBoxForCulling();
     }
+
+
 }

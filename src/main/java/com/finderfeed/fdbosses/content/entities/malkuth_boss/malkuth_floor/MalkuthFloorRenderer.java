@@ -48,7 +48,13 @@ public class MalkuthFloorRenderer extends EntityRenderer<MalkuthFloorEntity> {
 
                 int riseTime = 5 + random.nextInt(5);
 
-                float riseP = Math.clamp(time / riseTime,0, 1);
+                float downPercent = 1;
+
+                if (floor.isDead()){
+                    downPercent = ((floor.deathTicks - pticks)/MalkuthFloorEntity.DEATH_TME);
+                }
+
+                float riseP = Math.clamp(time / riseTime,0, 1) * downPercent;
 
                 float p = i / currentArcLength;
 
