@@ -20,6 +20,8 @@ import org.joml.Vector3f;
 
 public class MalkuthFireballRenderer extends EntityRenderer<MalkuthFireball> {
 
+
+
     public MalkuthFireballRenderer(EntityRendererProvider.Context p_174008_) {
         super(p_174008_);
     }

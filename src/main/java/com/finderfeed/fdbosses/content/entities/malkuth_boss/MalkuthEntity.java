@@ -12,6 +12,8 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.Malk
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_fireball.MalkuthFireball;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_floor.MalkuthFloorEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlash;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_platform.MalkuthPlatform;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
@@ -66,9 +68,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
-import org.joml.Vector3f;
+import org.joml.*;
 
+import java.lang.Math;
 import java.util.*;
 
 public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, AutoSerializable, BossSpawnerContextAssignable {
@@ -244,30 +246,27 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     //============================================================================ATTACKS==============================================================================================
 
-    private static Vec3[] PLATFORM_SPAWN_OFFSETS;
+    private static Vec3[] PLATFORM_SPAWN_OFFSETS = PLATFORM_SPAWN_OFFSETS = new Vec3[]{
+            new Vec3(0,5,-10 - 1),
+            new Vec3(0,5,-18 - 1),
+
+            new Vec3(8,5,-8 - 1),
+            new Vec3(-8,5,-8 - 1),
+
+            new Vec3(8,5,-16 - 1),
+            new Vec3(-8,5,-16 - 1),
+
+            new Vec3(-16,5,-6 - 1),
+            new Vec3(16,5,-6 - 1),
+
+
+            new Vec3(-16,5,-14 - 1),
+            new Vec3(16,5,-14 - 1),
+
+
+    };;
 
     private boolean fireballsNPlatforms(AttackInstance inst){
-
-        float platformZOffset = 1;
-        PLATFORM_SPAWN_OFFSETS = new Vec3[]{
-                new Vec3(0,5,-10 - platformZOffset),
-                new Vec3(0,5,-18 - platformZOffset),
-
-                new Vec3(8,5,-8 - platformZOffset),
-                new Vec3(-8,5,-8 - platformZOffset),
-
-                new Vec3(8,5,-16 - platformZOffset),
-                new Vec3(-8,5,-16 - platformZOffset),
-
-                new Vec3(-16,5,-6 - platformZOffset),
-                new Vec3(16,5,-6 - platformZOffset),
-
-
-                new Vec3(-16,5,-14 - platformZOffset),
-                new Vec3(16,5,-14 - platformZOffset),
-
-
-        };
 
         int stage = inst.stage;
         int tick = inst.tick;
@@ -276,6 +275,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             inst.nextStage();
         }else if (stage == 1){
             if (tick == 0) {
+
+                MalkuthFloorEntity malkuthFloorEntity = new MalkuthFloorEntity(BossEntities.MALKUTH_FLOOR.get(), level());
+
+                malkuthFloorEntity.setPos(this.spawnPosition.add(0,-1,0));
+
+                level().addFreshEntity(malkuthFloorEntity);
+
                 var combatants = this.getCombatants(true);
                 for (var player : combatants) {
                     if (Math.abs(player.getY() - this.spawnPosition.y) <= 3) {
@@ -293,10 +299,53 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 inst.nextStage();
             }
         }else if (stage == 2){
+
+            int localTick = tick % 100;
+
+            if (localTick == 40){
+
+                Vec3 forward = this.getForward().multiply(1,0,1).normalize();
+
+                Vec3 left = forward.yRot(FDMathUtil.FPI / 2);
+
+                for (int i = 0; i < PLATFORM_SPAWN_OFFSETS.length; i++){
+
+                    Vec3 platformPos = this.spawnPosition.add(PLATFORM_SPAWN_OFFSETS[i]);
+
+                    float p = (float) i / (PLATFORM_SPAWN_OFFSETS.length - 1);
+
+                    float angle = FDMathUtil.FPI * p;
+
+                    Vector3f spawnOffset = new Quaternionf(new AxisAngle4d(angle, forward.x,forward.y,forward.z)).transform((float)left.x,(float)left.y,(float)left.z,new Vector3f()).mul(2);
+
+                    Vec3 spawnPos = this.position().add(0,2,0);
+
+                    Vec3 gotoPos = spawnPos.add(spawnOffset.x,spawnOffset.y,spawnOffset.z);
+
+                    MalkuthFireball malkuthFireball = MalkuthFireball.summon(level(), spawnPos, gotoPos, platformPos.add(0,1.5,0));
+
+                }
+
+            }else if (localTick == 90){
+                for (var fireball : level().getEntitiesOfClass(MalkuthFireball.class, this.getBoundingBox().inflate(10,10,10))){
+                    fireball.setMoveToTarget();
+                }
+            }
+
+            if (tick > 400){
+                inst.nextStage();
+            }
+
+        }else if (stage == 3){
             if (tick == 300){
                 for (var platform : level().getEntitiesOfClass(MalkuthPlatform.class,new AABB(-ENRAGE_RADIUS,-ENRAGE_RADIUS,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(spawnPosition))){
                     platform.kill();
                 }
+
+                for (var platform : level().getEntitiesOfClass(MalkuthFloorEntity.class,new AABB(-ENRAGE_RADIUS,-ENRAGE_RADIUS,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(spawnPosition))){
+                    platform.kill();
+                }
+
             } else if (tick >= 400) {
                 return true;
             }
@@ -1253,8 +1302,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     public boolean giantSwordUltimate(AttackInstance inst){
-
-        if (true) return true;
 
         int stage = inst.stage;
         int tick = inst.tick;
