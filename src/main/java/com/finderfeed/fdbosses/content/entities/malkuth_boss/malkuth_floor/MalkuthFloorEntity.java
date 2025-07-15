@@ -28,7 +28,7 @@ public class MalkuthFloorEntity extends Entity {
 
     public static EntityDataAccessor<Boolean> IS_DEAD = SynchedEntityData.defineId(MalkuthFloorEntity.class, EntityDataSerializers.BOOLEAN);
 
-    public static final float RADIUS = 25f;
+    public static final float RADIUS = 28f;
 
     public static final int DEATH_TME = 10;
 

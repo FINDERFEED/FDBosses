@@ -78,8 +78,6 @@ public class MalkuthFloorRenderer extends EntityRenderer<MalkuthFloorEntity> {
 
                 matrices.translate(0,currentHeight,0);
 
-//                MalkuthEarthquakeSegment.Type type = MalkuthEarthquakeSegment.Type.getRandomBaseSegment(random);
-
                 MalkuthEarthquakeSegment.Type type;
 
                 float rndVal = random.nextFloat();

@@ -11,6 +11,7 @@ import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -36,6 +37,12 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
 
     @SerializableField
     private int currentMovingToTargetTime = 0;
+
+    @SerializableField
+    private Vec3 startedMovingFromPos = Vec3.ZERO;
+
+    @SerializableField
+    private int accelerationTicks = 0;
 
     public static MalkuthFireball summon(MalkuthAttackType type, Level level, Vec3 pos, Vec3 flyToPos, Vec3 targetPos){
         MalkuthFireball malkuthFireball = new MalkuthFireball(BossEntities.MALKUTH_FIREBALL.get(), level);
@@ -97,21 +104,34 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
             }
         }else{
 
-            if (movingToTargetTime == currentMovingToTargetTime) {
-                Vec3 current = this.position();
-                Vec3 target = this.targetPos;
+            if (accelerationTicks-- >= 0){
 
-                Vec3 between = target.subtract(current);
+                if (movingToTargetTime == currentMovingToTargetTime){
+                    this.setDeltaMovement(Vec3.ZERO);
+                }
 
-                double dist = between.length();
+                Vec3 startPos = this.startedMovingFromPos;
+                Vec3 targetPos = this.targetPos;
 
-                double speed = dist / movingToTargetTime;
+                Vec3 between = targetPos.subtract(startPos);
 
-                this.setDeltaMovement(between.normalize().multiply(speed, speed, speed));
+                double S = between.length();
+
+                double t = movingToTargetTime / 2f;
+
+                double v = S / (t * 1.5f);
+                double a = v / t;
+
+                Vec3 current = this.getDeltaMovement();
+
+                Vec3 next = current.add(between.normalize().multiply(a,a,a));
+
+                this.setDeltaMovement(next);
             }
 
-            if (this.currentMovingToTargetTime-- < 0){
-                this.explode();
+
+            if (this.currentMovingToTargetTime-- <= 0){
+                this.remove(RemovalReason.DISCARDED);
             }
 
         }
@@ -124,6 +144,8 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
     public void setMoveToTarget(int moveTime){
         this.movingToTargetTime = moveTime;
         this.currentMovingToTargetTime = moveTime;
+        this.accelerationTicks = moveTime / 2;
+        this.startedMovingFromPos = this.position();
     }
 
     public boolean isMovingToTarget(){
@@ -147,7 +169,7 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
 
         float maxrad = 0.5f;
 
-        for (float g = 0; g < length; g+= maxrad) {
+        for (float g = -0.001f; g < length; g+= maxrad) {
 
 
             for (int i = 0; i < 10; i++) {
@@ -183,7 +205,9 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
                 Vec3 ppos = pos.add(rndOffs)
                         .subtract(distOffset);
 
-                level().addParticle(particleOptions, true, ppos.x, ppos.y, ppos.z, 0, 0, 0);
+                float vspeed = length == 0 ? -random.nextFloat() * 0.1f : 0;
+
+                level().addParticle(particleOptions, true, ppos.x, ppos.y, ppos.z, 0, vspeed, 0);
 
             }
         }

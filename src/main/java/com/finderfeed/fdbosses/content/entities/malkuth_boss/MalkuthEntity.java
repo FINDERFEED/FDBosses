@@ -288,8 +288,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         FDLibCalls.setServerPlayerSpeed((ServerPlayer) player, new Vec3(0, 2, 0));
                     }
                 }
-            }else if (tick == 5) {
-
                 for (Vec3 offset : PLATFORM_SPAWN_OFFSETS) {
                     Vec3 pos = this.spawnPosition.add(offset);
                     MalkuthPlatform malkuthPlatform = new MalkuthPlatform(BossEntities.MALKUTH_PLATFORM.get(), level());
@@ -300,7 +298,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
         }else if (stage == 2){
 
-            int localTick = tick % 60;
+            int localTick = tick % 81;
 
             if (localTick == 40){
 
@@ -326,9 +324,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 }
 
-            }else if (localTick == 50){
+            }else if (localTick == 80){
                 for (var fireball : level().getEntitiesOfClass(MalkuthFireball.class, this.getBoundingBox().inflate(20,20,20))){
-                    fireball.setMoveToTarget(10);
+                    fireball.setMoveToTarget(12);
                 }
             }
 
