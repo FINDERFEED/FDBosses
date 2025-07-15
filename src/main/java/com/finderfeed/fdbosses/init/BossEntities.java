@@ -25,6 +25,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.Malk
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_fireball.MalkuthFireball;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_floor.MalkuthFloorEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlash;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_platform.MalkuthPlatform;
@@ -233,6 +234,12 @@ public class BossEntities {
                     MalkuthFloorEntity::new, MobCategory.MISC
             )
             .sized(0.3f,0.3f)
+            .build("malkuth_floor"));
+
+    public static final Supplier<EntityType<MalkuthFireball>> MALKUTH_FIREBALL = ENTITIES.register("malkuth_fireball",()->EntityType.Builder.of(
+                    MalkuthFireball::new, MobCategory.MISC
+            )
+            .sized(0.25f,0.25f)
             .build("malkuth_floor"));
 
 

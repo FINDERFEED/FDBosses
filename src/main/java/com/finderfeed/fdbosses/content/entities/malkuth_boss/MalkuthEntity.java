@@ -52,6 +52,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -68,10 +69,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, AutoSerializable, BossSpawnerContextAssignable {
 
@@ -1223,6 +1221,17 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
         return false;
+    }
+
+    public static Vector3f getAndRandomizeColor(MalkuthAttackType malkuthAttackType, RandomSource random){
+
+        Vector3f color = getMalkuthAttackPreparationParticleColor(malkuthAttackType);
+
+        color.x = Math.clamp(color.x + random.nextFloat() * 0.2f, 0, 1);
+        color.y = Math.clamp(color.y + random.nextFloat() * 0.2f, 0, 1);
+        color.z = Math.clamp(color.z + random.nextFloat() * 0.2f, 0, 1);
+
+        return color;
     }
 
     public static Vector3f getMalkuthAttackPreparationParticleColor(MalkuthAttackType attackType){
