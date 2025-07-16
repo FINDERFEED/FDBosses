@@ -3,7 +3,6 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
-import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticle;
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
@@ -56,6 +55,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -298,15 +299,49 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     @SerializableField
     private int currentlyFlyingTo = -1;
 
+    @SerializableField
+    private ProjectileMovementPath startSummonPlatformsPath;
+
     private boolean fireballsNPlatforms(AttackInstance inst){
 
         int stage = inst.stage;
         int tick = inst.tick;
 
         if (stage == 0){
-            inst.nextStage();
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_CRUSH).build());
+
+            if(startSummonPlatformsPath == null){
+                startSummonPlatformsPath = new ProjectileMovementPath(20, false)
+                        .addPos(this.position())
+                        .addPos(this.position().add(0,20,0))
+                        .addPos(this.position());
+            }
+
+            if (tick > 5) {
+                startSummonPlatformsPath.tick(this);
+                if (tick == 6){
+                    this.doJumpStartParticles(0);
+                }
+            }
+
+            if (tick == 30){
+                startSummonPlatformsPath = null;
+                this.setDeltaMovement(Vec3.ZERO);
+                this.teleportTo(spawnPosition.x,spawnPosition.y,spawnPosition.z);
+
+                inst.nextStage();
+            }
+
         }else if (stage == 1){
-            if (tick == 0) {
+            if (tick == 2) {
+
+                PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                        .frequency(5)
+                        .amplitude(2.5f)
+                        .inTime(0)
+                        .stayTime(0)
+                        .outTime(5)
+                        .build(),this.position(),60);
 
                 MalkuthFloorEntity malkuthFloorEntity = new MalkuthFloorEntity(BossEntities.MALKUTH_FLOOR.get(), level());
 
@@ -317,7 +352,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 var combatants = this.getCombatants(true);
                 for (var player : combatants) {
                     if (Math.abs(player.getY() - this.spawnPosition.y) <= 3) {
-                        FDLibCalls.setServerPlayerSpeed((ServerPlayer) player, new Vec3(0, 2, 0));
+                        FDLibCalls.setServerPlayerSpeed((ServerPlayer) player, new Vec3(0, 1.5, 0));
                     }
                 }
                 for (Vec3 offset : PLATFORM_SPAWN_OFFSETS) {
@@ -373,6 +408,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             int localTick = tick % cycleTime;
 
+            //------------------------------------------------------------------CONTROL AMOUNT----------------------------------------------------------
             if (currentCycle > 6){
                 inst.nextStage();
                 return false;
@@ -1607,6 +1643,15 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     //=============================================================================OTHER================================================================================================
 
+
+    @Override
+    public boolean hurt(DamageSource src, float damage) {
+
+        if (!src.is(DamageTypes.GENERIC_KILL) || !src.is(DamageTypes.FELL_OUT_OF_WORLD)) return false;
+
+        return super.hurt(src, damage);
+    }
+
     private void causeSwordChargeParticles(MalkuthAttackType attackType){
         PacketDistributor.sendToPlayersTrackingEntity(this, new MalkuthChargeSwordPacket(this,attackType));
     }
@@ -1741,6 +1786,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .texture(MALKUTH_FIRE_SWORD)
                 .renderType(FDRenderTypes.EYES.get())
         );
+    }
+
+    @Override
+    protected void playBlockFallSound() {
+
     }
 
     private void deattachFireSword(){
