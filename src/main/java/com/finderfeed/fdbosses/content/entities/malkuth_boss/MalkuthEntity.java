@@ -298,9 +298,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     @SerializableField
     private int currentlyFlyingTo = -1;
 
-    @SerializableField
-    private ProjectileMovementPath jumpToFlyPath;
-
     private boolean fireballsNPlatforms(AttackInstance inst){
 
         int stage = inst.stage;
@@ -333,34 +330,29 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
         }else if (stage == 2){
 
+            Vec3 end = this.spawnPosition.add(FLY_TO_OFFSETS[0]);
 
-            if (jumpToFlyPath == null){
-
-                Vec3 start = this.position();
-                Vec3 end = this.spawnPosition.add(FLY_TO_OFFSETS[0]);
-
-                Vec3 b = end.subtract(start);
-                Vec3 mid = start.add(b.multiply(0.5,0.5,0.5)).add(0,4,0);
-
-                jumpToFlyPath = new ProjectileMovementPath(20,false)
-                        .addPos(this.position())
-                        .addPos(mid)
-                        .addPos(end);
+            if (tick == 0) {
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_TO_FLOAT)
+                        .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_FLOAT).build())
+                        .build());
             }
 
-            if (!jumpToFlyPath.isFinished()){
-                this.noPhysics = true;
-                this.setNoGravity(true);
-                jumpToFlyPath.tick(this);
-            }else{
-                currentlyFlyingTo = 0;
-                this.setDeltaMovement(Vec3.ZERO);
-                if (tick > 40) {
-                    jumpToFlyPath = null;
-                    inst.nextStage();
+            if (tick > 4) {
+                if (!this.moveToPos(end)) {
+                    this.noPhysics = true;
+                    this.setNoGravity(true);
+                } else {
+                    currentlyFlyingTo = 0;
+                    this.setDeltaMovement(Vec3.ZERO);
+                    if (tick > 30) {
+                        inst.nextStage();
+                    }
                 }
             }
         }else if (stage == 3){
+
+            this.lookAt(EntityAnchorArgument.Anchor.EYES, this.getTarget().position());
 
             this.noPhysics = true;
             this.setNoGravity(true);
@@ -368,7 +360,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             int fireballTickStart = 30;
             int fireballTickEnd = fireballTickStart + PLATFORM_SPAWN_OFFSETS.length;
 
-            int fireballLaunchTick = fireballTickEnd + 21;
+            int fireballLaunchTick = fireballTickEnd + 20;
 
             int cycleTime = fireballLaunchTick + 5;
 
@@ -392,9 +384,24 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 while (currentlyFlyingTo == old){
                     currentlyFlyingTo = random.nextInt(FLY_TO_OFFSETS.length);
                 }
+
+                if (currentCycle == 0){
+                    currentlyFlyingTo = 0;
+                }
+
             }else if (localTick < fireballTickStart){
                 Vec3 target = this.spawnPosition.add(FLY_TO_OFFSETS[currentlyFlyingTo]);
                 this.moveToPos(target);
+
+                int ticksToEnd = fireballTickStart - localTick;
+
+                if (ticksToEnd == 7){
+                    this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SUMMON_AND_FIRE_FIREBALLS)
+                            .important()
+                            .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_FLOAT).build())
+                            .build());
+                }
+
             }else if (localTick < fireballTickEnd){
                 int[] pattern = PLATFORM_ATTACK_PATTERN[currentCycle % PLATFORM_ATTACK_PATTERN.length];
 
@@ -448,7 +455,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 float p = (float) currentFireball / (PLATFORM_SPAWN_OFFSETS.length - 1);
                 float angle = FDMathUtil.FPI * p;
                 Vector3f spawnOffset = new Quaternionf(new AxisAngle4d(angle, forward.x,forward.y,forward.z)).transform((float)left.x,(float)left.y,(float)left.z,new Vector3f()).mul(5);
-                Vec3 spawnPos = this.position().add(0,2,0);
+                Vec3 spawnPos = this.position().add(spawnOffset.x * 0.3f,spawnOffset.y * 0.3f + 2,spawnOffset.z * 0.3f);
                 Vec3 gotoPos = spawnPos.add(spawnOffset.x,spawnOffset.y,spawnOffset.z);
                 MalkuthFireball malkuthFireball = MalkuthFireball.summon(type, level(), spawnPos, gotoPos, platformPos.add(0,1.5,0));
 
@@ -460,6 +467,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
         } else if (stage == 4){
+
+            if (tick == 0){
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE)
+                                .important()
+                        .build());
+            }
 
             if (this.moveToPos(spawnPosition)){
                 this.noPhysics = false;
