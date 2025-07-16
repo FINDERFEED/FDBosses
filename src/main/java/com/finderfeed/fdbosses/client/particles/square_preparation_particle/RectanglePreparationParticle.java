@@ -72,15 +72,23 @@ public class RectanglePreparationParticle extends Particle {
 
         float colmod = 0.75f;
 
+        float endcolr = Math.clamp(color.r * colmod * 2f, 0, 1);
+        float endcolg = Math.clamp(color.g * colmod * 2f, 0, 1);
+        float endcolb = Math.clamp(color.b * colmod * 2f, 0, 1);
+
         vertex.addVertex((float)pos1.x,(float)pos1.y,(float)pos1.z).setColor(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
         vertex.addVertex((float)pos2.x,(float)pos2.y,(float)pos2.z).setColor(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.addVertex((float)pos3.x,(float)pos3.y,(float)pos3.z).setColor(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.addVertex((float)pos4.x,(float)pos4.y,(float)pos4.z).setColor(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
+        vertex.addVertex((float)pos3.x,(float)pos3.y,(float)pos3.z).setColor(endcolr,endcolg,endcolb,color.a * fadeOutP);
+        vertex.addVertex((float)pos4.x,(float)pos4.y,(float)pos4.z).setColor(endcolr,endcolg,endcolb,color.a * fadeOutP);
+//
 
+        float endcolr2 = Math.clamp(color.r * 2f, 0, 1);
+        float endcolg2 = Math.clamp(color.g * 2f, 0, 1);
+        float endcolb2 = Math.clamp(color.b * 2f, 0, 1);
         vertex.addVertex((float)pos1p.x,(float)pos1p.y + 0.005f,(float)pos1p.z).setColor(color.r,color.g,color.b,color.a * fadeOutP);
         vertex.addVertex((float)pos2p.x,(float)pos2p.y + 0.005f,(float)pos2p.z).setColor(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.addVertex((float)pos3p.x,(float)pos3p.y + 0.005f,(float)pos3p.z).setColor(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.addVertex((float)pos4p.x,(float)pos4p.y + 0.005f,(float)pos4p.z).setColor(color.r,color.g,color.b,color.a * fadeOutP);
+        vertex.addVertex((float)pos3p.x,(float)pos3p.y + 0.005f,(float)pos3p.z).setColor(endcolr2,endcolg2,endcolb2,color.a * fadeOutP);
+        vertex.addVertex((float)pos4p.x,(float)pos4p.y + 0.005f,(float)pos4p.z).setColor(endcolr2,endcolg2,endcolb2,color.a * fadeOutP);
 
     }
 

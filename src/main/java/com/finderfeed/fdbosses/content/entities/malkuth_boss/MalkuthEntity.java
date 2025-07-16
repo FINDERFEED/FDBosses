@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
+import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticle;
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
@@ -246,25 +247,47 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     //============================================================================ATTACKS==============================================================================================
 
-    private static Vec3[] PLATFORM_SPAWN_OFFSETS = PLATFORM_SPAWN_OFFSETS = new Vec3[]{
-            new Vec3(0,5,-10 - 1),
-            new Vec3(0,5,-18 - 1),
-
-            new Vec3(8,5,-8 - 1),
-            new Vec3(-8,5,-8 - 1),
-
-            new Vec3(8,5,-16 - 1),
-            new Vec3(-8,5,-16 - 1),
-
-            new Vec3(-16,5,-6 - 1),
+    /*
+    1  3  5  7  9
+    0  2  4  6  8
+     */
+    private static final Vec3[] PLATFORM_SPAWN_OFFSETS = new Vec3[]{
+            new Vec3(16,5,-14 - 1),
             new Vec3(16,5,-6 - 1),
 
+            new Vec3(8,5,-16 - 1),
+            new Vec3(8,5,-8 - 1),
+
+
+            new Vec3(0,5,-18 - 1),
+            new Vec3(0,5,-10 - 1),
+
+
+            new Vec3(-8,5,-16 - 1),
+            new Vec3(-8,5,-8 - 1),
 
             new Vec3(-16,5,-14 - 1),
-            new Vec3(16,5,-14 - 1),
+            new Vec3(-16,5,-6 - 1),
 
 
-    };;
+    };
+
+    //0 fire 1 ice
+
+    private static final int[][] PLATFORM_ATTACK_PATTERN = {
+            {0,1,1,0,0,1,1,0,0,1},
+
+            {1,1,0,0,1,1,0,0,1,1},
+
+            {0,0,0,1,1,1,0,1,0,0},
+
+            {1,0,0,1,1,0,0,1,1,0},
+
+            {0,0,1,1,0,0,1,1,0,0},
+
+            {1,1,1,0,0,0,1,0,1,1}
+
+    };
 
     private Vec3[] FLY_TO_OFFSETS = new Vec3[]{
             new Vec3(0,7,15),
@@ -332,14 +355,22 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }else{
                 currentlyFlyingTo = 0;
                 this.setDeltaMovement(Vec3.ZERO);
-                inst.nextStage();
+                if (tick > 40) {
+                    jumpToFlyPath = null;
+                    inst.nextStage();
+                }
             }
         }else if (stage == 3){
 
             this.noPhysics = true;
             this.setNoGravity(true);
 
-            int cycleTime = 100;
+            int fireballTickStart = 30;
+            int fireballTickEnd = fireballTickStart + PLATFORM_SPAWN_OFFSETS.length;
+
+            int fireballLaunchTick = fireballTickEnd + 21;
+
+            int cycleTime = fireballLaunchTick + 5;
 
             int currentCycle = tick / cycleTime;
 
@@ -354,8 +385,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 currentlyFlyingTo = random.nextInt(FLY_TO_OFFSETS.length);
             }
 
-            int fireballTickStart = 30;
-            int fireballTickEnd = fireballTickStart + PLATFORM_SPAWN_OFFSETS.length;
+
 
             if (localTick == 0){
                 int old = currentlyFlyingTo;
@@ -366,8 +396,49 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 Vec3 target = this.spawnPosition.add(FLY_TO_OFFSETS[currentlyFlyingTo]);
                 this.moveToPos(target);
             }else if (localTick < fireballTickEnd){
+                int[] pattern = PLATFORM_ATTACK_PATTERN[currentCycle % PLATFORM_ATTACK_PATTERN.length];
+
+                if (localTick == fireballTickStart){
+
+
+                    for (int i = 0; i < PLATFORM_SPAWN_OFFSETS.length;i++){
+
+                        int id = pattern[i];
+
+                        MalkuthAttackType type = id == 0 ? MalkuthAttackType.FIRE : MalkuthAttackType.ICE;
+
+                        Vec3 offset = PLATFORM_SPAWN_OFFSETS[i];
+
+                        Vec3 centerpos = this.spawnPosition.add(offset);
+
+                        Vector3f color = getMalkuthAttackPreparationParticleColor(type);
+
+                        RectanglePreparationParticleOptions options = new RectanglePreparationParticleOptions(
+                                new Vec3(0,0,-1), 5, 1.5f, 30, 5, 10, color.x,color.y,color.z,0.1f
+                        );
+
+                        int dir = offset.dot(new Vec3(1,0,0)) < 0 ? 1 : -1;
+
+                        Vec3 direction = new Vec3(dir,0,0);
+
+                        RectanglePreparationParticleOptions options2 = new RectanglePreparationParticleOptions(
+                                direction, 5, 1.5f, 30, 5, 10, color.x,color.y,color.z,0.1f
+                        );
+
+                        FDLibCalls.sendParticles((ServerLevel) level(), options, centerpos.add(0,1.06f,2.5),60);
+                        FDLibCalls.sendParticles((ServerLevel) level(), options2, centerpos.add(0,1.06f,0).add(direction.multiply(-2.5,0,0)),60);
+
+                    }
+
+                }
+
                 this.setDeltaMovement(Vec3.ZERO);
                 int currentFireball = localTick - fireballTickStart;
+
+                int id = pattern[currentFireball];
+
+                MalkuthAttackType type = id == 0 ? MalkuthAttackType.FIRE : MalkuthAttackType.ICE;
+
 
                 Vec3 forward = this.getForward().multiply(1,0,1).normalize();
 
@@ -379,9 +450,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 Vector3f spawnOffset = new Quaternionf(new AxisAngle4d(angle, forward.x,forward.y,forward.z)).transform((float)left.x,(float)left.y,(float)left.z,new Vector3f()).mul(5);
                 Vec3 spawnPos = this.position().add(0,2,0);
                 Vec3 gotoPos = spawnPos.add(spawnOffset.x,spawnOffset.y,spawnOffset.z);
-                MalkuthFireball malkuthFireball = MalkuthFireball.summon(MalkuthAttackType.getRandom(random), level(), spawnPos, gotoPos, platformPos.add(0,1.5,0));
+                MalkuthFireball malkuthFireball = MalkuthFireball.summon(type, level(), spawnPos, gotoPos, platformPos.add(0,1.5,0));
 
-            }else if (localTick == fireballTickEnd + 10){
+            }else if (localTick == fireballLaunchTick){
                 for (var fireball : this.level().getEntitiesOfClass(MalkuthFireball.class, new AABB(-20,-20,-20,20,20,20).move(this.position()))){
                     fireball.setMoveToTarget(12);
                 }
@@ -399,7 +470,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
         } else if (stage == 5){
-            if (tick == 100){
+            if (tick == 20){
                 for (var platform : level().getEntitiesOfClass(MalkuthPlatform.class,new AABB(-ENRAGE_RADIUS,-ENRAGE_RADIUS,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(spawnPosition))){
                     platform.kill();
                 }
@@ -408,7 +479,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     platform.kill();
                 }
 
-            } else if (tick >= 150) {
+            } else if (tick >= 40) {
                 return true;
             }
         }
@@ -432,30 +503,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }else{
             this.setDeltaMovement(Vec3.ZERO);
             return true;
-        }
-    }
-
-    private void immediateFireballs(){
-        Vec3 forward = this.getForward().multiply(1,0,1).normalize();
-
-        Vec3 left = forward.yRot(FDMathUtil.FPI / 2);
-
-        for (int i = 0; i < PLATFORM_SPAWN_OFFSETS.length; i++){
-
-            Vec3 platformPos = this.spawnPosition.add(PLATFORM_SPAWN_OFFSETS[i]);
-
-            float p = (float) i / (PLATFORM_SPAWN_OFFSETS.length - 1);
-
-            float angle = FDMathUtil.FPI * p;
-
-            Vector3f spawnOffset = new Quaternionf(new AxisAngle4d(angle, forward.x,forward.y,forward.z)).transform((float)left.x,(float)left.y,(float)left.z,new Vector3f()).mul(5);
-
-            Vec3 spawnPos = this.position().add(0,10,0);
-
-            Vec3 gotoPos = spawnPos.add(spawnOffset.x,spawnOffset.y,spawnOffset.z);
-
-            MalkuthFireball malkuthFireball = MalkuthFireball.summon(MalkuthAttackType.getRandom(random), level(), spawnPos, gotoPos, platformPos.add(0,1.5,0));
-
         }
     }
 

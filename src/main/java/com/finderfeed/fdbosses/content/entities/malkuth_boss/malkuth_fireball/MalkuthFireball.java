@@ -89,6 +89,7 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
 
             double dist = pos.distanceTo(target);
             if (dist >= minspeed) {
+
                 Vec3 between = target.subtract(pos).normalize();
 
                 float p = (float) Math.clamp(dist / maxDist, 0, 1);
@@ -131,7 +132,7 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
 
 
             if (this.currentMovingToTargetTime-- <= 0){
-                this.remove(RemovalReason.DISCARDED);
+                this.explode();
             }
 
         }
@@ -169,7 +170,7 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
 
         float maxrad = 0.5f;
 
-        for (float g = -0.001f; g < length; g+= maxrad) {
+        for (float g = -0.001f; g < length * 0.8f; g+= maxrad) {
 
 
             for (int i = 0; i < 10; i++) {
