@@ -29,6 +29,11 @@ public class MalkuthFireballRenderer extends EntityRenderer<MalkuthFireball> {
     @Override
     public void render(MalkuthFireball fireball, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light) {
         matrices.pushPose();
+
+        float scale = Math.clamp((fireball.tickCount + pticks) / 5,0,1);
+
+        matrices.scale(scale,scale,scale);
+
         float ri;
         float gi;
         float bi;

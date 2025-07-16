@@ -339,6 +339,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
             if (tick > 4) {
+                BossUtil.malkuthFloatParticles((ServerLevel) level(), this);
                 if (!this.moveToPos(end)) {
                     this.noPhysics = true;
                     this.setNoGravity(true);
@@ -352,7 +353,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
         }else if (stage == 3){
 
-            this.lookAt(EntityAnchorArgument.Anchor.EYES, this.getTarget().position());
+            BossUtil.malkuthFloatParticles((ServerLevel) level(), this);
+
+            if (this.getTarget() != null) {
+                this.lookAt(EntityAnchorArgument.Anchor.EYES, this.getTarget().position());
+            }
 
             this.noPhysics = true;
             this.setNoGravity(true);
@@ -421,7 +426,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         Vector3f color = getMalkuthAttackPreparationParticleColor(type);
 
                         RectanglePreparationParticleOptions options = new RectanglePreparationParticleOptions(
-                                new Vec3(0,0,-1), 5, 1.5f, 30, 5, 10, color.x,color.y,color.z,0.1f
+                                new Vec3(0,0,-1), 5, 1.5f, 30, 5, 10, color.x,color.y,color.z,0.2f
                         );
 
                         int dir = offset.dot(new Vec3(1,0,0)) < 0 ? 1 : -1;
@@ -429,11 +434,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         Vec3 direction = new Vec3(dir,0,0);
 
                         RectanglePreparationParticleOptions options2 = new RectanglePreparationParticleOptions(
-                                direction, 5, 1.5f, 30, 5, 10, color.x,color.y,color.z,0.1f
+                                direction, 5, 1.5f, 30, 5, 10, color.x,color.y,color.z,0.2f
                         );
 
                         FDLibCalls.sendParticles((ServerLevel) level(), options, centerpos.add(0,1.06f,2.5),60);
-                        FDLibCalls.sendParticles((ServerLevel) level(), options2, centerpos.add(0,1.06f,0).add(direction.multiply(-2.5,0,0)),60);
+                        FDLibCalls.sendParticles((ServerLevel) level(), options2, centerpos.add(0,1.061f,0).add(direction.multiply(-2.5,0,0)),60);
 
                     }
 
@@ -480,6 +485,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 this.setDeltaMovement(Vec3.ZERO);
                 this.teleportTo(spawnPosition.x,spawnPosition.y,spawnPosition.z);
                 inst.nextStage();
+            }else{
+                BossUtil.malkuthFloatParticles((ServerLevel) level(), this);
             }
 
         } else if (stage == 5){

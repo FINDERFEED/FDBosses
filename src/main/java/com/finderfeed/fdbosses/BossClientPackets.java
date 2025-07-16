@@ -25,6 +25,7 @@ import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
@@ -165,7 +166,62 @@ public class BossClientPackets {
             case BossUtil.MALKUTH_SWORD_CHARGE_PARTICLES -> {
                 malkuthSwordChargeParticles(pos, data);
             }
+            case BossUtil.MALKUTH_FLOAT_PARTICLES -> {
+                malkuthFloat(data);
+            }
         }
+    }
+
+    public static void malkuthFloat(int id){
+        ClientLevel clientLevel = (ClientLevel) FDClientHelpers.getClientLevel();
+
+        if (clientLevel.getEntity(id) instanceof MalkuthEntity malkuth){
+
+            Vec3 pos = malkuth.position();
+            Vec3 old = new Vec3(
+                    malkuth.xo,
+                    malkuth.yo,
+                    malkuth.zo
+            );
+
+            Vec3 between = old.subtract(pos);
+
+            Vec3 nrm = between.normalize();
+
+            double dist = between.length();
+
+            for (float i = -1; i < dist; i+=1f){
+
+                Vec3 startPos = pos.add(nrm.multiply(i,i,i)).add(0,2,0);
+
+                for (int g = 0; g < 10; g++) {
+
+                    Vector3f color = MalkuthEntity.getAndRandomizeColor(MalkuthAttackType.getRandom(clientLevel.random), clientLevel.random);
+
+
+                    float v = random.nextFloat() * 1.9f + 0.1f;
+
+
+                    BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                            .size(0.3f - random.nextFloat() * 0.1f)
+                            .scalingOptions(5,0,random.nextInt(10) + 10)
+                            .brightness(2)
+                            .color(color.x,color.y,color.z)
+                            .particleProcessor(new CircleParticleProcessor(startPos.add(0,-v,0), true, true, 1))
+                            .build();
+
+                    Vec3 horizontalOffset = new Vec3(2.1f - v,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat());
+
+                    Vec3 ppos = startPos.add(horizontalOffset).add(0,-v,0);
+
+                    clientLevel.addParticle(ballParticleOptions, true, ppos.x,ppos.y,ppos.z,0,-random.nextFloat() * 0.1f,0);
+
+                }
+            }
+
+
+        }
+
     }
 
     public static void malkuthSwordChargeParticles(Vec3 encodedMalkuthAttackTypeISAIDDONTJUDGEME, int entityId){
