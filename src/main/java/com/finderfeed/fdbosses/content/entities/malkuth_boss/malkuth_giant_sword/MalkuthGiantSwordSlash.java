@@ -136,12 +136,20 @@ public class MalkuthGiantSwordSlash extends Entity {
         float firstPointOffset = 2 + random.nextFloat() * 2;
         float secondPointOffset = 6 + random.nextFloat() * 2;
 
-        StripeParticleOptions stripeParticleOptions = new StripeParticleOptions(fireColorStart,fireColor, 20, 50, 0.2f, 0.5f,
-                new Vec3(0.01f,0,0),
-                dir.multiply(firstPointOffset,0,firstPointOffset).add(0,3,0),
-                dir.multiply(secondPointOffset,0,secondPointOffset).add(0,7,0),
-                rnd.add(0,12,0)
-        );
+        StripeParticleOptions stripeParticleOptions = StripeParticleOptions.builder()
+                .startColor(fireColorStart)
+                .endColor(fireColor)
+                .lifetime(20)
+                .lod(50)
+                .scale(0.24f)
+                .stripePercentLength(0.5f)
+                .endOutPercent(0.2f)
+                .startInPercent(0.2f)
+                .offsets(new Vec3(0.01f,0,0),
+                        dir.multiply(firstPointOffset,0,firstPointOffset).add(0,3,0),
+                        dir.multiply(secondPointOffset,0,secondPointOffset).add(0,7,0),
+                        rnd.add(0,12,0))
+                .build();
 
         level().addParticle(stripeParticleOptions, true, stripePos.x,stripePos.y,stripePos.z,0,0,0);
 

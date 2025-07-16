@@ -266,6 +266,18 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     };;
 
+    private Vec3[] FLY_TO_OFFSETS = new Vec3[]{
+            new Vec3(0,7,15),
+            new Vec3(-15,7,12),
+            new Vec3(15,7,12)
+    };
+
+    @SerializableField
+    private int currentlyFlyingTo = -1;
+
+    @SerializableField
+    private ProjectileMovementPath jumpToFlyPath;
+
     private boolean fireballsNPlatforms(AttackInstance inst){
 
         int stage = inst.stage;
@@ -298,43 +310,95 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
         }else if (stage == 2){
 
-            int localTick = tick % 81;
 
-            if (localTick == 40){
+            if (jumpToFlyPath == null){
+
+                Vec3 start = this.position();
+                Vec3 end = this.spawnPosition.add(FLY_TO_OFFSETS[0]);
+
+                Vec3 b = end.subtract(start);
+                Vec3 mid = start.add(b.multiply(0.5,0.5,0.5)).add(0,4,0);
+
+                jumpToFlyPath = new ProjectileMovementPath(20,false)
+                        .addPos(this.position())
+                        .addPos(mid)
+                        .addPos(end);
+            }
+
+            if (!jumpToFlyPath.isFinished()){
+                this.noPhysics = true;
+                this.setNoGravity(true);
+                jumpToFlyPath.tick(this);
+            }else{
+                currentlyFlyingTo = 0;
+                this.setDeltaMovement(Vec3.ZERO);
+                inst.nextStage();
+            }
+        }else if (stage == 3){
+
+            this.noPhysics = true;
+            this.setNoGravity(true);
+
+            int cycleTime = 100;
+
+            int currentCycle = tick / cycleTime;
+
+            int localTick = tick % cycleTime;
+
+            if (currentCycle > 6){
+                inst.nextStage();
+                return false;
+            }
+
+            if (currentlyFlyingTo == -1){
+                currentlyFlyingTo = random.nextInt(FLY_TO_OFFSETS.length);
+            }
+
+            int fireballTickStart = 30;
+            int fireballTickEnd = fireballTickStart + PLATFORM_SPAWN_OFFSETS.length;
+
+            if (localTick == 0){
+                int old = currentlyFlyingTo;
+                while (currentlyFlyingTo == old){
+                    currentlyFlyingTo = random.nextInt(FLY_TO_OFFSETS.length);
+                }
+            }else if (localTick < fireballTickStart){
+                Vec3 target = this.spawnPosition.add(FLY_TO_OFFSETS[currentlyFlyingTo]);
+                this.moveToPos(target);
+            }else if (localTick < fireballTickEnd){
+                this.setDeltaMovement(Vec3.ZERO);
+                int currentFireball = localTick - fireballTickStart;
 
                 Vec3 forward = this.getForward().multiply(1,0,1).normalize();
 
                 Vec3 left = forward.yRot(FDMathUtil.FPI / 2);
 
-                for (int i = 0; i < PLATFORM_SPAWN_OFFSETS.length; i++){
+                Vec3 platformPos = this.spawnPosition.add(PLATFORM_SPAWN_OFFSETS[currentFireball]);
+                float p = (float) currentFireball / (PLATFORM_SPAWN_OFFSETS.length - 1);
+                float angle = FDMathUtil.FPI * p;
+                Vector3f spawnOffset = new Quaternionf(new AxisAngle4d(angle, forward.x,forward.y,forward.z)).transform((float)left.x,(float)left.y,(float)left.z,new Vector3f()).mul(5);
+                Vec3 spawnPos = this.position().add(0,2,0);
+                Vec3 gotoPos = spawnPos.add(spawnOffset.x,spawnOffset.y,spawnOffset.z);
+                MalkuthFireball malkuthFireball = MalkuthFireball.summon(MalkuthAttackType.getRandom(random), level(), spawnPos, gotoPos, platformPos.add(0,1.5,0));
 
-                    Vec3 platformPos = this.spawnPosition.add(PLATFORM_SPAWN_OFFSETS[i]);
-
-                    float p = (float) i / (PLATFORM_SPAWN_OFFSETS.length - 1);
-
-                    float angle = FDMathUtil.FPI * p;
-
-                    Vector3f spawnOffset = new Quaternionf(new AxisAngle4d(angle, forward.x,forward.y,forward.z)).transform((float)left.x,(float)left.y,(float)left.z,new Vector3f()).mul(5);
-
-                    Vec3 spawnPos = this.position().add(0,10,0);
-
-                    Vec3 gotoPos = spawnPos.add(spawnOffset.x,spawnOffset.y,spawnOffset.z);
-
-                    MalkuthFireball malkuthFireball = MalkuthFireball.summon(MalkuthAttackType.getRandom(random), level(), spawnPos, gotoPos, platformPos.add(0,1.5,0));
-
-                }
-
-            }else if (localTick == 80){
-                for (var fireball : level().getEntitiesOfClass(MalkuthFireball.class, this.getBoundingBox().inflate(20,20,20))){
+            }else if (localTick == fireballTickEnd + 10){
+                for (var fireball : this.level().getEntitiesOfClass(MalkuthFireball.class, new AABB(-20,-20,-20,20,20,20).move(this.position()))){
                     fireball.setMoveToTarget(12);
                 }
             }
 
-            if (tick > 1001){
+
+        } else if (stage == 4){
+
+            if (this.moveToPos(spawnPosition)){
+                this.noPhysics = false;
+                this.setNoGravity(false);
+                this.setDeltaMovement(Vec3.ZERO);
+                this.teleportTo(spawnPosition.x,spawnPosition.y,spawnPosition.z);
                 inst.nextStage();
             }
 
-        }else if (stage == 3){
+        } else if (stage == 5){
             if (tick == 100){
                 for (var platform : level().getEntitiesOfClass(MalkuthPlatform.class,new AABB(-ENRAGE_RADIUS,-ENRAGE_RADIUS,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(spawnPosition))){
                     platform.kill();
@@ -350,6 +414,49 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
         return false;
+    }
+
+    private boolean moveToPos(Vec3 target){
+        Vec3 thisPos = this.position();
+        Vec3 between = target.subtract(thisPos);
+        double len = between.length();
+        if (len > 0.025){
+
+            float p = (float) Math.clamp(len / 15f, 0, 1);
+
+            float speed = (float) FDMathUtil.lerp(0.025, 2, p);
+
+            this.setDeltaMovement(between.normalize().multiply(speed,speed,speed));
+
+            return false;
+        }else{
+            this.setDeltaMovement(Vec3.ZERO);
+            return true;
+        }
+    }
+
+    private void immediateFireballs(){
+        Vec3 forward = this.getForward().multiply(1,0,1).normalize();
+
+        Vec3 left = forward.yRot(FDMathUtil.FPI / 2);
+
+        for (int i = 0; i < PLATFORM_SPAWN_OFFSETS.length; i++){
+
+            Vec3 platformPos = this.spawnPosition.add(PLATFORM_SPAWN_OFFSETS[i]);
+
+            float p = (float) i / (PLATFORM_SPAWN_OFFSETS.length - 1);
+
+            float angle = FDMathUtil.FPI * p;
+
+            Vector3f spawnOffset = new Quaternionf(new AxisAngle4d(angle, forward.x,forward.y,forward.z)).transform((float)left.x,(float)left.y,(float)left.z,new Vector3f()).mul(5);
+
+            Vec3 spawnPos = this.position().add(0,10,0);
+
+            Vec3 gotoPos = spawnPos.add(spawnOffset.x,spawnOffset.y,spawnOffset.z);
+
+            MalkuthFireball malkuthFireball = MalkuthFireball.summon(MalkuthAttackType.getRandom(random), level(), spawnPos, gotoPos, platformPos.add(0,1.5,0));
+
+        }
     }
 
     private MalkuthAttackType earthquakeToSummon = MalkuthAttackType.FIRE;
@@ -1320,7 +1427,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }else if (stage == 1){
 
 
-            int swordSpawnTick = 16;
+            int swordSpawnTick = 12;
 
             int particlesStart = swordSpawnTick - 3;
             int particlesEnd = swordSpawnTick + 40;
