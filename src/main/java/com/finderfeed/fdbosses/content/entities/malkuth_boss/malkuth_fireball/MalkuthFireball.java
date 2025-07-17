@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_fireball;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
@@ -8,6 +9,8 @@ import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
+import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -17,6 +20,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -139,7 +143,16 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
     }
 
     public void explode(){
+        BossUtil.malkuthFireballExplosionParticles((ServerLevel) level(), targetPos, this.getAttackType());
+        PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                .frequency(5)
+                .amplitude(2.5f)
+                .inTime(0)
+                .stayTime(0)
+                .outTime(5)
+                .build(),this.targetPos,10);
         this.remove(RemovalReason.DISCARDED);
+
     }
 
     public void setMoveToTarget(int moveTime){

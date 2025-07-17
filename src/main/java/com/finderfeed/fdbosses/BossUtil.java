@@ -39,6 +39,7 @@ public class BossUtil {
     public static final int MALKUTH_CANNON_SHOOT = 7;
     public static final int MALKUTH_SWORD_CHARGE_PARTICLES = 8;
     public static final int MALKUTH_FLOAT_PARTICLES = 9;
+    public static final int MALKUTH_FIREBALL_EXPLODE = 10;
 
     /**
      * Air Friction? What?
@@ -94,6 +95,10 @@ public class BossUtil {
             double z = pos.z - entity.getZ();
             return x * x + z * z <= radius * radius;
         };
+    }
+
+    public static void malkuthFireballExplosionParticles(ServerLevel serverLevel, Vec3 pos, MalkuthAttackType type){
+        posEvent(serverLevel, pos, MALKUTH_FIREBALL_EXPLODE, type.isFire() ? 0 : 1, 60);
     }
 
     public static void malkuthFloatParticles(ServerLevel serverLevel, MalkuthEntity malkuthEntity){

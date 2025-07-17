@@ -333,7 +333,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
         }else if (stage == 1){
-            if (tick == 2) {
+            if (tick == 1) {
+
+                for (int i = 0; i < 20; i++){
+                    this.malkuthEarthStrikeStripe(MalkuthAttackType.getRandom(random));
+                }
 
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                         .frequency(5)
@@ -352,7 +356,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 var combatants = this.getCombatants(true);
                 for (var player : combatants) {
                     if (Math.abs(player.getY() - this.spawnPosition.y) <= 3) {
-                        FDLibCalls.setServerPlayerSpeed((ServerPlayer) player, new Vec3(0, 1.5, 0));
+                        FDLibCalls.setServerPlayerSpeed((ServerPlayer) player, new Vec3(0, 2, 0));
                     }
                 }
                 for (Vec3 offset : PLATFORM_SPAWN_OFFSETS) {
@@ -375,16 +379,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             if (tick > 4) {
                 BossUtil.malkuthFloatParticles((ServerLevel) level(), this);
-                if (!this.moveToPos(end)) {
-                    this.noPhysics = true;
-                    this.setNoGravity(true);
-                } else {
-                    currentlyFlyingTo = 0;
-                    this.setDeltaMovement(Vec3.ZERO);
-                    if (tick > 30) {
-                        inst.nextStage();
-                    }
-                }
+                currentlyFlyingTo = 0;
+                this.noPhysics = true;
+                this.setNoGravity(true);
+                inst.nextStage();
             }
         }else if (stage == 3){
 
@@ -526,7 +524,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
         } else if (stage == 5){
-            if (tick == 20){
+            if (tick == 5){
                 for (var platform : level().getEntitiesOfClass(MalkuthPlatform.class,new AABB(-ENRAGE_RADIUS,-ENRAGE_RADIUS,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(spawnPosition))){
                     platform.kill();
                 }
@@ -535,12 +533,51 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     platform.kill();
                 }
 
-            } else if (tick >= 40) {
+            } else if (tick >= 20) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    private void malkuthEarthStrikeStripe(MalkuthAttackType type){
+
+        float rndRadius = 4 + FDEasings.easeOut(random.nextFloat()) * 3f;
+        Vec3 rnd = new Vec3(rndRadius,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat());
+
+        Vec3 dir = rnd.normalize();
+
+        float startOffsetRand = 0.25f;
+        Vec3 startOffset = dir.multiply(startOffsetRand,startOffsetRand,startOffsetRand);
+
+        Vec3 stripePos = this.position().add(this.getForward().multiply(1,0,1).normalize()).add(startOffset);
+
+        Vector3f colFire = MalkuthEntity.getMalkuthAttackPreparationParticleColor(type);
+
+        FDColor fireColorStart = new FDColor(colFire.x,colFire.y - random.nextFloat() * 0.1f - 0.3f,colFire.z,0.5f);
+        FDColor fireColor = new FDColor(colFire.x,colFire.y + random.nextFloat() * 0.1f,colFire.z,1f);
+
+        float firstPointOffset = 1 + random.nextFloat() * 1;
+        float secondPointOffset = 3 + random.nextFloat() * 1;
+
+        StripeParticleOptions stripeParticleOptions = StripeParticleOptions.builder()
+                .startColor(fireColorStart)
+                .endColor(fireColor)
+                .lifetime(10)
+                .lod(50)
+                .scale(0.1f)
+                .stripePercentLength(0.5f)
+                .endOutPercent(0.2f)
+                .startInPercent(0.2f)
+                .offsets(new Vec3(0.01f,0,0),
+                        dir.multiply(firstPointOffset,0,firstPointOffset).add(0,1.5,0),
+                        dir.multiply(secondPointOffset,0,secondPointOffset).add(0,3.5,0),
+                        rnd.add(0,4 + random.nextFloat() * 2,0))
+                .build();
+
+        ((ServerLevel)level()).sendParticles(stripeParticleOptions, stripePos.x,stripePos.y,stripePos.z,0,0,0,0,0);
+
     }
 
     private boolean moveToPos(Vec3 target){
