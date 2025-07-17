@@ -369,8 +369,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
         }else if (stage == 2){
 
-            Vec3 end = this.spawnPosition.add(FLY_TO_OFFSETS[0]);
-
             if (tick == 0) {
                 this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_TO_FLOAT)
                         .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_FLOAT).build())

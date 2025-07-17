@@ -4,6 +4,8 @@ import com.finderfeed.fdbosses.config.BossConfig;
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.SetClientMalkuthWeaknessAmountPacket;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossDataComponents;
@@ -14,6 +16,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -31,8 +34,10 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.ExplosionEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +45,13 @@ import java.util.regex.Pattern;
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class BossEvents {
+
+    @SubscribeEvent
+    public static void playerEnterWorld(PlayerEvent.PlayerLoggedInEvent event){
+        if (event.getEntity() instanceof ServerPlayer serverPlayer){
+            PacketDistributor.sendToPlayer(serverPlayer, new SetClientMalkuthWeaknessAmountPacket(MalkuthWeaknessHandler.getCurrentWeaknessLevel(serverPlayer)));
+        }
+    }
 
     @SubscribeEvent
     public static void preventArenaDestruction(BlockEvent.BreakEvent event){

@@ -11,6 +11,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
@@ -48,6 +49,10 @@ import java.util.Vector;
 public class BossClientPackets {
 
     private static Random random = new Random();
+
+    public static void setPlayerMalkuthWeaknessAmount(int amount){
+        MalkuthWeaknessHandler.setCurrentWeakness(FDClientHelpers.getClientPlayer(), amount);
+    }
 
     public static void closeDossierScreen(){
         if (Minecraft.getInstance().screen instanceof BaseBossScreen baseBossScreen){
