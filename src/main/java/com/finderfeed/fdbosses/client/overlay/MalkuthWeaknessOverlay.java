@@ -22,6 +22,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
+import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
@@ -82,7 +83,7 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
         float size = 5;
 
 
-        PoseStack matrices = new PoseStack();
+        PoseStack matrices = graphics.pose();
         RenderSystem.enableBlend();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
@@ -145,7 +146,99 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
 
         BufferUploader.drawWithShader(builder.build());
 
+        matrices.pushPose();
+        matrices.translate(w/2 - 0.5f,h/2 - 0.5f,0);
+
+        Vector3f colFire = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.FIRE);
+        Vector3f fire1 = new Vector3f(colFire.x,colFire.y - 0.25f,colFire.z);
+        Vector3f fire2 = new Vector3f(colFire.x,colFire.y,colFire.z);
+
+        Vector3f colIce = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.ICE);
+        Vector3f ice1 = new Vector3f(colIce.x - 0.1f,colIce.y - 0.6f,colIce.z);
+        Vector3f ice2 = new Vector3f(colIce.x,colIce.y,colIce.z);
+
+        float innerRadius = 1f;
+        float radius = 8;
+
+        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+        drawCircle(new Vector3f(),new Vector3f(),matrices, radius,innerRadius, 1f,1);
+
+        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+        drawCircle(ice1,ice2,matrices, radius,innerRadius, 1f,3);
+
+
+        matrices.popPose();
+
         RenderSystem.defaultBlendFunc();
+
+    }
+
+    public static void drawCircle(Vector3f c1, Vector3f c2, PoseStack matrices, float radius, float innerRadius,float a, int renderAmount){
+        RenderSystem.enableBlend();
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+
+        Tesselator tesselator = Tesselator.getInstance();
+
+        BufferBuilder vertex = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+
+
+        Vec3 v = new Vec3(radius,0,0);
+
+        int count = 48;
+
+        float angle = FDMathUtil.FPI * 2 / count;
+
+        Matrix4f m = matrices.last().pose();
+
+
+        for (int i = 0; i < count; i++){
+
+            float p = i / (float) count;
+            float sinp = (float) Math.sin(FDMathUtil.FPI * 2 * p * 3) / 2 + 0.5f;
+
+            float p2 = (i + 1f) / count;
+            float sinp2 = (float) Math.sin(FDMathUtil.FPI * 2 * p2 * 3) / 2 + 0.5f;
+
+            Vector3f color1 = FDMathUtil.interpolateVectors( c1, c2, sinp);
+            Vector3f color2 = FDMathUtil.interpolateVectors( c1, c2, sinp2);
+
+            float currentAngle = angle * i;
+            float nextAngle = angle * (i + 1);
+
+            Vec3 offset = v.zRot(currentAngle);
+            Vec3 noffset = offset.normalize().multiply(innerRadius,innerRadius,innerRadius);
+
+            Vec3 offset2 = v.zRot(nextAngle);
+            Vec3 noffset2 = offset2.normalize().multiply(innerRadius,innerRadius,innerRadius);
+
+            for (int g = 0; g < renderAmount;g++) {
+                vertex.addVertex(m, (float) (offset.x - noffset.x), (float) (offset.y - noffset.y), 0).setColor((float) color1.x, (float) color1.y, (float) color1.z, 0f);
+                vertex.addVertex(m, (float) offset.x, (float) offset.y, 0).setColor((float) color1.x, (float) color1.y, (float) color1.z, a);
+
+                vertex.addVertex(m, (float) offset2.x, (float) offset2.y, 0).setColor((float) color2.x, (float) color2.y, (float) color2.z, a);
+                vertex.addVertex(m, (float) (offset2.x - noffset2.x), (float) (offset2.y - noffset2.y), 0).setColor((float) color2.x, (float) color2.y, (float) color2.z, 0f);
+
+
+                vertex.addVertex(m, (float) offset.x, (float) offset.y, 0).setColor((float) color1.x, (float) color1.y, (float) color1.z, a);
+                vertex.addVertex(m, (float) (offset.x + noffset.x), (float) (offset.y + noffset.y), 0).setColor((float) color1.x, (float) color1.y, (float) color1.z, 0f);
+
+                vertex.addVertex(m, (float) (offset2.x + noffset2.x), (float) (offset2.y + noffset2.y), 0).setColor((float) color2.x, (float) color2.y, (float) color2.z, 0f);
+                vertex.addVertex(m, (float) offset2.x, (float) offset2.y, 0).setColor((float) color2.x, (float) color2.y, (float) color2.z, a);
+            }
+
+
+
+
+        }
+
+//        vertex.addVertex(m, (float) radius,(float) 0,0).setColor(1f,1f,1f,1f);
+//        vertex.addVertex(m, (float) radius - innerRadius,(float) 0,0).setColor(1f,1f,1f,1f);
+
+
+        BufferUploader.drawWithShader(vertex.build());
+
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.enableCull();
 
     }
 
