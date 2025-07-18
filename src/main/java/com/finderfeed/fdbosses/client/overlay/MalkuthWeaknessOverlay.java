@@ -11,6 +11,7 @@ import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Axis;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -48,6 +49,12 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
 
         MalkuthAttackType weakTo = MalkuthWeaknessHandler.getWeakTo(player);
 
+        if (player.level().getGameTime() % 200 > 100){
+            weakTo = MalkuthAttackType.ICE;
+        }else{
+            weakTo = MalkuthAttackType.FIRE;
+        }
+
         iceTickerO = iceTicker;
         fireTickerO = fireTicker;
 
@@ -63,6 +70,8 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
 
     @Override
     public void render(GuiGraphics graphics, DeltaTracker tracker) {
+
+        if (FDClientHelpers.getClientLevel() == null) return;
 
         Window window = Minecraft.getInstance().getWindow();
 
@@ -157,14 +166,27 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
         Vector3f ice1 = new Vector3f(colIce.x - 0.1f,colIce.y - 0.6f,colIce.z);
         Vector3f ice2 = new Vector3f(colIce.x,colIce.y,colIce.z);
 
-        float innerRadius = 1f;
-        float radius = 8;
+        float innerRadius = 1.5f;
+        float radius = 7.5f;
+
+        float time = FDClientHelpers.getClientLevel().getGameTime() + pticks;
+
+
+        matrices.mulPose(Axis.ZP.rotationDegrees(time * 10));
+        float sin = (float) Math.sin(time / 3) / 2 + 0.5f;
+
+        sin = sin * 0.5f;
 
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
         drawCircle(new Vector3f(),new Vector3f(),matrices, radius,innerRadius, 1f,1);
 
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-        drawCircle(ice1,ice2,matrices, radius,innerRadius, 1f,3);
+        drawCircle(ice1,ice2,matrices, radius,innerRadius, iceAlpha,3);
+        drawCircle(ice1,ice2,matrices, radius,innerRadius, iceAlpha * sin,2);
+
+        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+        drawCircle(fire1,fire2,matrices, radius,innerRadius, fireAlpha,3);
+        drawCircle(fire1,fire2,matrices, radius,innerRadius, fireAlpha * sin,2);
 
 
         matrices.popPose();
