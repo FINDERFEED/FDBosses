@@ -4,10 +4,13 @@ import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBuddy;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
+import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.util.FDColor;
@@ -23,6 +26,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
@@ -136,6 +140,13 @@ public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializab
                 dist += 1.75f;
             } while (dist < b);
 
+            if (tickCount == 1) {
+                for (int i = 0; i < 10; i++) {
+                    this.stripeParticles(MalkuthAttackType.FIRE);
+                    this.stripeParticles(MalkuthAttackType.ICE);
+                }
+            }
+
         }else{
             if (this.isAllowedToMoveToTarget()){
                 if (!this.movementPath.isFinished()) {
@@ -143,6 +154,7 @@ public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializab
                 }else{
                     this.removeNextTick = true;
                 }
+                this.tickDamage();
             }
 
 
@@ -159,15 +171,44 @@ public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializab
                                 .maxVerticalSpeedCenter(0.15f)
                 );
                 PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+
             }
         }
+    }
+
+
+
+    private void tickDamage(){
+
+        Vec3 movement = this.getDeltaMovement();
+        if (movement.equals(Vec3.ZERO)) return;
+
+        float bbwidthinflate = this.getBbWidth()/2;
+        float bbHeight = this.getBbHeight();
+
+        Vec3 startPos = this.position().add(0,bbHeight/2,0);
+
+        Vec3 endPos = startPos.add(movement);
+
+        var entities = FDHelpers.traceEntities(level(), startPos, endPos, bbwidthinflate, v->{
+            return !(v instanceof MalkuthBossBuddy);
+        });
+
+        for (var target : entities){
+            if (target instanceof LivingEntity livingEntity){
+
+                target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getMalkuthAttackType(), 34), 1);
+
+            }
+        }
+
     }
 
 
     private void stripeParticles(MalkuthAttackType type){
 
 
-        float rndRadius = 1 + FDEasings.easeOut(random.nextFloat()) * 4f;
+        float rndRadius = 2 + FDEasings.easeOut(random.nextFloat()) * 2f;
         Vec3 rnd = new Vec3(rndRadius,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat());
 
         Vec3 dir = rnd.normalize();
@@ -182,13 +223,22 @@ public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializab
         FDColor fireColorStart = new FDColor(colFire.x,colFire.y - random.nextFloat() * 0.1f - 0.3f,colFire.z,0.5f);
         FDColor fireColor = new FDColor(colFire.x,colFire.y + random.nextFloat() * 0.1f,colFire.z,1f);
 
-        float firstPointOffset = 2f + random.nextFloat() * 1f;
+        float firstPointOffset = 1f + random.nextFloat() * 1f;
 
-        StripeParticleOptions stripeParticleOptions = new StripeParticleOptions(fireColorStart,fireColor, 5 + random.nextInt(10), 50, 0.05f, 0.75f,
-                new Vec3(0.01f,0,0),
-                dir.multiply(firstPointOffset,0,firstPointOffset).add(0,0.5,0),
-                rnd.add(0,1.5f + random.nextFloat() * 2,0)
-        );
+
+        StripeParticleOptions stripeParticleOptions = StripeParticleOptions.builder()
+                .endColor(fireColor)
+                .startColor(fireColorStart)
+                .lifetime(5 + random.nextInt(5))
+                .lod(50)
+                .scale(0.1f)
+                .stripePercentLength(0.75f)
+                .endOutPercent(0.25f)
+                .startInPercent(0.25f)
+                .offsets(new Vec3(0.01f,0,0),
+                        dir.multiply(firstPointOffset,0,firstPointOffset).add(0,0.5,0),
+                        rnd.add(0,1.5f + random.nextFloat() * 2,0))
+                .build();
 
         level().addParticle(stripeParticleOptions, true, stripePos.x,stripePos.y,stripePos.z,0,0,0);
 

@@ -61,10 +61,10 @@ public class BossTargetFinder {
     }
 
     public static <T extends Entity> List<T> getEntitiesInArc(Class<T> clazz, Level level, Vec3 start, Vec2 direction, float halfAngle, float cylinderHeight, float cylinderRadius){
-        return getEntitiesInArc(clazz, level, start, direction, halfAngle, cylinderHeight, cylinderRadius);
+        return getEntitiesInArc(clazz, level, start, direction, halfAngle, cylinderHeight, cylinderRadius,v->true);
     }
 
-    public static <T extends Entity> List<T> getEntitiesInArc(Class<T> clazz, Level level, Vec3 start, Vec2 direction, float halfAngle, float cylinderHeight, float cylinderRadius, Predicate<T> predicate){
+    public static <T extends Entity> List<T> getEntitiesInArc(Class<T> clazz, Level level, Vec3 start, Vec2 direction, float angle, float cylinderHeight, float cylinderRadius, Predicate<T> predicate){
 
         var inCylinder = getEntitiesInCylinder(clazz, level, start, cylinderHeight, cylinderRadius, predicate);
 
@@ -79,9 +79,9 @@ public class BossTargetFinder {
             Vec3 horizontal = position.subtract(start).multiply(1,0,1).normalize();
             Vec3 dir = new Vec3(direction.x,0,direction.y);
 
-            double angle = FDMathUtil.angleBetweenVectors(horizontal,dir);
+            double angleBetween = FDMathUtil.angleBetweenVectors(horizontal,dir);
 
-            if (angle > halfAngle){
+            if (angleBetween > angle/2){
                 entities.remove();
             }
 

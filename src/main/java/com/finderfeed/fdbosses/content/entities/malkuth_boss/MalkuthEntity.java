@@ -168,14 +168,16 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 //                .addAttack(-1, sideRocks)
 //                .addAttack(0, JUMP_BACK_ON_SPAWN)
-                .addAttack(0, SLASH_ATTACK)
+//                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(0, JUMP_CRUSH)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
-//                .addAttack(2, SUMMON_EARTHQUAKE)
-//                .addAttack(3, JUMP_BACK_ON_SPAWN_WITH_CRUSH)
+                .addAttack(2, SUMMON_EARTHQUAKE)
+                .addAttack(3, NOTHING_20_TICKS)
+                .addAttack(4, NOTHING_20_TICKS)
+                .addAttack(5, NOTHING_20_TICKS)
 //                .addAttack(2, PULL_AND_PUNCH)
-//                .addAttack(3, JUMP_ON_WALL_COMMAND_CANNONS)
+//                .addAttack(3, SUMMON_AND_THROW_SIDE_ROCKS)
 //                .addAttack(4, CAROUSEL_SLASHES)
                 .attackListener(this::attackListener)
         ;
@@ -183,7 +185,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     private boolean doNothing20Ticks(AttackInstance instance){
-        return true;
+        if (instance.tick >= 20){
+            return true;
+        }
+        return false;
     }
 
     public static FDModel getClientModel(){
@@ -630,7 +635,14 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             if (tick == 8){
 
-                Vec3 targetPos = this.getTarget().position();
+
+                Vec3 targetPos;
+
+                if (this.getTarget() != null){
+                    targetPos = this.getTarget().position();
+                }else{
+                    targetPos = this.position().add(this.getForward().multiply(1,0,1).normalize().multiply(10,10,10));
+                }
 
                 Vec3 direction = targetPos.subtract(this.position()).multiply(1.5f,0,1.5f);
 
@@ -1343,7 +1355,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     private void shootCannons(){
-        int attackPerCombatant = 6;
+        int attackPerCombatant = 10;
         var cannons = this.getCannons();
         if (cannons.isEmpty()){
             //summon them
@@ -1360,7 +1372,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             for (int i = 0; i < attackPerCombatant;i++){
                 float angle = randomAngleStart + FDMathUtil.FPI / 4 * i;
-                float rad = random.nextFloat() * 5 + 2;
+                float rad = random.nextFloat() * 10 + 2;
                 Vec3 v = new Vec3(1,0,0)
                         .yRot(angle - FDMathUtil.FPI / 4 + FDMathUtil.FPI / 2 * random.nextFloat())
                         .multiply(rad,rad,rad)

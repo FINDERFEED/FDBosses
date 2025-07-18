@@ -1,10 +1,13 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake;
 
+import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.init.FDEDataSerializers;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
@@ -17,10 +20,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
@@ -65,11 +71,51 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
             this.summonSegments();
             this.manageSegments();
         }else{
+            this.tickDamage();
             if (this.tickCount > this.getEarthquakeTime() + 20){
                 this.remove(RemovalReason.DISCARDED);
             }
         }
 
+
+    }
+
+    private void tickDamage(){
+
+        var radius = this.getCurrentDamageRadius();
+
+        Vec3 dirAndLength = this.getDirectionAndLength();
+
+        float length = (float) dirAndLength.length();
+
+        Vec2 dir = new Vec2((float) dirAndLength.x,(float) dirAndLength.z);
+
+        var entities = BossTargetFinder.getEntitiesInArc(LivingEntity.class, level(), this.position().add(0,-1,0), dir, this.getAngle(),  2, length);
+
+        for (var entity : entities){
+
+            Vec3 position = entity.position();
+            Vec3 b = position.subtract(this.position()).multiply(1,0,1);
+
+            double k = b.length();
+
+            if (k < radius.first || k > radius.second){
+                continue;
+            }
+
+            entity.hurt(new MalkuthDamageSource(level().damageSources().generic(),this.getEarthquakeType(), 51),2);
+
+
+
+            Vec3 speed = new Vec3(dir.x ,0,dir.y).normalize().add(0,1,0);
+
+            if (entity instanceof ServerPlayer serverPlayer){
+                FDLibCalls.setServerPlayerSpeed(serverPlayer, speed);
+            }else{
+                entity.setDeltaMovement(speed);
+            }
+
+        }
 
     }
 

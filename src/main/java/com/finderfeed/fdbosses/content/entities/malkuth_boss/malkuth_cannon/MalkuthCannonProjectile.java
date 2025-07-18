@@ -1,10 +1,13 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon;
 
+import com.finderfeed.fdbosses.BossTargetFinder;
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityOptionsParticleType;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
@@ -200,6 +203,16 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
                             .maxVerticalSpeedCenter(0.15f)
             );
             PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+
+            BossUtil.malkuthFireballExplosionParticles((ServerLevel) level(), pos, this.getMalkuthAttackType());
+
+            var targets = BossTargetFinder.getEntitiesInSphere(LivingEntity.class, level(), pos, 2.5f);
+
+            for (var target : targets){
+
+                target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getMalkuthAttackType(), 100), 1);
+
+            }
 
             this.remove(RemovalReason.DISCARDED);
 
