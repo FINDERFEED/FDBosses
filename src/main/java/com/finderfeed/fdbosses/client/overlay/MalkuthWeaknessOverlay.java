@@ -49,12 +49,6 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
 
         MalkuthAttackType weakTo = MalkuthWeaknessHandler.getWeakTo(player);
 
-        if (player.level().getGameTime() % 200 > 100){
-            weakTo = MalkuthAttackType.ICE;
-        }else{
-            weakTo = MalkuthAttackType.FIRE;
-        }
-
         iceTickerO = iceTicker;
         fireTickerO = fireTicker;
 

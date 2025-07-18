@@ -45,7 +45,7 @@ public class MalkuthWeaknessHandler {
                     setCurrentWeakness(player, current + amount);
                 }
             }else{
-                setCurrentWeakness(player, current + amount);
+                setCurrentWeakness(player, current - amount);
             }
         }
     }

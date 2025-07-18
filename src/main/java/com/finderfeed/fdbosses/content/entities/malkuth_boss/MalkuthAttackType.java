@@ -7,6 +7,14 @@ public enum MalkuthAttackType {
     ICE,
     FIRE;
 
+    public static MalkuthAttackType getOpposite(MalkuthAttackType original){
+        if (original.isIce()){
+            return FIRE;
+        }else{
+            return ICE;
+        }
+    }
+
     public boolean isFire(){
         return this == FIRE;
     }

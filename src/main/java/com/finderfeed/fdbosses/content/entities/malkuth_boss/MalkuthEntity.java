@@ -68,6 +68,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
@@ -163,8 +167,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(PLATFORMS_N_FIREBALLS, this::fireballsNPlatforms)
 
 //                .addAttack(-1, sideRocks)
-//                .addAttack(0, NOTHING_20_TICKS)
-                .addAttack(0, PLATFORMS_N_FIREBALLS)
+//                .addAttack(0, JUMP_BACK_ON_SPAWN)
+                .addAttack(0, SLASH_ATTACK)
+//                .addAttack(0, JUMP_CRUSH)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
 //                .addAttack(2, SUMMON_EARTHQUAKE)
@@ -793,6 +798,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         ProjectileMovementPath path = jumpBackOnSpawnPath;
 
+
+
         if (jumpBackOnSpawnPath == null){
             Vec3 thisPos = this.position();
             Vec3 target = this.spawnPosition;
@@ -953,8 +960,16 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         if (localStage == 0){
             this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
 
-            this.slashAttackType = MalkuthAttackType.getRandom(this.getRandom());
 
+            if (this.getTarget() instanceof Player player) {
+                MalkuthAttackType attackType = MalkuthWeaknessHandler.getWeakTo(player);
+                if (random.nextFloat() < 0.33f){
+                    attackType = MalkuthAttackType.getOpposite(attackType);
+                }
+                this.slashAttackType = attackType;
+            }else{
+                this.slashAttackType = MalkuthAttackType.getRandom(this.getRandom());
+            }
             Animation animation = this.getSlashAttackAnimation(this.slashAttackType);
 
             AnimationTicker ticker = AnimationTicker.builder(animation)
@@ -993,9 +1008,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 float rotation = this.slashAttackType.isFire() ? 25 : -25;
 
-                MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level(),spawnPos,speedv,this.slashAttackType, 1, 2, rotation,0);
+                MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level(),spawnPos,speedv,this.slashAttackType, 5, 2, rotation,0);
 
-            }else if (tick >= 40){
+            }else if (tick >= 28){
                 inst.nextStage();
             }else if (tick == 8) {
                 this.causeSwordChargeParticles(slashAttackType);
@@ -1030,8 +1045,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         if (stage == 0){
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_CRUSH_ATTACK_FULL)
                             .setLoopMode(Animation.LoopMode.ONCE)
-                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE)
-                            .setSpeed(1.5f).build())
+                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
                     .build());
             if (tick == 5){
                 this.jumpCrushAttackMovementPath = this.createJumpCrushAttackMovementPath(15);
@@ -1084,7 +1098,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         .stayTime(0)
                         .outTime(5)
                         .build(),malkuthCrushAttack.position(),120);
-            }else if (tick >= 20){
+            }else if (tick >= 10){
                 return true;
             }
 
@@ -1125,12 +1139,15 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private boolean pullAndPunch(AttackInstance inst){
 
-        if (true) return true;
 
         int stage = inst.stage;
         int tick = inst.tick;
 
         if (stage == 0){
+
+            if (this.getTarget() != null){
+                this.lookAt(EntityAnchorArgument.Anchor.EYES, this.getTarget().position());
+            }
 
             AABB box = new AABB(-ENRAGE_RADIUS,4,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(this.position());
 
@@ -1224,7 +1241,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 this.causeSwordChargeParticles(MalkuthAttackType.ICE);
                 this.attachIceSword();
                 this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
-            } else if (tick >= 50){
+            } else if (tick >= 40){
                 return true;
             }
         }
@@ -1911,6 +1928,32 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }else{
             return "ice_sword_place";
         }
+    }
+
+    @EventBusSubscriber
+    public static class Events {
+
+        @SubscribeEvent
+        public static void onLivingDamage(LivingDamageEvent.Pre event){
+
+            LivingEntity living = event.getEntity();
+            Level level = living.level();
+
+            if (!level.isClientSide && living instanceof Player player && event.getSource() instanceof MalkuthDamageSource damageSource) {
+
+                int malkuthDamageAmount = damageSource.getMalkuthAttackAmount();
+                MalkuthAttackType malkuthAttackType = damageSource.getMalkuthAttackType();
+
+                if (!MalkuthWeaknessHandler.isWeakTo(player, malkuthAttackType)) {
+                    event.setNewDamage(0);
+                }
+
+                MalkuthWeaknessHandler.damageWeakness(malkuthAttackType, player, malkuthDamageAmount);
+
+            }
+
+        }
+
     }
 
 }
