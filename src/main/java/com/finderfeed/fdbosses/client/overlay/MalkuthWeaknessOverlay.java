@@ -5,8 +5,12 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
+import com.finderfeed.fdlib.systems.screen.screen_particles.ScreenParticlesRenderEvent;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticle;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
+import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -24,11 +28,14 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import org.joml.Matrix4f;
+import org.joml.Random;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.GAME)
 public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
+
+    public static Random random = new Random();
 
     public static final int MAX_IN_TIME = 10;
 
@@ -58,6 +65,31 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
         }else{
             iceTicker = Math.clamp(iceTicker - 1, 0, MAX_IN_TIME);
             fireTicker = Math.clamp(fireTicker + 1, 0, MAX_IN_TIME);
+        }
+
+
+        Window window = Minecraft.getInstance().getWindow();
+        float w = window.getGuiScaledWidth();
+        float h = window.getGuiScaledHeight();
+
+        for (int i = 0; i < 5; i++) {
+
+            Vector3f color = MalkuthEntity.getAndRandomizeColor(weakTo, player.level().random);
+
+            float x = random.nextFloat() * w;
+            float y = h;
+
+            FDTexturedSParticle.create(FDRenderUtil.ParticleRenderTypesS.TEXTURES_BLUR_ADDITIVE, BallParticle.LOCATION)
+                    .setPos(x, y, true)
+                    .setMaxQuadSize(3.5f)
+                    .setSpeed(0, -0.4)
+                    .setFriction(1f)
+                    .setColor(
+                            color.x,color.y,color.z,0.8f
+                    )
+                    .setLifetime(30)
+                    .setDefaultScaleOut()
+                    .sendToOverlay();
         }
 
     }

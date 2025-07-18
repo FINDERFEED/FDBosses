@@ -1,9 +1,11 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_fireball;
 
+import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
@@ -22,6 +24,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
@@ -151,6 +154,13 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
                 .stayTime(0)
                 .outTime(5)
                 .build(),this.targetPos,10);
+
+        var targets = BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.targetPos.add(0,-1,0), 3, 3f);
+
+        for (var target : targets){
+            target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getAttackType(), 34),1);
+        }
+
         this.remove(RemovalReason.DISCARDED);
 
     }
