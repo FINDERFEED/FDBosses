@@ -179,13 +179,19 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
     }
 
     public void setBroken(boolean broken) {
-        this.entityData.set(BROKEN, broken);
-        if (broken) {
-            this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_BREAK).build());
-            this.entityData.set(BROKEN_REQUIRES_MATERIALS, false);
-        }else{
-            this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_REPAIR).build());
+        if (!this.requiresRepair()) {
+            this.entityData.set(BROKEN, broken);
+            if (broken) {
+                this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_BREAK).build());
+                this.entityData.set(BROKEN_REQUIRES_MATERIALS, false);
+            } else {
+                this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_REPAIR).build());
+            }
         }
+    }
+
+    public boolean requiresRepair(){
+        return this.entityData.get(BROKEN_REQUIRES_MATERIALS);
     }
 
     public boolean isBroken(){

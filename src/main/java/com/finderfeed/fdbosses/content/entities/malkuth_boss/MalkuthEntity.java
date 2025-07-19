@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
+import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
@@ -1275,6 +1276,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         int tick = attackInstance.tick;
 
         if (stage == 0){
+
+            for (var cannon : BossTargetFinder.getEntitiesInCylinder(MalkuthCannonEntity.class, level(), this.spawnPosition.add(0,-5,0),20, 35)){
+                cannon.setBroken(false);
+            }
+
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
                     .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
             this.jumpOnWallPath = this.makeJumpOnWallPath(20,false);
