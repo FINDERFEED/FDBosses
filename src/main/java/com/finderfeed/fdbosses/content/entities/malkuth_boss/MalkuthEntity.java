@@ -167,7 +167,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(PLATFORMS_N_FIREBALLS, this::fireballsNPlatforms)
 
 //                .addAttack(-1, sideRocks)
-                .addAttack(0, PLATFORMS_N_FIREBALLS)
+//                .addAttack(0, PLATFORMS_N_FIREBALLS)
 //                .addAttack(0, JUMP_BACK_ON_SPAWN)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(0, JUMP_CRUSH)
@@ -1709,7 +1709,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     @Override
     public boolean hurt(DamageSource src, float damage) {
 
-        if (!src.is(DamageTypes.GENERIC_KILL) || !src.is(DamageTypes.FELL_OUT_OF_WORLD)) return false;
+        if (!src.is(DamageTypes.GENERIC_KILL) && !src.is(DamageTypes.FELL_OUT_OF_WORLD)) return false;
 
         return super.hurt(src, damage);
     }

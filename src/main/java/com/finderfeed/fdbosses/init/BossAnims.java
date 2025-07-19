@@ -125,6 +125,14 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_cannon"));
     });
 
+    public static DeferredHolder<Animation,Animation> MALKUTH_CANNON_BREAK = ANIMATIONS.register("malkuth_cannon_break", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_cannon"));
+    });
+
+    public static DeferredHolder<Animation,Animation> MALKUTH_CANNON_REPAIR = ANIMATIONS.register("malkuth_cannon_repair", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_cannon"));
+    });
+
     public static DeferredHolder<Animation,Animation> MALKUTH_CANNON_SUMMON = ANIMATIONS.register("malkuth_cannon_summon", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_cannon"));
     });

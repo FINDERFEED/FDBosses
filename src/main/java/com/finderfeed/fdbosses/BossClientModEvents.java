@@ -247,6 +247,14 @@ public class BossClientModEvents {
                                 .model(BossModels.MALKUTH_CANNON)
                                 .ignoreHurtOverlay(true)
                                 .build())
+                        .addLayer(FDEntityRenderLayerOptions.<MalkuthCannonEntity>builder()
+                                .renderType((entity,pticks)->{
+                                    return RenderType.eyes(FDBosses.location("textures/entities/malkuth/malkuth_cannon_emissive.png"));
+                                })
+                                .renderCondition((m)->m.getCannonType().isFire())
+                                .model(BossModels.MALKUTH_CANNON)
+                                .ignoreHurtOverlay(true)
+                                .build())
                 .build());
 
         var rightLegIK = new InverseKinematics2BoneTransform<MalkuthEntity>(

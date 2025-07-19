@@ -189,13 +189,13 @@ public class BossClientPackets {
 
         Level level = FDClientHelpers.getClientLevel();
 
-        for (int i = 0; i < 100;i++){
+        for (int i = 0; i < 200;i++){
 
             Vector3f color = MalkuthEntity.getAndRandomizeColor(attackType, level.random);
 
-            float vspeed = random.nextFloat();
+            float vspeed = random.nextFloat() * 1.5f;
 
-            float hspeed = FDEasings.easeOut(1-vspeed) * 0.25f;
+            float hspeed = FDEasings.easeOut(1.5f-vspeed) * 0.5f;
 
 
 
@@ -205,11 +205,11 @@ public class BossClientPackets {
 
             if (level.random.nextFloat() > 0.5f){
                 options = BallParticleOptions.builder()
-                        .brightness(2)
+                        .brightness(3)
                         .size(0.1f + random.nextFloat() * 0.1f)
                         .color(color.x,color.y,color.z)
                         .friction(0.7f)
-                        .scalingOptions(0,0,20 + random.nextInt(4))
+                        .scalingOptions(0,0,20 + random.nextInt(10))
                         .build();
             }else{
                 if (attackType.isFire()){
@@ -238,7 +238,7 @@ public class BossClientPackets {
 
         }
 
-        for (int i = 0; i < 40;i++){
+        for (int i = 0; i < 60;i++){
 
             float col = random.nextFloat() * 0.1f + 0.3f;
 
@@ -250,11 +250,13 @@ public class BossClientPackets {
                     .lifetime(0,0,25 + random.nextInt(5))
                     .build();
 
-            Vec3 speed = new Vec3(0.25f + level.random.nextFloat() * 1f,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat());
+            Vec3 speed = new Vec3(0.5f + level.random.nextFloat() * 1f,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat());
+
+            double hspeed = Math.sqrt(speed.x * speed.x + speed.z * speed.z);
 
             Vec3 ppos = pos.add(speed.normalize().multiply(0.15f,0.15f,0.15f));
 
-            level.addParticle(options, ppos.x,ppos.y,ppos.z, speed.x,speed.y,speed.z);
+            level.addParticle(options, ppos.x,ppos.y,ppos.z, speed.x,speed.y + (1.5f - hspeed) * random.nextFloat(),speed.z);
 
         }
 
