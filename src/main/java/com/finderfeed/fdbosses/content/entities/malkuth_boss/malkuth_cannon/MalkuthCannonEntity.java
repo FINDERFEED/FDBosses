@@ -174,7 +174,9 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
             this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_BREAK).build());
             this.entityData.set(BROKEN, false);
         }else{
-            this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_REPAIR).build());
+            if (this.isBroken()) {
+                this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_REPAIR).build());
+            }
         }
     }
 
@@ -185,7 +187,9 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
                 this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_BREAK).build());
                 this.entityData.set(BROKEN_REQUIRES_MATERIALS, false);
             } else {
-                this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_REPAIR).build());
+                if (this.isBroken()) {
+                    this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_REPAIR).build());
+                }
             }
         }
     }

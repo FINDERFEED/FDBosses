@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdlib.FDLibCalls;
@@ -109,7 +110,7 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
 
             Vec3 speed = new Vec3(dir.x ,0,dir.y).normalize().add(0,1,0);
 
-            if (entity instanceof ServerPlayer serverPlayer){
+            if (entity instanceof ServerPlayer serverPlayer && MalkuthWeaknessHandler.isWeakTo(serverPlayer, this.getEarthquakeType())){
                 FDLibCalls.setServerPlayerSpeed(serverPlayer, speed);
             }else{
                 entity.setDeltaMovement(speed);

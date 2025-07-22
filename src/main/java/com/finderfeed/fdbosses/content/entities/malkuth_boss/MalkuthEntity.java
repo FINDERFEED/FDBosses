@@ -72,7 +72,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
@@ -97,7 +96,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public static final String SUMMON_AND_THROW_SIDE_ROCKS = "summon_and_throw_side_rocks";
     public static final String ATTACH_SWORDS = "attach_swords";
     public static final String DEATTACH_SWORDS = "deattach_swords";
-    public static final String NOTHING_20_TICKS = "nothing_20_ticks";
+    public static final String DELAY_20 = "nothing_20_ticks";
+    public static final String DELAY_10 = "nothing_10_ticks";
     public static final String SUMMON_EARTHQUAKE = "summon_earthquake";
     public static final String PLATFORMS_N_FIREBALLS = "platforms_n_fireballs";
 
@@ -144,14 +144,27 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .addHeadController(CLIENT_MODEL, "head");
         this.lookControl = this.headControllerContainer;
 
-        AttackOptions sideRocks = AttackOptions.builder()
+        AttackOptions<?> sideRocks = AttackOptions.builder()
                 .setPreAttack(DEATTACH_SWORDS)
                 .addAttack(SUMMON_AND_THROW_SIDE_ROCKS)
                 .setNextAttack(ATTACH_SWORDS)
                 .build();
 
+        AttackOptions<?> cannons = AttackOptions.chainOptionsBuilder()
+                .addAttack(JUMP_ON_WALL_COMMAND_CANNONS)
+                .addAttack(JUMP_BACK_ON_SPAWN_WITH_CRUSH)
+                .build();
+
+        AttackOptions<?> jumpCrushChainpunchEarthquake = AttackOptions.chainOptionsBuilder()
+                .addAttack(JUMP_CRUSH)
+                .addAttack(PULL_AND_PUNCH)
+                .addAttack(SUMMON_EARTHQUAKE)
+                .addAttack(JUMP_BACK_ON_SPAWN)
+                .build();
+
         this.attackChain = new AttackChain(this.getRandom())
-                .registerAttack(NOTHING_20_TICKS,this::doNothing20Ticks)//not an attack
+                .registerAttack(DELAY_10,this::doNothing10Ticks)//not an attack
+                .registerAttack(DELAY_20,this::doNothing20Ticks)//not an attack
                 .registerAttack(DEATTACH_SWORDS, v->this.attachSwordsAttack(v,false)) //not an attack
                 .registerAttack(ATTACH_SWORDS, v->this.attachSwordsAttack(v,true)) //not an attack
 
@@ -169,13 +182,14 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 //                .addAttack(-1, sideRocks)
 //                .addAttack(0, PLATFORMS_N_FIREBALLS)
-//                .addAttack(0, JUMP_BACK_ON_SPAWN)
+                .addAttack(0, cannons)
+                .addAttack(1, jumpCrushChainpunchEarthquake)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(0, JUMP_CRUSH)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
 //                .addAttack(2, SUMMON_EARTHQUAKE)
-                .addAttack(1, NOTHING_20_TICKS)
+//                .addAttack(1, NOTHING_20_TICKS)
 //                .addAttack(3, SUMMON_AND_THROW_SIDE_ROCKS)
 //                .addAttack(4, CAROUSEL_SLASHES)
                 .attackListener(this::attackListener)
@@ -185,6 +199,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private boolean doNothing20Ticks(AttackInstance instance){
         if (instance.tick >= 20){
+            return true;
+        }
+        return false;
+    }
+
+    private boolean doNothing10Ticks(AttackInstance instance){
+        if (instance.tick >= 10){
             return true;
         }
         return false;
@@ -884,6 +905,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.setNoGravity(false);
             lookAtTarget = true;
             int waitTime = crush ? 30 : 10;
+
+
+            if (tick == 0 && this.getTarget() != null){
+                this.lookAt(EntityAnchorArgument.Anchor.EYES, this.getTarget().position());
+            }
+
             if (tick >= waitTime){
                 this.jumpBackOnSpawnPath = null;
                 return true;
@@ -1282,6 +1309,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
+                            .important()
                     .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
             this.jumpOnWallPath = this.makeJumpOnWallPath(20,false);
             attackInstance.nextStage();
@@ -1301,6 +1329,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
             if (this.jumpOnWallPath.isFinished()){
+                this.lookAt(EntityAnchorArgument.Anchor.EYES, this.position().add(0,0,-100));
                 this.setNoGravity(false);
                 this.noPhysics = false;
                 attackInstance.nextStage();
@@ -1318,34 +1347,37 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 this.shootCannons();
             }
 
-        }else if (stage == 3){
-            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
-                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
-            this.jumpOnWallPath = this.makeJumpOnWallPath(20,true);
-            attackInstance.nextStage();
-        }else if (stage == 4){
-            if (this.jumpOnWallPath == null){
-                this.jumpOnWallPath = this.makeJumpOnWallPath(20,true);
-            }
-
-            if (tick >= 6) {
-                if (tick == 6){
-                    this.doJumpStartParticles(0);
-                }
-                this.jumpOnWallPath.tick(this);
-                this.noPhysics = true;
-                this.setNoGravity(true);
-            }
-            if (this.jumpOnWallPath.isFinished()){
-                this.setNoGravity(false);
-                this.noPhysics = false;
-                attackInstance.nextStage();
-                this.setDeltaMovement(0,0,0);
-                this.teleportTo(this.spawnPosition.x,this.spawnPosition.y,this.spawnPosition.z);
-
-                this.doJumpStartParticles(0);
-            }
-        }else if (stage == 5){
+        }
+//        else if (stage == 3){
+//            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
+//                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
+//            this.jumpOnWallPath = this.makeJumpOnWallPath(20,true);
+//            attackInstance.nextStage();
+//        }
+//        else if (stage == 4){
+//            if (this.jumpOnWallPath == null){
+//                this.jumpOnWallPath = this.makeJumpOnWallPath(20,true);
+//            }
+//
+//            if (tick >= 6) {
+//                if (tick == 6){
+//                    this.doJumpStartParticles(0);
+//                }
+//                this.jumpOnWallPath.tick(this);
+//                this.noPhysics = true;
+//                this.setNoGravity(true);
+//            }
+//            if (this.jumpOnWallPath.isFinished()){
+//                this.setNoGravity(false);
+//                this.noPhysics = false;
+//                attackInstance.nextStage();
+//                this.setDeltaMovement(0,0,0);
+//                this.teleportTo(this.spawnPosition.x,this.spawnPosition.y,this.spawnPosition.z);
+//
+//                this.doJumpStartParticles(0);
+//            }
+//        }
+        else if (stage == 3){
             if (tick > 60){
                 lookAtTarget = true;
                 this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
