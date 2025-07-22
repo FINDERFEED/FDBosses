@@ -182,13 +182,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 //                .addAttack(-1, sideRocks)
 //                .addAttack(0, PLATFORMS_N_FIREBALLS)
-                .addAttack(0, cannons)
-                .addAttack(1, jumpCrushChainpunchEarthquake)
+//                .addAttack(0, cannons)
+//                .addAttack(1, jumpCrushChainpunchEarthquake)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(0, JUMP_CRUSH)
 //                .addAttack(0, SLASH_ATTACK)
 //                .addAttack(1, JUMP_CRUSH)
-//                .addAttack(2, SUMMON_EARTHQUAKE)
+                .addAttack(2, GIANT_SWORDS_ULTIMATE)
 //                .addAttack(1, NOTHING_20_TICKS)
 //                .addAttack(3, SUMMON_AND_THROW_SIDE_ROCKS)
 //                .addAttack(4, CAROUSEL_SLASHES)
@@ -1609,12 +1609,39 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         return new Vector3f(r,g,b);
     }
 
+    @SerializableField
+    private MalkuthAttackType giantSwordUltimateStartAttackType = MalkuthAttackType.FIRE;
+
     public boolean giantSwordUltimate(AttackInstance inst){
 
         int stage = inst.stage;
         int tick = inst.tick;
 
         if (stage == 0) {
+
+            AABB firstBox = new AABB(0,-2,-29,29,10,0).move(this.spawnPosition);
+            AABB secondBox = new AABB(-29,-2,-29,0,10,0).move(this.spawnPosition);
+
+            var players = level().getEntitiesOfClass(Player.class, firstBox, player -> {
+                return true;
+            });
+            if (players.isEmpty()){
+                players = level().getEntitiesOfClass(Player.class, secondBox, player -> {
+                    return true;
+                });
+                if (!players.isEmpty()){
+                    Player firstPlayer = players.getFirst();
+                    MalkuthAttackType weakTo = MalkuthWeaknessHandler.getWeakTo(firstPlayer);
+                    giantSwordUltimateStartAttackType = MalkuthAttackType.getOpposite(weakTo);
+                }
+            }else{
+                Player firstPlayer = players.getFirst();
+                MalkuthAttackType weakTo = MalkuthWeaknessHandler.getWeakTo(firstPlayer);
+                giantSwordUltimateStartAttackType = weakTo;
+            }
+
+
+
 
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_GIANT_SWORD_ATTACK)
                     .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
@@ -1646,8 +1673,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             if (tick == swordSpawnTick - 5){
 
-                Vector3f red = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.FIRE);
-                Vector3f blue = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.ICE);
+                Vector3f red = MalkuthEntity.getMalkuthAttackPreparationParticleColor(giantSwordUltimateStartAttackType);
+                Vector3f blue = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType));
 
                 RectanglePreparationParticleOptions rectanglePreparationParticleOptions1 =
                         new RectanglePreparationParticleOptions(new Vec3(0,0,-1),30, 14,60,20,10, red.x,red.y,red.z, 0.25f);
@@ -1664,15 +1691,19 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             } else if (tick == swordSpawnTick){
 
+
                 Vec3 offs1 = new Vec3(10, -1, 11);
                 Vec3 offs2 = new Vec3(-10, -1, 11);
 
                 Vec3 pos1 = this.position().add(offs1);
                 Vec3 pos2 = this.position().add(offs2);
 
-                MalkuthGiantSwordSlash.summon(level(), pos1, new Vec3(0,0,-1), MalkuthAttackType.FIRE);
-                MalkuthGiantSwordSlash.summon(level(), pos2, new Vec3(0,0,-1), MalkuthAttackType.ICE);
+                var slash1 = MalkuthGiantSwordSlash.summon(level(), pos1, new Vec3(0,0,-1), giantSwordUltimateStartAttackType, 0);
+                slash1.setDoDamage(false);
 
+
+                var slash2 = MalkuthGiantSwordSlash.summon(level(), pos2, new Vec3(0,0,-1), MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType), 0);
+                slash2.setDoDamage(false);
 
             }else if (tick == MalkuthGiantSwordSlash.TIME_TO_HIT + MalkuthGiantSwordSlash.TIME_TO_RISE + swordSpawnTick - 2){
                 ImpactFrame base = new ImpactFrame(0.5f, 0.1f, 1, false);
@@ -1685,6 +1716,19 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         new ImpactFrame(base).setDuration(1).setInverted(true)
                 );
 
+
+            }else if (tick == MalkuthGiantSwordSlash.TIME_TO_HIT + MalkuthGiantSwordSlash.TIME_TO_RISE + swordSpawnTick){
+
+                AABB firstBox = new AABB(0,-2,-29,29,10,0).move(this.spawnPosition);
+                AABB secondBox = new AABB(-29,-2,-29,0,10,0).move(this.spawnPosition);
+
+                for (var entity : this.level().getEntitiesOfClass(LivingEntity.class, firstBox, entity -> !(entity instanceof MalkuthBossBuddy))){
+                    entity.hurt(new MalkuthDamageSource(level().damageSources().generic(), giantSwordUltimateStartAttackType, 100), Integer.MAX_VALUE);
+                }
+
+                for (var entity : this.level().getEntitiesOfClass(LivingEntity.class, secondBox, entity -> !(entity instanceof MalkuthBossBuddy))){
+                    entity.hurt(new MalkuthDamageSource(level().damageSources().generic(), MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType), 100), Integer.MAX_VALUE);
+                }
                 inst.nextStage();
             }
 
@@ -1695,7 +1739,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
                 lookAtTarget = true;
             }
-            if (tick > 200){
+            if (tick > 80){
                 return true;
             }
         }

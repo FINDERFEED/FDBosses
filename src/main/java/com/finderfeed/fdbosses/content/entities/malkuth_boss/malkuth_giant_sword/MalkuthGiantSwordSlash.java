@@ -6,13 +6,12 @@ import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
-import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
-import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
-import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
-import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.*;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdlib.FDLibCalls;
+import com.finderfeed.fdlib.nbt.AutoSerializable;
+import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.BoundToEntityProcessor;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
@@ -39,7 +38,7 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
-public class MalkuthGiantSwordSlash extends Entity {
+public class MalkuthGiantSwordSlash extends Entity implements AutoSerializable {
 
     public static int TIME_TO_RISE = 60;
     public static int TIME_TO_HIT = 30;
@@ -48,7 +47,13 @@ public class MalkuthGiantSwordSlash extends Entity {
 
     public static final EntityDataAccessor<MalkuthAttackType> MALKUTH_ATTACK_TYPE = SynchedEntityData.defineId(MalkuthGiantSwordSlash.class, BossEntityDataSerializers.MALKUTH_ATTACK_TYPE.get());
 
-    public static MalkuthGiantSwordSlash summon(Level level, Vec3 pos, Vec3 direction, MalkuthAttackType attackType){
+    @SerializableField
+    private boolean doDamage = true;
+
+    @SerializableField
+    private float damage;
+
+    public static MalkuthGiantSwordSlash summon(Level level, Vec3 pos, Vec3 direction, MalkuthAttackType attackType, float damage){
 
         MalkuthGiantSwordSlash slash = new MalkuthGiantSwordSlash(BossEntities.MALKUTH_GIANT_SWORD.get(), level);
 
@@ -56,7 +61,7 @@ public class MalkuthGiantSwordSlash extends Entity {
         slash.setAttackType(attackType);
         slash.setPos(pos);
         slash.lookAt(EntityAnchorArgument.Anchor.FEET, pos.add(direction));
-
+        slash.damage = damage;
         level.addFreshEntity(slash);
 
         return slash;
@@ -91,23 +96,42 @@ public class MalkuthGiantSwordSlash extends Entity {
 
     private void doDamage(){
 
+        if (this.doDamage) {
 
-        Vec3 direction = new Vec3(0,0,1).yRot(-(float)Math.toRadians(this.getYRot()));
+            Vec3 direction = new Vec3(0, 0, 1).yRot(-(float) Math.toRadians(this.getYRot()));
 
-        float offset = 7.5f;
+            float offset = 7.5f;
 
-        Vec3 start = this.position().add(direction.multiply(offset, offset, offset)).add(0,-1,0);
+            Vec3 start = this.position().add(direction.multiply(offset, offset, offset)).add(0, -1, 0);
 
-        var targets = BossTargetFinder.getEntitiesInHorizontalBox(LivingEntity.class, level(), start, new Vec2((float) direction.x, (float) direction.z), 32,  10,  10, (entity)->{
-            return true;
-        });
+            var targets = BossTargetFinder.getEntitiesInHorizontalBox(LivingEntity.class, level(), start, new Vec2((float) direction.x, (float) direction.z), 32, 20, 10, (entity) -> {
+                return !(entity instanceof MalkuthBossBuddy);
+            });
 
-        for (var target : targets){
-            target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getAttackType(), MalkuthWeaknessHandler.MAX), 100);
+            for (var target : targets) {
+                target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getAttackType(), MalkuthWeaknessHandler.MAX), damage);
+            }
+
         }
 
     }
 
+
+    public void setDoDamage(boolean doDamage) {
+        this.doDamage = doDamage;
+    }
+
+    public boolean isDoDamage() {
+        return doDamage;
+    }
+
+    public float getDamage() {
+        return damage;
+    }
+
+    public void setDamage(float damage) {
+        this.damage = damage;
+    }
 
     private void riseParticles(){
 
@@ -418,14 +442,19 @@ public class MalkuthGiantSwordSlash extends Entity {
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
-        tag.putString("mtype",this.getAttackType().name());
+
+        if (tag.contains("mtype")) {
+            this.setAttackType(MalkuthAttackType.valueOf(tag.getString("mtype")));
+        }
+
+
+        this.autoLoad(tag);
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
-        if (tag.contains("mtype")) {
-            this.setAttackType(MalkuthAttackType.valueOf(tag.getString("mtype")));
-        }
+        tag.putString("mtype",this.getAttackType().name());
+        this.autoSave(tag);
     }
 
     @Override
