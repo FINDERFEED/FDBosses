@@ -1,12 +1,15 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword;
 
+import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdlib.FDLibCalls;
@@ -27,10 +30,12 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
@@ -77,12 +82,32 @@ public class MalkuthGiantSwordSlash extends Entity {
         }else{
             if (tickCount == TIME_TO_HIT + TIME_TO_RISE){
                 this.impactBlocks();
-
+                this.doDamage();
             }else if (tickCount >= TIME_TO_HIT + TIME_TO_RISE + DISSOLVE_TIME){
                 this.remove(RemovalReason.DISCARDED);
             }
         }
     }
+
+    private void doDamage(){
+
+
+        Vec3 direction = new Vec3(0,0,1).yRot(-(float)Math.toRadians(this.getYRot()));
+
+        float offset = 7.5f;
+
+        Vec3 start = this.position().add(direction.multiply(offset, offset, offset)).add(0,-1,0);
+
+        var targets = BossTargetFinder.getEntitiesInHorizontalBox(LivingEntity.class, level(), start, new Vec2((float) direction.x, (float) direction.z), 32,  10,  10, (entity)->{
+            return true;
+        });
+
+        for (var target : targets){
+            target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getAttackType(), MalkuthWeaknessHandler.MAX), 100);
+        }
+
+    }
+
 
     private void riseParticles(){
 
@@ -165,7 +190,7 @@ public class MalkuthGiantSwordSlash extends Entity {
 
         PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                 .frequency(50)
-                .amplitude(3f)
+                .amplitude(1f)
                 .inTime(0)
                 .stayTime(0)
                 .outTime(50)

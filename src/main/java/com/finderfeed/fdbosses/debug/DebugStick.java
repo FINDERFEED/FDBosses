@@ -55,10 +55,10 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-//            Vec3 f = player.getLookAngle().multiply(1,0,1).normalize().multiply(10,10,10);
+            Vec3 f = player.getLookAngle().multiply(1,0,1).normalize().multiply(10,10,10);
 
 
-//            MalkuthGiantSwordSlash malkuthGiantSwordSlash = MalkuthGiantSwordSlash.summon(level, player.position().add(f.yRot(FDMathUtil.FPI/2)), player.getLookAngle(), MalkuthAttackType.ICE);
+            MalkuthGiantSwordSlash malkuthGiantSwordSlash = MalkuthGiantSwordSlash.summon(level, player.position(), player.getLookAngle(), MalkuthAttackType.ICE);
 //            MalkuthGiantSwordSlash malkuthGiantSwordSlash2 = MalkuthGiantSwordSlash.summon(level, player.position().add(f.yRot(-FDMathUtil.FPI/2)), player.getLookAngle(), MalkuthAttackType.FIRE);
 
 //            MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level, MalkuthAttackType.FIRE,player.position(), player.getLookAngle().multiply(1,0,1).normalize().multiply(30,30,30),20,
@@ -67,15 +67,15 @@ public class DebugStick extends Item {
 
 
 
-            if (p1 == null){
-                p1 = player.position();
-            }else if (p2 == null){
-                p2 = player.position();
-            }else{
-                System.out.println(p2.subtract(p1));
-                p1 = null;
-                p2 = null;
-            }
+//            if (p1 == null){
+//                p1 = player.position();
+//            }else if (p2 == null){
+//                p2 = player.position();
+//            }else{
+//                System.out.println(p2.subtract(p1));
+//                p1 = null;
+//                p2 = null;
+//            }
 
             if (true) return InteractionResultHolder.consume(player.getItemInHand(hand));
 
