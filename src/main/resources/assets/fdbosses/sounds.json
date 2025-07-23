@@ -92,5 +92,8 @@
   },
   "button_click": {
     "sounds": ["fdbosses:button_click"]
+  },
+  "malkuth_cannon_shoot": {
+    "sounds": ["fdbosses:malkuth_cannon_shot"]
   }
 }

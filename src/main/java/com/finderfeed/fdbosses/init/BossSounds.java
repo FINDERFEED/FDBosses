@@ -43,5 +43,7 @@ public class BossSounds {
     public static final Supplier<SoundEvent> MONOLITH_HIT = SOUNDS.register("monolith_hit",()->SoundEvent.createVariableRangeEvent(FDBosses.location("monolith_hit")));
     public static final Supplier<SoundEvent> CHESED_IDLE = SOUNDS.register("chesed_idle",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_idle")));
 
+    public static final Supplier<SoundEvent> MALKUTH_CANNON_SHOOT = SOUNDS.register("malkuth_cannon_shoot",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_cannon_shoot")));
+
 
 }

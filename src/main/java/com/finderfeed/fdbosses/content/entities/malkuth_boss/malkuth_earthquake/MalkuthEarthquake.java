@@ -91,7 +91,7 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
 
         Vec2 dir = new Vec2((float) dirAndLength.x,(float) dirAndLength.z);
 
-        var entities = BossTargetFinder.getEntitiesInArc(LivingEntity.class, level(), this.position().add(0,-1,0), dir, this.getAngle(),  2, length);
+        var entities = BossTargetFinder.getEntitiesInArc(LivingEntity.class, level(), this.position().add(0,-1,0), dir, this.getAngle(),  3, length);
 
         for (var entity : entities){
 

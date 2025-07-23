@@ -3,22 +3,22 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
-import com.finderfeed.fdbosses.init.BossAnims;
-import com.finderfeed.fdbosses.init.BossEntities;
-import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
-import com.finderfeed.fdbosses.init.BossModels;
+import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.FDTagHelper;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
+import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -126,10 +126,21 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
                         MalkuthCannonProjectile.summon(level(), summonPos, speed, 1000, malkuthCannonType);
                     }
 
+                    ((ServerLevel)level()).playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.MALKUTH_CANNON_SHOOT.get(), SoundSource.HOSTILE, 4f ,0.75f);
+
+
+                    PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                            .frequency(50)
+                            .amplitude(1.5f)
+                            .inTime(0)
+                            .stayTime(0)
+                            .outTime(10)
+                            .build(), this.position().add(this.getForward().multiply(1,0,1).normalize().add(0,1,0)), 60);
+
 
                 }else if (shootTickCount == 5) {
                     if (this.isPlayerControlled()){
-                        this.setBroken(true);
+//                        this.setBroken(true);
                     }
                 }else if (shootTickCount <= 0){
                     this.shootTargets.clear();
@@ -182,7 +193,6 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
 
     public void setBroken(boolean broken) {
         if (!this.requiresRepair()) {
-            this.entityData.set(BROKEN, broken);
             if (broken) {
                 this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_BREAK).build());
                 this.entityData.set(BROKEN_REQUIRES_MATERIALS, false);
@@ -191,6 +201,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
                     this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_REPAIR).build());
                 }
             }
+            this.entityData.set(BROKEN, broken);
         }
     }
 
@@ -275,6 +286,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
         this.shootTargets = FDTagHelper.loadVec3List(tag, "targets");
         this.entityData.set(BROKEN,tag.getBoolean("broken"));
         this.entityData.set(BROKEN_REQUIRES_MATERIALS,tag.getBoolean("broken_materials"));
+        this.entityData.set(PLAYER_CONTROLLED, tag.getBoolean("playerControlled"));
         this.setCannonType(this.malkuthCannonType);
 
         if (this.isBroken()){
@@ -291,6 +303,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
         this.setCannonType(this.malkuthCannonType);
         tag.putBoolean("broken",this.entityData.get(BROKEN));
         tag.putBoolean("broken_materials",this.entityData.get(BROKEN_REQUIRES_MATERIALS));
+        tag.putBoolean("playerControlled",this.entityData.get(PLAYER_CONTROLLED));
     }
 
 }
