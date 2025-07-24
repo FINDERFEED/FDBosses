@@ -95,5 +95,32 @@
   },
   "malkuth_cannon_shoot": {
     "sounds": ["fdbosses:malkuth_cannon_shot"]
+  },
+  "malkuth_earthquake_spike": {
+    "sounds": ["fdbosses:malkuth_earthquake_spike"]
+  },
+  "malkuth_earthquake_rolling": {
+    "sounds": ["fdbosses:malkuth_earthquake_rolling"]
+  },
+  "malkuth_sword_earth_impact": {
+    "sounds": ["fdbosses:malkuth_sword_earth_impact"]
+  },
+  "malkuth_sword_slash": {
+    "sounds": ["fdbosses:malkuth_sword_slash"]
+  },
+  "malkuth_punch": {
+    "sounds": ["fdbosses:malkuth_punch"]
+  },
+  "malkuth_chain_pull": {
+    "sounds": ["fdbosses:malkuth_chain_pull"]
+  },
+  "malkuth_fireball_launch": {
+    "sounds": ["fdbosses:malkuth_fireball_launch"]
+  },
+  "malkuth_fireball_explosion": {
+    "sounds": ["fdbosses:malkuth_fireball_explosion"]
+  },
+  "malkuth_ice_fireball_explosion": {
+    "sounds": ["fdbosses:malkuth_ice_fireball_explosion"]
   }
 }

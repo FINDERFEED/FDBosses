@@ -44,6 +44,15 @@ public class BossSounds {
     public static final Supplier<SoundEvent> CHESED_IDLE = SOUNDS.register("chesed_idle",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_idle")));
 
     public static final Supplier<SoundEvent> MALKUTH_CANNON_SHOOT = SOUNDS.register("malkuth_cannon_shoot",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_cannon_shoot")));
+    public static final Supplier<SoundEvent> MALKUTH_EARTHQUAKE_SPIKE = SOUNDS.register("malkuth_earthquake_spike",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_earthquake_spike")));
+    public static final Supplier<SoundEvent> MALKUTH_EARTHQUAKE_ROLLING = SOUNDS.register("malkuth_earthquake_rolling",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_earthquake_rolling")));
+    public static final Supplier<SoundEvent> MALKUTH_SWORD_EARTH_IMPACT = SOUNDS.register("malkuth_sword_earth_impact",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_sword_earth_impact")));
+    public static final Supplier<SoundEvent> MALKUTH_SWORD_SLASH = SOUNDS.register("malkuth_sword_slash",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_sword_slash")));
+    public static final Supplier<SoundEvent> MALKUTH_PUNCH = SOUNDS.register("malkuth_punch",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_punch")));
+    public static final Supplier<SoundEvent> MALKUTH_CHAIN_PULL = SOUNDS.register("malkuth_chain_pull",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_chain_pull")));
+    public static final Supplier<SoundEvent> MALKUTH_FIREBALL_LAUNCH = SOUNDS.register("malkuth_fireball_launch",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_fireball_launch")));
+    public static final Supplier<SoundEvent> MALKUTH_FIREBALL_EXPLOSION = SOUNDS.register("malkuth_fireball_explosion",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_fireball_explosion")));
+    public static final Supplier<SoundEvent> MALKUTH_ICE_FIREBALL_EXPLOSION = SOUNDS.register("malkuth_ice_fireball_explosion",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_ice_fireball_explosion")));
 
 
 }

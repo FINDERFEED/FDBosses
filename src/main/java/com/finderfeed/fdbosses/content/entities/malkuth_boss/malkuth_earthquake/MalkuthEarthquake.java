@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.init.FDEDataSerializers;
@@ -22,6 +23,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -72,10 +74,30 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
             this.summonSegments();
             this.manageSegments();
         }else{
+
             this.tickDamage();
+
             if (this.tickCount > this.getEarthquakeTime() + 20){
                 this.remove(RemovalReason.DISCARDED);
             }
+
+            var damageRadiuses = this.getCurrentDamageRadius();
+
+            float v = FDMathUtil.lerp(damageRadiuses.first,damageRadiuses.second,0.5f);
+
+            Vec3 vec = this.getDirectionAndLength().normalize().multiply(v,v,v).add(this.position());
+
+            int tick = tickCount - 1;
+
+            if (tick % 5 == 0){
+                level().playSound(null, vec.x,vec.y,vec.z, BossSounds.MALKUTH_EARTHQUAKE_ROLLING.get(), SoundSource.HOSTILE,1f,0.75f);
+
+            }
+
+            if (tick % 3 == 0 && this.getEarthquakeType().isIce()){
+                level().playSound(null, vec.x,vec.y,vec.z, BossSounds.MALKUTH_EARTHQUAKE_SPIKE.get(), SoundSource.HOSTILE,1f,1.1f);
+            }
+
         }
 
 
