@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.FDTagHelper;
@@ -12,6 +13,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.F
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -34,6 +36,7 @@ import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Vector;
 
 public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializable {
 
@@ -149,7 +152,47 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
                 shootTickCount--;
             }
         }else{
+
+            this.brokenRequiresMaterialsParticles();
+
             this.brokenParticles();
+        }
+    }
+
+    private void brokenRequiresMaterialsParticles(){
+
+        if (!this.requiresRepair()) return;
+
+        Vec3 pos = this.position();
+
+
+        float t = (float) Math.sin(this.tickCount / 30f);
+
+
+        float h = t * 0.125f;
+
+        Vec3 basePPos = pos.add(0,3 + h,0);
+
+        for (int i = 0; i < 2; i++){
+
+
+            Vector3f col = MalkuthEntity.getAndRandomizeColor(this.getCannonType(), level().random);
+
+            BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                    .color(col.x,col.y,col.z)
+                    .scalingOptions(0,0,20)
+                    .size(0.025f)
+                    .brightness(2)
+                    .build();
+
+            Vec3 fwd = this.getForward().multiply(1,0,1).normalize();
+
+            level().addParticle(ballParticleOptions,
+                    basePPos.x + random.nextFloat() * 0.25f - 0.125f - fwd.x * 0.05f,
+                    basePPos.y + random.nextFloat() * 0.25f - 0.125f,
+                    basePPos.z + random.nextFloat() * 0.25f - 0.125f - fwd.z * 0.05f,
+                    0,-0.05,0);
+
         }
     }
 
@@ -180,22 +223,31 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
     }
 
     public void setBrokenRequiresMaterials(boolean broken){
-        this.entityData.set(BROKEN_REQUIRES_MATERIALS, broken);
         if (broken) {
-            this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_BREAK).build());
-            this.entityData.set(BROKEN, false);
+            if (!this.isBroken()) {
+                this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_BREAK).build());
+                this.entityData.set(BROKEN, false);
+            }
         }else{
             if (this.isBroken()) {
                 this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_REPAIR).build());
             }
         }
+        this.entityData.set(BROKEN_REQUIRES_MATERIALS, broken);
+    }
+
+    public void repair(){
+        this.entityData.set(BROKEN_REQUIRES_MATERIALS, false);
+        this.setBroken(false);
     }
 
     public void setBroken(boolean broken) {
         if (!this.requiresRepair()) {
             if (broken) {
-                this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_BREAK).build());
-                this.entityData.set(BROKEN_REQUIRES_MATERIALS, false);
+                if (!this.isBroken()){
+                    this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_BREAK).build());
+                    this.entityData.set(BROKEN_REQUIRES_MATERIALS, false);
+                }
             } else {
                 if (this.isBroken()) {
                     this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_REPAIR).build());

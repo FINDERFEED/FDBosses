@@ -35,6 +35,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawne
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boulder.MalkuthBoulderRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonProjectileRenderer;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquakeRenderer;
@@ -255,6 +256,7 @@ public class BossClientModEvents {
                                 .model(BossModels.MALKUTH_CANNON)
                                 .ignoreHurtOverlay(true)
                                 .build())
+                        .freeRender(new MalkuthCannonRenderer())
                 .build());
 
         var rightLegIK = new InverseKinematics2BoneTransform<MalkuthEntity>(
