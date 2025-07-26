@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "fdbosses:item/ice_cannon_repair_material"
+  }
+}
