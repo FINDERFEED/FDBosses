@@ -43,6 +43,8 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_fireball.Ma
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_floor.MalkuthFloorRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlashRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_platform.MalkuthPlatform;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairCrystal;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairCrystalRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
 import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
@@ -190,6 +192,42 @@ public class BossClientModEvents {
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
 
+
+        event.registerEntityRenderer(BossEntities.MALKUTH_REPAIR_CRYSTAL.get(), FDEntityRendererBuilder.<MalkuthRepairCrystal>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<MalkuthRepairCrystal>builder()
+                                .model(BossModels.MALKUTH_REPAIR_CRYSTAL)
+                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_crystal_base.png")))
+                                .ignoreHurtOverlay(true)
+                                .build())
+
+                        .addLayer(FDEntityRenderLayerOptions.<MalkuthRepairCrystal>builder()
+                                .model(BossModels.MALKUTH_REPAIR_CRYSTAL)
+                                .renderType(((malkuthRepairCrystal, v) -> {
+                                    return malkuthRepairCrystal.getCrystalType().isFire() ?
+                                            RenderType.text(FDBosses.location("textures/entities/malkuth/malkuth_crystal_fire.png")) :
+                                            RenderType.text(FDBosses.location("textures/entities/malkuth/malkuth_crystal_ice.png"));
+                                }))
+                                .ignoreHurtOverlay(true)
+                                .light(LightTexture.FULL_BRIGHT)
+                                .color(((malkuthRepairCrystal, v) -> {
+                                    return new FDColor(1,0.75f,0.75f,0.5f);
+                                }))
+                                .build())
+                        .addLayer(FDEntityRenderLayerOptions.<MalkuthRepairCrystal>builder()
+                                .model(BossModels.MALKUTH_REPAIR_CRYSTAL)
+                                .renderType(((malkuthRepairCrystal, v) -> {
+                                    return malkuthRepairCrystal.getCrystalType().isFire() ?
+                                            RenderType.eyes(FDBosses.location("textures/entities/malkuth/malkuth_crystal_fire.png")) :
+                                            RenderType.eyes(FDBosses.location("textures/entities/malkuth/malkuth_crystal_ice.png"));
+                                }))
+                                .ignoreHurtOverlay(true)
+                                .light(LightTexture.FULL_BRIGHT)
+                                .color(((malkuthRepairCrystal, v) -> {
+                                    return new FDColor(1,1,1,1);
+                                }))
+                                .build())
+                .freeRender(new MalkuthRepairCrystalRenderer())
+                .build());
 
         FDEntityTransformation<MalkuthPlatform> platformTransform = (platform, matrices, v) -> {
 

@@ -29,6 +29,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_fireball.Ma
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_floor.MalkuthFloorEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlash;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_platform.MalkuthPlatform;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairCrystal;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -215,6 +216,12 @@ public class BossEntities {
             )
             .sized(2f,2f)
             .build("malkuth_giant_sword_slash"));
+
+    public static final Supplier<EntityType<MalkuthRepairCrystal>> MALKUTH_REPAIR_CRYSTAL = ENTITIES.register("malkuth_repair_crystal",()->EntityType.Builder.of(
+                    MalkuthRepairCrystal::new, MobCategory.MISC
+            )
+            .sized(2f,2f)
+            .build("malkuth_repair_crystal"));
 
     public static final Supplier<EntityType<MalkuthBoulderEntity>> MALKUTH_BOULDER = ENTITIES.register("malkuth_boulder",()->EntityType.Builder.of(
                     MalkuthBoulderEntity::new, MobCategory.MISC

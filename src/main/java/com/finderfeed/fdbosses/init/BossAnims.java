@@ -185,4 +185,8 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
     });
 
+    public static DeferredHolder<Animation,Animation> MALKUTH_REPAIR_CRYSTAL_SUMMON = ANIMATIONS.register("malkuth_crystal_summon", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_repair_crystal"));
+    });
+
 }
