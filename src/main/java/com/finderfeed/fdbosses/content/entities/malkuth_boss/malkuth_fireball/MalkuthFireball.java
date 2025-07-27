@@ -167,7 +167,7 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
         var targets = BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.targetPos.add(0,-1,0), 3, 4f);
 
         for (var target : targets){
-            target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getAttackType(), 34),1);
+            target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getAttackType(), 75),1);
         }
 
         this.remove(RemovalReason.DISCARDED);

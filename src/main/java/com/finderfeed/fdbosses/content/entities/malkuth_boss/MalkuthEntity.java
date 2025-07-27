@@ -185,7 +185,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(PLATFORMS_N_FIREBALLS, this::fireballsNPlatforms)
 
 //                .addAttack(-1, sideRocks)
-                .addAttack(0, PLATFORMS_N_FIREBALLS)
+//                .addAttack(0, PLATFORMS_N_FIREBALLS)
+                .addAttack(1,DELAY_20)
 //                .addAttack(0, cannons)
 //                .addAttack(1, jumpCrushChainpunchEarthquake)
 //                .addAttack(0, SUMMON_EARTHQUAKE)

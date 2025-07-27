@@ -34,7 +34,7 @@ public class MalkuthCannonRenderer implements FDFreeEntityRenderer<MalkuthCannon
             float vt = (float) Math.sin(time / 30f);
             float vt2 = (float) Math.sin(time / 20f);
 
-            matrices.translate(0, 3 + vt * 0.125f, 0);
+            matrices.translate(0, 4 + vt * 0.125f, 0);
             matrices.mulPose(Axis.YP.rotationDegrees(vt * 5));
             matrices.mulPose(Axis.XP.rotationDegrees(vt2 * 5));
 
