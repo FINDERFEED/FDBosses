@@ -97,7 +97,7 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
     @Override
     public void render(GuiGraphics graphics, DeltaTracker tracker) {
 
-        if (FDClientHelpers.getClientLevel() == null) return;
+        if (FDClientHelpers.getClientLevel() == null || Minecraft.getInstance().options.hideGui) return;
 
         Window window = Minecraft.getInstance().getWindow();
 

@@ -15,6 +15,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_sy
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.BaseModelAttachmentData;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.instances.fdmodel.FDModelAttachmentData;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.instances.item_stack.ItemStackAttachmentData;
+import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.render_types.FDRenderType;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -46,6 +47,8 @@ public class DebugStick extends Item {
     private Vec3 p1;
     private Vec3 p2;
 
+    private Vec3 anchor = Vec3.ZERO;
+
     public DebugStick(Properties p_41383_) {
         super(p_41383_);
     }
@@ -55,10 +58,10 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            Vec3 f = player.getLookAngle().multiply(1,0,1).normalize().multiply(10,10,10);
-
-
-            MalkuthGiantSwordSlash malkuthGiantSwordSlash = MalkuthGiantSwordSlash.summon(level, player.position(), player.getLookAngle(), MalkuthAttackType.ICE, 30);
+//            Vec3 f = player.getLookAngle().multiply(1,0,1).normalize().multiply(10,10,10);
+//
+//
+//            MalkuthGiantSwordSlash malkuthGiantSwordSlash = MalkuthGiantSwordSlash.summon(level, player.position(), player.getLookAngle(), MalkuthAttackType.ICE, 30);
 //            MalkuthGiantSwordSlash malkuthGiantSwordSlash2 = MalkuthGiantSwordSlash.summon(level, player.position().add(f.yRot(-FDMathUtil.FPI/2)), player.getLookAngle(), MalkuthAttackType.FIRE);
 
 //            MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level, MalkuthAttackType.FIRE,player.position(), player.getLookAngle().multiply(1,0,1).normalize().multiply(30,30,30),20,
@@ -76,6 +79,24 @@ public class DebugStick extends Item {
 //                p1 = null;
 //                p2 = null;
 //            }
+
+            if (player.isCrouching()){
+                anchor = player.position();
+            }else{
+                Vec3 eyePos = player.getEyePosition();
+                Vec3 offs = eyePos.subtract(anchor);
+                Vec3 lookAngle = player.getLookAngle();
+                new CameraPos(eyePos, lookAngle);
+                System.out.println("new CameraPos(base.add(%.3f,%.3f,%.3f), new Vec3(%.3f,%.3f,%.3f))".formatted(
+                        (float)offs.x,
+                        (float)offs.y,
+                        (float)offs.z,
+
+                        (float)lookAngle.x,
+                        (float)lookAngle.y,
+                        (float)lookAngle.z
+                ));
+            }
 
             if (true) return InteractionResultHolder.consume(player.getItemInHand(hand));
 

@@ -62,7 +62,9 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
         super(type, level);
         malkuthCannonType = MalkuthAttackType.ICE;
         this.setNoGravity(true);
-        this.getAnimationSystem().startAnimation("SUMMON", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_SUMMON).build());
+        this.getAnimationSystem().startAnimation("SUMMON", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_SUMMON)
+                        .setSpeed(0.75f)
+                .build());
         if (level.isClientSide){
             CLIENT_MODEL = new FDModel(BossModels.MALKUTH_CANNON.get());
         }

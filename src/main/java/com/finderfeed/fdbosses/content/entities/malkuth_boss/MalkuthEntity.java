@@ -120,7 +120,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     private AttackChain attackChain;
 
     @SerializableField
-    private Vec3 spawnPosition;
+    protected Vec3 spawnPosition;
 
     @SerializableField
     private MalkuthBossInitializer malkuthBossInitializer;
