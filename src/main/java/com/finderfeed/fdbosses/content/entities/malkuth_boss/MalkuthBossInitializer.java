@@ -89,21 +89,33 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
                 ;
 
         CutsceneData data3 = CutsceneData.create()
-                .time(30)
+                .time(35)
                 .addScreenEffect(0, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1), 0,5,15)
                 .addCameraPos(new CameraPos(base.add(0,26.296,36.434), new Vec3(0,0.280,0.960)))
                 ;
+
 
         var headCameraPos = new CameraPos(base.add(0,3.034,-2.649), new Vec3(-0.009,-0.612,0.911));
         var lastCameraPos = new CameraPos(base.add(0,2.4,-7.178), new Vec3(0,0.017,1.000));
 
         CutsceneData data4 = CutsceneData.create()
-                .time(75)
+                .time(35)
                 .lookEasing(EasingType.EASE_IN_OUT)
                 .timeEasing(EasingType.EASE_IN_OUT)
                 .addCameraPos(new CameraPos(base.add(0,26.296,36.434), new Vec3(0,0.280,0.960)))
                 .addCameraPos(new CameraPos(base.add(-0.223,15.398,9.756), new Vec3(-0.005,0.497,0.868)))
                 .addCameraPos(new CameraPos(base.add(0.452,4.528,1.622), new Vec3(-0.009,0.698,0.716)))
+                .addCameraPos(new CameraPos(base.add(0,4.147,-1.75), new Vec3(0,0.853,0.522)))
+
+                ;
+        CutsceneData data42 = CutsceneData.create()
+                .time(10)
+                .timeEasing(EasingType.EASE_IN)
+                .addCameraPos(new CameraPos(base.add(0,4.147,-1.75), new Vec3(0,0.853,0.522)))
+                .addCameraPos(headCameraPos)
+                ;
+        CutsceneData data43 = CutsceneData.create()
+                .time(10)
                 .addCameraPos(headCameraPos)
                 ;
 
@@ -122,7 +134,7 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
                 .addCameraPos(lastCameraPos)
                 ;
 
-        data1.nextCutscene(data2.nextCutscene(data3.nextCutscene(data4.nextCutscene(data5.nextCutscene(data6)))));
+        data1.nextCutscene(data2.nextCutscene(data3.nextCutscene(data4.nextCutscene(data42.nextCutscene(data43.nextCutscene(data5.nextCutscene(data6)))))));
 
         return data1;
     }
@@ -147,7 +159,7 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
 
         int tick = this.getTick();
 
-        int movePathTime = 50;
+        int movePathTime = 35;
 
         if (movePath == null){
             movePath = new ProjectileMovementPath(movePathTime,false)
@@ -162,7 +174,7 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
 
         int bossJumpStart = 160;
 
-        int erruptionStart = bossJumpStart - 10;
+        int erruptionStart = bossJumpStart - 5;
 
         int erruptionTime = 50;
 
