@@ -3,13 +3,19 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
+import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.init.FDScreenEffects;
+import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.head.HeadControllerContainer;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
 import com.finderfeed.fdlib.systems.cutscenes.EasingType;
 import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
+import com.finderfeed.fdlib.util.ProjectileMovementPath;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.AABB;
@@ -48,8 +54,10 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
         var cutsceneData = this.constructCutscene();
 
         for (var player : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, malkuth.level(), malkuth.spawnPosition.add(0,-2,0),30,30)){
-            FDLibCalls.startCutsceneForPlayer(player, cutsceneData);
+//            FDLibCalls.startCutsceneForPlayer(player, cutsceneData);
         }
+
+
 
     }
 
@@ -105,12 +113,62 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
 
     }
 
+    private ProjectileMovementPath movePath;
+
     @Override
     public void onTick() {
 
         MalkuthEntity boss = this.getBoss();
 
+
+
+        Vec3 base = boss.spawnPosition;
+
+        Vec3 startPos = base.add(0,23.620,59.886);
+
         int tick = this.getTick();
+
+        if (movePath == null){
+            movePath = new ProjectileMovementPath(50,false)
+                    .addPos(startPos)
+                    .addPos(base.add(0,46.091,44.675))
+                    .addPos(base.add(0,49.459,18.125))
+                    .addPos(base.add(0,21.895,3.019))
+                    .addPos(base);
+            boss.teleportTo(startPos.x,startPos.y,startPos.z);
+            boss.lookAt(EntityAnchorArgument.Anchor.FEET, boss.position().add(0,0,-100));
+        }
+
+        if (tick >= 120){
+            if (tick == 120){
+                boss.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.ANIMATION);
+                boss.getAnimationSystem().startAnimation(MalkuthEntity.MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SUMMON_ANIM)
+                        .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
+                        .build());
+            }
+            if (!movePath.isFinished()) {
+                boss.noPhysics = true;
+                boss.setNoGravity(true);
+                movePath.tick(boss);
+            }else{
+                boss.noPhysics = false;
+                boss.setNoGravity(false);
+                boss.teleportTo(base.x,base.y,base.z);
+                boss.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.LOOK);
+                this.setFinished();
+            }
+        }
+
+
+
+        this.summonCannonsTicks();
+
+    }
+
+
+    private void summonCannonsTicks(){
+        int tick = this.getTick();
+        MalkuthEntity boss = this.getBoss();
 
         HashMap<Integer, Pair<Vec3,MalkuthAttackType>> cannonSpawnMap = new HashMap<>(Map.of(
                 10,new Pair<>(new Vec3(9, 10.0, 29.5),MalkuthAttackType.ICE),
@@ -126,21 +184,14 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
 
             Pair<Vec3, MalkuthAttackType> sppos = cannonSpawnMap.get(tick);
 
-            Vec3 pos = sppos.first.add(boss.position());
+            Vec3 pos = sppos.first.add(boss.spawnPosition);
 
             var cannons = BossTargetFinder.getEntitiesInCylinder(MalkuthCannonEntity.class, boss.level(), pos.add(0,-0.1,0), 4,2);
 
             if (cannons.isEmpty()) {
                 MalkuthCannonEntity.summon(boss.level(), pos, pos.add(0, 0, -100), sppos.second);
             }
-        }else if (tick >= 200){
-            this.setFinished();
         }
-
-
-
-
     }
-
 
 }

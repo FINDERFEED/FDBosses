@@ -187,8 +187,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 //                .addAttack(-1, sideRocks)
 //                .addAttack(0, PLATFORMS_N_FIREBALLS)
                 .addAttack(1,DELAY_20)
-//                .addAttack(0, cannons)
-//                .addAttack(1, jumpCrushChainpunchEarthquake)
+                .addAttack(0, cannons)
+                .addAttack(1, jumpCrushChainpunchEarthquake)
 //                .addAttack(0, SUMMON_EARTHQUAKE)
 //                .addAttack(0, JUMP_CRUSH)
 //                .addAttack(0, SLASH_ATTACK)
@@ -235,37 +235,42 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }else{
 
             AnimationSystem animationSystem = this.getAnimationSystem();
-            if (animationSystem.getTicker(MAIN_LAYER) == null){
+            if (animationSystem.getTicker(MAIN_LAYER) == null && malkuthBossInitializer.isFinished()){
                 animationSystem.startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
             }
 
             if (malkuthBossInitializer.isFinished()) {
                 this.attackChain.tick();
+
+
+                if (this.getTarget() != null) {
+
+                    var target = this.getTarget();
+
+                    this.checkTarget(target);
+
+                    if (lookAtTarget) {
+                        this.getLookControl().setLookAt(target);
+                    }
+
+                }else{
+
+                    this.changeTarget();
+
+                    if (this.getTarget() == null){
+                        this.getLookControl().setLookAt(
+                                this.position().add(this.getForward().multiply(100,0,100))
+                        );
+                    }
+
+                }
+
             }else{
                 malkuthBossInitializer.tick();
             }
 
-            if (this.getTarget() != null) {
 
-                var target = this.getTarget();
 
-                this.checkTarget(target);
-
-                if (lookAtTarget) {
-                    this.getLookControl().setLookAt(target);
-                }
-
-            }else{
-
-                this.changeTarget();
-
-                if (this.getTarget() == null){
-                    this.getLookControl().setLookAt(
-                            this.position().add(this.getForward().multiply(100,0,100))
-                    );
-                }
-
-            }
 
 
 
@@ -2039,6 +2044,16 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     @Override
     public BossSpawnerEntity getSpawner() {
         return null;
+    }
+
+    @Override
+    public boolean fireImmune() {
+        return true;
+    }
+
+    @Override
+    public boolean displayFireAnimation() {
+        return false;
     }
 
     public static String getMalkuthSwordPlaceBone(MalkuthAttackType type){
