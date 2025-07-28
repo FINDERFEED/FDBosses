@@ -1506,7 +1506,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         return path;
     }
 
-    private void doJumpStartParticles(float verticalOffset){
+    protected void doJumpStartParticles(float verticalOffset){
         SlamParticlesPacket packet = new SlamParticlesPacket(
                 new SlamParticlesPacket.SlamData(this.getOnPos(),this.position().add(0,verticalOffset,0),new Vec3(1,0,0))
                         .maxAngle(FDMathUtil.FPI * 2)

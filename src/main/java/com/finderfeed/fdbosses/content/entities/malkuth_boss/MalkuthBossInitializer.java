@@ -14,6 +14,8 @@ import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
 import com.finderfeed.fdlib.systems.cutscenes.EasingType;
 import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
+import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.server.level.ServerLevel;
@@ -54,7 +56,7 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
         var cutsceneData = this.constructCutscene();
 
         for (var player : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, malkuth.level(), malkuth.spawnPosition.add(0,-2,0),30,30)){
-//            FDLibCalls.startCutsceneForPlayer(player, cutsceneData);
+            FDLibCalls.startCutsceneForPlayer(player, cutsceneData);
         }
 
 
@@ -66,30 +68,30 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
         Vec3 base = this.getBoss().spawnPosition;
 
         CutsceneData data1 = CutsceneData.create()
-                .time(80)
+                .time(60)
                 .addScreenEffect(0, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1), 0,5,15)
-                .addScreenEffect(60, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1), 20,0,0)
+                .addScreenEffect(40, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1), 20,0,0)
                 .addCameraPos(new CameraPos(base.add(10.281,11.647,22.042), new Vec3(0.623,-0.037,0.781)))
                 .addCameraPos(new CameraPos(base.add(6.313,11.647,23.500), new Vec3(0.623,-0.037,0.781)));
 
         CutsceneData data2 = CutsceneData.create()
-                .time(80)
+                .time(60)
                 .addScreenEffect(0, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1), 0,5,15)
-                .addScreenEffect(60, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1), 20,0,0)
+                .addScreenEffect(40, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1), 20,0,0)
                 .addCameraPos(new CameraPos(base.add(-10.281,11.647,22.042), new Vec3(-0.623,-0.037,0.781)))
                 .addCameraPos(new CameraPos(base.add(-6.313,11.647,23.500), new Vec3(-0.623,-0.037,0.781)))
                 ;
 
         CutsceneData data3 = CutsceneData.create()
-                .time(60)
+                .time(40)
                 .addScreenEffect(0, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1), 0,5,15)
                 .addCameraPos(new CameraPos(base.add(0,26.296,36.434), new Vec3(0,0.280,0.960)))
                 ;
 
-        var lastCameraPos = new CameraPos(base.add(0,2.663,-6.178), new Vec3(0,0.017,1.000));
+        var lastCameraPos = new CameraPos(base.add(0,2.663,-7.178), new Vec3(0,0.017,1.000));
 
         CutsceneData data4 = CutsceneData.create()
-                .time(100)
+                .time(50)
                 .lookEasing(EasingType.EASE_IN_OUT)
                 .timeEasing(EasingType.EASE_IN_OUT)
                 .addCameraPos(new CameraPos(base.add(0,26.296,36.434), new Vec3(0,0.280,0.960)))
@@ -99,7 +101,7 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
 
         CutsceneData data5 = CutsceneData.create()
                 .time(40)
-                .addScreenEffect(20, FDScreenEffects.SCREEN_COLOR.get(), new ScreenColorData(0,0,0,1), 20,20,20)
+                .addScreenEffect(30, FDScreenEffects.SCREEN_COLOR.get(), new ScreenColorData(0,0,0,1), 10,20,10)
                 .addCameraPos(lastCameraPos)
                 ;
 
@@ -128,8 +130,10 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
 
         int tick = this.getTick();
 
+        int movePathTime = 50;
+
         if (movePath == null){
-            movePath = new ProjectileMovementPath(50,false)
+            movePath = new ProjectileMovementPath(movePathTime,false)
                     .addPos(startPos)
                     .addPos(base.add(0,46.091,44.675))
                     .addPos(base.add(0,49.459,18.125))
@@ -139,24 +143,47 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
             boss.lookAt(EntityAnchorArgument.Anchor.FEET, boss.position().add(0,0,-100));
         }
 
-        if (tick >= 120){
-            if (tick == 120){
+        int bossJumpStart = 160;
+
+        int erruptionStart = bossJumpStart - 40;
+
+        if (tick == erruptionStart){
+            DefaultShakePacket.send((ServerLevel) boss.level(), boss.spawnPosition, 30, FDShakeData.builder()
+                    .amplitude(0.1f)
+                    .stayTime(60)
+                    .build());
+        }
+
+        if (tick >= bossJumpStart){
+            if (tick == bossJumpStart){
+                DefaultShakePacket.send((ServerLevel) boss.level(), boss.spawnPosition, 30, FDShakeData.builder()
+                                .amplitude(1f)
+                                .outTime(30)
+                        .build());
                 boss.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.ANIMATION);
                 boss.getAnimationSystem().startAnimation(MalkuthEntity.MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SUMMON_ANIM)
                         .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
                         .build());
+            }else if (tick == bossJumpStart + movePathTime + 1){
+                DefaultShakePacket.send((ServerLevel) boss.level(), boss.spawnPosition, 30, FDShakeData.builder()
+                        .amplitude(0.5f)
+                        .outTime(10)
+                        .build());
+
+                boss.doJumpStartParticles(0f);
             }
             if (!movePath.isFinished()) {
                 boss.noPhysics = true;
                 boss.setNoGravity(true);
                 movePath.tick(boss);
             }else{
+
                 boss.noPhysics = false;
                 boss.setNoGravity(false);
                 boss.teleportTo(base.x,base.y,base.z);
-                boss.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.LOOK);
-                this.setFinished();
+//                this.setFinished();
             }
+
         }
 
 
@@ -175,9 +202,9 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
                 7,new Pair<>(new Vec3(13, 10.0, 27.5),MalkuthAttackType.FIRE),
                 11,new Pair<>(new Vec3(11, 3.0, 29),MalkuthAttackType.FIRE),
 
-                72,new Pair<>(new Vec3(-9, 10.0, 29.5),MalkuthAttackType.ICE),
-                69,new Pair<>(new Vec3(-13, 10.0, 27.5),MalkuthAttackType.FIRE),
-                68,new Pair<>(new Vec3(-11, 3.0, 29),MalkuthAttackType.ICE)
+                72 - 20,new Pair<>(new Vec3(-9, 10.0, 29.5),MalkuthAttackType.ICE),
+                69 - 20,new Pair<>(new Vec3(-13, 10.0, 27.5),MalkuthAttackType.FIRE),
+                68 - 20,new Pair<>(new Vec3(-11, 3.0, 29),MalkuthAttackType.ICE)
         ));
 
         if (cannonSpawnMap.containsKey(tick)){
