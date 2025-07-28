@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.client.boss_screen.BaseBossScreen;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreens;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
+import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
@@ -18,6 +19,7 @@ import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
+import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.client.particles.FDBlockParticleOptions;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticle;
@@ -180,7 +182,121 @@ public class BossClientPackets {
             case BossUtil.MALKUTH_FIREBALL_EXPLODE -> {
                 malkuthFireballExplode(pos, data);
             }
+            case BossUtil.MALKUTH_VOLCANO_ERRUPTION -> {
+                volcanoErruptionParticles(pos,data);
+            }
         }
+    }
+
+    public static void volcanoErruptionParticles(Vec3 pos, int data){
+
+        Level level = FDClientHelpers.getClientLevel();
+
+        float radius = data / 16f;
+
+        int amount = 30;
+
+        float angle = FDMathUtil.FPI * 2 / amount;
+
+        float maxBallSize = 1f;
+
+        for (int i = 0; i < amount;i++){
+
+            float rndAdd = random.nextFloat() * angle;
+            float rndAdd2 = random.nextFloat() * angle;
+
+            Vec3 offs = new Vec3(1,0,0).yRot(rndAdd + angle * i);
+            Vec3 offs2 = new Vec3(1,0,0).yRot(rndAdd2 + angle * i);
+
+            float aradius = radius - random.nextFloat() * 0.5f * radius;
+
+            Vec3 ppos = pos.add(offs.multiply(aradius,aradius,aradius));
+            Vec3 ppos2 = pos.add(offs2.multiply(radius,radius,radius));
+
+            float size = 0.1f + random.nextFloat() * (maxBallSize - 0.1f);
+
+            float sizeP = FDEasings.easeInOut(size / maxBallSize);
+
+            Vector3f color = MalkuthEntity.getAndRandomizeColor(MalkuthAttackType.FIRE, level.random);
+
+            BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                    .brightness(2)
+                    .size(size)
+                    .scalingOptions(0,0,20 + random.nextInt(10))
+                    .friction(0.9f - 0.1f * sizeP)
+                    .color(color.x,color.y,color.z)
+                    .build();
+
+            level.addParticle(ballParticleOptions,true, ppos.x,ppos.y,ppos.z,
+                    offs.x * (0.3f + random.nextFloat() * 0.2f),
+                    1 + random.nextFloat() * 0.5,
+                    offs.z * (0.3f + random.nextFloat() * 0.2f)
+            );
+
+            if (random.nextBoolean()) {
+                GravityParticleOptions options = new GravityParticleOptions(BossParticles.FLAME_WITH_STONE.get(), 20 + random.nextInt(4), 0.6f + random.nextFloat() * 0.6f,
+                        (float) Mob.DEFAULT_BASE_GRAVITY * 20, 2f, true);
+
+                level.addParticle(options, true, ppos2.x, ppos2.y, ppos2.z,
+                        offs2.x * (0.5f + random.nextFloat() * 0.2f),
+                        0.5 + random.nextFloat() * 0.5,
+                        offs2.z * (0.5f + random.nextFloat() * 0.2f)
+                );
+            }
+
+            if (random.nextFloat() > 0.8f) {
+                float col = 0.2f + random.nextFloat() * 0.1f;
+                BigSmokeParticleOptions options = BigSmokeParticleOptions.builder()
+                        .lifetime(0, 0, 20 + random.nextInt(10))
+                        .friction(0.8f)
+                        .size(2f + random.nextFloat() * 2f)
+                        .minSpeed(0.0025f)
+                        .color(col,col,col)
+                        .build();
+
+                level.addParticle(options, true, ppos2.x, ppos2.y, ppos2.z,
+                        offs2.x * (0.5f + random.nextFloat() * 0.2f),
+                        0.5 + random.nextFloat() * 0.5,
+                        offs2.z * (0.5f + random.nextFloat() * 0.2f)
+                );
+            }
+
+
+
+
+        }
+
+        Vec3 randomDir = new Vec3(radius,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat());
+        Vec3 randomDirN = randomDir.normalize();
+
+        Vector3f colFire = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.FIRE);
+
+        FDColor fireColorStart = new FDColor(colFire.x,colFire.y - random.nextFloat() * 0.1f - 0.3f,colFire.z,0.5f);
+        FDColor fireColor = new FDColor(colFire.x,colFire.y + random.nextFloat() * 0.1f,colFire.z,1f);
+
+        float firstMultiplier = 2;
+        float secondMultiplier = 8f;
+        StripeParticleOptions stripeParticleOptions = StripeParticleOptions.builder()
+                .startColor(fireColorStart)
+                .endColor(fireColor)
+                .lifetime(10 + random.nextInt(10))
+                .lod(50)
+                .scale(0.1f)
+                .stripePercentLength(0.5f)
+                .endOutPercent(0.2f)
+                .startInPercent(0.2f)
+                .offsets(
+                        Vec3.ZERO,
+                        randomDirN.multiply(firstMultiplier,firstMultiplier,firstMultiplier).add(random.nextFloat() * 2 - 1,2 + random.nextFloat(),random.nextFloat() * 2 - 1),
+                        randomDirN.multiply(secondMultiplier,secondMultiplier,secondMultiplier).add(random.nextFloat() * 2 - 1,7 + random.nextFloat() * 3f,random.nextFloat() * 2 - 1)
+                        )
+                .build();
+
+        Vec3 stripePos = pos.add(randomDir);
+
+        level.addParticle(stripeParticleOptions,true,stripePos.x,stripePos.y,stripePos.z,0,0,0);
+
+
     }
 
     public static void malkuthFireballExplode(Vec3 pos, int type){

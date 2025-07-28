@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
 import com.finderfeed.fdbosses.BossTargetFinder;
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.init.BossAnims;
@@ -145,21 +146,27 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
 
         int bossJumpStart = 160;
 
-        int erruptionStart = bossJumpStart - 40;
+        int erruptionStart = bossJumpStart - 10;
 
-        if (tick == erruptionStart){
+        int erruptionTime = 50;
+
+        if (tick == erruptionStart - 30){
             DefaultShakePacket.send((ServerLevel) boss.level(), boss.spawnPosition, 30, FDShakeData.builder()
                     .amplitude(0.1f)
                     .stayTime(60)
                     .build());
+        }else if (tick == erruptionStart){
+            DefaultShakePacket.send((ServerLevel) boss.level(), boss.spawnPosition, 30, FDShakeData.builder()
+                    .amplitude(1f)
+                    .outTime(30)
+                    .build());
+        }else if (tick >= erruptionStart && tick <= erruptionStart + erruptionTime){
+            BossUtil.volcanoErruptionParticles((ServerLevel) boss.level(), startPos.add(0,3,0), 16 * 5 + 6, 120);
         }
 
         if (tick >= bossJumpStart){
             if (tick == bossJumpStart){
-                DefaultShakePacket.send((ServerLevel) boss.level(), boss.spawnPosition, 30, FDShakeData.builder()
-                                .amplitude(1f)
-                                .outTime(30)
-                        .build());
+
                 boss.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.ANIMATION);
                 boss.getAnimationSystem().startAnimation(MalkuthEntity.MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SUMMON_ANIM)
                         .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
