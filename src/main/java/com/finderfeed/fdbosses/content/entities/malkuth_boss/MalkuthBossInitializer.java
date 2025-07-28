@@ -198,25 +198,30 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
                 boss.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.ANIMATION);
                 boss.getAnimationSystem().startAnimation(MalkuthEntity.MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SUMMON_ANIM)
                         .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
+                                .setToNullTransitionTime(0)
                         .build());
             }else if (tick == bossJumpStart + movePathTime + 1){
                 DefaultShakePacket.send((ServerLevel) boss.level(), boss.spawnPosition, 30, FDShakeData.builder()
                         .amplitude(0.5f)
                         .outTime(10)
                         .build());
-
                 boss.doJumpStartParticles(0f);
             }
-            if (!movePath.isFinished()) {
+
+            if (tick <= bossJumpStart + movePathTime) {
                 boss.noPhysics = true;
                 boss.setNoGravity(true);
                 movePath.tick(boss);
-            }else{
-
+            }else if (tick == bossJumpStart + movePathTime + 1){
                 boss.noPhysics = false;
                 boss.setNoGravity(false);
                 boss.teleportTo(base.x,base.y,base.z);
-//                this.setFinished();
+            }else if (tick == bossJumpStart + movePathTime + 50){
+                boss.getAnimationSystem().stopAnimation(MalkuthEntity.MAIN_LAYER);
+                boss.getAnimationSystem().startAnimation(MalkuthEntity.MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE)
+                        .build());
+            }else if (tick >= bossJumpStart + movePathTime + 80){
+                this.setFinished();
             }
 
         }
@@ -233,8 +238,8 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
         MalkuthEntity boss = this.getBoss();
 
         HashMap<Integer, Pair<Vec3,MalkuthAttackType>> cannonSpawnMap = new HashMap<>(Map.of(
-                10,new Pair<>(new Vec3(9, 10.0, 29.5),MalkuthAttackType.ICE),
-                7,new Pair<>(new Vec3(13, 10.0, 27.5),MalkuthAttackType.FIRE),
+                9,new Pair<>(new Vec3(9, 10.0, 29.5),MalkuthAttackType.ICE),
+                6,new Pair<>(new Vec3(13, 10.0, 27.5),MalkuthAttackType.FIRE),
                 11,new Pair<>(new Vec3(11, 3.0, 29),MalkuthAttackType.FIRE),
 
                 72 - 20,new Pair<>(new Vec3(-9, 10.0, 29.5),MalkuthAttackType.ICE),

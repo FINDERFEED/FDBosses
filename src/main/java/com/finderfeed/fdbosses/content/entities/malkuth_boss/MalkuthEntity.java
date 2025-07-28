@@ -843,6 +843,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private ProjectileMovementPath jumpBackOnSpawnPath;
 
+    private MalkuthAttackType jumpBackOnSpawnCrushType = MalkuthAttackType.FIRE;
+
     private boolean jumpBackOnSpawn(AttackInstance attackInstance, boolean crush){
 
         int stage = attackInstance.stage;
@@ -889,6 +891,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 }
             }
             if (tick == 0){
+                jumpBackOnSpawnCrushType = MalkuthAttackType.getRandom(random);
                 if (!crush) {
                     this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
                             .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
@@ -919,6 +922,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             if (tick == 3 && crush){
                 this.jumpEarthquake(this.position().add(0,-0.99,0), earthquakesCount, angle, radius);
+                level().playSound(null, this.getX(),this.getY(),this.getZ(), BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.HOSTILE, 2f, 0.8f);
+                level().playSound(null, this.getX(),this.getY(),this.getZ(), BossSounds.ROCK_IMPACT.get(), SoundSource.HOSTILE, 2f, 0.8f);
             }
 
             this.noPhysics = false;
@@ -942,7 +947,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private void jumpEndEarthquakePrepareParticles(Vec3 lastpos, int earthquakesCount, float angle, float radius){
 
-        MalkuthAttackType localType = MalkuthAttackType.FIRE;
+        MalkuthAttackType localType = jumpBackOnSpawnCrushType;
 
         for (int i = 0; i < earthquakesCount; i++) {
 
@@ -967,7 +972,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private void jumpEarthquake(Vec3 lastpos, int earthquakesCount, float angle, float radius){
 
-        MalkuthAttackType localType = MalkuthAttackType.FIRE;
+        MalkuthAttackType localType = jumpBackOnSpawnCrushType;
 
         for (int i = 0; i < earthquakesCount; i++) {
 
