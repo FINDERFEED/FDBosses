@@ -56,8 +56,13 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
 
         var cutsceneData = this.constructCutscene();
 
+        var boss = this.getBoss();
+
+        Vec3 sppos = boss.spawnPosition;
+
         for (var player : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, malkuth.level(), malkuth.spawnPosition.add(0,-2,0),30,30)){
             FDLibCalls.startCutsceneForPlayer(player, cutsceneData);
+            player.teleportTo(sppos.x,sppos.y - 0.99,sppos.z - 10);
         }
 
 
@@ -84,29 +89,40 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
                 ;
 
         CutsceneData data3 = CutsceneData.create()
-                .time(40)
+                .time(30)
                 .addScreenEffect(0, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1), 0,5,15)
                 .addCameraPos(new CameraPos(base.add(0,26.296,36.434), new Vec3(0,0.280,0.960)))
                 ;
 
-        var lastCameraPos = new CameraPos(base.add(0,2.663,-7.178), new Vec3(0,0.017,1.000));
+        var headCameraPos = new CameraPos(base.add(0,3.034,-2.649), new Vec3(-0.009,-0.612,0.911));
+        var lastCameraPos = new CameraPos(base.add(0,2.4,-7.178), new Vec3(0,0.017,1.000));
 
         CutsceneData data4 = CutsceneData.create()
-                .time(50)
+                .time(75)
                 .lookEasing(EasingType.EASE_IN_OUT)
                 .timeEasing(EasingType.EASE_IN_OUT)
                 .addCameraPos(new CameraPos(base.add(0,26.296,36.434), new Vec3(0,0.280,0.960)))
-                .addCameraPos(new CameraPos(base.add(0,4.531,1.252), new Vec3(0,0.405,0.914)))
-                .addCameraPos(lastCameraPos)
+                .addCameraPos(new CameraPos(base.add(-0.223,15.398,9.756), new Vec3(-0.005,0.497,0.868)))
+                .addCameraPos(new CameraPos(base.add(0.452,4.528,1.622), new Vec3(-0.009,0.698,0.716)))
+                .addCameraPos(headCameraPos)
                 ;
+
+
 
         CutsceneData data5 = CutsceneData.create()
-                .time(40)
-                .addScreenEffect(30, FDScreenEffects.SCREEN_COLOR.get(), new ScreenColorData(0,0,0,1), 10,20,10)
+                .time(5)
+                .timeEasing(EasingType.EASE_OUT)
+                .addCameraPos(headCameraPos)
                 .addCameraPos(lastCameraPos)
                 ;
 
-        data1.nextCutscene(data2.nextCutscene(data3.nextCutscene(data4.nextCutscene(data5))));
+        CutsceneData data6 = CutsceneData.create()
+                .time(10)
+                .addScreenEffect(9, FDScreenEffects.SCREEN_COLOR.get(), new ScreenColorData(0,0,0,1), 0,20,10)
+                .addCameraPos(lastCameraPos)
+                ;
+
+        data1.nextCutscene(data2.nextCutscene(data3.nextCutscene(data4.nextCutscene(data5.nextCutscene(data6)))));
 
         return data1;
     }
