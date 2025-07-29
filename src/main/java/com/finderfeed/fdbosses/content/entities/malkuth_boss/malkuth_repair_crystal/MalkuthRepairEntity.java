@@ -36,6 +36,7 @@ public class MalkuthRepairEntity extends Entity {
         MalkuthRepairEntity repairEntity = new MalkuthRepairEntity(BossEntities.MALKUTH_REPAIR_ENTITY.get(), level);
         repairEntity.setPos(pos);
         repairEntity.entityData.set(ATTACK_TYPE, repairEntityType);
+        level.addFreshEntity(repairEntity);
         return repairEntity;
     }
 

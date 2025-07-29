@@ -149,7 +149,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
 
                 }else if (shootTickCount == 5) {
                     if (this.isPlayerControlled()){
-                        this.setBroken(true);
+//                        this.setBroken(true);
                     }
                 }else if (shootTickCount <= 0){
                     this.shootTargets.clear();
@@ -163,6 +163,13 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
 
             this.brokenParticles();
         }
+    }
+
+    public void cancelShot(){
+        this.getAnimationSystem().stopAnimation("SHOOT");
+        this.shootTargets.clear();
+        this.shootTickCount = 0;
+        this.damage = 0;
     }
 
     private void brokenRequiresMaterialsParticles(){

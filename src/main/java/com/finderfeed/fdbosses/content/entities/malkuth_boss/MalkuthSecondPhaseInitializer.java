@@ -44,6 +44,8 @@ public class MalkuthSecondPhaseInitializer extends BossInitializer<MalkuthEntity
             FDLibCalls.startCutsceneForPlayer(player, data);
         }
 
+        boss.removeThingsForSecondPhase();
+
         MalkuthBossInitializer.teleportCombatants(boss);
 
     }
@@ -56,13 +58,13 @@ public class MalkuthSecondPhaseInitializer extends BossInitializer<MalkuthEntity
         CameraPos end = new CameraPos(base.add(0,20.653,38.780), new Vec3(0.001,-0.185,-0.983));
 
         CutsceneData data1 = CutsceneData.create()
-                .time(15)
+                .time(22)
                 .addScreenEffect(0, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1), 0,0, 20)
                 .addCameraPos(start)
                 ;
 
         CutsceneData data2 = CutsceneData.create()
-                .time(10)
+                .time(15)
                 .timeEasing(EasingType.EASE_IN_OUT)
                 .addCameraPos(start)
                 .addCameraPos(new CameraPos(base.add(4.695,17,29.002), new Vec3(-0.909,-0.417,-0.009)))
@@ -108,6 +110,7 @@ public class MalkuthSecondPhaseInitializer extends BossInitializer<MalkuthEntity
 
             boss.getAnimationSystem().startAnimation(MalkuthEntity.MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SWORD_FORWARD)
                             .setSpeed(0.75f)
+                            .setToNullTransitionTime(0)
                     .build());
 
         }else if (tick == cannonShootTick){
@@ -134,6 +137,8 @@ public class MalkuthSecondPhaseInitializer extends BossInitializer<MalkuthEntity
             Vec3 tppos = boss.spawnPosition;
             boss.teleportTo(tppos.x,tppos.y,tppos.z);
             boss.lookAt(EntityAnchorArgument.Anchor.EYES, tppos.add(0,0,-100));
+            boss.getAnimationSystem().stopAnimation(MalkuthEntity.MAIN_LAYER);
+            boss.getAnimationSystem().startAnimation(MalkuthEntity.MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
         }else if (tick >= endTick + 40){
             this.setFinished();
         }

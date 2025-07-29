@@ -50,11 +50,7 @@ public class MalkuthRepairCrystal extends FDEntity implements AutoSerializable {
 
         MalkuthRepairEntity malkuthRepairEntity = MalkuthRepairEntity.summon(level(), this.position().add(0,3,0), this.entityData.get(CRYSTAL_TYPE));
 
-        this.deathTicks = BossAnims.MALKUTH_REPAIR_CRYSTAL_SUMMON.get().getAnimTime();
-
-        this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.MALKUTH_REPAIR_CRYSTAL_SUMMON.get())
-                .reversed()
-                .build());
+        this.remove(RemovalReason.DISCARDED);
 
     }
 

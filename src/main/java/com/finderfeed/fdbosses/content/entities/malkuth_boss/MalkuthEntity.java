@@ -10,6 +10,7 @@ import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignabl
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boulder.MalkuthBoulderEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
@@ -183,6 +184,14 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .addAttack(JUMP_BACK_ON_SPAWN)
                 .build();
 
+        AttackOptions<?> slashOptions = AttackOptions.chainOptionsBuilder()
+                .addAttack(SLASH_ATTACK)
+                .addAttack(SLASH_ATTACK)
+                .addAttack(SLASH_ATTACK)
+                .addAttack(SLASH_ATTACK)
+                .addAttack(SLASH_ATTACK)
+                .build();
+
         this.attackChain = new AttackChain(this.getRandom())
                 .registerAttack(DELAY_10,this::doNothing10Ticks)//not an attack
                 .registerAttack(DELAY_20,this::doNothing20Ticks)//not an attack
@@ -205,6 +214,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .addAttack(1,DELAY_20)
                 .addAttack(0, cannons)
                 .addAttack(1, jumpCrushChainpunchEarthquake)
+                .addAttack(2, slashOptions)
 //                .addAttack(0, SUMMON_EARTHQUAKE)
 //                .addAttack(0, JUMP_CRUSH)
 //                .addAttack(0, SLASH_ATTACK)
@@ -314,6 +324,26 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     public int getMaxHits(){
         return maxHits;
+    }
+
+    public void removeThingsForSecondPhase(){
+
+        for (var entity : this.getMalkuthCannons()){
+            entity.cancelShot();
+        }
+
+        for (var entity : this.getPlayerCannons(false)){
+            entity.cancelShot();
+        }
+
+        for (var entity : BossTargetFinder.getEntitiesInCylinder(MalkuthCannonProjectile.class, level(), this.spawnPosition.add(0,-2,0), 30, 40)){
+            entity.remove(RemovalReason.DISCARDED);
+        }
+
+        this.getAnimationSystem().stopAnimation(MAIN_LAYER);
+
+        this.attackChain.reset();
+
     }
 
     private AttackAction attackListener(String attack){
@@ -1123,12 +1153,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             if (this.getTarget() == null){
                 return false;
             }
-            if (stage >= 23){
-                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
-                return true;
-            }else{
-                inst.nextStage();
-            }
+//            if (stage >= 23){
+//                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
+            return true;
+//            }else{
+//                inst.nextStage();
+//            }
         }
 
 
@@ -1468,7 +1498,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 this.setNoGravity(false);
                 this.noPhysics = false;
                 attackInstance.nextStage();
-                this.getAnimationSystem().startAnimation(MAIN_LAYER,AnimationTicker.builder(BossAnims.MALKUTH_SWORD_FORWARD).build());
+                this.getAnimationSystem().startAnimation(MAIN_LAYER,AnimationTicker.builder(BossAnims.MALKUTH_SWORD_FORWARD)
+                                .setToNullTransitionTime(0)
+                        .build());
             }
         }else if (stage == 2){
             int start = 6;
