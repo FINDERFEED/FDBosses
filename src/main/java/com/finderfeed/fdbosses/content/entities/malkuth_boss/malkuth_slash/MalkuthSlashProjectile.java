@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBuddy;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairCrystal;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdlib.FDHelpers;
@@ -297,6 +298,10 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
                     if (e instanceof LivingEntity livingEntity){
 
                         livingEntity.hurt(new MalkuthDamageSource(level().damageSources().magic(), this.getAttackType(), MalkuthWeaknessHandler.MAX / 3), this.getDamage());
+
+                    }else if (e instanceof MalkuthRepairCrystal repairCrystal){
+
+                        repairCrystal.destroyAndSummonRepairMaterial();
 
                     }
 

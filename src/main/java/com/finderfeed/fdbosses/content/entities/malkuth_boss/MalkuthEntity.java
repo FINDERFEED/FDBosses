@@ -17,6 +17,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_fireball.Ma
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_floor.MalkuthFloorEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlash;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_platform.MalkuthPlatform;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairCrystal;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.MalkuthChargeSwordPacket;
 import com.finderfeed.fdbosses.init.BossAnims;
@@ -69,6 +70,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -1153,7 +1155,15 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.noPhysics = false;
 
             if (tick == 5){
-                MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level(), this.position().add(this.getForward().multiply(1,0,1).normalize()), 1);
+
+                Vec3 basePos = this.position().add(this.getForward().multiply(1,0,1).normalize());
+                Vec3 actualPos = this.findGroundPosForCrush(basePos);
+
+                if (this.isBelowHalfHP()){
+                    this.summonRepairCrystal(actualPos);
+                }
+
+                MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level(), actualPos, 1);
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                         .frequency(5)
                         .amplitude(5f)
@@ -1170,6 +1180,59 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
         return false;
+    }
+
+    private void summonRepairCrystal(Vec3 pos){
+
+        var crystals = BossTargetFinder.getEntitiesInCylinder(MalkuthRepairCrystal.class, level(), this.spawnPosition.add(0,-2,0), 20, 30);
+
+        var playerCannons = this.getPlayerCannons(true);
+
+        int spawnedCrystals = crystals.size();
+
+        int cannonsAmount = playerCannons.size();
+
+        if (crystals.size() == playerCannons.size()) return;
+
+        int fireCrystals = (int) crystals.stream().filter(c->c.getCrystalType().isFire()).count();
+        int iceCrystals = spawnedCrystals - fireCrystals;
+
+        int fireCannons = (int) playerCannons.stream().filter(cannon->cannon.getCannonType().isFire()).count();
+        int iceCannons = cannonsAmount - fireCannons;
+
+        MalkuthAttackType finalType;
+
+        if (fireCrystals >= fireCannons && iceCrystals >= iceCannons) return;
+
+        if (fireCrystals >= fireCannons){
+            finalType = MalkuthAttackType.ICE;
+        }else if (iceCrystals >= iceCannons){
+            finalType = MalkuthAttackType.FIRE;
+        }else{
+            finalType = MalkuthAttackType.getRandom(random);
+        }
+
+        MalkuthRepairCrystal malkuthRepairCrystal = new MalkuthRepairCrystal(BossEntities.MALKUTH_REPAIR_CRYSTAL.get(), level());
+
+        malkuthRepairCrystal.getEntityData().set(MalkuthRepairCrystal.CRYSTAL_TYPE, finalType);
+
+        malkuthRepairCrystal.setPos(pos);
+
+        level().addFreshEntity(malkuthRepairCrystal);
+    }
+
+    private Vec3 findGroundPosForCrush(Vec3 crushBasePos){
+
+        Vec3 end = crushBasePos.add(0,-5,0);
+
+        ClipContext clipContext = new ClipContext(crushBasePos, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+
+        var res = level().clip(clipContext);
+
+        if (res.getType() == HitResult.Type.BLOCK){
+            return res.getLocation();
+        }
+        return crushBasePos;
     }
 
     private ProjectileMovementPath createJumpCrushAttackMovementPath(int flyTime){
@@ -1429,7 +1492,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private void shootCannons(){
         int attackPerCombatant = 10;
-        var cannons = this.getCannons();
+        var cannons = this.getMalkuthCannons();
         if (cannons.isEmpty()){
             //summon them
             return;
@@ -1825,6 +1888,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     //=============================================================================OTHER================================================================================================
 
 
+    private boolean isBelowHalfHP(){
+        return true;
+    }
+
     @Override
     public boolean hurt(DamageSource src, float damage) {
 
@@ -1905,10 +1972,19 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         ).move(offset);
     }
 
-    private List<MalkuthCannonEntity> getCannons(){
-        AABB box = new AABB(-20,-20,-10,20,10,10);
-        return this.level().getEntitiesOfClass(MalkuthCannonEntity.class, box.move(this.position()));
+    private List<MalkuthCannonEntity> getMalkuthCannons(){
+        return BossTargetFinder.getEntitiesInCylinder(MalkuthCannonEntity.class, level(), this.spawnPosition, 30, 30, (cannon) -> {
+            return !cannon.isPlayerControlled();
+        });
     }
+
+
+    private List<MalkuthCannonEntity> getPlayerCannons(boolean onlyCannonsThatNeedRepair){
+        return BossTargetFinder.getEntitiesInCylinder(MalkuthCannonEntity.class, level(), this.spawnPosition, 30, 30, (cannon) -> {
+            return cannon.isPlayerControlled() && (!onlyCannonsThatNeedRepair || cannon.requiresRepair());
+        });
+    }
+
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
