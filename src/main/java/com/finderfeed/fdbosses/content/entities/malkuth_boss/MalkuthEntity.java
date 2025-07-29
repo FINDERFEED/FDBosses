@@ -20,10 +20,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_platform.Ma
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairCrystal;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.MalkuthChargeSwordPacket;
-import com.finderfeed.fdbosses.init.BossAnims;
-import com.finderfeed.fdbosses.init.BossEntities;
-import com.finderfeed.fdbosses.init.BossModels;
-import com.finderfeed.fdbosses.init.BossSounds;
+import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDRenderTypes;
@@ -43,6 +40,7 @@ import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
+import com.finderfeed.fdlib.systems.hud.bossbars.FDServerBossBar;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
@@ -123,6 +121,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public static final ResourceLocation MALKUTH_ICE_SWORD = FDBosses.location("textures/item/malkuth_sword_ice_emissive.png");
     public static final ResourceLocation MALKUTH_FIRE_SWORD = FDBosses.location("textures/item/malkuth_sword_fire_emissive.png");
 
+    private FDServerBossBar bossbar = new FDServerBossBar(BossBars.MALKUTH_BOSS_BAR, this);
+
     private HeadControllerContainer<MalkuthEntity> headControllerContainer;
 
     private AttackChain attackChain;
@@ -138,6 +138,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     @SerializableField
     private boolean lookAtTarget = true;
+
+    @SerializableField
+    private int hits = 10;
+
+    private int maxHits = 10;
 
     public MalkuthEntity(EntityType<? extends FDMob> type, Level level) {
         super(type, level);
@@ -245,6 +250,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.headControllerContainer.clientTick();
         }else{
 
+            this.bossbar.setPercentage(this.hits / (float) this.getMaxHits());
+
             AnimationSystem animationSystem = this.getAnimationSystem();
             if (animationSystem.getTicker(MAIN_LAYER) == null && malkuthBossInitializer.isFinished()){
                 animationSystem.startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
@@ -292,6 +299,21 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.setYRot(this.yBodyRot);
 
         }
+    }
+
+    public void hurtBoss(int amount){
+        this.hits = Math.clamp(this.hits - amount, 0, maxHits);
+        if (hits == 0){
+            this.kill();
+        }
+    }
+
+    public int getCurrentHits(){
+        return this.hits;
+    }
+
+    public int getMaxHits(){
+        return maxHits;
     }
 
     private AttackAction attackListener(String attack){
@@ -1902,7 +1924,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
     private boolean isBelowHalfHP(){
-        return true;
+        return this.hits <= maxHits / 2;
     }
 
     @Override
@@ -2148,6 +2170,18 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     @Override
     public boolean displayFireAnimation() {
         return false;
+    }
+
+    @Override
+    public void startSeenByPlayer(ServerPlayer player) {
+        super.startSeenByPlayer(player);
+        this.bossbar.addPlayer(player);
+    }
+
+    @Override
+    public void stopSeenByPlayer(ServerPlayer player) {
+        super.stopSeenByPlayer(player);
+        this.bossbar.removePlayer(player);
     }
 
     public static String getMalkuthSwordPlaceBone(MalkuthAttackType type){
