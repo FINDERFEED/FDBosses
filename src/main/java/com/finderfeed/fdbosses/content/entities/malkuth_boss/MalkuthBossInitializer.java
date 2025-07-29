@@ -18,9 +18,11 @@ import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenC
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -39,8 +41,8 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
 
         MalkuthEntity malkuth = this.getBoss();
 
-        Vec3 v1 = new Vec3(-6.5,-1,-25).add(malkuth.position());
-        Vec3 v2 = new Vec3(6.5,-1,-25).add(malkuth.position());
+        Vec3 v1 = new Vec3(-6.5,-1,-25).add(malkuth.spawnPosition);
+        Vec3 v2 = new Vec3(6.5,-1,-25).add(malkuth.spawnPosition);
 
         AABB aabb1 = new AABB(-5,-5,-5,5,5,5).move(v1);
         AABB aabb2 = new AABB(-5,-5,-5,5,5,5).move(v2);
@@ -62,8 +64,9 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
 
         for (var player : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, malkuth.level(), malkuth.spawnPosition.add(0,-2,0),30,30)){
             FDLibCalls.startCutsceneForPlayer(player, cutsceneData);
-            player.teleportTo(sppos.x,sppos.y - 0.99,sppos.z - 10);
         }
+
+        teleportCombatants(boss);
 
 
 
@@ -152,7 +155,6 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
         MalkuthEntity boss = this.getBoss();
 
 
-
         Vec3 base = boss.spawnPosition;
 
         Vec3 startPos = base.add(0,23.620,59.886);
@@ -200,12 +202,12 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
                         .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
                                 .setToNullTransitionTime(0)
                         .build());
-            }else if (tick == bossJumpStart + movePathTime + 1){
+            }else if (tick == bossJumpStart + movePathTime + 3){
                 DefaultShakePacket.send((ServerLevel) boss.level(), boss.spawnPosition, 30, FDShakeData.builder()
                         .amplitude(0.5f)
                         .outTime(10)
                         .build());
-                boss.doJumpStartParticles(0f);
+                boss.doJumpStartParticles(1f);
             }
 
             if (tick <= bossJumpStart + movePathTime) {
@@ -259,6 +261,38 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
                 MalkuthCannonEntity.summon(boss.level(), pos, pos.add(0, 0, -100), sppos.second);
             }
         }
+    }
+
+    public static void teleportCombatants(MalkuthEntity boss){
+
+        Vec3 spawnPos = boss.spawnPosition;
+
+
+        Vec3 mainOffset = new Vec3(0,0,-20);
+
+        int t = 2;
+
+        for (var player : boss.getCombatants(true)){
+
+            int l = t % 3;
+
+            Vec3 pos;
+
+            if (l == 2){
+                pos = spawnPos.add(mainOffset);
+            }else if (l == 1){
+                pos = spawnPos.add(mainOffset.multiply(-1,0,0));
+            }else{
+                mainOffset = mainOffset.yRot(FDMathUtil.FPI / 8);
+                pos = spawnPos.add(mainOffset);
+            }
+
+            player.teleportTo(pos.x,pos.y - 0.99,pos.z);
+
+            t++;
+        }
+
+
     }
 
 }

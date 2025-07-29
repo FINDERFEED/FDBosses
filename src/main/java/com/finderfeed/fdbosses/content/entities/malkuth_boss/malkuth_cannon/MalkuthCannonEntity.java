@@ -58,6 +58,9 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
     @SerializableField
     private int shootTickCount = 0;
 
+    @SerializableField
+    private float damage;
+
     public MalkuthCannonEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
         malkuthCannonType = MalkuthAttackType.ICE;
@@ -79,10 +82,11 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
         return malkuthCannonEntity;
     }
 
-    public void shoot(List<Vec3> targets){
+    public void shoot(List<Vec3> targets, float damage){
         if (level().isClientSide) return;
         if (shootTargets.isEmpty()){
             this.shootTargets = new ArrayList<>(targets);
+            this.damage = damage;
             this.shootTickCount = 20;
         }
     }
@@ -100,10 +104,10 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
 
             if (attackType.isFire()) {
                 Vec3 fireOffset = new Vec3(6.5, 14.0, 55);
-                this.shoot(List.of(fireOffset.add(this.position())));
+                this.shoot(List.of(fireOffset.add(this.position())), 1);
             }else {
                 Vec3 iceOffset = new Vec3(-6.5, 14.0, 55);
-                this.shoot(List.of(iceOffset.add(this.position())));
+                this.shoot(List.of(iceOffset.add(this.position())), 1);
             }
         }
 
@@ -128,7 +132,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
 
                     for (Vec3 target : this.shootTargets){
                         Vec3 speed = BossUtil.calculateMortarProjectileVelocity(summonPos, target, -(float)LivingEntity.DEFAULT_BASE_GRAVITY, 35 + random.nextInt(10));
-                        MalkuthCannonProjectile.summon(level(), summonPos, speed, 1000, malkuthCannonType);
+                        MalkuthCannonProjectile.summon(level(), summonPos, speed, 1000, malkuthCannonType, damage);
                     }
 
                     ((ServerLevel)level()).playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.MALKUTH_CANNON_SHOOT.get(), SoundSource.HOSTILE, 4f ,0.75f);
@@ -361,4 +365,8 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
         tag.putBoolean("playerControlled",this.entityData.get(PLAYER_CONTROLLED));
     }
 
+    @Override
+    public boolean shouldRenderAtSqrDistance(double p_19883_) {
+        return true;
+    }
 }

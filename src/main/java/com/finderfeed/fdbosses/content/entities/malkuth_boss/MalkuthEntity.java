@@ -85,6 +85,12 @@ import java.util.*;
 
 public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, AutoSerializable, BossSpawnerContextAssignable {
 
+    public static final Vec3 FIRE_PLAYER_CANNON_OFFSET = new Vec3(-6.5,-1,-25);
+    public static final Vec3 ICE_PLAYER_CANNON_OFFSET = new Vec3(6.5,-1,-25);
+
+
+    public static final Vec3 WALL_OFFSET = new Vec3(0, 13.0, 27.85);
+
     public static final String MAIN_LAYER = "MAIN";
 
     public static final float ENRAGE_RADIUS = 30;
@@ -128,6 +134,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     private MalkuthBossInitializer malkuthBossInitializer;
 
     @SerializableField
+    private MalkuthSecondPhaseInitializer malkuthSecondPhaseInitializer;
+
+    @SerializableField
     private boolean lookAtTarget = true;
 
     public MalkuthEntity(EntityType<? extends FDMob> type, Level level) {
@@ -143,6 +152,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
         malkuthBossInitializer = new MalkuthBossInitializer(this);
+        malkuthSecondPhaseInitializer = new MalkuthSecondPhaseInitializer(this);
 
         this.headControllerContainer = new HeadControllerContainer<>(this)
                 .addHeadController(CLIENT_MODEL, "head");
@@ -156,7 +166,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         AttackOptions<?> cannons = AttackOptions.chainOptionsBuilder()
                 .addAttack(JUMP_ON_WALL_COMMAND_CANNONS)
-                .addAttack(JUMP_BACK_ON_SPAWN_WITH_CRUSH)
+                .addAttack(JUMP_BACK_ON_SPAWN)
                 .build();
 
         AttackOptions<?> jumpCrushChainpunchEarthquake = AttackOptions.chainOptionsBuilder()
@@ -178,8 +188,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(PULL_AND_PUNCH,this::pullAndPunch) //combos and anti flight
                 .registerAttack(JUMP_CRUSH,this::jumpCrushAttack)
                 .registerAttack(CAROUSEL_SLASHES,this::carouselSlashesAttack)
-                .registerAttack(JUMP_BACK_ON_SPAWN,v->this.jumpBackOnSpawn(v,false))
-                .registerAttack(JUMP_BACK_ON_SPAWN_WITH_CRUSH,v->this.jumpBackOnSpawn(v,true))
+                .registerAttack(JUMP_BACK_ON_SPAWN,v->this.jumpBackOnSpawn(v,this.isBelowHalfHP()))
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
                 .registerAttack(GIANT_SWORDS_ULTIMATE,this::giantSwordUltimate)
                 .registerAttack(SUMMON_AND_THROW_SIDE_ROCKS,this::summonAndThrowSideRocks)
@@ -241,7 +250,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 animationSystem.startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
             }
 
-            if (malkuthBossInitializer.isFinished()) {
+            if (malkuthBossInitializer.isFinished() && (!this.isBelowHalfHP() || malkuthSecondPhaseInitializer.isFinished())) {
                 this.attackChain.tick();
 
 
@@ -268,7 +277,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 }
 
             }else{
-                malkuthBossInitializer.tick();
+                if (!malkuthBossInitializer.isFinished()) {
+                    malkuthBossInitializer.tick();
+                }else if (!malkuthSecondPhaseInitializer.isFinished()){
+                    malkuthSecondPhaseInitializer.tick();
+                }
             }
 
 
@@ -1539,7 +1552,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         for (var entry : cannonTargets.entrySet()){
             var cannon = entry.getKey();
-            cannon.shoot(entry.getValue());
+            cannon.shoot(entry.getValue(), 1);
         }
     }
 
@@ -1547,7 +1560,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         Vec3 start = this.spawnPosition;
 
-        Vec3 offset = new Vec3(0, 13.0, 27.85);
+        Vec3 offset = WALL_OFFSET;
 
         Vec3 end = start.add(offset);
 
@@ -1955,7 +1968,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
     }
 
-    private List<Player> getCombatants(boolean includeCreativeAndSpectator){
+    public List<Player> getCombatants(boolean includeCreativeAndSpectator){
         return this.level().getEntitiesOfClass(Player.class, this.createEnrageRadiusAABB(this.spawnPosition),player->{
             return includeCreativeAndSpectator || (!player.isCreative() && !player.isSpectator());
         });
@@ -1972,15 +1985,15 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         ).move(offset);
     }
 
-    private List<MalkuthCannonEntity> getMalkuthCannons(){
-        return BossTargetFinder.getEntitiesInCylinder(MalkuthCannonEntity.class, level(), this.spawnPosition, 30, 30, (cannon) -> {
+    protected List<MalkuthCannonEntity> getMalkuthCannons(){
+        return BossTargetFinder.getEntitiesInCylinder(MalkuthCannonEntity.class, level(), this.spawnPosition, 30, 35, (cannon) -> {
             return !cannon.isPlayerControlled();
         });
     }
 
 
-    private List<MalkuthCannonEntity> getPlayerCannons(boolean onlyCannonsThatNeedRepair){
-        return BossTargetFinder.getEntitiesInCylinder(MalkuthCannonEntity.class, level(), this.spawnPosition, 30, 30, (cannon) -> {
+    protected List<MalkuthCannonEntity> getPlayerCannons(boolean onlyCannonsThatNeedRepair){
+        return BossTargetFinder.getEntitiesInCylinder(MalkuthCannonEntity.class, level(), this.spawnPosition.add(0,-2,0), 30, 30, (cannon) -> {
             return cannon.isPlayerControlled() && (!onlyCannonsThatNeedRepair || cannon.requiresRepair());
         });
     }

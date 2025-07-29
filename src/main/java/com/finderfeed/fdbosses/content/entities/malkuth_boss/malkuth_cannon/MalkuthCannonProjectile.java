@@ -45,17 +45,21 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
     @SerializableField
     private int reversedAge = 3000;
 
+    @SerializableField
+    private float damage;
+
     public MalkuthCannonProjectile(EntityType<? extends AbstractHurtingProjectile> type, Level level) {
         super(type, level);
         this.setNoGravity(false);
     }
 
-    public static MalkuthCannonProjectile summon(Level level, Vec3 pos, Vec3 speed, int lifetime, MalkuthAttackType projectileDamageType){
+    public static MalkuthCannonProjectile summon(Level level, Vec3 pos, Vec3 speed, int lifetime, MalkuthAttackType projectileDamageType, float damage){
         MalkuthCannonProjectile malkuthCannonProjectile = new MalkuthCannonProjectile(BossEntities.MALKUTH_CANNON_PROJECTILE.get(), level);
         malkuthCannonProjectile.setPos(pos);
         malkuthCannonProjectile.setDeltaMovement(speed);
         malkuthCannonProjectile.reversedAge = lifetime;
         malkuthCannonProjectile.setMalkuthAttackType(projectileDamageType);
+        malkuthCannonProjectile.damage = damage;
         level.addFreshEntity(malkuthCannonProjectile);
         return malkuthCannonProjectile;
     }
@@ -210,7 +214,9 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
 
             for (var target : targets){
 
-                target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getMalkuthAttackType(), 100), 1);
+                if (damage != 0) {
+                    target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getMalkuthAttackType(), 100), this.damage);
+                }
 
             }
 
