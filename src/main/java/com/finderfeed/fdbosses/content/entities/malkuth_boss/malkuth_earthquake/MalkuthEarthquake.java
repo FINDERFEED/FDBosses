@@ -126,7 +126,7 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
                 continue;
             }
 
-            entity.hurt(new MalkuthDamageSource(level().damageSources().generic(),this.getEarthquakeType(), 51),2);
+            entity.hurt(new MalkuthDamageSource(level().damageSources().generic(),this.getEarthquakeType(), 51),damage);
 
 
 

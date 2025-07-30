@@ -45,6 +45,9 @@ public class BossConfig extends ReflectiveJsonConfig implements ManualSerializea
     @ConfigValue
     public ItemConfig itemConfig = new ItemConfig();
 
+    @ConfigValue
+    public MalkuthConfig malkuthConfig = new MalkuthConfig();
+
     public BossConfig() {
         super(FDBosses.location("bosses"));
     }

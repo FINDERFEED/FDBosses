@@ -53,14 +53,19 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
     @SerializableField
     private int accelerationTicks = 0;
 
-    public static MalkuthFireball summon(MalkuthAttackType type, Level level, Vec3 pos, Vec3 flyToPos, Vec3 targetPos){
+    @SerializableField
+    private float damage;
+
+    public static MalkuthFireball summon(MalkuthAttackType type, Level level, Vec3 pos, Vec3 flyToPos, Vec3 targetPos, float damage){
         MalkuthFireball malkuthFireball = new MalkuthFireball(BossEntities.MALKUTH_FIREBALL.get(), level);
 
         malkuthFireball.setAttackType(type);
         malkuthFireball.setPos(pos);
         malkuthFireball.moveToPos = flyToPos;
         malkuthFireball.targetPos = targetPos;
+        malkuthFireball.damage = damage;
         malkuthFireball.doMove();
+
 
         level.addFreshEntity(malkuthFireball);
         return malkuthFireball;
@@ -167,7 +172,7 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
         var targets = BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.targetPos.add(0,-1,0), 3, 4f);
 
         for (var target : targets){
-            target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getAttackType(), 75),1);
+            target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getAttackType(), 75),damage);
         }
 
         this.remove(RemovalReason.DISCARDED);

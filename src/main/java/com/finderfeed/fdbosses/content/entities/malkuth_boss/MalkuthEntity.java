@@ -608,7 +608,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 Vector3f spawnOffset = new Quaternionf(new AxisAngle4d(angle, forward.x,forward.y,forward.z)).transform((float)left.x,(float)left.y,(float)left.z,new Vector3f()).mul(5);
                 Vec3 spawnPos = this.position().add(spawnOffset.x * 0.3f,spawnOffset.y * 0.3f + 2,spawnOffset.z * 0.3f);
                 Vec3 gotoPos = spawnPos.add(spawnOffset.x,spawnOffset.y,spawnOffset.z);
-                MalkuthFireball malkuthFireball = MalkuthFireball.summon(type, level(), spawnPos, gotoPos, platformPos.add(0,1.5,0));
+
+                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.fireballsDamage;
+
+                MalkuthFireball malkuthFireball = MalkuthFireball.summon(type, level(), spawnPos, gotoPos, platformPos.add(0,1.5,0), damage);
 
             }else if (localTick == fireballLaunchTick){
                 level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.MALKUTH_FIREBALL_LAUNCH.get(), SoundSource.HOSTILE, 3f, 1f);
@@ -771,7 +774,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 int time = (int) Math.ceil(dist);
 
-                MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(),earthquakeToSummon, this.position(), direction, time, FDMathUtil.FPI / 9, 1);
+                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.earthquakeDamage;
+
+                MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(),earthquakeToSummon, this.position(), direction, time, FDMathUtil.FPI / 9, damage);
             }else if (tick == 9){
 
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
@@ -1041,13 +1046,15 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         MalkuthAttackType localType = jumpBackOnSpawnCrushType;
 
+        float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.jumpBackOnSpawnCrushDamage;
+
         for (int i = 0; i < earthquakesCount; i++) {
 
             float currentAngle = i * angle + angle / 2;
 
             Vec3 v = new Vec3(radius,0,0).yRot(currentAngle);
 
-            MalkuthEarthquake earthquake = MalkuthEarthquake.summon(level(), localType, lastpos, v, 40, angle, 1);
+            MalkuthEarthquake earthquake = MalkuthEarthquake.summon(level(), localType, lastpos, v, 40, angle, damage);
             if (localType.isFire()){
                 localType = MalkuthAttackType.ICE;
             }else{
@@ -1138,7 +1145,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 float rotation = this.slashAttackType.isFire() ? 25 : -25;
 
-                MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level(),spawnPos,speedv,this.slashAttackType, 5, 2, rotation,0);
+                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.slashAttackDamage;
+
+                MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level(),spawnPos,speedv,this.slashAttackType, damage, 2.2f, rotation,0);
 
             }else if (tick >= 28){
                 inst.nextStage();
@@ -1228,7 +1237,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     this.summonRepairCrystal(actualPos);
                 }
 
-                MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level(), actualPos, 1);
+                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.jumpCrushAttackDamage;
+
+                MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level(), actualPos, damage);
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                         .frequency(5)
                         .amplitude(5f)
@@ -1403,6 +1414,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                                 .brightness(2)
                         .build(), this.position().add(pos.x,pos.y,pos.z), 60);
 
+                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.pullAndPunchDamage;
+
 
                 for (var chain : this.level().getEntitiesOfClass(MalkuthChainEntity.class, this.getBoundingBox().inflate(20,20,20))){
                     var passengers = new ArrayList<>(chain.getPassengers());
@@ -1413,7 +1426,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                     for (var e : passengers){
                         if (e instanceof LivingEntity livingEntity){
-                            livingEntity.hurt(livingEntity.damageSources().generic(),1);
+                            livingEntity.hurt(livingEntity.damageSources().generic(),damage);
 
                             Vec3 speed = forward.multiply(6,6,6).add(0,-1,0);
 
@@ -1604,9 +1617,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
         }
 
+        float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.cannonDamage;
+
         for (var entry : cannonTargets.entrySet()){
             var cannon = entry.getKey();
-            cannon.shoot(entry.getValue(), 1);
+            cannon.shoot(entry.getValue(), damage);
         }
     }
 
@@ -1716,6 +1731,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             MalkuthAttackType localCarouselSlash = this.currentStartCarouselSlash;
 
+            float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.carouselSlashesDamage;
+
             for (int i = 0; i < slashesAmount;i++){
 
                 Vec3 direction = startVec.yRot(i * angle + angle / 2);
@@ -1724,7 +1741,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 speed = speed.add(0,verticalSpeed,0);
 
 
-                MalkuthSlashProjectile.summon(level(),this.position().add(0,0.25,0), speed, localCarouselSlash, 1, maxSlashSize, 0, reachDestinationTime);
+                MalkuthSlashProjectile.summon(level(),this.position().add(0,0.25,0), speed, localCarouselSlash, damage, maxSlashSize, 0, reachDestinationTime);
 
                 if (localCarouselSlash.isFire()){
                     localCarouselSlash = MalkuthAttackType.ICE;
