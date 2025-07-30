@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.client.particles.square_preparation_particle.Rect
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boulder.MalkuthBoulderEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonProjectile;
@@ -75,6 +76,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingUseTotemEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
@@ -92,7 +96,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     public static final String MAIN_LAYER = "MAIN";
 
-    public static final float ENRAGE_RADIUS = 30;
+    public static final float ENRAGE_HEIGHT = 12;
+    public static final float ENRAGE_RADIUS = 29;
 
     public static final String SLASH_ATTACK = "slash";
     public static final String JUMP_CRUSH = "jump_crush";
@@ -2241,8 +2246,63 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
     }
 
-    @EventBusSubscriber
+    @EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
     public static class Events {
+
+        @SubscribeEvent
+        public static void ignoreTotems(LivingUseTotemEvent event){
+
+            LivingEntity livingEntity = event.getEntity();
+
+            if (!livingEntity.level().isClientSide && event.getSource() == BossDamageSources.MALKUTH_COWARDICE_SOURCE){
+                event.setCanceled(true);
+            }
+
+        }
+
+        @SubscribeEvent
+        public static void onCowardice(MobEffectEvent.Expired event){
+
+            MobEffectInstance instance = event.getEffectInstance();
+
+            var effect = instance.getEffect();
+
+            LivingEntity entity = event.getEntity();
+
+            if (!entity.level().isClientSide && effect.is(BossEffects.MARK_OF_A_COWARD)){
+                entity.hurt(BossDamageSources.MALKUTH_COWARDICE_SOURCE, Float.MAX_VALUE);
+            }
+
+
+        }
+
+        @SubscribeEvent
+        public static void livingTick(PlayerTickEvent.Post event){
+
+            var entity = event.getEntity();
+
+            Level level = entity.level();
+
+            if (!level.isClientSide){
+                if (!entity.hasEffect(BossEffects.MARK_OF_A_KNIGHT)
+//                        && (!entity.isSpectator() && !entity.isCreative())
+                ) return;
+
+                Vec3 cylinderStart = entity.position().add(0,-MalkuthEntity.ENRAGE_HEIGHT,0);
+
+                var spawners = BossTargetFinder.getEntitiesInCylinder(MalkuthBossSpawner.class, level, cylinderStart, MalkuthEntity.ENRAGE_HEIGHT + 2, MalkuthEntity.ENRAGE_RADIUS);
+
+                if (spawners.isEmpty()){
+                    entity.removeEffect(BossEffects.MARK_OF_A_KNIGHT);
+                    entity.addEffect(new MobEffectInstance(BossEffects.MARK_OF_A_COWARD, 100, 0, true, false));
+                }else{
+                    entity.removeEffect(BossEffects.MARK_OF_A_COWARD);
+                }
+
+            }
+
+
+        }
 
         @SubscribeEvent
         public static void onLivingDamage(LivingDamageEvent.Pre event){

@@ -1,6 +1,5 @@
 package com.finderfeed.fdbosses;
 
-import com.finderfeed.fdbosses.config.BossConfig;
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
@@ -10,16 +9,18 @@ import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossEffects;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -33,6 +34,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
@@ -45,6 +47,16 @@ import java.util.regex.Pattern;
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class BossEvents {
+
+    public static final TagKey<MobEffect> NOT_CURABLE_EFFECTS = TagKey.create(Registries.MOB_EFFECT, FDBosses.location("not_curable"));
+
+    @SubscribeEvent
+    public static void preventRemovingEffects(MobEffectEvent.Remove event){
+        var effect = event.getEffect();
+        if (effect.is(NOT_CURABLE_EFFECTS) && event.getCure() != null){
+            event.setCanceled(true);
+        }
+    }
 
     @SubscribeEvent
     public static void playerEnterWorld(PlayerEvent.PlayerLoggedInEvent event){

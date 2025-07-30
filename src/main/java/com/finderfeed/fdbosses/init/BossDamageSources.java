@@ -26,6 +26,8 @@ public class BossDamageSources {
     public static final ResourceKey<DamageType> CHESED_ROLL = key("chesed_roll_attack");
     public static final ResourceKey<DamageType> CHESED_BLOCK_ATTACK = key("chesed_rock_attack");
 
+    public static final ResourceKey<DamageType> MALKUTH_COWARDICE = key("malkuth_cowardice");
+
 
     private static EntityDamageSource CHESED_ATTACK_SOURCE;
     private static EntityDamageSource CHESED_LOR_ATTACK_SOURCE;
@@ -36,6 +38,8 @@ public class BossDamageSources {
     public static DamageSource CHESED_EARTHQUAKE_SOURCE;
     public static DamageSource CHESED_ROLL_SOURCE;
     public static DamageSource CHESED_BLOCK_ATTACK_SOURCE;
+
+    public static DamageSource MALKUTH_COWARDICE_SOURCE;
 
     public static DamageSource chesedAttack(Entity attacker){
         return CHESED_ATTACK_SOURCE.create(attacker);
@@ -62,6 +66,9 @@ public class BossDamageSources {
         CHESED_EARTHQUAKE_SOURCE = new DamageSource(access.holderOrThrow(CHESED_EARTHQUAKE));
         CHESED_ROLL_SOURCE = new DamageSource(access.holderOrThrow(CHESED_ROLL));
         CHESED_BLOCK_ATTACK_SOURCE = new DamageSource(access.holderOrThrow(CHESED_BLOCK_ATTACK));
+
+        MALKUTH_COWARDICE_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_COWARDICE));
+
     }
 
 
