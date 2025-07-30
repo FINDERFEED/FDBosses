@@ -71,6 +71,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -96,7 +97,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     public static final String MAIN_LAYER = "MAIN";
 
-    public static final float ENRAGE_HEIGHT = 12;
+    public static final float ENRAGE_HEIGHT = 11;
     public static final float ENRAGE_RADIUS = 29;
 
     public static final String SLASH_ATTACK = "slash";
@@ -2290,7 +2291,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 Vec3 cylinderStart = entity.position().add(0,-MalkuthEntity.ENRAGE_HEIGHT,0);
 
-                var spawners = BossTargetFinder.getEntitiesInCylinder(MalkuthBossSpawner.class, level, cylinderStart, MalkuthEntity.ENRAGE_HEIGHT + 2, MalkuthEntity.ENRAGE_RADIUS);
+                var spawners = BossTargetFinder.getEntitiesInArc(MalkuthBossSpawner.class, level, cylinderStart,new Vec2(0,1),FDMathUtil.FPI,
+                        MalkuthEntity.ENRAGE_HEIGHT + 2, MalkuthEntity.ENRAGE_RADIUS);
+
 
                 if (spawners.isEmpty()){
                     entity.removeEffect(BossEffects.MARK_OF_A_KNIGHT);

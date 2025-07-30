@@ -20,6 +20,8 @@
   "entity.fdbosses.chesed_crystal": "Condensed Lightning",
   "entity.fdbosses.chesed_ray_reflector": "Lightning Ray Reflector",
   "effect.fdbosses.chesed_gaze": "Chesed Gaze",
+  "effect.fdbosses.knight": "Mark of a Knight",
+  "effect.fdbosses.coward": "Mark of a Coward",
   "effect.fdbosses.shocked": "Shocked",
   "effect_description.fdbosses.chesed_gaze": "Extreme level of blindness.",
   "effect.fdbosses.chesed_energized": "Energized",

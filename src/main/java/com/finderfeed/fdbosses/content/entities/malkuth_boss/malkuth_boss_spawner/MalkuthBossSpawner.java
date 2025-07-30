@@ -39,6 +39,9 @@ public class MalkuthBossSpawner extends BossSpawnerEntity {
                     if (player.hasEffect(BossEffects.MARK_OF_A_KNIGHT)) {
                         player.removeEffect(BossEffects.MARK_OF_A_KNIGHT);
                     }
+                    if (player.hasEffect(BossEffects.MARK_OF_A_COWARD)) {
+                        player.removeEffect(BossEffects.MARK_OF_A_COWARD);
+                    }
                 }
 
             }
