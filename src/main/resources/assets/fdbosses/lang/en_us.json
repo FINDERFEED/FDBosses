@@ -97,5 +97,6 @@
   "fdbosses.word.tried_to_break_arena": "An evil force prevents you from corrupting this place.",
   "fdbosses.tldr.chesed": "Chesed damage pierces armor and shields.\n\nTo damage Chesed:\n\nWait until lightning ray attack, kill a crystal with an axe to get {{(fdbosses:effect)id=fdbosses:chesed_energized,level=1}}, run to a ray reflector and make Chesed hit it. You are immune to lightning ray attack when you are {{(fdbosses:effect)id=fdbosses:chesed_energized}}.\n\nChesed has an attack which damage depends on the amount of active monoliths, if all monoliths are active - there is no way to survive the attack. To deactivate a monolith - kill it.",
   "fdbosses.word.tldr": "Short Boss Description",
-  "fdbosses.word.short_description": "Short Description"
+  "fdbosses.word.short_description": "Short Description",
+  "death.attack.cowardice": "%s was punished for its cowardice"
 }

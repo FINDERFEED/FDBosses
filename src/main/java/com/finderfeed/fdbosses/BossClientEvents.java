@@ -1,14 +1,18 @@
 package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdbosses.content.util.GainLoseValue;
 import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.init.BossItems;
+import com.finderfeed.fdbosses.init.BossModels;
+import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -26,6 +30,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -191,8 +196,113 @@ public class BossClientEvents {
     public static void renderLevelStageEvent(RenderLevelStageEvent event){
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL){
             renderHellscapeSkybox(event);
-
+        }else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS){
+            renderMalkuthCowardExecution(event);
         }
+    }
+
+    private static FDModel SWORD_MODEL;
+    public static final ResourceLocation MALKUTH_FIRE_SWORD = FDBosses.location("textures/item/malkuth_sword_fire.png");
+    private static final ResourceLocation MALKUTH_COWARD_EXECUTION_SQUARE = FDBosses.location("textures/util/malkuth_cowardice_prepare.png");
+    private static void renderMalkuthCowardExecution(RenderLevelStageEvent event){
+
+        float pticks = event.getPartialTick().getGameTimeDeltaPartialTick(false);
+
+        Player player = Minecraft.getInstance().player;
+
+        if (player == null || player.isCreative() || player.isSpectator()) return;
+
+        Vec3 forward = player.getForward().multiply(1,0,1).normalize();
+
+        Vec3 camPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        Vec3 offsetPos = player.getPosition(pticks);
+
+        PoseStack matrices = event.getPoseStack();
+
+        Vec3 offset = offsetPos.subtract(camPos);
+
+        if (!player.hasEffect(BossEffects.MARK_OF_A_COWARD)) return;
+
+        var instance = player.getEffect(BossEffects.MARK_OF_A_COWARD);
+
+        int duration = instance.getDuration();
+
+
+        int maxtime = MalkuthEntity.Events.MARK_OF_A_COWARD_DURATION;
+        int maxtime2 = 7;
+
+        float time = Mth.clamp(duration - pticks, 0,maxtime);
+        float time2 = Mth.clamp(duration - pticks, 0,maxtime2);
+
+
+        float p = time / maxtime;
+        float p2 = time2 / maxtime2;
+
+        if (p == 0) return;
+
+
+        float easeOut = FDEasings.easeIn(1 - p);
+        float easeInP2 = FDEasings.easeOutBack(p2);
+
+        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+
+
+        FDRenderUtil.bindTexture(MALKUTH_COWARD_EXECUTION_SQUARE);
+
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+
+        matrices.pushPose();
+
+        matrices.translate(offset.x,offset.y + 0.001,offset.z);
+
+        matrices.mulPose(Axis.YP.rotationDegrees(easeOut * 360 * 6));
+
+
+        QuadRenderer.start(builder)
+                .pose(matrices)
+                .size((1f - p) * 2)
+                .color(1,1,1,1 - p)
+                .direction(new Vec3(0,1,0))
+                .renderBack()
+                .render();
+        ;
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.enableBlend();
+
+        BufferUploader.drawWithShader(builder.build());
+        matrices.popPose();
+
+        RenderSystem.disableDepthTest();
+
+        if (SWORD_MODEL == null){
+            SWORD_MODEL = new FDModel(BossModels.MALKUTH_SWORD.get());
+        }
+
+        builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+
+        FDRenderUtil.bindTexture(MALKUTH_FIRE_SWORD);
+
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+
+        matrices.pushPose();
+
+        float offsetP = -3f * (1 - easeInP2);
+
+        matrices.translate(offset.x + forward.x * 0.1,offset.y + 5 + offsetP,offset.z + forward.z * 0.1);
+        matrices.mulPose(Axis.ZP.rotationDegrees(180));
+
+        matrices.mulPose(Axis.YP.rotationDegrees(easeOut * 360 * 6));
+        SWORD_MODEL.render(matrices, builder, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 1 - p);
+
+        RenderSystem.enableDepthTest();
+        RenderSystem.enableBlend();
+
+        BufferUploader.drawWithShader(builder.build());
+        matrices.popPose();
+
+        RenderSystem.disableDepthTest();
+
     }
 
     private static void tickHellscapeSky(){

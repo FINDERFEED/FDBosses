@@ -2277,6 +2277,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         }
 
+        public static final int MARK_OF_A_COWARD_DURATION = 60;
+
         @SubscribeEvent
         public static void livingTick(PlayerTickEvent.Post event){
 
@@ -2297,7 +2299,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 if (spawners.isEmpty()){
                     entity.removeEffect(BossEffects.MARK_OF_A_KNIGHT);
-                    entity.addEffect(new MobEffectInstance(BossEffects.MARK_OF_A_COWARD, 100, 0, true, false));
+                    entity.addEffect(new MobEffectInstance(BossEffects.MARK_OF_A_COWARD, MARK_OF_A_COWARD_DURATION, 0, true, false));
                 }else{
                     entity.removeEffect(BossEffects.MARK_OF_A_COWARD);
                 }
