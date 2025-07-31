@@ -115,9 +115,21 @@ public class BossScreens {
                 .setTLDRComponent(Component.translatable("fdbosses.tldr.malkuth"))
                 .addSkill(new BossInfo(
                         TextureAtlas.LOCATION_BLOCKS,
+                        Component.translatable("fdbosses.skills.malkuth.armor"),
+                        null,
+                        Component.translatable("fdbosses.skills.malkuth.armor_description")
+                ))
+                .addSkill(new BossInfo(
+                        TextureAtlas.LOCATION_BLOCKS,
                         Component.translatable("fdbosses.skills.malkuth.fire_and_ice"),
                         Component.translatable("fdbosses.skills.malkuth.fire_and_ice_stats"),
                         Component.translatable("fdbosses.skills.malkuth.fire_and_ice_description")
+                ))
+                .addSkill(new BossInfo(
+                        TextureAtlas.LOCATION_BLOCKS,
+                        Component.translatable("fdbosses.skills.malkuth.knights_duty"),
+                        null,
+                        Component.translatable("fdbosses.skills.malkuth.knights_duty_description")
                 ))
                 .addSkill(new BossInfo(
                         TextureAtlas.LOCATION_BLOCKS,
@@ -130,6 +142,12 @@ public class BossScreens {
                         Component.translatable("fdbosses.skills.malkuth.slash"),
                         Component.translatable("fdbosses.skills.malkuth.slash_stats"),
                         Component.translatable("fdbosses.skills.malkuth.slash_description")
+                ))
+                .addSkill(new BossInfo(
+                        TextureAtlas.LOCATION_BLOCKS,
+                        Component.translatable("fdbosses.skills.malkuth.cannons"),
+                        Component.translatable("fdbosses.skills.malkuth.cannons_stats"),
+                        Component.translatable("fdbosses.skills.malkuth.cannons_description")
                 ))
         );
     });

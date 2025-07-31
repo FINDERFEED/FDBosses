@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.FDTagHelper;
@@ -94,7 +95,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
     @Override
     public InteractionResult interactAt(Player player, Vec3 vec, InteractionHand hand) {
 
-        if (!level().isClientSide && hand == InteractionHand.MAIN_HAND && this.isPlayerControlled()){
+        if (!level().isClientSide && hand == InteractionHand.MAIN_HAND && this.isPlayerControlled() && MalkuthWeaknessHandler.isWeakTo(player, this.getCannonType())){
 
             if (this.isBroken()) {
                 return InteractionResult.SUCCESS;
