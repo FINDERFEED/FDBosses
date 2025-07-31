@@ -28,4 +28,7 @@ public class MalkuthConfig {
     @ConfigValue
     public float cannonDamage = 20;
 
+    @ConfigValue
+    public float nonWeakToDamageReduction = 100;
+
 }

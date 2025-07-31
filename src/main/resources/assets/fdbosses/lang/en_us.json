@@ -98,5 +98,17 @@
   "fdbosses.tldr.chesed": "Chesed damage pierces armor and shields.\n\nTo damage Chesed:\n\nWait until lightning ray attack, kill a crystal with an axe to get {{(fdbosses:effect)id=fdbosses:chesed_energized,level=1}}, run to a ray reflector and make Chesed hit it. You are immune to lightning ray attack when you are {{(fdbosses:effect)id=fdbosses:chesed_energized}}.\n\nChesed has an attack which damage depends on the amount of active monoliths, if all monoliths are active - there is no way to survive the attack. To deactivate a monolith - kill it.",
   "fdbosses.word.tldr": "Short Boss Description",
   "fdbosses.word.short_description": "Short Description",
-  "death.attack.cowardice": "%s was punished for its cowardice"
+  "death.attack.cowardice": "%s was punished for its cowardice",
+  "fdbosses.skills.malkuth.fire_and_ice_description": "While on an arena combatants may be weak to §cFire§r or §bIce§r.\n\nCurrent damage type you are weak to can be seen on the crosshair.\n\nMalkuth skills deal three types of damage:\n\n1: §7Basic§r - regular damage type.\n\n2: §cFire§r - makes targets weaker to §cFire§r damage, deals reduced damage to targets that are weak to §bIce§r.\n\n3: §bIce§r - makes targets weaker to §bIce§r damage, deals reduced damage to targets that are weak to §cFire§r.\n\n§lExample:§r\n\nIf target that is weak to §cFire§r receives §bIce§r damage, its amount is reduced and that target becomes weaker to §cFire§r.\n\nIf target that is weak to §cFire§r receives §cFire§r damage, its amount is not reduced and target becomes weaker to §cFire§r.",
+  "fdbosses.skills.malkuth.fire_and_ice_stats": "Damage reduction: {{(fdbosses:config_float) config=malkuthConfig, value=nonWeakToDamageReduction}}%",
+  "fdbosses.skills.malkuth.fire_and_ice": "Fire and Ice",
+  "fdbosses.bosses.description.malkuth": "",
+  "fdbosses.tldr.malkuth": "",
+  "fdbosses.skills.malkuth.slash": "Slashes",
+  "fdbosses.skills.malkuth.slash_stats": "Slash:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=malkuthConfig, value=slashAttackDamage}}.",
+  "fdbosses.skills.malkuth.slash_description": "Damage type: §cFire§r / §bIce§r\n\nCharges one if his swords and releases an aerial slash traveling towards the target.\n\nThe damage type of the slash is based on the sword that was charged.\n\nThis slash is capable of slicing through crystals.",
+  "fdbosses.skills.malkuth.fair_duel": "A Fair Duel",
+  "fdbosses.skills.malkuth.fair_duel_description": "During the bossfight all combatants receive {{(fdbosses:effect)id=fdbosses:knight}} .\n\nWhen combatant escapes the arena before the fight ended {{(fdbosses:effect)id=fdbosses:knight}} transforms into {{(fdbosses:effect)id=fdbosses:coward}} .\n\nWhen a combatant with {{(fdbosses:effect)id=fdbosses:coward}} steps into arena once again, it changes back to {{(fdbosses:effect)id=fdbosses:knight}}.",
+  "effect_description.fdbosses.knight": "Dueling Malkuth to the death",
+  "effect_description.fdbosses.coward": "When this effect expires immediately kills the owner"
 }

@@ -3,8 +3,10 @@ package com.finderfeed.fdbosses.client.boss_screen.screen_definitions;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.boss_screen.BaseBossScreen;
 import com.finderfeed.fdbosses.client.boss_screen.ChesedBossScreen;
+import com.finderfeed.fdbosses.client.boss_screen.MalkuthBossScreen;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossItems;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 
@@ -103,6 +105,32 @@ public class BossScreens {
                         Component.translatable("fdbosses.drops.chesed.trophy_description")
                 ))
                 .setTLDRComponent(Component.translatable("fdbosses.tldr.chesed"))
+        );
+    });
+
+    public static final Function<Integer, BaseBossScreen> MALKUTH_BOSS_SCREEN = register(BossEntities.MALKUTH.get(), id -> {
+        return new MalkuthBossScreen(id, new BossScreenOptions()
+                .setEntityType(BossEntities.MALKUTH.get())
+                .setBossDescription(Component.translatable("fdbosses.bosses.description.malkuth"))
+                .setTLDRComponent(Component.translatable("fdbosses.tldr.malkuth"))
+                .addSkill(new BossInfo(
+                        TextureAtlas.LOCATION_BLOCKS,
+                        Component.translatable("fdbosses.skills.malkuth.fire_and_ice"),
+                        Component.translatable("fdbosses.skills.malkuth.fire_and_ice_stats"),
+                        Component.translatable("fdbosses.skills.malkuth.fire_and_ice_description")
+                ))
+                .addSkill(new BossInfo(
+                        TextureAtlas.LOCATION_BLOCKS,
+                        Component.translatable("fdbosses.skills.malkuth.fair_duel"),
+                        null,
+                        Component.translatable("fdbosses.skills.malkuth.fair_duel_description")
+                ))
+                .addSkill(new BossInfo(
+                        TextureAtlas.LOCATION_BLOCKS,
+                        Component.translatable("fdbosses.skills.malkuth.slash"),
+                        Component.translatable("fdbosses.skills.malkuth.slash_stats"),
+                        Component.translatable("fdbosses.skills.malkuth.slash_description")
+                ))
         );
     });
 

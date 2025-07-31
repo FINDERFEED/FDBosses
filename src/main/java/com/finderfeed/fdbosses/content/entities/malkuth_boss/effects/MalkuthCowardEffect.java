@@ -6,7 +6,7 @@ import net.minecraft.world.effect.MobEffectCategory;
 public class MalkuthCowardEffect extends MobEffect {
 
     public MalkuthCowardEffect() {
-        super(MobEffectCategory.BENEFICIAL, 0x220045);
+        super(MobEffectCategory.BENEFICIAL, 0xcc1100);
     }
 
 }
