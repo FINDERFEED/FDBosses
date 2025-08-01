@@ -8,19 +8,22 @@ public class MalkuthConfig {
     public float slashAttackDamage = 10;
 
     @ConfigValue
-    public float jumpCrushAttackDamage = 30;
+    public float sideRocksDamage = 10;
+
+    @ConfigValue
+    public float kingsLeapDamage = 30;
 
     @ConfigValue
     public float pullAndPunchDamage = 20;
 
     @ConfigValue
-    public float carouselSlashesDamage = 20;
+    public float arcSlashesDamage = 20;
 
     @ConfigValue
     public float jumpBackOnSpawnCrushDamage = 30;
 
     @ConfigValue
-    public float earthquakeDamage = 30;
+    public float impalingDoomDamage = 30;
 
     @ConfigValue
     public float fireballsDamage = 30;

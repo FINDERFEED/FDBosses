@@ -46,15 +46,19 @@ public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializab
     @SerializableField
     private boolean shouldMoveToTarget = false;
 
+    @SerializableField
+    private float damage = 0;
+
     private boolean removeNextTick = false;
 
-    public static MalkuthBoulderEntity summon(Level level, Vec3 pos, int prepareTime, float prepareHeight, ProjectileMovementPath movementPath, MalkuthAttackType malkuthAttackType){
+    public static MalkuthBoulderEntity summon(Level level, Vec3 pos, int prepareTime, float prepareHeight, ProjectileMovementPath movementPath, MalkuthAttackType malkuthAttackType, float damage){
         MalkuthBoulderEntity malkuthBoulderEntity = new MalkuthBoulderEntity(BossEntities.MALKUTH_BOULDER.get(), level);
         malkuthBoulderEntity.setPos(pos);
         malkuthBoulderEntity.movementPath = movementPath;
         malkuthBoulderEntity.entityData.set(PREPARE_TIME, prepareTime);
         malkuthBoulderEntity.entityData.set(PREPARE_HEIGHT, prepareHeight);
         malkuthBoulderEntity.setMalkuthAttackType(malkuthAttackType);
+        malkuthBoulderEntity.damage = damage;
         level.addFreshEntity(malkuthBoulderEntity);
         return malkuthBoulderEntity;
     }
@@ -197,7 +201,7 @@ public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializab
         for (var target : entities){
             if (target instanceof LivingEntity livingEntity){
 
-                target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getMalkuthAttackType(), 34), 1);
+                target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getMalkuthAttackType(), 34), this.damage);
 
             }
         }

@@ -149,6 +149,48 @@ public class BossScreens {
                         Component.translatable("fdbosses.skills.malkuth.cannons_stats"),
                         Component.translatable("fdbosses.skills.malkuth.cannons_description")
                 ))
+                .addSkill(new BossInfo(
+                        TextureAtlas.LOCATION_BLOCKS,
+                        Component.translatable("fdbosses.skills.malkuth.arcslash"),
+                        Component.translatable("fdbosses.skills.malkuth.arcslash_stats"),
+                        Component.translatable("fdbosses.skills.malkuth.arcslash_description")
+                ))
+                .addSkill(new BossInfo(
+                        TextureAtlas.LOCATION_BLOCKS,
+                        Component.translatable("fdbosses.skills.malkuth.side_rocks"),
+                        Component.translatable("fdbosses.skills.malkuth.side_rocks_stats"),
+                        Component.translatable("fdbosses.skills.malkuth.side_rocks_description")
+                ))
+                .addSkill(new BossInfo(
+                        TextureAtlas.LOCATION_BLOCKS,
+                        Component.translatable("fdbosses.skills.malkuth.impaling_doom"),
+                        Component.translatable("fdbosses.skills.malkuth.impaling_doom_stats"),
+                        Component.translatable("fdbosses.skills.malkuth.impaling_doom_description")
+                ))
+                .addSkill(new BossInfo(
+                        TextureAtlas.LOCATION_BLOCKS,
+                        Component.translatable("fdbosses.skills.malkuth.kingly_leap"),
+                        Component.translatable("fdbosses.skills.malkuth.kingly_leap_stats"),
+                        Component.translatable("fdbosses.skills.malkuth.kingly_leap_description")
+                ))
+                .addSkill(new BossInfo(
+                        TextureAtlas.LOCATION_BLOCKS,
+                        Component.translatable("fdbosses.skills.malkuth.chainpunch"),
+                        Component.translatable("fdbosses.skills.malkuth.chainpunch_stats"),
+                        Component.translatable("fdbosses.skills.malkuth.chainpunch_description")
+                ))
+                .addSkill(new BossInfo(
+                        TextureAtlas.LOCATION_BLOCKS,
+                        Component.translatable("fdbosses.skills.malkuth.tsars_wrath"),
+                        Component.translatable("fdbosses.skills.malkuth.tsars_wrath_stats"),
+                        Component.translatable("fdbosses.skills.malkuth.tsars_wrath_description")
+                ))
+                .addSkill(new BossInfo(
+                        TextureAtlas.LOCATION_BLOCKS,
+                        Component.translatable("fdbosses.skills.malkuth.hellshaper"),
+                        Component.translatable("fdbosses.skills.malkuth.hellshaper_stats"),
+                        Component.translatable("fdbosses.skills.malkuth.hellshaper_description")
+                ))
         );
     });
 
