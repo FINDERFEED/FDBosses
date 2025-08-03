@@ -148,7 +148,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     private MalkuthSecondPhaseInitializer malkuthSecondPhaseInitializer;
 
     @SerializableField
-    private boolean lookAtTarget = true;
+    protected boolean lookAtTarget = true;
 
     @SerializableField
     private int hits = 10;
@@ -316,11 +316,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .addAttack(id++, slashOptions)
                 .addAttack(id++, randomJumpCrush)
                 .addAttack(id++, boulders)
-                .addAttack(id++, randomJumpCrush)
-//                .addAttack(id++, AttackOptions.chainOptionsBuilder()
-//                        .addAttack(JUMP_CRUSH)
-//                        .addAttack(PLATFORMS_N_FIREBALLS)
-//                        .build())
+                .addAttack(id++, AttackOptions.chainOptionsBuilder()
+                        .addAttack(JUMP_CRUSH)
+                        .addAttack(DELAY_10)
+                        .addAttack(PLATFORMS_N_FIREBALLS)
+                        .build())
 
 
                 .attackListener(this::attackListener)
@@ -1769,6 +1769,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         PacketDistributor.sendToPlayersTrackingEntity(this,packet);
     }
 
+    private void hideRepairCrystals(boolean hide){
+        for (var crystal : BossTargetFinder.getEntitiesInCylinder(MalkuthRepairCrystal.class, level(), this.spawnPosition.add(0,-2,0),10,40)){
+            crystal.setHidden(hide);
+        }
+    }
+
     private MalkuthAttackType currentStartCarouselSlash = MalkuthAttackType.FIRE;
 
     private boolean carouselSlashesAttack(AttackInstance attackInstance){
@@ -1787,6 +1793,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
 
         if (tick == 0){
+
+            this.hideRepairCrystals(true);
 
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_CAROUSEL_SLASH_1)
                             .important()
@@ -1857,6 +1865,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
         }else if (tick >= preparationTime + 20){
+            this.hideRepairCrystals(false);
             return true;
         }
 

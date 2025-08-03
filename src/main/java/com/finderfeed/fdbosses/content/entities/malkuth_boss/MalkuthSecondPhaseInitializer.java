@@ -88,7 +88,10 @@ public class MalkuthSecondPhaseInitializer extends BossInitializer<MalkuthEntity
         var boss = this.getBoss();
         Vec3 tppos = boss.spawnPosition;
         boss.teleportTo(tppos.x,tppos.y,tppos.z);
-        boss.lookAt(EntityAnchorArgument.Anchor.EYES, tppos.add(0,0,-100));
+        boss.lookAtTarget = true;
+        if (boss.getTarget() != null) {
+            boss.getLookControl().setLookAt(boss.getTarget());
+        }
         boss.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.LOOK);
 
     }

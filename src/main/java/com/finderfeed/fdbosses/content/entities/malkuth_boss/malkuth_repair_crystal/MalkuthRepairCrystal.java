@@ -12,6 +12,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.F
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
@@ -20,6 +21,8 @@ import net.minecraft.world.level.Level;
 public class MalkuthRepairCrystal extends FDEntity implements AutoSerializable {
 
     public static final EntityDataAccessor<MalkuthAttackType> CRYSTAL_TYPE = SynchedEntityData.defineId(MalkuthRepairCrystal.class, BossEntityDataSerializers.MALKUTH_ATTACK_TYPE.get());
+
+    public static final EntityDataAccessor<Boolean> HIDDEN = SynchedEntityData.defineId(MalkuthRepairCrystal.class, EntityDataSerializers.BOOLEAN);
 
     public MalkuthRepairCrystal(EntityType<?> type, Level level) {
         super(type, level);
@@ -33,6 +36,22 @@ public class MalkuthRepairCrystal extends FDEntity implements AutoSerializable {
         super.tick();
     }
 
+    public void setHidden(boolean hidden){
+        this.entityData.set(HIDDEN, hidden);
+        if (hidden){
+            this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.MALKUTH_REPAIR_CRYSTAL_SUMMON)
+                    .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
+                    .reversed()
+                    .build());
+        }else{
+            this.getAnimationSystem().stopAnimation("MAIN");
+        }
+    }
+
+    public boolean isHidden(){
+        return this.entityData.get(HIDDEN);
+    }
+
     public MalkuthAttackType getCrystalType(){
         return this.entityData.get(CRYSTAL_TYPE);
     }
@@ -42,6 +61,8 @@ public class MalkuthRepairCrystal extends FDEntity implements AutoSerializable {
     }
 
     public void destroyAndSummonRepairMaterial(){
+
+        if (this.isHidden()) return;
 
         MalkuthRepairEntity malkuthRepairEntity = MalkuthRepairEntity.summon(level(), this.position().add(0,3,0), this.entityData.get(CRYSTAL_TYPE));
 
@@ -62,6 +83,7 @@ public class MalkuthRepairCrystal extends FDEntity implements AutoSerializable {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder data) {
         data.define(CRYSTAL_TYPE, MalkuthAttackType.FIRE);
+        data.define(HIDDEN, false);
     }
 
     @Override
@@ -73,7 +95,9 @@ public class MalkuthRepairCrystal extends FDEntity implements AutoSerializable {
     protected void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         tag.putString("crystalType", this.getCrystalType().name());
+        tag.putBoolean("hidden", this.entityData.get(HIDDEN));
         this.autoSave(tag);
+
     }
 
     @Override
@@ -82,6 +106,8 @@ public class MalkuthRepairCrystal extends FDEntity implements AutoSerializable {
         if (tag.contains("crystalType")) {
             this.setCrystalType(MalkuthAttackType.valueOf(tag.getString("crystalType")));
         }
+        this.entityData.set(HIDDEN, tag.getBoolean("hidden"));
+        this.setHidden(this.entityData.get(HIDDEN));
         this.autoLoad(tag);
     }
 
