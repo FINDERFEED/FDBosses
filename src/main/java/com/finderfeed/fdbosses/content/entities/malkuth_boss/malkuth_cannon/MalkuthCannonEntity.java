@@ -150,7 +150,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
 
                 }else if (shootTickCount == 5) {
                     if (this.isPlayerControlled()){
-//                        this.setBroken(true);
+                        this.setBroken(true);
                     }
                 }else if (shootTickCount <= 0){
                     this.shootTargets.clear();

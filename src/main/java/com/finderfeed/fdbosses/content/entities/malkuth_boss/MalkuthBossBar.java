@@ -18,8 +18,8 @@ public class MalkuthBossBar extends FDBossBarInterpolated {
 
         PoseStack matrices = graphics.pose();
 
-        FDRenderUtil.fill(matrices, -101, -1, 202, 22, 0f, 0f, 0f,1f);
-        FDRenderUtil.fill(matrices, -100, 0, 200 * interpolatedPercent, 20, 1f, 0f, 0f,1f);
+        FDRenderUtil.fill(matrices, -101, -1, 202, 12, 0f, 0f, 0f,1f);
+        FDRenderUtil.fill(matrices, -100, 0, 200 * interpolatedPercent, 10, 1f, 0f, 0f,1f);
 
     }
 

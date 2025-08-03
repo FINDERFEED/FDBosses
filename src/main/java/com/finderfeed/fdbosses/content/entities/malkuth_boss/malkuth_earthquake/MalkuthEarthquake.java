@@ -130,7 +130,7 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
 
 
 
-            Vec3 speed = new Vec3(dir.x ,0,dir.y).normalize().add(0,1,0);
+            Vec3 speed = new Vec3(dir.x ,0,dir.y).normalize().add(0,1.2,0);
 
             if (entity instanceof ServerPlayer serverPlayer && MalkuthWeaknessHandler.isWeakTo(serverPlayer, this.getEarthquakeType())){
                 FDLibCalls.setServerPlayerSpeed(serverPlayer, speed);

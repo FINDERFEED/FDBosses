@@ -89,6 +89,8 @@ import java.util.*;
 
 public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, AutoSerializable, BossSpawnerContextAssignable {
 
+    public static float CHANCE_TO_CHOOSE_WEAK_TYPE = 0.75f;
+
     public static final Vec3 FIRE_PLAYER_CANNON_OFFSET = new Vec3(-6.5,-1,-25);
     public static final Vec3 ICE_PLAYER_CANNON_OFFSET = new Vec3(6.5,-1,-25);
 
@@ -113,7 +115,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public static final String DEATTACH_SWORDS = "deattach_swords";
     public static final String DELAY_20 = "nothing_20_ticks";
     public static final String DELAY_10 = "nothing_10_ticks";
+    public static final String DELAY_5 = "nothing_5_ticks";
     public static final String SUMMON_EARTHQUAKE = "summon_earthquake";
+    public static final String SUMMON_EARTHQUAKE_LOWER = "summon_earthquake_lower";
     public static final String PLATFORMS_N_FIREBALLS = "platforms_n_fireballs";
 
     private static FDModel SERVER_MODEL;
@@ -178,17 +182,68 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         AttackOptions<?> cannons = AttackOptions.chainOptionsBuilder()
                 .addAttack(JUMP_ON_WALL_COMMAND_CANNONS)
+                .addAttack(DELAY_10)
                 .addAttack(JUMP_BACK_ON_SPAWN)
                 .build();
 
-        AttackOptions<?> jumpCrushChainpunchEarthquake = AttackOptions.chainOptionsBuilder()
+        AttackOptions<?> jumpCrushEarthquake = AttackOptions.chainOptionsBuilder()
                 .addAttack(JUMP_CRUSH)
-                .addAttack(PULL_AND_PUNCH)
+                .addAttack(DELAY_20)
                 .addAttack(SUMMON_EARTHQUAKE)
+                .addAttack(DELAY_5)
                 .addAttack(SUMMON_EARTHQUAKE)
+                .addAttack(DELAY_5)
                 .addAttack(SUMMON_EARTHQUAKE)
+                .addAttack(DELAY_5)
                 .addAttack(JUMP_BACK_ON_SPAWN)
                 .build();
+
+        AttackOptions<?> jumpCrushEarthquakeJumpCrushEarthquake = AttackOptions.chainOptionsBuilder()
+                .addAttack(JUMP_CRUSH)
+                .addAttack(DELAY_20)
+                .addAttack(SUMMON_EARTHQUAKE)
+                .addAttack(DELAY_10)
+                .addAttack(JUMP_CRUSH)
+                .addAttack(DELAY_20)
+                .addAttack(SUMMON_EARTHQUAKE)
+                .addAttack(DELAY_10)
+                .addAttack(JUMP_CRUSH)
+                .addAttack(DELAY_20)
+                .addAttack(SUMMON_EARTHQUAKE)
+                .addAttack(DELAY_10)
+                .addAttack(JUMP_BACK_ON_SPAWN)
+                .build();
+
+
+        AttackOptions<?> jumpCrushSlash = AttackOptions.chainOptionsBuilder()
+                .addAttack(JUMP_CRUSH)
+                .addAttack(DELAY_20)
+                .addAttack(SLASH_ATTACK)
+                .addAttack(SLASH_ATTACK)
+                .addAttack(SLASH_ATTACK)
+                .addAttack(JUMP_BACK_ON_SPAWN)
+                .build();
+
+        AttackOptions<?> jumpCrushSlashNEarthquake = AttackOptions.chainOptionsBuilder()
+                .addAttack(JUMP_CRUSH)
+                .addAttack(DELAY_20)
+                .addAttack(SLASH_ATTACK)
+                .addAttack(DELAY_5)
+                .addAttack(SUMMON_EARTHQUAKE)
+                .addAttack(DELAY_10)
+                .addAttack(JUMP_CRUSH)
+                .addAttack(DELAY_5)
+                .addAttack(JUMP_BACK_ON_SPAWN)
+                .build();
+
+
+        AttackOptions<?> randomJumpCrush = AttackOptions.builder()
+                .addAttack(jumpCrushEarthquake)
+                .addAttack(jumpCrushEarthquakeJumpCrushEarthquake)
+                .addAttack(jumpCrushSlash)
+                .addAttack(jumpCrushSlashNEarthquake)
+                .build();
+
 
         AttackOptions<?> slashOptions = AttackOptions.chainOptionsBuilder()
                 .addAttack(SLASH_ATTACK)
@@ -198,9 +253,37 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .addAttack(SLASH_ATTACK)
                 .build();
 
+        AttackOptions<?> carouselEarthquakes = AttackOptions.chainOptionsBuilder()
+                .addAttack(CAROUSEL_SLASHES)
+                .addAttack(SUMMON_EARTHQUAKE_LOWER)
+                .addAttack(CAROUSEL_SLASHES)
+                .addAttack(SUMMON_EARTHQUAKE_LOWER)
+                .addAttack(CAROUSEL_SLASHES)
+                .build();
+
+        AttackOptions<?> boulders = AttackOptions.chainOptionsBuilder()
+                .addAttack(DELAY_10)
+                .addAttack(DEATTACH_SWORDS)
+                .addAttack(SUMMON_AND_THROW_SIDE_ROCKS)
+                .addAttack(SUMMON_AND_THROW_SIDE_ROCKS)
+                .addAttack(SUMMON_AND_THROW_SIDE_ROCKS)
+                .addAttack(ATTACH_SWORDS)
+                .addAttack(DELAY_20)
+                .build();
+
+        AttackOptions<?> bouldersNCarousel = AttackOptions.chainOptionsBuilder()
+                .addAttack(SUMMON_AND_THROW_SIDE_ROCKS)
+                .addAttack(CAROUSEL_SLASHES)
+                .addAttack(SUMMON_AND_THROW_SIDE_ROCKS)
+                .addAttack(CAROUSEL_SLASHES)
+                .build();
+
+        int id = 0;
+
         this.attackChain = new AttackChain(this.getRandom())
-                .registerAttack(DELAY_10,this::doNothing10Ticks)//not an attack
-                .registerAttack(DELAY_20,this::doNothing20Ticks)//not an attack
+                .registerAttack(DELAY_5,v->this.doNothingNTicks(v,5))//not an attack
+                .registerAttack(DELAY_10,v->this.doNothingNTicks(v,10))//not an attack
+                .registerAttack(DELAY_20,v->this.doNothingNTicks(v,20))//not an attack
                 .registerAttack(DEATTACH_SWORDS, v->this.attachSwordsAttack(v,false)) //not an attack
                 .registerAttack(ATTACH_SWORDS, v->this.attachSwordsAttack(v,true)) //not an attack
 
@@ -212,37 +295,41 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .registerAttack(JUMP_ON_WALL_COMMAND_CANNONS,this::jumpAndCommandCannons)
                 .registerAttack(GIANT_SWORDS_ULTIMATE,this::giantSwordUltimate)
                 .registerAttack(SUMMON_AND_THROW_SIDE_ROCKS,this::summonAndThrowSideRocks)
-                .registerAttack(SUMMON_EARTHQUAKE,this::summonEartquake)
+                .registerAttack(SUMMON_EARTHQUAKE,v->this.summonEarthquake(v, 0))
+                .registerAttack(SUMMON_EARTHQUAKE_LOWER,v->this.summonEarthquake(v, -1))
                 .registerAttack(PLATFORMS_N_FIREBALLS, this::fireballsNPlatforms)
 
-//                .addAttack(-1, sideRocks)
-//                .addAttack(0, PLATFORMS_N_FIREBALLS)
-                .addAttack(1,DELAY_20)
-                .addAttack(0, cannons)
-                .addAttack(1, jumpCrushChainpunchEarthquake)
-                .addAttack(2, slashOptions)
-//                .addAttack(0, SUMMON_EARTHQUAKE)
-//                .addAttack(0, JUMP_CRUSH)
-//                .addAttack(0, SLASH_ATTACK)
-//                .addAttack(1, JUMP_CRUSH)
-//                .addAttack(2, GIANT_SWORDS_ULTIMATE)
-//                .addAttack(1, NOTHING_20_TICKS)
-//                .addAttack(3, SUMMON_AND_THROW_SIDE_ROCKS)
-//                .addAttack(4, CAROUSEL_SLASHES)
+                .addAlwaysTryCastAttack(this::checkCanPunch, PULL_AND_PUNCH)
+
+
+                .addAttack(id++, slashOptions)
+                .addAttack(id++, randomJumpCrush)
+                .addAttack(id++, cannons)
+                .addAttack(id++, randomJumpCrush)
+                .addAttack(id++, carouselEarthquakes)
+                .addAttack(id++, randomJumpCrush)
+                .addAttack(id++, cannons)
+                .addAttack(id++, slashOptions)
+                .addAttack(id++, GIANT_SWORDS_ULTIMATE)
+                .addAttack(id++, randomJumpCrush)
+                .addAttack(id++, cannons)
+                .addAttack(id++, slashOptions)
+                .addAttack(id++, randomJumpCrush)
+                .addAttack(id++, boulders)
+                .addAttack(id++, randomJumpCrush)
+//                .addAttack(id++, AttackOptions.chainOptionsBuilder()
+//                        .addAttack(JUMP_CRUSH)
+//                        .addAttack(PLATFORMS_N_FIREBALLS)
+//                        .build())
+
+
                 .attackListener(this::attackListener)
         ;
 
     }
 
-    private boolean doNothing20Ticks(AttackInstance instance){
-        if (instance.tick >= 20){
-            return true;
-        }
-        return false;
-    }
-
-    private boolean doNothing10Ticks(AttackInstance instance){
-        if (instance.tick >= 10){
+    private boolean doNothingNTicks(AttackInstance instance, int tick){
+        if (instance.tick >= tick){
             return true;
         }
         return false;
@@ -721,9 +808,21 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
     }
 
+    private MalkuthAttackType chooseAttackTypeForTarget(LivingEntity target, float chanceToChooseWeakToType){
+        if (target instanceof Player player){
+            MalkuthAttackType weakTo = MalkuthWeaknessHandler.getWeakTo(player);
+            if (random.nextFloat() < chanceToChooseWeakToType){
+                return weakTo;
+            }else{
+                return MalkuthAttackType.getOpposite(weakTo);
+            }
+        }
+        return MalkuthAttackType.getRandom(random);
+    }
+
     private MalkuthAttackType earthquakeToSummon = MalkuthAttackType.FIRE;
 
-    private boolean summonEartquake(AttackInstance inst){
+    private boolean summonEarthquake(AttackInstance inst, int spawnYOffset){
 
         int stage = inst.stage;
         int tick = inst.tick;
@@ -731,8 +830,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         if (stage == 0){
             this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
             lookAtTarget = true;
-            this.lookAt(EntityAnchorArgument.Anchor.EYES, this.getTarget().position());
-            earthquakeToSummon = MalkuthAttackType.getRandom(random);
+
+            var target = this.getTarget();
+
+            this.lookAt(EntityAnchorArgument.Anchor.EYES, target.position());
+
+            earthquakeToSummon = this.chooseAttackTypeForTarget(this.getTarget(), CHANCE_TO_CHOOSE_WEAK_TYPE);
+
             if (earthquakeToSummon.isFire()){
                 this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SINGLE_EARTHQUAKE_FIRE)
                                 .important()
@@ -782,7 +886,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.impalingDoomDamage;
 
-                MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(),earthquakeToSummon, this.position(), direction, time, FDMathUtil.FPI / 9, damage);
+                MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(),earthquakeToSummon, this.position().add(0, spawnYOffset, 0), direction, time, FDMathUtil.FPI / 9, damage);
             }else if (tick == 9){
 
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
@@ -826,6 +930,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.deattachSwords();
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SUMMON_THROW_SIDE_STONES)
                             .important()
+                            .setSpeed(0.8f)
                     .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
             inst.nextStage();
         }else if (lstage == 1){
@@ -872,7 +977,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                     Vector3f col = getMalkuthAttackPreparationParticleColor(currentType);
 
-                    RectanglePreparationParticleOptions rectanglePreparationParticleOptions = new RectanglePreparationParticleOptions(new Vec3(-k,0,0), 56, distForOne/2, 20, 10,10,col.x,col.y,col.z,0.25f);
+                    RectanglePreparationParticleOptions rectanglePreparationParticleOptions = new RectanglePreparationParticleOptions(new Vec3(-k,0,0), 56, distForOne/2, 30, 10,10,col.x,col.y,col.z,0.25f);
                     Vec3 ppos = new Vec3(this.getX() + k * 28,y + 0.01f,z);
 
                     FDLibCalls.sendParticles(((ServerLevel) level()),rectanglePreparationParticleOptions, ppos, 60);
@@ -896,7 +1001,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     this.sideRocksCurrentType = MalkuthAttackType.FIRE;
                 }
 
-            }else if (tick > 30){
+            }else if (tick > 40){
 
                 var l = this.level().getEntitiesOfClass(MalkuthBoulderEntity.class, new AABB(-30,-30,-30,30,30,30).move(this.position()));
 
@@ -908,14 +1013,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
         }else if (lstage == 2){
-            if (tick >= 15){
-                if (stage >= 12) {
-                    return true;
-                }else{
-                    inst.nextStage();
-                    return false;
-                }
-            }
+            return true;
         }
         return false;
     }
@@ -1105,16 +1203,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         if (localStage == 0){
             this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
 
+            this.slashAttackType = this.chooseAttackTypeForTarget(this.getTarget(), CHANCE_TO_CHOOSE_WEAK_TYPE);
 
-            if (this.getTarget() instanceof Player player) {
-                MalkuthAttackType attackType = MalkuthWeaknessHandler.getWeakTo(player);
-                if (random.nextFloat() < 0.33f){
-                    attackType = MalkuthAttackType.getOpposite(attackType);
-                }
-                this.slashAttackType = attackType;
-            }else{
-                this.slashAttackType = MalkuthAttackType.getRandom(this.getRandom());
-            }
             Animation animation = this.getSlashAttackAnimation(this.slashAttackType);
 
             AnimationTicker ticker = AnimationTicker.builder(animation)
@@ -1349,6 +1439,14 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
 
+    private boolean checkCanPunch(){
+        AABB box = new AABB(-ENRAGE_RADIUS,4,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(this.position());
+
+        List<Player> players = level().getEntitiesOfClass(Player.class, box);
+
+        return !players.isEmpty();
+    }
+
     private boolean pullAndPunch(AttackInstance inst){
 
 
@@ -1361,13 +1459,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 this.lookAt(EntityAnchorArgument.Anchor.EYES, this.getTarget().position());
             }
 
-            AABB box = new AABB(-ENRAGE_RADIUS,4,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(this.position());
-
-            List<Player> players = level().getEntitiesOfClass(Player.class, box);
-
-            if (players.isEmpty()){
-                return true;
-            }
 
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_PULL_AND_PUNCH)
                             .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
