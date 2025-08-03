@@ -18,16 +18,16 @@ import java.util.regex.PatternSyntaxException;
 public class BossConfig extends ReflectiveJsonConfig implements ManualSerializeable {
 
     @ConfigValue
-    public float peacefulDifficultyBossDamageMuliplier = 0.25f;
+    public float peacefulDifficultyBossDamageMuliplier = 0.5f;
 
     @ConfigValue
-    public float easyDifficultyBossDamageMultiplier = 0.5f;
+    public float easyDifficultyBossDamageMultiplier = 0.75f;
 
     @ConfigValue
-    public float normalDifficultyBossDamageMultiplier = 0.75f;
+    public float normalDifficultyBossDamageMultiplier = 1f;
 
     @ConfigValue
-    public float hardDifficultyBossDamageMultiplier = 1f;
+    public float hardDifficultyBossDamageMultiplier = 1.25f;
 
     public List<String> blocksAllowedToBreakInArena = new ArrayList<>(List.of(
             "(grave)|(tomb)",

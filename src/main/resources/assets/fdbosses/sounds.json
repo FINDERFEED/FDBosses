@@ -122,5 +122,8 @@
   },
   "malkuth_ice_fireball_explosion": {
     "sounds": ["fdbosses:malkuth_ice_fireball_explosion"]
+  },
+  "malkuth_slash": {
+    "sounds": ["fdbosses:malkuth_slash"]
   }
 }

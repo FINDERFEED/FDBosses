@@ -167,6 +167,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
         }
 
+        this.maxHits = BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthMaxHits;
+
         malkuthBossInitializer = new MalkuthBossInitializer(this);
         malkuthSecondPhaseInitializer = new MalkuthSecondPhaseInitializer(this);
 
@@ -1245,9 +1247,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.slashAttackDamage;
 
+
                 MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level(),spawnPos,speedv,this.slashAttackType, damage, 2.2f, rotation,0);
 
-            }else if (tick >= 28){
+            }else if (tick == 20){
+                this.playSlashSound();
+            } else if (tick >= 28){
                 inst.nextStage();
             }else if (tick == 8) {
                 this.causeSwordChargeParticles(slashAttackType);
@@ -1840,6 +1845,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.arcSlashesDamage;
 
+            this.playSlashSound();
+
             for (int i = 0; i < slashesAmount;i++){
 
                 Vec3 direction = startVec.yRot(i * angle + angle / 2);
@@ -1870,6 +1877,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
         return false;
+    }
+
+    private void playSlashSound(){
+        level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.MALKUTH_SLASH.get(), SoundSource.HOSTILE, 2f, 1f + random.nextFloat() * 0.5f);
     }
 
     public static Vector3f getAndRandomizeColor(MalkuthAttackType malkuthAttackType, RandomSource random){

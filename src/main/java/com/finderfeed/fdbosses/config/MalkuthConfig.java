@@ -34,4 +34,7 @@ public class MalkuthConfig {
     @ConfigValue
     public float nonWeakToDamageReduction = 100;
 
+    @ConfigValue
+    public int malkuthMaxHits = 10;
+
 }

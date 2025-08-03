@@ -621,7 +621,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
         this.summonStonesAfterRayAttack(30, look.multiply(1,0,1).normalize(),end);
 
-        ((ServerLevel)level()).playSound(null,end.x,end.y,end.z, BossSounds.CHESED_RAY.get(), SoundSource.HOSTILE,50f,1f);
+        ((ServerLevel)level()).playSound(null,end.x,end.y,end.z, BossSounds.CHESED_RAY.get(), SoundSource.HOSTILE,5f,1f);
 
     }
 
@@ -1123,7 +1123,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             } else if (instance.tick == rayStartTick) {
 
                 this.boomAttackRotatingRay(rayDuration);
-                ((ServerLevel) level()).playSound(null, this.position().x, this.position().y, this.position().z, BossSounds.CHESED_FINAL_ATTACK_RAY.get(), SoundSource.HOSTILE, 100f, 0.8f);
+                ((ServerLevel) level()).playSound(null, this.position().x, this.position().y, this.position().z, BossSounds.CHESED_FINAL_ATTACK_RAY.get(), SoundSource.HOSTILE, 6f, 0.8f);
             }else if (instance.tick > rayStartTick && instance.tick <= rayStartTick + rayDuration) {
 
                 float p = 1 - (instance.tick - rayStartTick) / (float) rayDuration;
@@ -1525,7 +1525,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
 
                 BossUtil.chesedRaySmoke((ServerLevel) level(),end,reversedLook,120);
-                ((ServerLevel)level()).playSound(null,end.x,end.y,end.z, BossSounds.CHESED_LIGHTNING_RAY.get(), SoundSource.HOSTILE,100f,0.8f);
+                ((ServerLevel)level()).playSound(null,end.x,end.y,end.z, BossSounds.CHESED_LIGHTNING_RAY.get(), SoundSource.HOSTILE,5f,0.8f);
 
 
                 PositionedScreenShakePacket.send((ServerLevel) level(),FDShakeData.builder()
