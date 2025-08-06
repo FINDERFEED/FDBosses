@@ -54,6 +54,8 @@ public class BossSounds {
     public static final Supplier<SoundEvent> MALKUTH_FIREBALL_EXPLOSION = SOUNDS.register("malkuth_fireball_explosion",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_fireball_explosion")));
     public static final Supplier<SoundEvent> MALKUTH_ICE_FIREBALL_EXPLOSION = SOUNDS.register("malkuth_ice_fireball_explosion",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_ice_fireball_explosion")));
     public static final Supplier<SoundEvent> MALKUTH_SLASH = SOUNDS.register("malkuth_slash",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_slash")));
+    public static final Supplier<SoundEvent> MALKUTH_VOLCANO_ERRUPTION = SOUNDS.register("malkuth_volcano_erruption",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_volcano_erruption")));
+    public static final Supplier<SoundEvent> MALKUTH_VOLCANO_RUMBLING_LOOP = SOUNDS.register("volcano_rumbling_loop",()->SoundEvent.createVariableRangeEvent(FDBosses.location("volcano_rumbling_loop")));
 
 
 }

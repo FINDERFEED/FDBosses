@@ -125,5 +125,11 @@
   },
   "malkuth_slash": {
     "sounds": ["fdbosses:malkuth_slash"]
+  },
+  "malkuth_volcano_erruption": {
+    "sounds": ["fdbosses:malkuth_volcano_erruption"]
+  },
+  "volcano_rumbling_loop": {
+    "sounds": ["fdbosses:volcano_rumbling_loop"]
   }
 }

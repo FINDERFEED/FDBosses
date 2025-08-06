@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.init.FDScreenEffects;
@@ -22,6 +23,7 @@ import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -181,16 +183,22 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
         int erruptionTime = 50;
 
         if (tick == erruptionStart - 30){
+            boss.level().playSound(null, startPos.x,startPos.y,startPos.z, BossSounds.MALKUTH_VOLCANO_RUMBLING_LOOP.get(), SoundSource.AMBIENT, 6f, 1f);
+
             DefaultShakePacket.send((ServerLevel) boss.level(), boss.spawnPosition, 30, FDShakeData.builder()
                     .amplitude(0.1f)
                     .stayTime(60)
                     .build());
         }else if (tick == erruptionStart){
+
+            boss.level().playSound(null, startPos.x, startPos.y, startPos.z, BossSounds.MALKUTH_VOLCANO_ERRUPTION.get(), SoundSource.AMBIENT, 6f, 1f);
+
             DefaultShakePacket.send((ServerLevel) boss.level(), boss.spawnPosition, 30, FDShakeData.builder()
                     .amplitude(1f)
                     .outTime(30)
                     .build());
         }else if (tick >= erruptionStart && tick <= erruptionStart + erruptionTime){
+
             BossUtil.volcanoErruptionParticles((ServerLevel) boss.level(), startPos.add(0,3,0), 16 * 5 + 6, 120);
         }
 
@@ -214,10 +222,10 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
                 boss.noPhysics = true;
                 boss.setNoGravity(true);
                 movePath.tick(boss);
-            }else if (tick == bossJumpStart + movePathTime + 1){
+            }else if (tick == bossJumpStart + movePathTime + 1) {
                 boss.noPhysics = false;
                 boss.setNoGravity(false);
-                boss.teleportTo(base.x,base.y,base.z);
+                boss.teleportTo(base.x, base.y, base.z);
             }else if (tick == bossJumpStart + movePathTime + 50){
                 boss.getAnimationSystem().stopAnimation(MalkuthEntity.MAIN_LAYER);
                 boss.getAnimationSystem().startAnimation(MalkuthEntity.MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE)
