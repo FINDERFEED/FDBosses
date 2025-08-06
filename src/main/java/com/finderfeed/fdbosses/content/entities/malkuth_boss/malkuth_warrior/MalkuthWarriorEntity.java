@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior;
 
 import com.finderfeed.fdbosses.BossTargetFinder;
+import com.finderfeed.fdbosses.content.entities.base.BossPathfinderMob;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBuddy;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
@@ -24,6 +25,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
@@ -37,7 +39,8 @@ import org.joml.Vector3f;
 
 import java.util.List;
 
-public class MalkuthWarriorEntity extends FDMob implements IHasHead<MalkuthWarriorEntity>, MalkuthBossBuddy {
+
+public class MalkuthWarriorEntity extends BossPathfinderMob implements IHasHead<MalkuthWarriorEntity>, MalkuthBossBuddy {
 
     public static float DISTANCE_TO_ATTACK = 1.75f;
 
@@ -56,7 +59,7 @@ public class MalkuthWarriorEntity extends FDMob implements IHasHead<MalkuthWarri
 
     public AttackChain attackChain;
 
-    public MalkuthWarriorEntity(EntityType<? extends Mob> type, Level level) {
+    public MalkuthWarriorEntity(EntityType<? extends BossPathfinderMob> type, Level level) {
         super(type, level);
 
         if (level.isClientSide && CLIENT_MODEL == null){
@@ -249,14 +252,44 @@ public class MalkuthWarriorEntity extends FDMob implements IHasHead<MalkuthWarri
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.goalSelector.addGoal(8, new LookAtPlayerGoal(this, Player.class, 8.0F));
+
+
+        this.goalSelector.addGoal(6, new WaterAvoidingRandomStrollGoal(this, 1.0){
+
+            @Override
+            public void tick() {
+                super.tick();
+                Vec3 lookAt = this.mob.position().add(this.mob.getForward().multiply(1,0,1).normalize().multiply(100,100,100));
+                this.mob.getLookControl().setLookAt(lookAt);
+            }
+
+            @Override
+            public boolean canUse() {
+                return super.canUse() && MalkuthWarriorEntity.super.getTarget() == null;
+            }
+        });
+        this.goalSelector.addGoal(7, new LookAtPlayerGoal(this, Player.class, 6.0F){
+            @Override
+            public boolean canUse() {
+                return super.canUse() && MalkuthWarriorEntity.super.getTarget() == null;
+            }
+        });
+        this.goalSelector.addGoal(8, new RandomLookAroundGoal(this){
+            @Override
+            public boolean canUse() {
+                return super.canUse() && MalkuthWarriorEntity.super.getTarget() == null;
+            }
+        });
+
         this.goalSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
+
     }
 
     @Override
     public void tick() {
         super.tick();
         if (level().isClientSide){
+
             this.getHeadControllerContainer().clientTick();
 
             var ticker = this.getAnimationSystem().getTicker(MAIN_LAYER);
