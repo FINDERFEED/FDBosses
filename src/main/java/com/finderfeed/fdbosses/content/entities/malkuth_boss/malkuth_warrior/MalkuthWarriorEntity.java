@@ -1,7 +1,14 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior;
 
-import com.finderfeed.fdbosses.init.BossAnims;
-import com.finderfeed.fdbosses.init.BossModels;
+import com.finderfeed.fdbosses.BossTargetFinder;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBuddy;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
+import com.finderfeed.fdbosses.init.*;
+import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
+import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
+import com.finderfeed.fdlib.systems.bedrock.animations.TransitionAnimation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.head.HeadControllerContainer;
@@ -9,7 +16,13 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.h
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
@@ -17,14 +30,29 @@ import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector3f;
 
-public class MalkuthWarriorEntity extends FDMob implements IHasHead<MalkuthWarriorEntity> {
+import java.util.List;
+
+public class MalkuthWarriorEntity extends FDMob implements IHasHead<MalkuthWarriorEntity>, MalkuthBossBuddy {
+
+    public static float DISTANCE_TO_ATTACK = 1.75f;
+
+    public static final EntityDataAccessor<MalkuthAttackType> WARRIOR_TYPE = SynchedEntityData.defineId(MalkuthWarriorEntity.class, BossEntityDataSerializers.MALKUTH_ATTACK_TYPE.get());
 
     public static final String SIMPLE_HIT = "simple_axe_hit";
+    public static final String EARTH_SLAM_ATTACK = "earth_slam_attack";
+
+    public static final String MAIN_LAYER = "main";
 
     private static FDModel CLIENT_MODEL;
+
+    private boolean wasNormalAttackCancelled = false;
+
+    private int slamCooldown = 0;
 
     public AttackChain attackChain;
 
@@ -40,30 +68,183 @@ public class MalkuthWarriorEntity extends FDMob implements IHasHead<MalkuthWarri
 
         this.attackChain = new AttackChain(this.level().random)
                 .registerAttack(SIMPLE_HIT, this::simpleAxeAttack)
+                .registerAttack(EARTH_SLAM_ATTACK, this::earthSlamAttack)
+                .addAlwaysTryCastAttack(this::canCastSlamAttack, EARTH_SLAM_ATTACK)
                 .addAttack(0, SIMPLE_HIT)
         ;
 
     }
 
-    public boolean simpleAxeAttack(AttackInstance attackInstance){
+    public boolean earthSlamAttack(AttackInstance instance){
+
+        var target = this.getTarget();
+        int stage = instance.stage;
+
+        int tick = instance.tick;
+
+        if (stage == 0){
+            if (target == null) return true;
+
+            this.getNavigation().stop();
+
+            this.lookAt(EntityAnchorArgument.Anchor.EYES, target.position());
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_SLAM_EARTH)
+                            .important()
+                            .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build())
+                    .build());
+            instance.nextStage();
+            this.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.ANIMATION);
+        }else if (stage == 1){
+
+            if (tick == 14){
+                if (target != null) {
+                    this.lookAt(EntityAnchorArgument.Anchor.EYES, target.position());
+                }
+            } else if (tick == 17){
+
+                double dist = 13;
+                Vec3 forward = this.getForward().multiply(1,0,1).normalize().multiply(dist,dist,dist);
+
+                SlamParticlesPacket packet = new SlamParticlesPacket(
+                        new SlamParticlesPacket.SlamData(this.getOnPos(),this.position().add(0,0.5f,0),forward.normalize())
+                                .maxAngle(FDMathUtil.FPI)
+                                .maxSpeed(0.5f)
+                                .collectRadius(2)
+                                .maxParticleLifetime(30)
+                                .count(40)
+                                .maxVerticalSpeedEdges(0.15f)
+                                .maxVerticalSpeedCenter(0.4f)
+                );
+                PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+
+                level().playSound(null, this.getX(), this.getY() + this.getBbHeight()/2f, this.getZ(), BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.HOSTILE, 1f, 1f);
+
+
+
+                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthWarriorEarthSlamDamage;
+
+                MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(), this.entityData.get(WARRIOR_TYPE), this.position(), forward, 20, FDMathUtil.FPI / 6, damage);
+
+            }else if (tick >= 25){
+                wasNormalAttackCancelled = false;
+                slamCooldown = 20;
+                this.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.LOOK);
+                return true;
+            }
+        }
+
+
+        return false;
+    }
+
+    public boolean canCastSlamAttack(){
 
         var target = this.getTarget();
 
         if (target != null){
-            Vec3 targetPos = target.position();
-            double dist = this.position().distanceTo(targetPos);
-            if (dist > 1.5f && level().getGameTime() % 5 == 0){
-                this.getNavigation().moveTo(target, 1);
+
+            float distance = target.distanceTo(this);
+
+            if (distance <= DISTANCE_TO_ATTACK || distance >= 10) return false;
+
+            double yDiff = this.getY() - target.getY();
+
+            if (yDiff > -0.1f && yDiff < 1.5f){
+                return wasNormalAttackCancelled && slamCooldown <= 0;
             }
-
-
-            this.getLookControl().setLookAt(target);
-
         }
 
         return false;
     }
 
+
+    public boolean simpleAxeAttack(AttackInstance attackInstance){
+
+        var target = this.getTarget();
+
+        int stage = attackInstance.stage;
+        int tick = attackInstance.tick;
+
+        if (stage == 0) {
+            wasNormalAttackCancelled = false;
+            if (target != null) {
+                Vec3 targetPos = target.position();
+                double dist = this.position().distanceTo(targetPos);
+                if (dist > DISTANCE_TO_ATTACK) {
+
+                    if (level().random.nextFloat() < 0.015){
+                        wasNormalAttackCancelled = true;
+                        return true;
+                    }
+
+                    if (level().getGameTime() % 5 == 0) {
+                        this.getNavigation().moveTo(target, 1);
+                    }
+                }else{
+                    this.getNavigation().stop();
+                    this.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.ANIMATION);
+                    this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_ATTACK)
+                                    .important()
+                                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build())
+                            .build());
+
+                    attackInstance.nextStage();
+                }
+                this.getLookControl().setLookAt(target);
+            }
+        }else if (stage == 1){
+
+            if (tick == 0 && target != null){
+                this.lookAt(EntityAnchorArgument.Anchor.EYES, target.position());
+            }
+
+            if (tick == 5) {
+                level().playSound(null, this.getX(), this.getY() + this.getBbHeight()/2f, this.getZ(), BossSounds.MALKUTH_SLASH.get(), SoundSource.HOSTILE, 1f, 1f + random.nextFloat() * 0.5f);
+            }else if (tick == 10){
+                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthWarriorDamage;
+
+                var type = this.entityData.get(WARRIOR_TYPE);
+
+                for (var t : this.getTargetsForAxeAttack()){
+
+                    t.hurt(new MalkuthDamageSource(level().damageSources().generic(), type, 50), damage);
+
+                }
+
+            }else if (tick >= 15){
+                this.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.LOOK);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<LivingEntity> getTargetsForAxeAttack(){
+
+        Vec3 forward = this.getForward().multiply(1,0,1).normalize();
+
+        float cylinderOffset = 1.25f;
+
+        Vec3 cylinderStart = this.position().add(forward.multiply(cylinderOffset,0,cylinderOffset)).add(0,-1.01,0);
+
+        var list = BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(),  cylinderStart, 2.5f, 0.75f, entity -> !(entity instanceof MalkuthBossBuddy));
+
+        Vec2 direction = new Vec2((float)forward.x,(float)forward.z);
+
+        var list2 = BossTargetFinder.getEntitiesInArc(LivingEntity.class, level(),  this.position().add(0,-1.01,0), direction,
+                FDMathUtil.FPI/2, 2.5f, 1f, entity -> !(entity instanceof MalkuthBossBuddy));
+
+        list.addAll(list2);
+
+        return list;
+    }
+
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder);
+        builder.define(WARRIOR_TYPE, MalkuthAttackType.FIRE);
+    }
 
     @Override
     protected void registerGoals() {
@@ -77,17 +258,35 @@ public class MalkuthWarriorEntity extends FDMob implements IHasHead<MalkuthWarri
         super.tick();
         if (level().isClientSide){
             this.getHeadControllerContainer().clientTick();
-            if (this.getHeadControllerContainer().getControllersMode() != HeadControllerContainer.Mode.LOOK){
-                this.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.LOOK);
-            }
-            if (this.walkAnimation.speed() > 0.05f){
-                this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_WALK)
+
+            var ticker = this.getAnimationSystem().getTicker(MAIN_LAYER);
+
+            if (ticker == null){
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build());
+            }else {
+
+                Animation anim = ticker.getAnimation();
+
+                if (anim instanceof TransitionAnimation tr){
+                    anim = tr.getTransitionTo();
+                }
+
+                if (anim == BossAnims.MALKUTH_WARRIOR_IDLE.get()) {
+                    if (this.walkAnimation.speed() > 0.05f) {
+                        this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_WALK)
                                 .setToNullTransitionTime(5)
-                        .build());
-            }else{
-                this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build());
+                                        .setSpeed(1.25f)
+                                .build());
+                    }
+                }else if (anim == BossAnims.MALKUTH_WARRIOR_WALK.get()){
+                    if (this.walkAnimation.speed() < 0.05f){
+                        this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build());
+                    }
+                }
             }
         }else{
+
+            slamCooldown = Math.clamp(slamCooldown - 1, 0, Integer.MAX_VALUE);
 
             this.attackChain.tick();
 

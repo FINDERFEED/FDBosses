@@ -282,7 +282,7 @@ public class BossEntities {
         event.put(MALKUTH_CANNON.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
 
         event.put(MALKUTH_WARRIOR.get(), Mob.createMobAttributes()
-                        .add(Attributes.MOVEMENT_SPEED, 0.3f)
+                        .add(Attributes.MOVEMENT_SPEED, 0.23f)
                         .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
                 .build());
     }

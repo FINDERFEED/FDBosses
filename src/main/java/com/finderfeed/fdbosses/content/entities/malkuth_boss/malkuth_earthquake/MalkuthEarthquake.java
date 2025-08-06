@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBuddy;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.init.BossEntities;
@@ -48,11 +49,11 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
 
     private List<MalkuthEarthquakeSegment> segments = new ArrayList<>();
 
-    public static MalkuthEarthquake summon(Level level, MalkuthAttackType malkuthAttackType,Vec3 pos, Vec3 direction, int time, float arcAngle, float damage){
+    public static MalkuthEarthquake summon(Level level, MalkuthAttackType malkuthAttackType,Vec3 pos, Vec3 directionAndLength, int time, float arcAngle, float damage){
         MalkuthEarthquake malkuthEarthquake = new MalkuthEarthquake(BossEntities.MALKUTH_EARTHQUAKE.get(), level);
 
         malkuthEarthquake.setEarthquakeTime(time);
-        malkuthEarthquake.setDirectionAndLength(direction);
+        malkuthEarthquake.setDirectionAndLength(directionAndLength);
         malkuthEarthquake.setAngle(arcAngle);
         malkuthEarthquake.setMalkuthAttackType(malkuthAttackType);
         malkuthEarthquake.setPos(pos);
@@ -113,7 +114,16 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
 
         Vec2 dir = new Vec2((float) dirAndLength.x,(float) dirAndLength.z);
 
-        var entities = BossTargetFinder.getEntitiesInArc(LivingEntity.class, level(), this.position().add(0,-1,0), dir, this.getAngle(),  3, length);
+        var entities = BossTargetFinder.getEntitiesInArc(LivingEntity.class, level(), this.position().add(0,-1,0), dir, this.getAngle(),  3, length, livingEntity -> {
+            return !(livingEntity instanceof MalkuthBossBuddy);
+        });
+
+        var entities2 = BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position().add(0,-1,0), 3, 1f,livingEntity -> {
+            return !(livingEntity instanceof MalkuthBossBuddy);
+        });
+
+        entities.addAll(entities2);
+
 
         for (var entity : entities){
 
@@ -150,7 +160,7 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
 
         float fullLength = (float) this.getDirectionAndLength().length();
 
-        float currentCompletionPercent = this.tickCount / (float) this.getEarthquakeTime();
+        float currentCompletionPercent = (this.tickCount - 1) / (float) this.getEarthquakeTime();
 
         float currentLength = fullLength * currentCompletionPercent;
 
