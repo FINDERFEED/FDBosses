@@ -32,6 +32,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_platform.Ma
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairCrystal;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
@@ -43,6 +44,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import org.w3c.dom.Attr;
 
 import java.util.function.Supplier;
 
@@ -258,7 +260,13 @@ public class BossEntities {
                     MalkuthFireball::new, MobCategory.MISC
             )
             .sized(0.25f,0.25f)
-            .build("malkuth_floor"));
+            .build("malkuth_fireball"));
+
+    public static final Supplier<EntityType<MalkuthWarriorEntity>> MALKUTH_WARRIOR = ENTITIES.register("malkuth_warrior",()->EntityType.Builder.of(
+                    MalkuthWarriorEntity::new, MobCategory.MISC
+            )
+            .sized(0.6F, 1.8F)
+            .build("malkuth_warrior"));
 
 
     @SubscribeEvent
@@ -272,6 +280,11 @@ public class BossEntities {
         event.put(MALKUTH_CHAIN.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
         event.put(MALKUTH.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,20).build());
         event.put(MALKUTH_CANNON.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
+
+        event.put(MALKUTH_WARRIOR.get(), Mob.createMobAttributes()
+                        .add(Attributes.MOVEMENT_SPEED, 0.3f)
+                        .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
+                .build());
     }
 
 

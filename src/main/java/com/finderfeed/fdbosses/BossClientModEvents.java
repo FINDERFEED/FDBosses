@@ -47,6 +47,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crys
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairCrystalRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairEntityRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
 import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
 import com.finderfeed.fdbosses.ik_2d.InverseKinematics2BoneTransform;
@@ -193,6 +194,13 @@ public class BossClientModEvents {
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
 
+        event.registerEntityRenderer(BossEntities.MALKUTH_WARRIOR.get(), FDEntityRendererBuilder.<MalkuthWarriorEntity>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<MalkuthWarriorEntity>builder()
+                                .model(BossModels.MALKUTH_WARRIOR)
+                                .renderType(RenderType.entityCutoutNoCull(FDBosses.location("textures/entities/malkuth/malkuth_warrior.png")))
+                                .addBoneController("head", new HeadBoneTransformation<>())
+                                .build())
+                .build());
 
         event.registerEntityRenderer(BossEntities.MALKUTH_REPAIR_CRYSTAL.get(), FDEntityRendererBuilder.<MalkuthRepairCrystal>builder()
                         .addLayer(FDEntityRenderLayerOptions.<MalkuthRepairCrystal>builder()

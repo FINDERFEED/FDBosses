@@ -193,4 +193,20 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
     });
 
+    public static DeferredHolder<Animation,Animation> MALKUTH_WARRIOR_IDLE = ANIMATIONS.register("malkuth_warrior_idle", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_warrior"));
+    });
+
+    public static DeferredHolder<Animation,Animation> MALKUTH_WARRIOR_ATTACK = ANIMATIONS.register("malkuth_warrior_attack", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_warrior"));
+    });
+
+    public static DeferredHolder<Animation,Animation> MALKUTH_WARRIOR_WALK = ANIMATIONS.register("malkuth_warrior_walk", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_warrior"));
+    });
+
+    public static DeferredHolder<Animation,Animation> MALKUTH_WARRIOR_SLAM_EARTH = ANIMATIONS.register("malkuth_warrior_slam_earth", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_warrior"));
+    });
+
 }
