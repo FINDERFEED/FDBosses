@@ -17,6 +17,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.flying_block_entity.
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boulder.MalkuthBoulderEntity;
@@ -44,7 +45,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import org.w3c.dom.Attr;
 
 import java.util.function.Supplier;
 
@@ -262,11 +262,17 @@ public class BossEntities {
             .sized(0.25f,0.25f)
             .build("malkuth_fireball"));
 
-    public static final Supplier<EntityType<MalkuthWarriorEntity>> MALKUTH_WARRIOR = ENTITIES.register("malkuth_warrior",()->EntityType.Builder.of(
-                    MalkuthWarriorEntity::new, MobCategory.MISC
+    public static final Supplier<EntityType<MalkuthWarriorEntity>> FIRE_MALKUTH_WARRIOR = ENTITIES.register("fire_malkuth_warrior",()->EntityType.Builder.<MalkuthWarriorEntity>of(
+                    (type,lvl)->new MalkuthWarriorEntity(type,lvl, MalkuthAttackType.FIRE), MobCategory.MONSTER
             )
             .sized(0.6F, 1.8F)
-            .build("malkuth_warrior"));
+            .build("fire_malkuth_warrior"));
+
+    public static final Supplier<EntityType<MalkuthWarriorEntity>> ICE_MALKUTH_WARRIOR = ENTITIES.register("ice_malkuth_warrior",()->EntityType.Builder.<MalkuthWarriorEntity>of(
+                    (type,lvl)->new MalkuthWarriorEntity(type,lvl, MalkuthAttackType.ICE), MobCategory.MONSTER
+            )
+            .sized(0.6F, 1.8F)
+            .build("ice_malkuth_warrior"));
 
 
     @SubscribeEvent
@@ -281,7 +287,12 @@ public class BossEntities {
         event.put(MALKUTH.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,20).build());
         event.put(MALKUTH_CANNON.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
 
-        event.put(MALKUTH_WARRIOR.get(), Mob.createMobAttributes()
+        event.put(FIRE_MALKUTH_WARRIOR.get(), Mob.createMobAttributes()
+                        .add(Attributes.MOVEMENT_SPEED, 0.23f)
+                        .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
+                .build());
+
+        event.put(ICE_MALKUTH_WARRIOR.get(), Mob.createMobAttributes()
                         .add(Attributes.MOVEMENT_SPEED, 0.23f)
                         .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
                 .build());

@@ -72,6 +72,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.util.Mth;
@@ -194,13 +195,28 @@ public class BossClientModEvents {
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
 
-        event.registerEntityRenderer(BossEntities.MALKUTH_WARRIOR.get(), FDEntityRendererBuilder.<MalkuthWarriorEntity>builder()
-                        .addLayer(FDEntityRenderLayerOptions.<MalkuthWarriorEntity>builder()
-                                .model(BossModels.MALKUTH_WARRIOR)
-                                .renderType(RenderType.entityCutoutNoCull(FDBosses.location("textures/entities/malkuth/malkuth_warrior.png")))
-                                .addBoneController("head", new HeadBoneTransformation<>())
-                                .build())
-                .build());
+        EntityRendererProvider<MalkuthWarriorEntity> warriorRenderer = FDEntityRendererBuilder.<MalkuthWarriorEntity>builder()
+                .addLayer(FDEntityRenderLayerOptions.<MalkuthWarriorEntity>builder()
+                        .model(BossModels.MALKUTH_WARRIOR)
+                        .renderType(RenderType.entityCutoutNoCull(FDBosses.location("textures/entities/malkuth/malkuth_warrior.png")))
+                        .addBoneController("head", new HeadBoneTransformation<>())
+                        .build())
+                .addLayer(FDEntityRenderLayerOptions.<MalkuthWarriorEntity>builder()
+                        .model(BossModels.MALKUTH_WARRIOR)
+                        .renderType((entity, pticks) -> {
+                            if (entity.getEntityData().get(MalkuthWarriorEntity.WARRIOR_TYPE).isFire()) {
+                                return RenderType.entityTranslucent(FDBosses.location("textures/entities/malkuth/malkuth_warrior_fire.png"));
+                            }else{
+                                return RenderType.entityTranslucent(FDBosses.location("textures/entities/malkuth/malkuth_warrior_ice.png"));
+                            }
+                        })
+                        .light(LightTexture.FULL_BRIGHT)
+                        .addBoneController("head", new HeadBoneTransformation<>())
+                        .build())
+                .build();
+
+        event.registerEntityRenderer(BossEntities.FIRE_MALKUTH_WARRIOR.get(), warriorRenderer);
+        event.registerEntityRenderer(BossEntities.ICE_MALKUTH_WARRIOR.get(), warriorRenderer);
 
         event.registerEntityRenderer(BossEntities.MALKUTH_REPAIR_CRYSTAL.get(), FDEntityRendererBuilder.<MalkuthRepairCrystal>builder()
                         .addLayer(FDEntityRenderLayerOptions.<MalkuthRepairCrystal>builder()

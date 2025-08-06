@@ -136,17 +136,21 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
                 continue;
             }
 
-            entity.hurt(new MalkuthDamageSource(level().damageSources().generic(),this.getEarthquakeType(), 51),damage);
 
 
 
             Vec3 speed = new Vec3(dir.x ,0,dir.y).normalize().add(0,1.2,0);
 
-            if (entity instanceof ServerPlayer serverPlayer && MalkuthWeaknessHandler.isWeakTo(serverPlayer, this.getEarthquakeType())){
-                FDLibCalls.setServerPlayerSpeed(serverPlayer, speed);
+            if (entity instanceof ServerPlayer serverPlayer){
+                if (MalkuthWeaknessHandler.isWeakTo(serverPlayer, this.getEarthquakeType())) {
+                    FDLibCalls.setServerPlayerSpeed(serverPlayer, speed);
+                }
             }else{
                 entity.setDeltaMovement(speed);
             }
+
+
+            entity.hurt(new MalkuthDamageSource(level().damageSources().generic(),this.getEarthquakeType(), 51),damage);
 
         }
 

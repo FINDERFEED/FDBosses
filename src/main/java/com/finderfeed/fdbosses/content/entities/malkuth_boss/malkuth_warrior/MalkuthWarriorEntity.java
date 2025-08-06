@@ -19,6 +19,7 @@ import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundSource;
@@ -46,6 +47,8 @@ public class MalkuthWarriorEntity extends BossPathfinderMob implements IHasHead<
 
     public static final EntityDataAccessor<MalkuthAttackType> WARRIOR_TYPE = SynchedEntityData.defineId(MalkuthWarriorEntity.class, BossEntityDataSerializers.MALKUTH_ATTACK_TYPE.get());
 
+    private MalkuthAttackType initialType;
+
     public static final String SIMPLE_HIT = "simple_axe_hit";
     public static final String EARTH_SLAM_ATTACK = "earth_slam_attack";
 
@@ -59,8 +62,10 @@ public class MalkuthWarriorEntity extends BossPathfinderMob implements IHasHead<
 
     public AttackChain attackChain;
 
-    public MalkuthWarriorEntity(EntityType<? extends BossPathfinderMob> type, Level level) {
+    public MalkuthWarriorEntity(EntityType<? extends BossPathfinderMob> type, Level level, MalkuthAttackType initialType) {
         super(type, level);
+
+        this.entityData.set(WARRIOR_TYPE, initialType);
 
         if (level.isClientSide && CLIENT_MODEL == null){
             CLIENT_MODEL = new FDModel(BossModels.MALKUTH_WARRIOR.get());
@@ -325,6 +330,20 @@ public class MalkuthWarriorEntity extends BossPathfinderMob implements IHasHead<
 
             this.setYRot(this.yBodyRot);
 
+        }
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.putString("mtype", this.entityData.get(WARRIOR_TYPE).name());
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        if (tag.contains("mtype")){
+            this.entityData.set(WARRIOR_TYPE, MalkuthAttackType.valueOf(tag.getString("mtype")));
         }
     }
 
