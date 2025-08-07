@@ -80,23 +80,40 @@ public class DebugStick extends Item {
 //                p2 = null;
 //            }
 
-            if (player.isCrouching()){
-                anchor = player.position();
-            }else{
-                Vec3 eyePos = player.getEyePosition();
-                Vec3 offs = eyePos.subtract(anchor);
-                Vec3 lookAngle = player.getLookAngle();
-                new CameraPos(eyePos, lookAngle);
-                System.out.println("new CameraPos(base.add(%.3f,%.3f,%.3f), new Vec3(%.3f,%.3f,%.3f))".formatted(
-                        (float)offs.x,
-                        (float)offs.y,
-                        (float)offs.z,
 
-                        (float)lookAngle.x,
-                        (float)lookAngle.y,
-                        (float)lookAngle.z
-                ));
+            for (int x = -200; x <= 200; x++){
+                for (int z = -200; z <= 200; z++){
+
+                    BlockPos pos = player.getOnPos().above().offset(x,0,z);
+
+                    BlockState state = level.getBlockState(pos.above());
+                    BlockState state1 = level.getBlockState(pos);
+
+                    if (!state.isAir() && state1.isAir()){
+                        level.setBlock(pos, Blocks.DEEPSLATE.defaultBlockState(), Block.UPDATE_CLIENTS);
+                    }
+
+                }
             }
+
+
+//            if (player.isCrouching()){
+//                anchor = player.position();
+//            }else{
+//                Vec3 eyePos = player.getEyePosition();
+//                Vec3 offs = eyePos.subtract(anchor);
+//                Vec3 lookAngle = player.getLookAngle();
+//                new CameraPos(eyePos, lookAngle);
+//                System.out.println("new CameraPos(base.add(%.3f,%.3f,%.3f), new Vec3(%.3f,%.3f,%.3f))".formatted(
+//                        (float)offs.x,
+//                        (float)offs.y,
+//                        (float)offs.z,
+//
+//                        (float)lookAngle.x,
+//                        (float)lookAngle.y,
+//                        (float)lookAngle.z
+//                ));
+//            }
 
             if (true) return InteractionResultHolder.consume(player.getItemInHand(hand));
 

@@ -1,0 +1,149 @@
+{
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "weight": 150,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_1",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 150,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_2",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 150,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_3",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 150,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_4",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_11",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_12",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_13",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_21",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_22",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_23",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_31",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_32",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_33",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_41",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_42",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:malkuth_arena/malkuth_arena_part_43",
+        "processors": "minecraft:empty"
+      }
+    }
+  ]
+}
