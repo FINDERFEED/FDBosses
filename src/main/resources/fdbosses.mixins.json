@@ -6,6 +6,7 @@
   "mixins": [
     "CraftingMenuMixin",
     "EntityMixin",
+    "JigsawPlacementMixin",
     "PlayerMixin"
   ],
   "minVersion": "0.8",

@@ -32,12 +32,13 @@ public class FDBosses {
         BossEntities.ENTITIES.register(bus);
         BossEffects.MOB_EFFECTS.register(bus);
         BossParticles.PARTICLES.register(bus);
+        BossStructures.STRUCTURES.register(bus);
         BossTileEntities.TILE_ENTITIES.register(bus);
         BossCreativeTabs.CREATIVE_TABS.register(bus);
+        BossDataAttachments.ATTACHMENTS.register(bus);
         BossDataComponents.DATA_COMPONENTS.register(bus);
         BossCriteriaTriggers.CRITERION_TRIGGERS.register(bus);
         BossRecipeSerializers.RECIPE_SERIALIZERS.register(bus);
-        BossDataAttachments.ATTACHMENTS.register(bus);
         BossEntityDataSerializers.ENTITY_DATA_SERIALIZERS.register(bus);
     }
 
