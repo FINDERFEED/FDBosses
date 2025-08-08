@@ -1,7 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior;
 
 import com.finderfeed.fdbosses.BossTargetFinder;
-import com.finderfeed.fdbosses.content.entities.base.BossPathfinderMob;
+import com.finderfeed.fdbosses.content.entities.base.BossMonsterMob;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBuddy;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
@@ -11,7 +11,6 @@ import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.TransitionAnimation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.head.HeadControllerContainer;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.head.IHasHead;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
@@ -25,8 +24,6 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
@@ -36,18 +33,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
-import org.joml.Vector3f;
 
 import java.util.List;
 
 
-public class MalkuthWarriorEntity extends BossPathfinderMob implements IHasHead<MalkuthWarriorEntity>, MalkuthBossBuddy {
+public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<MalkuthWarriorEntity>, MalkuthBossBuddy {
 
     public static float DISTANCE_TO_ATTACK = 1.75f;
 
     public static final EntityDataAccessor<MalkuthAttackType> WARRIOR_TYPE = SynchedEntityData.defineId(MalkuthWarriorEntity.class, BossEntityDataSerializers.MALKUTH_ATTACK_TYPE.get());
-
-    private MalkuthAttackType initialType;
 
     public static final String SIMPLE_HIT = "simple_axe_hit";
     public static final String EARTH_SLAM_ATTACK = "earth_slam_attack";
@@ -62,8 +56,10 @@ public class MalkuthWarriorEntity extends BossPathfinderMob implements IHasHead<
 
     public AttackChain attackChain;
 
-    public MalkuthWarriorEntity(EntityType<? extends BossPathfinderMob> type, Level level, MalkuthAttackType initialType) {
+    public MalkuthWarriorEntity(EntityType<? extends BossMonsterMob> type, Level level, MalkuthAttackType initialType) {
         super(type, level);
+
+        this.xpReward = 20;
 
         this.entityData.set(WARRIOR_TYPE, initialType);
 
@@ -80,6 +76,8 @@ public class MalkuthWarriorEntity extends BossPathfinderMob implements IHasHead<
                 .addAlwaysTryCastAttack(this::canCastSlamAttack, EARTH_SLAM_ATTACK)
                 .addAttack(0, SIMPLE_HIT)
         ;
+
+        this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build());
 
     }
 

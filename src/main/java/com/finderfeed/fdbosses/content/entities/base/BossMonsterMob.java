@@ -7,13 +7,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.Level;
 
-public class BossPathfinderMob extends PathfinderMob implements AnimatedObject {
+public class BossMonsterMob extends Monster implements AnimatedObject {
 
     private EntityModelSystem<?> modelSystem;
 
-    public BossPathfinderMob(EntityType<? extends PathfinderMob> etype, Level level) {
+    public BossMonsterMob(EntityType<? extends Monster> etype, Level level) {
         super(etype, level);
         modelSystem = EntityModelSystem.create(this);
     }

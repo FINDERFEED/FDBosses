@@ -81,20 +81,20 @@ public class DebugStick extends Item {
 //            }
 
 
-            for (int x = -200; x <= 200; x++){
-                for (int z = -200; z <= 200; z++){
-
-                    BlockPos pos = player.getOnPos().above().offset(x,0,z);
-
-                    BlockState state = level.getBlockState(pos.above());
-                    BlockState state1 = level.getBlockState(pos);
-
-                    if (!state.isAir() && state1.isAir()){
-                        level.setBlock(pos, Blocks.DEEPSLATE.defaultBlockState(), Block.UPDATE_CLIENTS);
-                    }
-
-                }
-            }
+//            for (int x = -200; x <= 200; x++){
+//                for (int z = -200; z <= 200; z++){
+//
+//                    BlockPos pos = player.getOnPos().above().offset(x,0,z);
+//
+//                    BlockState state = level.getBlockState(pos.above());
+//                    BlockState state1 = level.getBlockState(pos);
+//
+//                    if (!state.isAir() && state1.isAir()){
+//                        level.setBlock(pos, Blocks.DEEPSLATE.defaultBlockState(), Block.UPDATE_CLIENTS);
+//                    }
+//
+//                }
+//            }
 
 
 //            if (player.isCrouching()){
@@ -115,7 +115,7 @@ public class DebugStick extends Item {
 //                ));
 //            }
 
-            if (true) return InteractionResultHolder.consume(player.getItemInHand(hand));
+//            if (true) return InteractionResultHolder.consume(player.getItemInHand(hand));
 
 //            int mountainDiameter = 40;
 //
@@ -152,153 +152,153 @@ public class DebugStick extends Item {
 //                }
 //            }
 
-            int radiusStart = 30;
-            int radiusEnd = 90;
-            int fixedRadiusEnd = radiusEnd;
-            float between = radiusEnd - radiusStart;
-
-
-            float minDoughnutRadius = 5;
-            float maxDougnutRadius = 17;
-
-            int maxHeight = 30;
-            int startMountainPeakHeight = 18;
-
-            float noiseModifier = 0.05337f;
-
-            float noiseOffset = 4332.43f;
-            noiseOffset = 15435.324f;
-
-            int deepslateHeight = 6;
-
-            Random r1 = new Random(432432);
-            Random r2 = new Random(8454534);
-
-            for (int x = -radiusEnd; x <= radiusEnd;x++){
-                for (int z = -radiusEnd; z <= radiusEnd;z++){
-                    double d = Math.sqrt(x * x + z * z);
-                    if (d < radiusStart || d > radiusEnd) continue;
-
-                    double angle = Math.atan2(z,x);
-
-                    float doughnutSinVal = (float) Math.abs(Math.cos(angle * 4));
-                    doughnutSinVal = (float) Math.pow(doughnutSinVal,2);
-
-
-                    float currentDougnutRad = FDMathUtil.lerp(minDoughnutRadius,maxDougnutRadius,doughnutSinVal);
-
-
-
-                    float sinval = 0.7f + 0.3f * FDEasings.easeInOut(( float) Math.abs(Math.cos(angle * 4)));
-
-                    float radval = 1 - Math.abs( (float)d - radiusStart - between/2 ) / between * 2; radval = FDEasings.easeOut(radval);
-
-
-                    float noise = SimplexNoise.noise(x * noiseModifier + noiseOffset, z * noiseModifier + noiseOffset) * 0.5f + 1f;
-
-
-                    int height = Math.round(sinval * maxHeight * (noise * 0.4f + 0.6f) * radval);
-
-
-                    for (int y = 0; y < height;y++){
-
-                        if (y >= 1) {
-                            Vec3 doughnutCenterLine = new Vec3(x, 0, z).normalize().multiply(radiusStart + between / 2, radiusStart + between / 2, radiusStart + between / 2).add(0,1,0);
-                            Vec3 blockAboutToPlacePos = new Vec3(x, y, z);
-                            Vec3 b = blockAboutToPlacePos.subtract(doughnutCenterLine);
-                            if (b.length() < currentDougnutRad) {
-                                continue;
-                            }
-                        }
-
-                        BlockPos pos = player.getOnPos().offset(x,y,z);
-                        BlockState state = Blocks.BLACKSTONE.defaultBlockState();
-
-
-                        double peakheightsin = Math.abs(Math.sin(angle * 8 + Math.PI/4)) * 6;
-
-                        int dheight = deepslateHeight + (int) Math.round(Math.abs(Math.cos(angle * 4)) * 5);
-
-                        if (y == height - 1 && height >= startMountainPeakHeight - peakheightsin){
-
-                            float currentDegrees = (float)Math.toDegrees((float) angle + FDMathUtil.FPI) ;
-                            float zh = currentDegrees % 90;
-
-                            if (zh > 20 && zh < 70){
-
-                                state = Blocks.SNOW_BLOCK.defaultBlockState();
-                                level.setBlock(pos.below(),Blocks.BLUE_ICE.defaultBlockState(),2);
-
-                            }else{
-                                float ch = r1.nextFloat();
-                                if (ch > 0.75){
-                                    state = Blocks.MAGMA_BLOCK.defaultBlockState();
-                                }
-
-                            }
-
-
-                        }else if (y < dheight){
-
-                            float chanceToBlackstone = y / (float) dheight;
-                            chanceToBlackstone = chanceToBlackstone * chanceToBlackstone;
-
-                            float p = r2.nextFloat();
-
-                            if (p > chanceToBlackstone){
-                                state = Blocks.DEEPSLATE.defaultBlockState();
-                            }
-
-                        }
-
-                        level.setBlock(pos, state, 2);
-
-                    }
-
-
-                }
-
-
-
-
-
-
-
-
-            }
-
-
-            int craterRadius = 8;
-
-            for (int i = 0; i < 4;i++){
-
-                Vec3 d = new Vec3(radiusStart + between/2,0,0).yRot(i * FDMathUtil.FPI / 2);
-
-                Vec3 posDown = player.position().add(d);
-                Vec3 posUp = posDown.add(0,maxHeight,0);
-
-                ClipContext clipContext = new ClipContext(posUp,posDown, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
-
-                var ctx = level.clip(clipContext);
-
-                BlockPos craterPosStart = ctx.getBlockPos();
-
-                for (int x = -craterRadius;x < craterRadius;x++){
-                    for (int y = -craterRadius;y < craterRadius;y++){
-                        for (int z = -craterRadius;z < craterRadius;z++){
-
-                            if (Math.sqrt(x*x + y*y + z*z) > craterRadius) continue;
-
-                            BlockPos removePos = craterPosStart.offset(x,y,z);
-
-                            level.removeBlock(removePos, false);
-
-                        }
-                    }
-                }
-
-
-            }
+//            int radiusStart = 30;
+//            int radiusEnd = 90;
+//            int fixedRadiusEnd = radiusEnd;
+//            float between = radiusEnd - radiusStart;
+//
+//
+//            float minDoughnutRadius = 5;
+//            float maxDougnutRadius = 17;
+//
+//            int maxHeight = 30;
+//            int startMountainPeakHeight = 18;
+//
+//            float noiseModifier = 0.05337f;
+//
+//            float noiseOffset = 4332.43f;
+//            noiseOffset = 15435.324f;
+//
+//            int deepslateHeight = 6;
+//
+//            Random r1 = new Random(432432);
+//            Random r2 = new Random(8454534);
+//
+//            for (int x = -radiusEnd; x <= radiusEnd;x++){
+//                for (int z = -radiusEnd; z <= radiusEnd;z++){
+//                    double d = Math.sqrt(x * x + z * z);
+//                    if (d < radiusStart || d > radiusEnd) continue;
+//
+//                    double angle = Math.atan2(z,x);
+//
+//                    float doughnutSinVal = (float) Math.abs(Math.cos(angle * 4));
+//                    doughnutSinVal = (float) Math.pow(doughnutSinVal,2);
+//
+//
+//                    float currentDougnutRad = FDMathUtil.lerp(minDoughnutRadius,maxDougnutRadius,doughnutSinVal);
+//
+//
+//
+//                    float sinval = 0.7f + 0.3f * FDEasings.easeInOut(( float) Math.abs(Math.cos(angle * 4)));
+//
+//                    float radval = 1 - Math.abs( (float)d - radiusStart - between/2 ) / between * 2; radval = FDEasings.easeOut(radval);
+//
+//
+//                    float noise = SimplexNoise.noise(x * noiseModifier + noiseOffset, z * noiseModifier + noiseOffset) * 0.5f + 1f;
+//
+//
+//                    int height = Math.round(sinval * maxHeight * (noise * 0.4f + 0.6f) * radval);
+//
+//
+//                    for (int y = 0; y < height;y++){
+//
+//                        if (y >= 1) {
+//                            Vec3 doughnutCenterLine = new Vec3(x, 0, z).normalize().multiply(radiusStart + between / 2, radiusStart + between / 2, radiusStart + between / 2).add(0,1,0);
+//                            Vec3 blockAboutToPlacePos = new Vec3(x, y, z);
+//                            Vec3 b = blockAboutToPlacePos.subtract(doughnutCenterLine);
+//                            if (b.length() < currentDougnutRad) {
+//                                continue;
+//                            }
+//                        }
+//
+//                        BlockPos pos = player.getOnPos().offset(x,y,z);
+//                        BlockState state = Blocks.BLACKSTONE.defaultBlockState();
+//
+//
+//                        double peakheightsin = Math.abs(Math.sin(angle * 8 + Math.PI/4)) * 6;
+//
+//                        int dheight = deepslateHeight + (int) Math.round(Math.abs(Math.cos(angle * 4)) * 5);
+//
+//                        if (y == height - 1 && height >= startMountainPeakHeight - peakheightsin){
+//
+//                            float currentDegrees = (float)Math.toDegrees((float) angle + FDMathUtil.FPI) ;
+//                            float zh = currentDegrees % 90;
+//
+//                            if (zh > 20 && zh < 70){
+//
+//                                state = Blocks.SNOW_BLOCK.defaultBlockState();
+//                                level.setBlock(pos.below(),Blocks.BLUE_ICE.defaultBlockState(),2);
+//
+//                            }else{
+//                                float ch = r1.nextFloat();
+//                                if (ch > 0.75){
+//                                    state = Blocks.MAGMA_BLOCK.defaultBlockState();
+//                                }
+//
+//                            }
+//
+//
+//                        }else if (y < dheight){
+//
+//                            float chanceToBlackstone = y / (float) dheight;
+//                            chanceToBlackstone = chanceToBlackstone * chanceToBlackstone;
+//
+//                            float p = r2.nextFloat();
+//
+//                            if (p > chanceToBlackstone){
+//                                state = Blocks.DEEPSLATE.defaultBlockState();
+//                            }
+//
+//                        }
+//
+//                        level.setBlock(pos, state, 2);
+//
+//                    }
+//
+//
+//                }
+//
+//
+//
+//
+//
+//
+//
+//
+//            }
+//
+//
+//            int craterRadius = 8;
+//
+//            for (int i = 0; i < 4;i++){
+//
+//                Vec3 d = new Vec3(radiusStart + between/2,0,0).yRot(i * FDMathUtil.FPI / 2);
+//
+//                Vec3 posDown = player.position().add(d);
+//                Vec3 posUp = posDown.add(0,maxHeight,0);
+//
+//                ClipContext clipContext = new ClipContext(posUp,posDown, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+//
+//                var ctx = level.clip(clipContext);
+//
+//                BlockPos craterPosStart = ctx.getBlockPos();
+//
+//                for (int x = -craterRadius;x < craterRadius;x++){
+//                    for (int y = -craterRadius;y < craterRadius;y++){
+//                        for (int z = -craterRadius;z < craterRadius;z++){
+//
+//                            if (Math.sqrt(x*x + y*y + z*z) > craterRadius) continue;
+//
+//                            BlockPos removePos = craterPosStart.offset(x,y,z);
+//
+//                            level.removeBlock(removePos, false);
+//
+//                        }
+//                    }
+//                }
+//
+//
+//            }
 
 
 
@@ -343,13 +343,13 @@ public class DebugStick extends Item {
 //            }
 
 
-//            BlockPos base = player.getOnPos();
+            BlockPos base = player.getOnPos();
 //
 //
-//            for (int x = 0; x < 200;x++){
-//                for (int y = 0; y < 200;y++){
+//            for (int x = 0; x < 300;x++){
+//                for (int y = 0; y < 20;y++){
 //                    boolean wasInterrupted = false;
-//                    for (int z = 0; z < 200;z++){
+//                    for (int z = 0; z < 300;z++){
 //                        BlockPos setPos = base.offset(x,y,z);
 //                        BlockState state = level.getBlockState(setPos);
 //                        if (state.isAir() || state.is(Blocks.STRUCTURE_VOID)){
@@ -372,6 +372,33 @@ public class DebugStick extends Item {
 //                    }
 //                }
 //            }
+
+            List<Block> allowedToReplace = List.of(
+                    Blocks.BLACKSTONE,
+                    Blocks.POLISHED_BLACKSTONE,
+                    Blocks.POLISHED_BLACKSTONE_BRICKS
+            );
+
+            int rad = 40;
+
+            int height = 9;
+
+            for (int x = -rad; x <= rad; x++){
+                for (int z = -rad; z <= rad; z++){
+
+
+                    BlockState state = level.getBlockState(base);
+
+                    Block block = state.getBlock();
+
+                    if (!allowedToReplace.contains(block)) continue;
+
+
+
+
+
+                }
+            }
 
 
 
