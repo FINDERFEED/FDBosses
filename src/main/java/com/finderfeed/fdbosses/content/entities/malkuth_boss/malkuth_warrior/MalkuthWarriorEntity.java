@@ -21,7 +21,9 @@ import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
@@ -329,6 +331,16 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
             this.setYRot(this.yBodyRot);
 
         }
+    }
+
+    @Override
+    protected SoundEvent getHurtSound(DamageSource p_33034_) {
+        return BossSounds.MALKUTH_WARRIOR_HIT.get();
+    }
+
+    @Override
+    protected SoundEvent getDeathSound() {
+        return BossSounds.MALKUTH_WARRIOR_HIT.get();
     }
 
     @Override

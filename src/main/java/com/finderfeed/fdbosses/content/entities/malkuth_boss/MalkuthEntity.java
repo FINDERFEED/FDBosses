@@ -2098,6 +2098,27 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     @Override
     public boolean hurt(DamageSource src, float damage) {
 
+        if (src.getEntity() instanceof ServerPlayer serverPlayer){
+
+            Vec3 position = this.position();
+
+            double dist = serverPlayer.position().distanceTo(position);
+
+            if (dist < 5){
+
+                level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.MALKUTH_HIT.get(), SoundSource.HOSTILE,1f,0.5f);
+
+                PacketDistributor.sendToPlayer(serverPlayer, new DefaultShakePacket(FDShakeData.builder()
+                        .outTime(5)
+                        .amplitude(0.15f)
+                        .build()));
+
+                serverPlayer.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 2));
+
+            }
+
+        }
+
         if (!src.is(DamageTypes.GENERIC_KILL) && !src.is(DamageTypes.FELL_OUT_OF_WORLD)) return false;
 
         return super.hurt(src, damage);
@@ -2120,7 +2141,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     private void changeTarget(){
-        List<Player> combatants = this.getCombatants(true);
+        List<Player> combatants = this.getCombatants(false);
         if (combatants.isEmpty()){
             this.setTarget(null);
         }else{

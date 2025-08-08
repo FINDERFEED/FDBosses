@@ -131,5 +131,11 @@
   },
   "volcano_rumbling_loop": {
     "sounds": ["fdbosses:volcano_rumbling_loop"]
+  },
+  "malkuth_hit": {
+    "sounds": ["fdbosses:malkuth_hit"]
+  },
+  "malkuth_warrior_hit": {
+    "sounds": ["fdbosses:malkuth_warrior_hit"]
   }
 }

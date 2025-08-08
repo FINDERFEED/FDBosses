@@ -167,7 +167,7 @@ public class BossEntities {
     public static final Supplier<EntityType<MalkuthEntity>> MALKUTH = ENTITIES.register("malkuth",()->EntityType.Builder.of(
             MalkuthEntity::new, MobCategory.CREATURE
     )
-            .sized(1f,4f)
+            .sized(1.5f,3f)
             .build("malkuth"));
 
     public static final Supplier<EntityType<MalkuthSlashProjectile>> MALKUTH_SLASH = ENTITIES.register("malkuth_slash",()->EntityType.Builder.of(
@@ -221,7 +221,7 @@ public class BossEntities {
     public static final Supplier<EntityType<MalkuthBossSpawner>> MALKUTH_BOSS_SPAWNER = ENTITIES.register("malkuth_boss_spawner",()->EntityType.Builder.of(
                     MalkuthBossSpawner::new, MobCategory.MISC
             )
-            .sized(2f,2f)
+            .sized(0.5f,1f)
             .build("malkuth_boss_spawner"));
 
     public static final Supplier<EntityType<MalkuthGiantSwordSlash>> MALKUTH_GIANT_SWORD = ENTITIES.register("malkuth_giant_sword_slash",()->EntityType.Builder.of(
