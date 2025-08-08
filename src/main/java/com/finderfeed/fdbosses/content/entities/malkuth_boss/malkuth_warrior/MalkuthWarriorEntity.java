@@ -295,41 +295,63 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
         super.tick();
         if (level().isClientSide){
 
-            this.getHeadControllerContainer().clientTick();
+            if (!this.isDeadOrDying()) {
 
-            var ticker = this.getAnimationSystem().getTicker(MAIN_LAYER);
 
-            if (ticker == null){
-                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build());
-            }else {
+                this.getHeadControllerContainer().clientTick();
 
-                Animation anim = ticker.getAnimation();
+                var ticker = this.getAnimationSystem().getTicker(MAIN_LAYER);
 
-                if (anim instanceof TransitionAnimation tr){
-                    anim = tr.getTransitionTo();
-                }
+                if (ticker == null) {
+                    this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build());
+                } else {
 
-                if (anim == BossAnims.MALKUTH_WARRIOR_IDLE.get()) {
-                    if (this.walkAnimation.speed() > 0.05f) {
-                        this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_WALK)
-                                .setToNullTransitionTime(5)
-                                        .setSpeed(1.25f)
-                                .build());
+                    Animation anim = ticker.getAnimation();
+
+                    if (anim instanceof TransitionAnimation tr) {
+                        anim = tr.getTransitionTo();
                     }
-                }else if (anim == BossAnims.MALKUTH_WARRIOR_WALK.get()){
-                    if (this.walkAnimation.speed() < 0.05f){
-                        this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build());
+
+                    if (anim == BossAnims.MALKUTH_WARRIOR_IDLE.get()) {
+                        if (this.walkAnimation.speed() > 0.05f) {
+                            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_WALK)
+                                    .setToNullTransitionTime(5)
+                                    .setSpeed(2f)
+                                    .build());
+                        }
+                    } else if (anim == BossAnims.MALKUTH_WARRIOR_WALK.get()) {
+                        if (this.walkAnimation.speed() < 0.05f) {
+                            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build());
+                        }
                     }
                 }
             }
         }else{
 
-            slamCooldown = Math.clamp(slamCooldown - 1, 0, Integer.MAX_VALUE);
+            if (tickCount == 1){
 
-            this.attackChain.tick();
+                Vec3 forward = this.getForward().multiply(1,0,1).normalize().multiply(100,100,100);
 
-            this.setYRot(this.yBodyRot);
+                this.getLookControl().setLookAt(this.position().add(forward).add(0,this.getEyeHeight(),0));
+            }
 
+            if (!this.isDeadOrDying()) {
+                slamCooldown = Math.clamp(slamCooldown - 1, 0, Integer.MAX_VALUE);
+
+                this.attackChain.tick();
+
+                this.setYRot(this.yBodyRot);
+            }
+
+        }
+    }
+
+    @Override
+    public void die(DamageSource p_21014_) {
+        super.die(p_21014_);
+        if (!level().isClientSide){
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_DIE)
+                    .build());
         }
     }
 

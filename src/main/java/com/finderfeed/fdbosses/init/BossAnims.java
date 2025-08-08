@@ -209,4 +209,8 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_warrior"));
     });
 
+    public static DeferredHolder<Animation,Animation> MALKUTH_WARRIOR_DIE = ANIMATIONS.register("malkuth_warrior_die", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_warrior"));
+    });
+
 }
