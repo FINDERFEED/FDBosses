@@ -4,6 +4,7 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "fdbosses.refmap.json",
   "mixins": [
+    "BeardifierMixin",
     "CraftingMenuMixin",
     "EntityMixin",
     "JigsawPlacementMixin",

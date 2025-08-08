@@ -1,8 +1,11 @@
 package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
+import com.finderfeed.fdbosses.content.structures.MalkuthArenaStructure;
 import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossItems;
+import it.unimi.dsi.fastutil.objects.ObjectList;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -15,13 +18,50 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.levelgen.Beardifier;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.levelgen.structure.StructureStart;
+import net.minecraft.world.level.levelgen.structure.TerrainAdjustment;
+import net.minecraft.world.level.levelgen.structure.pools.JigsawJunction;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
 
 public class BossMixinHandler {
+
+    public static boolean addBeardifiersToStructureManually(StructureManager structureManager, ChunkPos chunkPos, ObjectList<Beardifier.Rigid> beardifiers, StructureStart structureStart){
+
+        Structure structure = structureStart.getStructure();
+
+        if (structure instanceof MalkuthArenaStructure malkuthArenaStructure){
+
+            var bb = structureStart.getBoundingBox();
+
+            var center = bb.getCenter();
+
+            BlockPos startPos = new BlockPos(center.getX(),bb.minY(),center.getZ());
+
+            BoundingBox boundingBox = new BoundingBox(
+                    startPos.getX() - 50,
+                    startPos.getY() - 40,
+                    startPos.getZ() - 50,
+                    startPos.getX() + 50,
+                    startPos.getY(),
+                    startPos.getZ() + 50
+            );
+
+            beardifiers.add(new Beardifier.Rigid(boundingBox, TerrainAdjustment.ENCAPSULATE, 1));
+
+            return true;
+        }
+
+        return false;
+    }
 
     public static Rotation getRotationForStructure(Optional<ResourceLocation> location){
 
