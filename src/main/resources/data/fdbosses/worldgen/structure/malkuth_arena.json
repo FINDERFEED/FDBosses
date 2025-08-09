@@ -2,7 +2,7 @@
   "type": "fdbosses:malkuth_arena",
   "biomes": "#minecraft:is_deep_ocean",
   "start_pool": "fdbosses:malkuth_arena",
-  "step": "surface_structures",
+  "step": "top_layer_modification",
   "terrain_adaptation": "none",
   "spawn_overrides": {
     "ambient": {

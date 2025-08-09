@@ -176,74 +176,39 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .addHeadController(CLIENT_MODEL, "head");
         this.lookControl = this.headControllerContainer;
 
-        AttackOptions<?> sideRocks = AttackOptions.builder()
-                .setPreAttack(DEATTACH_SWORDS)
-                .addAttack(SUMMON_AND_THROW_SIDE_ROCKS)
-                .setNextAttack(ATTACH_SWORDS)
-                .build();
 
         AttackOptions<?> cannons = AttackOptions.chainOptionsBuilder()
                 .addAttack(JUMP_ON_WALL_COMMAND_CANNONS)
-                .addAttack(DELAY_10)
-                .addAttack(JUMP_BACK_ON_SPAWN)
-                .build();
-
-        AttackOptions<?> jumpCrushEarthquake = AttackOptions.chainOptionsBuilder()
-                .addAttack(JUMP_CRUSH)
-                .addAttack(DELAY_20)
-                .addAttack(SUMMON_EARTHQUAKE)
-                .addAttack(DELAY_5)
-                .addAttack(SUMMON_EARTHQUAKE)
-                .addAttack(DELAY_5)
-                .addAttack(SUMMON_EARTHQUAKE)
                 .addAttack(DELAY_5)
                 .addAttack(JUMP_BACK_ON_SPAWN)
                 .build();
 
-        AttackOptions<?> jumpCrushEarthquakeJumpCrushEarthquake = AttackOptions.chainOptionsBuilder()
-                .addAttack(JUMP_CRUSH)
-                .addAttack(DELAY_20)
-                .addAttack(SUMMON_EARTHQUAKE)
-                .addAttack(DELAY_10)
-                .addAttack(JUMP_CRUSH)
-                .addAttack(DELAY_20)
-                .addAttack(SUMMON_EARTHQUAKE)
-                .addAttack(DELAY_10)
-                .addAttack(JUMP_CRUSH)
-                .addAttack(DELAY_20)
-                .addAttack(SUMMON_EARTHQUAKE)
-                .addAttack(DELAY_10)
-                .addAttack(JUMP_BACK_ON_SPAWN)
-                .build();
-
-
-        AttackOptions<?> jumpCrushSlash = AttackOptions.chainOptionsBuilder()
-                .addAttack(JUMP_CRUSH)
-                .addAttack(DELAY_20)
-                .addAttack(SLASH_ATTACK)
-                .addAttack(SLASH_ATTACK)
-                .addAttack(SLASH_ATTACK)
-                .addAttack(JUMP_BACK_ON_SPAWN)
-                .build();
-
-        AttackOptions<?> jumpCrushSlashNEarthquake = AttackOptions.chainOptionsBuilder()
-                .addAttack(JUMP_CRUSH)
-                .addAttack(DELAY_20)
-                .addAttack(SLASH_ATTACK)
+        AttackOptions<?> cannonsNoJumpBack = AttackOptions.chainOptionsBuilder()
+                .addAttack(JUMP_ON_WALL_COMMAND_CANNONS)
                 .addAttack(DELAY_5)
-                .addAttack(SUMMON_EARTHQUAKE)
-                .addAttack(DELAY_10)
-                .addAttack(JUMP_CRUSH)
-                .addAttack(DELAY_5)
-                .addAttack(JUMP_BACK_ON_SPAWN)
                 .build();
+
+        AttackOptions<?> jumpCrushEarthquake = AttackOptions.chainOptionsBuilder().addAttack(JUMP_CRUSH).addAttack(DELAY_10).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(JUMP_BACK_ON_SPAWN).build();
+        AttackOptions<?> jumpCrushEarthquakeNoJumpBack = AttackOptions.chainOptionsBuilder().addAttack(JUMP_CRUSH).addAttack(DELAY_10).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).build();
+
+        AttackOptions<?> jumpCrushEarthquakeJumpCrushEarthquake = AttackOptions.chainOptionsBuilder().addAttack(JUMP_CRUSH).addAttack(DELAY_10).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(JUMP_CRUSH).addAttack(DELAY_5).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(JUMP_CRUSH).addAttack(DELAY_5).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(JUMP_BACK_ON_SPAWN).build();
+        AttackOptions<?> jumpCrushEarthquakeJumpCrushEarthquakeNoJumpBack = AttackOptions.chainOptionsBuilder().addAttack(JUMP_CRUSH).addAttack(DELAY_10).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(JUMP_CRUSH).addAttack(DELAY_5).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(JUMP_CRUSH).addAttack(DELAY_5).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).build();
+
+        AttackOptions<?> jumpCrushSlashNEarthquake = AttackOptions.chainOptionsBuilder().addAttack(JUMP_CRUSH).addAttack(DELAY_10).addAttack(SLASH_ATTACK).addAttack(DELAY_5).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(SLASH_ATTACK).addAttack(DELAY_5).addAttack(JUMP_CRUSH).addAttack(DELAY_5).addAttack(JUMP_BACK_ON_SPAWN).build();
+        AttackOptions<?> jumpCrushSlashNEarthquakeNoJumpBack = AttackOptions.chainOptionsBuilder().addAttack(JUMP_CRUSH).addAttack(DELAY_10).addAttack(SLASH_ATTACK).addAttack(DELAY_5).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(SLASH_ATTACK).addAttack(DELAY_5).addAttack(JUMP_CRUSH).addAttack(DELAY_5).build();
 
 
         AttackOptions<?> randomJumpCrush = AttackOptions.builder()
                 .addAttack(jumpCrushEarthquake)
                 .addAttack(jumpCrushEarthquakeJumpCrushEarthquake)
-                .addAttack(jumpCrushSlash)
                 .addAttack(jumpCrushSlashNEarthquake)
+                .build();
+
+
+        AttackOptions<?> randomJumpCrushNoJumpBack = AttackOptions.builder()
+                .addAttack(jumpCrushEarthquakeNoJumpBack)
+                .addAttack(jumpCrushEarthquakeJumpCrushEarthquakeNoJumpBack)
+                .addAttack(jumpCrushSlashNEarthquakeNoJumpBack)
                 .build();
 
 
@@ -305,15 +270,15 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
                 .addAttack(id++, slashOptions)
-                .addAttack(id++, randomJumpCrush)
-                .addAttack(id++, cannons)
+                .addAttack(id++, randomJumpCrushNoJumpBack)
+                .addAttack(id++, cannonsNoJumpBack)
                 .addAttack(id++, randomJumpCrush)
                 .addAttack(id++, carouselEarthquakes)
-                .addAttack(id++, randomJumpCrush)
+                .addAttack(id++, randomJumpCrushNoJumpBack)
                 .addAttack(id++, cannons)
                 .addAttack(id++, slashOptions)
                 .addAttack(id++, GIANT_SWORDS_ULTIMATE)
-                .addAttack(id++, randomJumpCrush)
+                .addAttack(id++, randomJumpCrushNoJumpBack)
                 .addAttack(id++, cannons)
                 .addAttack(id++, slashOptions)
                 .addAttack(id++, randomJumpCrush)
@@ -1593,12 +1558,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
                             .important()
                     .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
-            this.jumpOnWallPath = this.makeJumpOnWallPath(20,false);
+            this.jumpOnWallPath = this.makeJumpOnWallPath(23,false);
             attackInstance.nextStage();
         }else if (stage == 1){
 
             if (this.jumpOnWallPath == null){
-                this.jumpOnWallPath = this.makeJumpOnWallPath(20,false);
+                this.jumpOnWallPath = this.makeJumpOnWallPath(23,false);
             }
 
             if (tick >= 6) {
@@ -1731,16 +1696,18 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private ProjectileMovementPath makeJumpOnWallPath(int time, boolean reversed){
 
-        Vec3 start = this.spawnPosition;
+        Vec3 start = this.position();
 
         Vec3 offset = WALL_OFFSET;
 
-        Vec3 end = start.add(offset);
+        Vec3 end = this.spawnPosition.add(offset);
 
-        Vec3 hoffset = offset.multiply(1,0,1);
-        Vec3 v1 = start.add(hoffset.multiply(0.25,0.25,0.25).add(0,10,0));
-        Vec3 v2 = start.add(hoffset.multiply(0.5,0.5,0.5).add(0,17,0));
-        Vec3 v3 = start.add(hoffset.multiply(0.75,0.75,0.75).add(0,15,0));
+        double yDiff = end.y - start.y;
+
+        Vec3 hoffset = end.subtract(start).multiply(1,0,1);
+        Vec3 v1 = start.add(hoffset.multiply(0.25,0.25,0.25).add(0,yDiff + 5,0));
+        Vec3 v2 = start.add(hoffset.multiply(0.5,0.5,0.5).add(0,yDiff + 10,0));
+        Vec3 v3 = start.add(hoffset.multiply(0.75,0.75,0.75).add(0,yDiff + 5,0));
 
         ProjectileMovementPath path = new ProjectileMovementPath(time,false);
         if (!reversed){
@@ -1976,6 +1943,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             if (tick == swordSpawnTick - 5){
 
+                this.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(-100,0,0).add(this.position()));
+
                 Vector3f red = MalkuthEntity.getMalkuthAttackPreparationParticleColor(giantSwordUltimateStartAttackType);
                 Vector3f blue = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType));
 
@@ -2141,7 +2110,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     private void changeTarget(){
-        List<Player> combatants = this.getCombatants(false);
+        List<Player> combatants = this.getCombatants(true);
         if (combatants.isEmpty()){
             this.setTarget(null);
         }else{
