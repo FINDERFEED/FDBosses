@@ -29,6 +29,7 @@ import com.finderfeed.fdlib.init.FDRenderTypes;
 import com.finderfeed.fdlib.init.FDScreenEffects;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.network.lib_packets.PlaySoundInEarsPacket;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
@@ -59,6 +60,7 @@ import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -327,6 +329,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.headControllerContainer.clientTick();
         }else{
 
+//            BossUtil.malkuthSwordsInsertParticles((ServerLevel) level(), this.position(), 30, this.getId());
+
             this.bossbar.setPercentage(this.hits / (float) this.getMaxHits());
 
             AnimationSystem animationSystem = this.getAnimationSystem();
@@ -432,9 +436,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 ;
 
         CutsceneData data2 = CutsceneData.create()
-                .addScreenEffect(199, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1),0,30,30)
+                .addScreenEffect(219, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1),0,30,30)
                 .addCameraPos(last)
-                .time(200)
+                .time(220)
                 ;
         data1.nextCutscene(data2);
 
@@ -448,19 +452,53 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         int animStartTime = 5;
         int animEndtime = animStartTime + BossAnims.MALKUTH_DEATH.get().getAnimTime();
 
-        if (this.deathTime == animStartTime){
+        if (!level().isClientSide) {
+            if (this.deathTime == animStartTime) {
 
-            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_DEATH).build());
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_DEATH).build());
 
-        } else if (this.deathTime == animEndtime + 10){
+            } else if (deathTime == animEndtime - 38){
+                DefaultShakePacket.send((ServerLevel) level(), spawnPosition, 40, FDShakeData.builder()
+                        .amplitude(0.3f)
+                        .outTime(30)
+                        .build());
+                for (var player : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level(), this.spawnPosition.subtract(0,2,0),40,40)){
+                    PacketDistributor.sendToPlayer(player, new PlaySoundInEarsPacket(BossSounds.MALKUTH_HIT.get(),0.75f,1f));
+                    PacketDistributor.sendToPlayer(player, new PlaySoundInEarsPacket(BossSounds.MALKUTH_VOLCANO_ERRUPTION.get(),1.75f,1f));
+                }
+            }else if (this.deathTime == animEndtime - 37) {
+                BossUtil.malkuthSwordsInsertParticles((ServerLevel) level(), this.spawnPosition, 100, this.getId());
 
-            if (level() instanceof ServerLevel serverLevel) {
+            } else if (this.deathTime == animEndtime + 15) {
+
                 this.dropLoot = true;
-                this.dropAllDeathLoot(serverLevel, level().damageSources().generic());
+                this.dropAllDeathLoot((ServerLevel) level(), level().damageSources().generic());
+
+                Vector3f col1 = getAndRandomizeColor(MalkuthAttackType.FIRE, random);
+                Vector3f col2 = getAndRandomizeColor(MalkuthAttackType.ICE, random);
+
+                BallParticleOptions options = BallParticleOptions.builder()
+                        .color(col1.x,col1.y,col1.z)
+                        .scalingOptions(0,0,25)
+                        .size(0.25f)
+                        .brightness(2)
+                        .friction(0.8f)
+                        .build();
+                BallParticleOptions options2 = BallParticleOptions.builder()
+                        .color(col2.x,col2.y,col2.z)
+                        .scalingOptions(0,0,25)
+                        .size(0.25f)
+                        .brightness(2)
+                        .friction(0.8f)
+                        .build();
+                for (var player : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level(), this.spawnPosition.subtract(0,2,0),40,40)){
+                    player.connection.send(new ClientboundLevelParticlesPacket(options, true, this.getX(), this.getY(), this.getZ(), 1f, 1f, 1f,0.75f,400));
+                    player.connection.send(new ClientboundLevelParticlesPacket(options2, true, this.getX(), this.getY(), this.getZ(), 1f, 1f, 1f,0.75f,400));
+                }
+
+                this.setRemoved(RemovalReason.KILLED);
+
             }
-
-            this.setRemoved(RemovalReason.KILLED);
-
         }
 
 

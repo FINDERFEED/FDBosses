@@ -41,6 +41,7 @@ public class BossUtil {
     public static final int MALKUTH_FLOAT_PARTICLES = 9;
     public static final int MALKUTH_FIREBALL_EXPLODE = 10;
     public static final int MALKUTH_VOLCANO_ERRUPTION = 11;
+    public static final int MALKUTH_SWORD_INSERT_PARTICLES = 12;
 
     /**
      * Air Friction? What?
@@ -96,6 +97,10 @@ public class BossUtil {
             double z = pos.z - entity.getZ();
             return x * x + z * z <= radius * radius;
         };
+    }
+
+    public static void malkuthSwordsInsertParticles(ServerLevel serverLevel, Vec3 pos, double radius, int malkuthEntityId){
+        posEvent(serverLevel, pos, MALKUTH_SWORD_INSERT_PARTICLES, malkuthEntityId, radius);
     }
 
     public static void volcanoErruptionParticles(ServerLevel serverLevel, Vec3 pos, int radius16, double sendRadius){

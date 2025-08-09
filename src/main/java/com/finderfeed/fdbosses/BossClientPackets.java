@@ -33,6 +33,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -185,7 +186,101 @@ public class BossClientPackets {
             case BossUtil.MALKUTH_VOLCANO_ERRUPTION -> {
                 volcanoErruptionParticles(pos,data);
             }
+            case BossUtil.MALKUTH_SWORD_INSERT_PARTICLES -> {
+                malkuthSwordInsertParticles(data);
+            }
         }
+    }
+
+    public static void malkuthSwordInsertParticles(int malkuthEntityId){
+
+        Level level = FDClientHelpers.getClientLevel();
+
+        if (!(level.getEntity(malkuthEntityId) instanceof MalkuthEntity malkuth)) return;
+
+        Matrix4f iceSwordTransform = malkuth.getModelPartTransformation(malkuth, MalkuthEntity.getMalkuthSwordPlaceBone(MalkuthAttackType.ICE),MalkuthEntity.getClientModel());
+        Matrix4f fireSwordTransform = malkuth.getModelPartTransformation(malkuth, MalkuthEntity.getMalkuthSwordPlaceBone(MalkuthAttackType.FIRE),MalkuthEntity.getClientModel());
+
+        Vector3f v1 = iceSwordTransform.transformPosition(0,0,0, new Vector3f());
+        Vector3f v2 = fireSwordTransform.transformPosition(0,0,0, new Vector3f());
+
+        Vector3f vd1 = iceSwordTransform.transformDirection(0,1,0, new Vector3f());
+        Vector3f vd2 = fireSwordTransform.transformDirection(0,1,0, new Vector3f());
+
+        Vec3 posIce = malkuth.position().add(v1.x,v1.y,v1.z);
+        Vec3 posFire = malkuth.position().add(v2.x,v2.y,v2.z);
+
+        Vec3 dirIce = new Vec3(vd1.x,vd1.y,vd1.z);
+        Vec3 dirFire = new Vec3(vd2.x,vd2.y,vd2.z);
+
+        swordInsertParticles(MalkuthAttackType.ICE, posIce, dirIce);
+        swordInsertParticles(MalkuthAttackType.FIRE, posFire, dirFire);
+
+    }
+
+    public static void swordInsertParticles(MalkuthAttackType type, Vec3 pos, Vec3 direction){
+
+        Matrix4f t = new Matrix4f();
+
+        FDRenderUtil.applyMovementMatrixRotations(t, direction);
+
+        Level level = FDClientHelpers.getClientLevel();
+
+        float maxSize = 0.35f;
+        float minSize = 0.1f;
+
+        for (int i = 0; i < 200;i++){
+
+            float angle = FDMathUtil.FPI * 2 * random.nextFloat();
+
+            float hoffset = random.nextFloat() * 0.5f;
+
+            Vector3f v = new Vector3f(hoffset,0,0).rotateY(angle);
+
+            v = t.transformDirection(v);
+
+            Vec3 p = pos.add(v.x,v.y,v.z);
+
+            float size = minSize + random.nextFloat() * (maxSize - minSize);
+
+            Vector3f color = MalkuthEntity.getAndRandomizeColor(type, level.random);
+
+            BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                    .scalingOptions(0,0,35 + random.nextInt(10))
+                    .size(size)
+                    .color(color.x,color.y,color.z)
+                    .brightness(2)
+                    .friction(0.7f)
+                    .build();
+
+            float sizep = FDEasings.easeOut(1 - size / maxSize);
+
+            double speed = 0.2f + sizep * 2f * random.nextFloat();
+
+            Vec3 sp = direction.normalize().multiply(speed,speed,speed);
+
+            level.addParticle(ballParticleOptions,true, p.x,p.y,p.z,
+                    sp.x + random.nextFloat() * 0.5f - 0.25f,
+                    sp.y + random.nextFloat() * 0.5f - 0.25f,
+                    sp.z + random.nextFloat() * 0.5f - 0.25f
+            );
+
+            if (level.random.nextFloat() < 0.2f) {
+
+                ParticleType<?> ptype = type.isFire() ? BossParticles.FLAME_WITH_STONE.get() : BossParticles.ICE_CHUNK.get();
+
+                GravityParticleOptions gravityParticleOptions = new GravityParticleOptions(ptype, 20 + random.nextInt(4), 0.6f + random.nextFloat() * 0.6f,
+                        (float) Mob.DEFAULT_BASE_GRAVITY * 20, 2f, true);
+
+                level.addParticle(gravityParticleOptions, true, p.x, p.y, p.z,
+                        sp.x + random.nextFloat() * 0.5f - 0.25f,
+                        sp.y + random.nextFloat() * 0.5f - 0.25f,
+                        sp.z + random.nextFloat() * 0.5f - 0.25f
+                );
+            }
+
+        }
+
     }
 
     public static void volcanoErruptionParticles(Vec3 pos, int data){
