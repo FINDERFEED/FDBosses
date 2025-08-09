@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.content.structures.MalkuthArenaStructure;
 import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossItems;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
@@ -20,14 +21,16 @@ import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.Beardifier;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.TerrainAdjustment;
-import net.minecraft.world.level.levelgen.structure.pools.JigsawJunction;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
@@ -46,21 +49,57 @@ public class BossMixinHandler {
 
             BlockPos startPos = new BlockPos(center.getX(),bb.minY(),center.getZ());
 
-            BoundingBox boundingBox = new BoundingBox(
-                    startPos.getX() - 50,
-                    startPos.getY() - 40,
-                    startPos.getZ() - 50,
-                    startPos.getX() + 50,
-                    startPos.getY(),
-                    startPos.getZ() + 50
-            );
+            int centerBBRadius = 60;
+            int height = 40;
 
-            beardifiers.add(new Beardifier.Rigid(boundingBox, TerrainAdjustment.ENCAPSULATE, 1));
+
+
+            BoundingBox centerBB = new BoundingBox(
+                    -centerBBRadius,-height,-centerBBRadius,
+                    centerBBRadius,-6,centerBBRadius
+            ).moved(startPos.getX(),startPos.getY(),startPos.getZ());
+
+
+            if (boxIntersectsChunk(centerBB, chunkPos, 6)) {
+                beardifiers.add(new Beardifier.Rigid(centerBB, TerrainAdjustment.ENCAPSULATE, 0));
+            }
+
+            int otherBoxRadius = 13;
+
+            addMalkuthArenaBeardifiersInRadius(chunkPos, startPos, structureManager, beardifiers, centerBBRadius + otherBoxRadius - 1, otherBoxRadius, 6, 32, height);
 
             return true;
         }
 
         return false;
+    }
+
+    private static boolean boxIntersectsChunk(BoundingBox box, ChunkPos chunkPos, int bigger){
+        return box.intersects(chunkPos.getMinBlockX() - bigger, chunkPos.getMinBlockZ() - bigger, chunkPos.getMaxBlockX() + bigger, chunkPos.getMaxBlockZ() + bigger);
+    }
+
+    private static void addMalkuthArenaBeardifiersInRadius(ChunkPos chunkPos, BlockPos startPos, StructureManager structureManager, ObjectList<Beardifier.Rigid> beardifiers, int startRadius, int boxRadius, int verticalOffset, int count, int height){
+
+        float angle = 2 * FDMathUtil.FPI / count;
+
+        for (int i = 0; i < count; i++){
+
+            Vec3 offset = new Vec3(startRadius,0,0).yRot(angle * i);
+
+            BlockPos pos = startPos.offset(
+                    (int) Math.floor(offset.x),
+                    (int) Math.floor(offset.y),
+                    (int) Math.floor(offset.z)
+            );
+
+            BoundingBox box = new BoundingBox(-boxRadius, -height, -boxRadius, boxRadius, -verticalOffset, boxRadius)
+                    .moved(pos.getX(), pos.getY(), pos.getZ());
+
+            if (boxIntersectsChunk(box, chunkPos, 6)) {
+                beardifiers.add(new Beardifier.Rigid(box, TerrainAdjustment.ENCAPSULATE, 0));
+            }
+
+        }
     }
 
     public static Rotation getRotationForStructure(Optional<ResourceLocation> location){
