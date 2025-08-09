@@ -26,6 +26,7 @@ import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDRenderTypes;
+import com.finderfeed.fdlib.init.FDScreenEffects;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
@@ -38,12 +39,16 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_sy
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.BaseModelAttachmentData;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.instances.fdmodel.FDModelAttachmentData;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
+import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
+import com.finderfeed.fdlib.systems.cutscenes.EasingType;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
 import com.finderfeed.fdlib.systems.hud.bossbars.FDServerBossBar;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
+import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
@@ -154,6 +159,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     private int hits = 10;
 
     private int maxHits = 10;
+
+    private boolean dropLoot = true;
 
     public MalkuthEntity(EntityType<? extends FDMob> type, Level level) {
         super(type, level);
@@ -323,41 +330,43 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.bossbar.setPercentage(this.hits / (float) this.getMaxHits());
 
             AnimationSystem animationSystem = this.getAnimationSystem();
-            if (animationSystem.getTicker(MAIN_LAYER) == null && malkuthBossInitializer.isFinished()){
+            if (animationSystem.getTicker(MAIN_LAYER) == null && malkuthBossInitializer.isFinished() && !this.isDeadOrDying()){
                 animationSystem.startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
             }
 
-            if (malkuthBossInitializer.isFinished() && (!this.isBelowHalfHP() || malkuthSecondPhaseInitializer.isFinished())) {
-                this.attackChain.tick();
+            if (!this.isDeadOrDying()) {
+                if (malkuthBossInitializer.isFinished() && (!this.isBelowHalfHP() || malkuthSecondPhaseInitializer.isFinished())) {
+                    this.attackChain.tick();
 
 
-                if (this.getTarget() != null) {
+                    if (this.getTarget() != null) {
 
-                    var target = this.getTarget();
+                        var target = this.getTarget();
 
-                    this.checkTarget(target);
+                        this.checkTarget(target);
 
-                    if (lookAtTarget) {
-                        this.getLookControl().setLookAt(target);
+                        if (lookAtTarget) {
+                            this.getLookControl().setLookAt(target);
+                        }
+
+                    } else {
+
+                        this.changeTarget();
+
+                        if (this.getTarget() == null) {
+                            this.getLookControl().setLookAt(
+                                    this.position().add(this.getForward().multiply(100, 0, 100))
+                            );
+                        }
+
                     }
 
-                }else{
-
-                    this.changeTarget();
-
-                    if (this.getTarget() == null){
-                        this.getLookControl().setLookAt(
-                                this.position().add(this.getForward().multiply(100,0,100))
-                        );
+                } else {
+                    if (!malkuthBossInitializer.isFinished()) {
+                        malkuthBossInitializer.tick();
+                    } else if (!malkuthSecondPhaseInitializer.isFinished()) {
+                        malkuthSecondPhaseInitializer.tick();
                     }
-
-                }
-
-            }else{
-                if (!malkuthBossInitializer.isFinished()) {
-                    malkuthBossInitializer.tick();
-                }else if (!malkuthSecondPhaseInitializer.isFinished()){
-                    malkuthSecondPhaseInitializer.tick();
                 }
             }
 
@@ -376,6 +385,91 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         if (hits == 0){
             this.kill();
         }
+    }
+
+    @Override
+    public void die(DamageSource src) {
+        this.dropLoot = false;
+
+        for (var repairCrystal : BossTargetFinder.getEntitiesInCylinder(MalkuthRepairCrystal.class, level(), this.spawnPosition.add(0,-3,0),30,40)){
+            repairCrystal.remove(RemovalReason.DISCARDED);
+        }
+
+        this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_FLOAT)
+                .setToNullTransitionTime(0).build());
+        this.getAnimationSystem().stopAnimation(MAIN_LAYER);
+
+        Vec3 teleportPos = this.spawnPosition.add(WALL_OFFSET);
+
+        this.teleportTo(teleportPos.x,teleportPos.y,teleportPos.z);
+
+        this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
+
+        this.lookAt(EntityAnchorArgument.Anchor.EYES, this.position().add(0,0,-100));
+
+        super.die(src);
+
+        CutsceneData data = this.deathCutscene();
+
+        for (var player : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level(), this.spawnPosition.subtract(0,2,0),40,40)){
+            FDLibCalls.startCutsceneForPlayer(player, data);
+        }
+
+    }
+
+    private CutsceneData deathCutscene(){
+
+        Vec3 base = this.spawnPosition;
+        CameraPos last = new CameraPos(base.add(0,16.119,23.010), new Vec3(0,-0.270,0.963));
+
+        CutsceneData data1 = CutsceneData.create()
+                .addScreenEffect(0, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1),0,6,30)
+                .timeEasing(EasingType.EASE_OUT)
+                .time(80)
+                .addCameraPos(new CameraPos(base.add(0,16.119,19.863), new Vec3(0,-0.182,0.983)))
+                .addCameraPos(last)
+
+                ;
+
+        CutsceneData data2 = CutsceneData.create()
+                .addScreenEffect(199, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1),0,30,30)
+                .addCameraPos(last)
+                .time(200)
+                ;
+        data1.nextCutscene(data2);
+
+        return data1;
+    }
+
+    @Override
+    protected void tickDeath() {
+        this.deathTime++;
+
+        int animStartTime = 5;
+        int animEndtime = animStartTime + BossAnims.MALKUTH_DEATH.get().getAnimTime();
+
+        if (this.deathTime == animStartTime){
+
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_DEATH).build());
+
+        } else if (this.deathTime == animEndtime + 10){
+
+            if (level() instanceof ServerLevel serverLevel) {
+                this.dropLoot = true;
+                this.dropAllDeathLoot(serverLevel, level().damageSources().generic());
+            }
+
+            this.setRemoved(RemovalReason.KILLED);
+
+        }
+
+
+
+    }
+
+    @Override
+    protected boolean shouldDropLoot() {
+        return dropLoot;
     }
 
     public int getCurrentHits(){
@@ -1597,35 +1691,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
         }
-//        else if (stage == 3){
-//            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
-//                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
-//            this.jumpOnWallPath = this.makeJumpOnWallPath(20,true);
-//            attackInstance.nextStage();
-//        }
-//        else if (stage == 4){
-//            if (this.jumpOnWallPath == null){
-//                this.jumpOnWallPath = this.makeJumpOnWallPath(20,true);
-//            }
-//
-//            if (tick >= 6) {
-//                if (tick == 6){
-//                    this.doJumpStartParticles(0);
-//                }
-//                this.jumpOnWallPath.tick(this);
-//                this.noPhysics = true;
-//                this.setNoGravity(true);
-//            }
-//            if (this.jumpOnWallPath.isFinished()){
-//                this.setNoGravity(false);
-//                this.noPhysics = false;
-//                attackInstance.nextStage();
-//                this.setDeltaMovement(0,0,0);
-//                this.teleportTo(this.spawnPosition.x,this.spawnPosition.y,this.spawnPosition.z);
-//
-//                this.doJumpStartParticles(0);
-//            }
-//        }
+
         else if (stage == 3){
             if (tick > 60){
                 lookAtTarget = true;
@@ -2110,7 +2176,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     private void changeTarget(){
-        List<Player> combatants = this.getCombatants(true);
+        List<Player> combatants = this.getCombatants(false);
         if (combatants.isEmpty()){
             this.setTarget(null);
         }else{

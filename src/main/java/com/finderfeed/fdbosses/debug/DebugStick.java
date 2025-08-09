@@ -97,25 +97,25 @@ public class DebugStick extends Item {
 //            }
 
 
-//            if (player.isCrouching()){
-//                anchor = player.position();
-//            }else{
-//                Vec3 eyePos = player.getEyePosition();
-//                Vec3 offs = eyePos.subtract(anchor);
-//                Vec3 lookAngle = player.getLookAngle();
-//                new CameraPos(eyePos, lookAngle);
-//                System.out.println("new CameraPos(base.add(%.3f,%.3f,%.3f), new Vec3(%.3f,%.3f,%.3f))".formatted(
-//                        (float)offs.x,
-//                        (float)offs.y,
-//                        (float)offs.z,
-//
-//                        (float)lookAngle.x,
-//                        (float)lookAngle.y,
-//                        (float)lookAngle.z
-//                ));
-//            }
+            if (player.isCrouching()){
+                anchor = player.position();
+            }else{
+                Vec3 eyePos = player.getEyePosition();
+                Vec3 offs = eyePos.subtract(anchor);
+                Vec3 lookAngle = player.getLookAngle();
+                new CameraPos(eyePos, lookAngle);
+                System.out.println("new CameraPos(base.add(%.3f,%.3f,%.3f), new Vec3(%.3f,%.3f,%.3f))".formatted(
+                        (float)offs.x,
+                        (float)offs.y,
+                        (float)offs.z,
 
-//            if (true) return InteractionResultHolder.consume(player.getItemInHand(hand));
+                        (float)lookAngle.x,
+                        (float)lookAngle.y,
+                        (float)lookAngle.z
+                ));
+            }
+
+            if (true) return InteractionResultHolder.consume(player.getItemInHand(hand));
 
 //            int mountainDiameter = 40;
 //

@@ -349,6 +349,7 @@ public class BossClientModEvents {
                                 .addBoneController("head", new HeadBoneTransformation<>())
                                 .addBoneController("leg_right_holder", rightLegIK)
                                 .addBoneController("leg_left_holder", leftLegIK)
+                                .ignoreHurtOverlay(true)
                                 .build())
                         .addLayer(FDEntityRenderLayerOptions.<MalkuthEntity>builder()
                                 .model(BossModels.MALKUTH)
@@ -356,6 +357,7 @@ public class BossClientModEvents {
                                 .addBoneController("head", new HeadBoneTransformation<>())
                                 .addBoneController("leg_right_holder", rightLegIK)
                                 .addBoneController("leg_left_holder", leftLegIK)
+                                .ignoreHurtOverlay(true)
                                 .light(LightTexture.FULL_BRIGHT)
                                 .build())
                 .build());
