@@ -32,7 +32,7 @@ public class MalkuthFloorRenderer extends EntityRenderer<MalkuthFloorEntity> {
 
         Random random = new Random(floor.getId() * 23L);
 
-        float segmentSize = 0.9f;
+        float segmentSize = 1.5f;
 
         float radius = MalkuthFloorEntity.RADIUS;
 

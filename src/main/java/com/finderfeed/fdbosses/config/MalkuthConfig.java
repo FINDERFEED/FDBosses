@@ -43,4 +43,7 @@ public class MalkuthConfig {
     @ConfigValue
     public float malkuthWarriorEarthSlamDamage = 10;
 
+    @ConfigValue
+    public float malkuthFloorDamage = 10;
+
 }

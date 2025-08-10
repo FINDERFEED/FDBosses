@@ -1,11 +1,15 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_floor;
 
+import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBuddy;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.particles.ParticleOptions;
@@ -14,11 +18,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
@@ -46,6 +53,10 @@ public class MalkuthFloorEntity extends Entity {
         if (this.level().isClientSide) {
             this.summonParticles();
             this.particles();
+        }else{
+            if (!this.isDead()) {
+                this.damageAndThrowUp();
+            }
         }
 
         if (this.isDead()){
@@ -53,6 +64,29 @@ public class MalkuthFloorEntity extends Entity {
                 this.setRemoved(RemovalReason.DISCARDED);
             }
             this.deathTicks = Math.clamp(deathTicks - 1,0,DEATH_TME);
+        }
+
+    }
+
+    private void damageAndThrowUp(){
+
+        float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthFloorDamage;
+
+        var targets = BossTargetFinder.getEntitiesInArc(LivingEntity.class, level(), this.position(), new Vec2(0,-1), FDMathUtil.FPI, 2.5f,RADIUS);
+        for (var target : targets){
+
+            if (target instanceof MalkuthBossBuddy) continue;
+
+            target.hurt(level().damageSources().generic(), damage);
+
+            double speed = 1.2f;
+
+            if (target instanceof ServerPlayer serverPlayer){
+                FDLibCalls.setServerPlayerSpeed(serverPlayer, new Vec3(0,speed,0));
+            }else{
+                target.setDeltaMovement(0,speed,0);
+            }
+
         }
 
     }
