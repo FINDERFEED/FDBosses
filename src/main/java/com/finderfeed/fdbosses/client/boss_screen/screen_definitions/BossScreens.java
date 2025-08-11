@@ -169,9 +169,9 @@ public class BossScreens {
                 ))
                 .addSkill(new BossInfo(
                         TextureAtlas.LOCATION_BLOCKS,
-                        Component.translatable("fdbosses.skills.malkuth.kingly_leap"),
-                        Component.translatable("fdbosses.skills.malkuth.kingly_leap_stats"),
-                        Component.translatable("fdbosses.skills.malkuth.kingly_leap_description")
+                        Component.translatable("fdbosses.skills.malkuth.earthshatter"),
+                        Component.translatable("fdbosses.skills.malkuth.earthshatter_stats"),
+                        Component.translatable("fdbosses.skills.malkuth.earthshatter_description")
                 ))
                 .addSkill(new BossInfo(
                         TextureAtlas.LOCATION_BLOCKS,
