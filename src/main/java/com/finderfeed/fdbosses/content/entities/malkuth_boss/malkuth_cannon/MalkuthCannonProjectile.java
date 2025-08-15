@@ -9,6 +9,7 @@ import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleO
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
@@ -219,7 +220,7 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
                     malkuth.hurtBoss(1);
                 }else {
                     if (damage != 0) {
-                        target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getMalkuthAttackType(), 100), this.damage);
+                        target.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_CANNONS_SOURCE, this.getMalkuthAttackType(), 100), this.damage);
                     }
                 }
 

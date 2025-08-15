@@ -27,6 +27,14 @@ public class BossDamageSources {
     public static final ResourceKey<DamageType> CHESED_BLOCK_ATTACK = key("chesed_rock_attack");
 
     public static final ResourceKey<DamageType> MALKUTH_COWARDICE = key("malkuth_cowardice");
+    public static final ResourceKey<DamageType> MALKUTH_CANNONS = key("malkuth_cannons");
+    public static final ResourceKey<DamageType> MALKUTH_CHAINPUNCH = key("malkuth_chainpunch");
+    public static final ResourceKey<DamageType> MALKUTH_EARTHSHATTER = key("malkuth_earthshatter");
+    public static final ResourceKey<DamageType> MALKUTH_HELLSHAPER = key("malkuth_hellshaper");
+    public static final ResourceKey<DamageType> MALKUTH_IMPALING_DOOM = key("malkuth_impaling_doom");
+    public static final ResourceKey<DamageType> MALKUTH_SIDE_ROCKS = key("malkuth_side_rocks");
+    public static final ResourceKey<DamageType> MALKUTH_SLASHES = key("malkuth_slashes");
+    public static final ResourceKey<DamageType> MALKUTH_TSARS_WRATH = key("malkuth_tsars_wrath");
 
 
     private static EntityDamageSource CHESED_ATTACK_SOURCE;
@@ -40,6 +48,14 @@ public class BossDamageSources {
     public static DamageSource CHESED_BLOCK_ATTACK_SOURCE;
 
     public static DamageSource MALKUTH_COWARDICE_SOURCE;
+    public static DamageSource MALKUTH_CANNONS_SOURCE;
+    public static DamageSource MALKUTH_CHAINPUNCH_SOURCE;
+    public static DamageSource MALKUTH_EARTHSHATTER_SOURCE;
+    public static DamageSource MALKUTH_HELLSHAPER_SOURCE;
+    public static DamageSource MALKUTH_IMPALING_DOOM_SOURCE;
+    public static DamageSource MALKUTH_SIDE_ROCKS_SOURCE;
+    public static DamageSource MALKUTH_SLASHES_SOURCE;
+    public static DamageSource MALKUTH_TSARS_WRATH_SOURCE;
 
     public static DamageSource chesedAttack(Entity attacker){
         return CHESED_ATTACK_SOURCE.create(attacker);
@@ -57,6 +73,8 @@ public class BossDamageSources {
     public static void registerDamageTypes(ServerStartedEvent event){
         RegistryAccess access = event.getServer().registryAccess();
 
+
+
         CHESED_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_ATTACK));
         CHESED_LOR_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_LOR_EASTER_EGG_ATTACK));
         CHESED_BA_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_BA_EASTER_EGG_ATTACK));
@@ -68,6 +86,14 @@ public class BossDamageSources {
         CHESED_BLOCK_ATTACK_SOURCE = new DamageSource(access.holderOrThrow(CHESED_BLOCK_ATTACK));
 
         MALKUTH_COWARDICE_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_COWARDICE));
+        MALKUTH_CANNONS_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_CANNONS));
+        MALKUTH_CHAINPUNCH_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_CHAINPUNCH));
+        MALKUTH_HELLSHAPER_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_HELLSHAPER));
+        MALKUTH_IMPALING_DOOM_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_IMPALING_DOOM));
+        MALKUTH_SIDE_ROCKS_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_SIDE_ROCKS));
+        MALKUTH_SLASHES_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_SLASHES));
+        MALKUTH_TSARS_WRATH_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_TSARS_WRATH));
+        MALKUTH_EARTHSHATTER_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_EARTHSHATTER));
 
     }
 

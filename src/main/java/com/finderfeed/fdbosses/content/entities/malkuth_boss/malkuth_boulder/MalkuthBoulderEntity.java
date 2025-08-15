@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBuddy;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
@@ -201,7 +202,7 @@ public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializab
         for (var target : entities){
             if (target instanceof LivingEntity livingEntity){
 
-                target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getMalkuthAttackType(), 34), this.damage);
+                target.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_SIDE_ROCKS_SOURCE, this.getMalkuthAttackType(), 34), this.damage);
 
             }
         }

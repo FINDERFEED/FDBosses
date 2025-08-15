@@ -9,6 +9,8 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBuddy;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
@@ -20,19 +22,16 @@ import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOpti
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector2d;
-import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
@@ -77,9 +76,10 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
 
         var targets = BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position(), 2, radius, v->!(v instanceof MalkuthBossBuddy));
 
+
         for (var target : targets){
 
-            target.hurt(level().damageSources().generic(),1);
+            target.hurt(BossDamageSources.MALKUTH_EARTHSHATTER_SOURCE,damage);
 
             Vec3 speed = target.position().subtract(this.position())
                     .multiply(1,0,1)

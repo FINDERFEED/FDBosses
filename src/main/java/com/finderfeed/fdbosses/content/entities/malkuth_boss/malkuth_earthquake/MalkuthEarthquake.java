@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBuddy;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdbosses.init.BossSounds;
@@ -150,7 +151,7 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
             }
 
 
-            entity.hurt(new MalkuthDamageSource(level().damageSources().generic(),this.getEarthquakeType(), 51),damage);
+            entity.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_IMPALING_DOOM_SOURCE,this.getEarthquakeType(), 51),damage);
 
         }
 

@@ -4,6 +4,16 @@
   "item.fdbosses.eye_of_chesed": "Eye Of Chesed",
   "item.fdbosses.malkuth_fire_warrior_spawn_egg": "Malkuth Warrior Spawn Egg (Fire)",
   "item.fdbosses.malkuth_ice_warrior_spawn_egg": "Malkuth Warrior Spawn Egg (Ice)",
+
+  "death.attack.malkuth_cannons": "%s lost the cannon duel",
+  "death.attack.malkuth_chainpunch": "%s was punched to death",
+  "death.attack.earthshatter": "%s became one with the earth",
+  "death.attack.hellshaper": "%s was burnt to an icicle by IceOrFireBall",
+  "death.attack.impaling_doom": "%s was violently impaled through",
+  "death.attack.side_rocks": "%s's face was smashed with a boulder",
+  "death.attack.tsars_wrath": "%s couldn't survive the wrath of fallen king",
+  "death.attack.slashes": "%s found itself neatly sliced",
+
   "death.attack.chesed_roll_attack": "%s was rolled over",
   "death.attack.chesed_attack": "%s was obliterated by %s",
   "death.attack.chesed_lor_attack": "%s was turned into a book by %s",

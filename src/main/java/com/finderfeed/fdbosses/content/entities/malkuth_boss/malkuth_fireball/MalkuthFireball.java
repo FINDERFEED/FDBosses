@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdbosses.init.BossSounds;
@@ -172,7 +173,7 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
         var targets = BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.targetPos.add(0,-1,0), 3, 4f);
 
         for (var target : targets){
-            target.hurt(new MalkuthDamageSource(level().damageSources().generic(), this.getAttackType(), 100),damage);
+            target.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_HELLSHAPER_SOURCE, this.getAttackType(), 100),damage);
         }
 
         this.remove(RemovalReason.DISCARDED);

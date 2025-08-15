@@ -11,7 +11,7 @@ public class MalkuthConfig {
     public float sideRocksDamage = 10;
 
     @ConfigValue
-    public float kingsLeapDamage = 30;
+    public float earthshatterDamage = 30;
 
     @ConfigValue
     public float pullAndPunchDamage = 20;

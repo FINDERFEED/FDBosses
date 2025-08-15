@@ -1437,7 +1437,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     this.summonRepairCrystal(actualPos);
                 }
 
-                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.kingsLeapDamage;
+                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.earthshatterDamage;
 
                 MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level(), actualPos, damage);
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
@@ -1627,7 +1627,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                     for (var e : passengers){
                         if (e instanceof LivingEntity livingEntity){
-                            livingEntity.hurt(livingEntity.damageSources().generic(),damage);
+                            livingEntity.hurt(BossDamageSources.MALKUTH_CHAINPUNCH_SOURCE,damage);
 
                             Vec3 speed = forward.multiply(6,6,6).add(0,-1,0);
 
@@ -2098,12 +2098,14 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 AABB firstBox = new AABB(0,-2,-29,29,10,0).move(this.spawnPosition);
                 AABB secondBox = new AABB(-29,-2,-29,0,10,0).move(this.spawnPosition);
 
+                DamageSource damageSource = BossDamageSources.MALKUTH_TSARS_WRATH_SOURCE;
+
                 for (var entity : this.level().getEntitiesOfClass(LivingEntity.class, firstBox, entity -> !(entity instanceof MalkuthBossBuddy))){
-                    entity.hurt(new MalkuthDamageSource(level().damageSources().generic(), giantSwordUltimateStartAttackType, 100), Integer.MAX_VALUE);
+                    entity.hurt(new MalkuthDamageSource(damageSource, giantSwordUltimateStartAttackType, 100), Integer.MAX_VALUE);
                 }
 
                 for (var entity : this.level().getEntitiesOfClass(LivingEntity.class, secondBox, entity -> !(entity instanceof MalkuthBossBuddy))){
-                    entity.hurt(new MalkuthDamageSource(level().damageSources().generic(), MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType), 100), Integer.MAX_VALUE);
+                    entity.hurt(new MalkuthDamageSource(damageSource, MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType), 100), Integer.MAX_VALUE);
                 }
                 inst.nextStage();
             }
