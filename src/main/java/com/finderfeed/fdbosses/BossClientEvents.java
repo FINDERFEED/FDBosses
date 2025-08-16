@@ -17,13 +17,17 @@ import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.sounds.MusicManager;
+import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -36,6 +40,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
+import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
@@ -57,6 +62,47 @@ public class BossClientEvents {
     public static int chesedDarkenEffectTickMax = 10;
 
     private static GainLoseValue hellscapeSkyValue = new GainLoseValue(0,100);
+
+    private static int a;
+
+    @SubscribeEvent
+    public static void tickEventTest(ClientTickEvent.Pre pre){
+        if (true) return;
+        a++;
+        MusicManager manager = Minecraft.getInstance().getMusicManager();
+
+    }
+
+    @SubscribeEvent
+    public static void renderTickEvent(RenderFrameEvent.Pre event){
+
+        if (true) return;
+        DeltaTracker deltaTracker = event.getPartialTick();
+        float pticks = deltaTracker.getGameTimeDeltaPartialTick(false);
+
+        float time = (a + pticks) / 10f;
+        float volume = ((float) Math.sin(time) + 1) / 2f;
+        System.out.println(volume);
+
+        SoundEngine soundEngine = Minecraft.getInstance().getSoundManager().soundEngine;
+
+        var map = soundEngine.instanceToChannel;
+
+        for (var entry : map.entrySet()){
+
+            var channelHandler = entry.getValue();
+            var sound = entry.getKey();
+            var source = sound.getSource();
+            if (source != SoundSource.MUSIC) continue;
+
+            channelHandler.execute(channel->{
+                channel.setVolume(volume);
+                channel.setPitch(2 - volume);
+            });
+
+        }
+
+    }
 
     @SubscribeEvent
     public static void collectTooltips(ItemTooltipEvent event){
