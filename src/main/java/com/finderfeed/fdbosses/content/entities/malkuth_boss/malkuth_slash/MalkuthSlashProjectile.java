@@ -277,43 +277,48 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
         List<Entity> damagedEntities = new ArrayList<>();
 
         for (float i = 0; i < this.getSlashSize(); i+= 0.2f){
+            this.hurtTargetsOnOffset(damagedEntities, pos, movement, left, i);
+        }
 
-            Vec3 offsetPos = pos.add(left.multiply(i,i,i));
-            Vec3 offsetPos2 = pos.add(left.multiply(-i,-i,-i));
+        this.hurtTargetsOnOffset(damagedEntities,pos,movement,left,this.getSlashSize());
 
-            var targets = FDHelpers.traceEntities(level(), offsetPos, offsetPos.add(movement), 0, (e)->{
-                return !(e instanceof MalkuthBossBuddy);
-            });
+    }
+
+    private void hurtTargetsOnOffset(List<Entity> damagedEntities, Vec3 pos, Vec3 movement, Vec3 left, float offset){
+        Vec3 offsetPos = pos.add(left.multiply(offset,offset,offset));
+        Vec3 offsetPos2 = pos.add(left.multiply(-offset,-offset,-offset));
+
+        var targets = FDHelpers.traceEntities(level(), offsetPos, offsetPos.add(movement), 0, (e)->{
+            return !(e instanceof MalkuthBossBuddy);
+        });
 
 
-            var targets2 = FDHelpers.traceEntities(level(), offsetPos2, offsetPos2.add(movement), 0, (e)->{
-                return !(e instanceof MalkuthBossBuddy);
-            });
+        var targets2 = FDHelpers.traceEntities(level(), offsetPos2, offsetPos2.add(movement), 0, (e)->{
+            return !(e instanceof MalkuthBossBuddy);
+        });
 
-            targets.addAll(targets2);
+        targets.addAll(targets2);
 
-            for (Entity e : targets){
+        for (Entity e : targets){
 
-                if (!damagedEntities.contains(e)){
+            if (!damagedEntities.contains(e)){
 
-                    if (e instanceof LivingEntity livingEntity){
+                if (e instanceof LivingEntity livingEntity){
 
-                        livingEntity.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_SLASHES_SOURCE, this.getAttackType(), MalkuthWeaknessHandler.MAX / 3), this.getDamage());
+                    livingEntity.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_SLASHES_SOURCE, this.getAttackType(), MalkuthWeaknessHandler.MAX / 3), this.getDamage());
 
-                    }else if (e instanceof MalkuthRepairCrystal repairCrystal){
+                }else if (e instanceof MalkuthRepairCrystal repairCrystal){
 
-                        repairCrystal.destroyAndSummonRepairMaterial();
+                    repairCrystal.destroyAndSummonRepairMaterial();
 
-                    }
-
-                    damagedEntities.add(e);
                 }
 
+                damagedEntities.add(e);
             }
 
         }
-
     }
+
 
     @Override
     protected void onHitBlock(BlockHitResult p_37258_) {

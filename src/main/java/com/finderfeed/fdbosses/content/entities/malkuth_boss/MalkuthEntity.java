@@ -330,6 +330,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.headControllerContainer.clientTick();
         }else{
 
+            this.preventEnteringLavaField();
+
 //            BossUtil.malkuthSwordsInsertParticles((ServerLevel) level(), this.position(), 30, this.getId());
 
             this.bossbar.setPercentage(this.hits / (float) this.getMaxHits());
@@ -383,6 +385,37 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.setYRot(this.yBodyRot);
 
         }
+    }
+
+    private void preventEnteringLavaField(){
+
+        for (var entity : BossTargetFinder.getEntitiesInArc(LivingEntity.class, level(), this.spawnPosition.add(0,-1.5,-0.7), new Vec2(0,1), FDMathUtil.FPI, 13, ENRAGE_RADIUS)){
+
+            if (entity instanceof MalkuthBossBuddy) continue;
+
+            Vec3 speed = new Vec3(0,0.025f,-1f);
+
+            if (entity instanceof ServerPlayer serverPlayer){
+                FDLibCalls.setServerPlayerSpeed(serverPlayer, speed);
+            }else{
+                entity.setDeltaMovement(speed);
+            }
+
+            Vector3f col = getAndRandomizeColor(MalkuthAttackType.FIRE, random);
+
+            BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                    .color(col.x,col.y,col.z)
+                    .scalingOptions(0,0,20)
+                    .brightness(2)
+                    .friction(0.7f)
+                    .build();
+
+            ((ServerLevel)level()).sendParticles(ballParticleOptions, entity.getX(),entity.getY() + entity.getBbHeight()/2,entity.getZ(),25,
+                    entity.getBbWidth()/2,entity.getBbHeight()/2,entity.getBbWidth()/2,0.5f);
+
+
+        }
+
     }
 
     public void hurtBoss(int amount){
@@ -1905,7 +1938,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             float angle = FDMathUtil.FPI / slashesAmount;
 
-            float maxSlashSize = (float) Math.sqrt(2 * radius * radius * (1 - (float) Math.cos(angle))) / 2 * 1.15f;
+            float maxSlashSize = (float) Math.sqrt(2 * radius * radius * (1 - (float) Math.cos(angle))) / 2;
 
             float slashSpeed = 2.5f;
 
@@ -1924,16 +1957,31 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 Vec3 direction = startVec.yRot(i * angle + angle / 2);
 
                 Vec3 speed = direction.multiply(slashSpeed,slashSpeed,slashSpeed);
-                speed = speed.add(0,verticalSpeed,0);
+                speed = speed.add(0,verticalSpeed * 0.15f,0);
 
 
-                MalkuthSlashProjectile.summon(level(),this.position().add(0,0.25,0), speed, localCarouselSlash, damage, maxSlashSize, 0, reachDestinationTime);
+                MalkuthSlashProjectile.summon(level(),this.position().add(0,0.25,0), speed, localCarouselSlash, damage, maxSlashSize + 2f, 0, reachDestinationTime);
 
                 if (localCarouselSlash.isFire()){
                     localCarouselSlash = MalkuthAttackType.ICE;
                 }else{
                     localCarouselSlash = MalkuthAttackType.FIRE;
                 }
+
+            }
+
+            for (var entity : BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position().add(0,-2,0),5,2)){
+
+                if (entity instanceof MalkuthBossBuddy) continue;
+
+                MalkuthAttackType malkuthAttackType;
+                if (entity instanceof Player player){
+                    malkuthAttackType = MalkuthWeaknessHandler.getWeakTo(player);
+                }else{
+                    malkuthAttackType = MalkuthAttackType.getRandom(random);
+                }
+
+                entity.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_SLASHES_SOURCE, malkuthAttackType, MalkuthWeaknessHandler.MAX / 3), damage);
 
             }
 
