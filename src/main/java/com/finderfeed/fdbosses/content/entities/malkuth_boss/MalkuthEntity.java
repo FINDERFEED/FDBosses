@@ -278,25 +278,26 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .addAlwaysTryCastAttack(this::checkCanPunch, PULL_AND_PUNCH)
 
 
-                .addAttack(id++, slashOptions)
-                .addAttack(id++, randomJumpCrushNoJumpBack)
-                .addAttack(id++, cannonsNoJumpBack)
-                .addAttack(id++, randomJumpCrush)
-                .addAttack(id++, carouselEarthquakes)
-                .addAttack(id++, randomJumpCrushNoJumpBack)
-                .addAttack(id++, cannons)
-                .addAttack(id++, slashOptions)
-                .addAttack(id++, GIANT_SWORDS_ULTIMATE)
-                .addAttack(id++, randomJumpCrushNoJumpBack)
-                .addAttack(id++, cannons)
-                .addAttack(id++, slashOptions)
-                .addAttack(id++, randomJumpCrush)
-                .addAttack(id++, boulders)
-                .addAttack(id++, AttackOptions.chainOptionsBuilder()
-                        .addAttack(JUMP_CRUSH)
-                        .addAttack(DELAY_10)
-                        .addAttack(PLATFORMS_N_FIREBALLS)
-                        .build())
+                .addAttack(0,CAROUSEL_SLASHES)
+//                .addAttack(id++, slashOptions)
+//                .addAttack(id++, randomJumpCrushNoJumpBack)
+//                .addAttack(id++, cannonsNoJumpBack)
+//                .addAttack(id++, randomJumpCrush)
+//                .addAttack(id++, carouselEarthquakes)
+//                .addAttack(id++, randomJumpCrushNoJumpBack)
+//                .addAttack(id++, cannons)
+//                .addAttack(id++, slashOptions)
+//                .addAttack(id++, GIANT_SWORDS_ULTIMATE)
+//                .addAttack(id++, randomJumpCrushNoJumpBack)
+//                .addAttack(id++, cannons)
+//                .addAttack(id++, slashOptions)
+//                .addAttack(id++, randomJumpCrush)
+//                .addAttack(id++, boulders)
+//                .addAttack(id++, AttackOptions.chainOptionsBuilder()
+//                        .addAttack(JUMP_CRUSH)
+//                        .addAttack(DELAY_10)
+//                        .addAttack(PLATFORMS_N_FIREBALLS)
+//                        .build())
 
 
                 .attackListener(this::attackListener)
@@ -1904,7 +1905,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             float angle = FDMathUtil.FPI / slashesAmount;
 
-            float maxSlashSize = (float) Math.sqrt(2 * radius * radius * (1 - (float) Math.cos(angle))) / 2;
+            float maxSlashSize = (float) Math.sqrt(2 * radius * radius * (1 - (float) Math.cos(angle))) / 2 * 1.15f;
 
             float slashSpeed = 2.5f;
 

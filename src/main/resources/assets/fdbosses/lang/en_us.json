@@ -7,12 +7,12 @@
 
   "death.attack.malkuth_cannons": "%s lost the cannon duel",
   "death.attack.malkuth_chainpunch": "%s was punched to death",
-  "death.attack.earthshatter": "%s became one with the earth",
-  "death.attack.hellshaper": "%s was burnt to an icicle by IceOrFireBall",
-  "death.attack.impaling_doom": "%s was violently impaled through",
-  "death.attack.side_rocks": "%s's face was smashed with a boulder",
-  "death.attack.tsars_wrath": "%s couldn't survive the wrath of fallen king",
-  "death.attack.slashes": "%s found itself neatly sliced",
+  "death.attack.malkuth_earthshatter": "%s became one with the earth",
+  "death.attack.malkuth_hellshaper": "%s was burnt to an icicle by IceOrFireBall",
+  "death.attack.malkuth_impaling_doom": "%s was violently impaled through",
+  "death.attack.malkuth_side_rocks": "%s's face was smashed with a boulder",
+  "death.attack.malkuth_tsars_wrath": "%s couldn't survive the wrath of fallen king",
+  "death.attack.malkuth_slashes": "%s found itself neatly sliced",
 
   "death.attack.chesed_roll_attack": "%s was rolled over",
   "death.attack.chesed_attack": "%s was obliterated by %s",
