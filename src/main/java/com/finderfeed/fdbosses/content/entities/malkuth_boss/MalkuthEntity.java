@@ -835,7 +835,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 Vec3 spawnPos = this.position().add(spawnOffset.x * 0.3f,spawnOffset.y * 0.3f + 2,spawnOffset.z * 0.3f);
                 Vec3 gotoPos = spawnPos.add(spawnOffset.x,spawnOffset.y,spawnOffset.z);
 
-                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.fireballsDamage;
+                float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.fireballsDamage);
 
                 MalkuthFireball malkuthFireball = MalkuthFireball.summon(type, level(), spawnPos, gotoPos, platformPos.add(0,1.5,0), damage);
 
@@ -1017,7 +1017,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 int time = (int) Math.ceil(dist);
 
-                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.impalingDoomDamage;
+                float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.impalingDoomDamage);
 
                 MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(),earthquakeToSummon, this.position().add(0, spawnYOffset, 0), direction, time, FDMathUtil.FPI / 9, damage);
             }else if (tick == 9){
@@ -1077,7 +1077,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 int h = random.nextInt(2);
 
-                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.sideRocksDamage;
+                float damage = BossUtil.transformDamage(level(),BossConfigs.BOSS_CONFIG.get().malkuthConfig.sideRocksDamage);
 
                 MalkuthAttackType currentType = this.sideRocksCurrentType;
 
@@ -1285,7 +1285,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         MalkuthAttackType localType = jumpBackOnSpawnCrushType;
 
-        float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.jumpBackOnSpawnCrushDamage;
+        float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.jumpBackOnSpawnCrushDamage);
 
         for (int i = 0; i < earthquakesCount; i++) {
 
@@ -1376,7 +1376,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 float rotation = this.slashAttackType.isFire() ? 25 : -25;
 
-                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.slashAttackDamage;
+                float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.slashAttackDamage);
 
 
                 MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level(),spawnPos,speedv,this.slashAttackType, damage, 2.2f, rotation,0);
@@ -1471,7 +1471,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     this.summonRepairCrystal(actualPos);
                 }
 
-                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.earthshatterDamage;
+                float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.earthshatterDamage);
 
                 MalkuthCrushAttack malkuthCrushAttack = MalkuthCrushAttack.summon(level(), actualPos, damage);
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
@@ -1649,7 +1649,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                                 .brightness(2)
                         .build(), this.position().add(pos.x,pos.y,pos.z), 60);
 
-                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.pullAndPunchDamage;
+                float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.pullAndPunchDamage);
 
 
                 for (var chain : this.level().getEntitiesOfClass(MalkuthChainEntity.class, this.getBoundingBox().inflate(20,20,20))){
@@ -1824,7 +1824,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
         }
 
-        float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.cannonDamage;
+        float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.cannonDamage);
 
         for (var entry : cannonTargets.entrySet()){
             var cannon = entry.getKey();
@@ -1948,7 +1948,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             MalkuthAttackType localCarouselSlash = this.currentStartCarouselSlash;
 
-            float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.arcSlashesDamage;
+            float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.arcSlashesDamage);
 
             this.playSlashSound();
 

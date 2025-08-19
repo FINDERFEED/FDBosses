@@ -1,14 +1,17 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_floor;
 
 import com.finderfeed.fdbosses.BossTargetFinder;
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBuddy;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -70,14 +73,14 @@ public class MalkuthFloorEntity extends Entity {
 
     private void damageAndThrowUp(){
 
-        float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthFloorDamage;
+        float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthFloorDamage);
 
         var targets = BossTargetFinder.getEntitiesInArc(LivingEntity.class, level(), this.position(), new Vec2(0,-1), FDMathUtil.FPI, 2.5f,RADIUS);
         for (var target : targets){
 
             if (target instanceof MalkuthBossBuddy) continue;
 
-            target.hurt(level().damageSources().generic(), damage);
+            target.hurt(BossDamageSources.MALKUTH_IMPALING_DOOM_SOURCE, damage);
 
             double speed = 1.2f;
 

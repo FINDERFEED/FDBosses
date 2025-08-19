@@ -165,7 +165,7 @@ public class ChesedBossScreen extends BaseBossScreen {
 
     @Override
     public int getBaseStringColor() {
-        return 0x55ccff;
+        return DEFAULT_TEXT_COLOR;
     }
 
 

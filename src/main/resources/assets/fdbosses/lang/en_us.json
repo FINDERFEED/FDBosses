@@ -143,7 +143,7 @@
   "fdbosses.skills.malkuth.impaling_doom_stats": "Spikes:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=malkuthConfig, value=impalingDoomDamage}}.",
   "fdbosses.skills.malkuth.impaling_doom_description": "Damage type: §cFire§r / §bIce§r\n\nMalkuth slams the earth, releasing either a §cFire§r or §bIce§r spikes that travel in the slam direction.\n\nWhen colliding with combatants those spikes hurl them up into the air.",
   "fdbosses.skills.malkuth.earthshatter": "Earthshatter",
-  "fdbosses.skills.malkuth.earthshatter_stats": "Earthshatter:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=malkuthConfig, value=kingsLeapDamage}}.",
+  "fdbosses.skills.malkuth.earthshatter_stats": "Earthshatter:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=malkuthConfig, value=earthshatterDamage}}.",
   "fdbosses.skills.malkuth.earthshatter_description": "Damage type: §7Basic§r\n\nMalkuth leaps to the target and crushes the earth, hurling everyone who were caught in the attack into the air.\n\nDuring the second phase, if there are broken cannons on the combatants side, spawns a special crystal at the attack location.",
   "fdbosses.skills.malkuth.chainpunch": "Chainpunch",
   "fdbosses.skills.malkuth.chainpunch_stats": "Punch:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=malkuthConfig, value=pullAndPunchDamage}}.",

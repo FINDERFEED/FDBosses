@@ -37,6 +37,8 @@ import java.util.List;
 
 public abstract class BaseBossScreen extends SimpleFDScreen {
 
+    public static final int DEFAULT_TEXT_COLOR = 0x55ccff;
+
     public static boolean wasSkillRead = false;
 
     private static int OPEN_TIME = 9;

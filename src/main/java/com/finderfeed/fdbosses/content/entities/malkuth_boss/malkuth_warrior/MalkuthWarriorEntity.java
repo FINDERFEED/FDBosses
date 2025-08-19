@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior;
 
 import com.finderfeed.fdbosses.BossTargetFinder;
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.base.BossMonsterMob;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBuddy;
@@ -129,7 +130,7 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
 
 
 
-                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthWarriorEarthSlamDamage;
+                float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthWarriorEarthSlamDamage);
 
                 MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(), this.entityData.get(WARRIOR_TYPE), this.position(), forward, 20, FDMathUtil.FPI / 6, damage);
 
@@ -209,7 +210,7 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
             if (tick == 5) {
                 level().playSound(null, this.getX(), this.getY() + this.getBbHeight()/2f, this.getZ(), BossSounds.MALKUTH_SLASH.get(), SoundSource.HOSTILE, 1f, 1f + random.nextFloat() * 0.5f);
             }else if (tick == 10){
-                float damage = BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthWarriorDamage;
+                float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthWarriorDamage);
 
                 var type = this.entityData.get(WARRIOR_TYPE);
 
