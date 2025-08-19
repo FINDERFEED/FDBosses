@@ -33,7 +33,10 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 public abstract class BaseBossScreen extends SimpleFDScreen {
 
@@ -44,14 +47,14 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     private static int OPEN_TIME = 9;
     private boolean skillOpened = false;
     private int openTicker = 0;
-    private SkillInfoWidget skillInfoWidget;
-    private TextBlockWidget skillInfoText;
-    private BossScreenOptions options;
-    private BossDetailsWidget bossDetailsWidget;
-    private BossAbilitesWidget bossAbilitesWidget;
-    private FDButton skillStatsButton;
-    private FDButton skillInfoButton;
-    private float bossMenuXStart = 0;
+    protected SkillInfoWidget skillInfoWidget;
+    protected TextBlockWidget skillInfoText;
+    protected BossScreenOptions options;
+    protected BossDetailsWidget bossDetailsWidget;
+    protected BossAbilitesWidget bossAbilitesWidget;
+    protected FDButton skillStatsButton;
+    protected FDButton skillInfoButton;
+    protected float bossMenuXStart = 0;
 
     private DidntReadSkillWarningWidget didntReadSkillWarningWidget;
 
@@ -236,7 +239,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         this.initAbilitiesWidgetModeChangeButtons(bossAbilitesWidget);
 
-        this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget.bossAbilitiesButtonContainer, skills);
+        this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget.bossAbilitiesButtonContainer, skills, false);
 
         this.addRenderableWidget(bossAbilitesWidget);
 
@@ -254,9 +257,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                 .setText(Component.translatable("fdbosses.word.abilities").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         73,1f,true,0,1)
                 .setOnClickAction((fdWidget, v, v1, i) -> {
-                    bossAbilitesWidget.bossAbilitiesButtonContainer.setCurrentScroll(0);
-                    bossAbilitesWidget.bossAbilitiesButtonContainer.removeAllChildren();
-                    this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget.bossAbilitiesButtonContainer, this.options.getSkills());
+                    this.resetAbilities(this.options.getSkills(), false);
                     return true;
                 });
 
@@ -269,15 +270,19 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                 .setText(Component.translatable("fdbosses.word.drops").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         73,1f,true,0,1)
                 .setOnClickAction(((fdWidget, v, v1, i) -> {
-                    bossAbilitesWidget.bossAbilitiesButtonContainer.setCurrentScroll(0);
-                    bossAbilitesWidget.bossAbilitiesButtonContainer.removeAllChildren();
-                    this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget.bossAbilitiesButtonContainer, this.options.getDrops());
+                    this.resetAbilities(this.options.getDrops(), false);
                     return true;
                 }));
 
         bossAbilitesWidget.addChild("openSkills",fdButtonSkills);
         bossAbilitesWidget.addChild("openDrops",fdButtonDrops);
 
+    }
+
+    protected void resetAbilities(List<BossInfo> bossInfos, boolean malkuthShuffle){
+        bossAbilitesWidget.bossAbilitiesButtonContainer.setCurrentScroll(0);
+        bossAbilitesWidget.bossAbilitiesButtonContainer.removeAllChildren();
+        this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget.bossAbilitiesButtonContainer,bossInfos, malkuthShuffle);
     }
 
     private void initTLDRButton(){
@@ -317,12 +322,35 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
 
 
-    private void initAbilitiesWidgetInfoButtons(FDScrollableWidget bossAbilitesWidget, List<BossInfo> bossInfos){
+    private void initAbilitiesWidgetInfoButtons(FDScrollableWidget bossAbilitesWidget, List<BossInfo> bossInfos, boolean malkuthShuffle){
         float offsx = 5;
         float offsy = 4;
+
+        List<BossInfo> bossInfos2 = new ArrayList<>(bossInfos);
+
+        Random random = new Random();
+
+        if (malkuthShuffle && bossInfos2.size() > 1){
+            for (int i = 0; i < bossInfos2.size() * 2; i++){
+
+                int id1 = random.nextInt(bossInfos2.size());
+                BossInfo info1 = bossInfos2.get(id1);
+
+                int id2;
+                while ((id2 = random.nextInt(bossInfos2.size())) == id1);
+
+                BossInfo info2 = bossInfos2.get(id2);
+
+                bossInfos2.set(id1, info2);
+                bossInfos2.set(id2, info1);
+
+            }
+        }
+
         for (int  i = 0; i < bossInfos.size();i++) {
 
             BossInfo bossSkill = bossInfos.get(i);
+            BossInfo skillToOpen = bossInfos2.get(i);
 
             float x = offsx + (i % 5) * 39;
             float y = offsy + (i / 5) * 35;
@@ -352,7 +380,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
                         BaseBossScreen.wasSkillRead = true;
 
-                        this.openSkillInfo(bossSkill,true);
+                        this.openSkillInfo(skillToOpen,true);
 
                         return true;
                     }));

@@ -16,6 +16,8 @@ public class BossAbilitesWidget extends FDWidget {
     private int stringColor;
     public BossAbilitiesButtonContainer bossAbilitiesButtonContainer;
 
+    private int tickCount = 0;
+
     public BossAbilitesWidget(Screen screen, float x, float y, int stringColor) {
         super(screen, x, y, 231,120);
         bossAbilitiesButtonContainer = new BossAbilitiesButtonContainer(screen, 14,26,195,74);
@@ -46,10 +48,29 @@ public class BossAbilitesWidget extends FDWidget {
         FDRenderUtil.bindTexture(FDBosses.location("textures/gui/scroller.png"));
         FDRenderUtil.blitWithBlend(matrices, this.getX() + 211, this.getY() + 28 + p * 62,5,8,0,0,1,1,1,1,0,1);
 
+        if (this.bossAbilitiesButtonContainer.getChildren().size() > 10 && this.bossAbilitiesButtonContainer.getCurrentScroll() == 0){
+
+            float time = tickCount + pticks;
+            float offsetY = (float) Math.sin(time / 2f);
+
+            this.renderArrow(matrices, 15,95 + offsetY);
+
+        }
+
     }
 
+    private void renderArrow(PoseStack matrices, float offsetX, float offsetY){
+        FDRenderUtil.fill(matrices, this.getX() + offsetX, this.getY() + offsetY, 1,1,1f,1f,1f,1f);
+        FDRenderUtil.fill(matrices, this.getX() + offsetX + 1, this.getY() + offsetY + 1, 1,1,1f,1f,1f,1f);
+        FDRenderUtil.fill(matrices, this.getX() + offsetX + 2, this.getY() + offsetY, 1,1,1f,1f,1f,1f);
 
+    }
 
+    @Override
+    public void tick() {
+        super.tick();
+        tickCount++;
+    }
 
     @Override
     public boolean onMouseClick(float v, float v1, int i) {

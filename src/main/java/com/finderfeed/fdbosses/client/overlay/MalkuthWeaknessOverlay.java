@@ -1,9 +1,11 @@
 package com.finderfeed.fdbosses.client.overlay;
 
+import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
 import com.finderfeed.fdlib.systems.screen.screen_particles.ScreenParticlesRenderEvent;
@@ -21,6 +23,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -45,6 +48,9 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
     private static int iceTickerO = 0;
     private static int fireTickerO = 0;
 
+    private static int alpha = 0;
+    private static int alphaO = 0;
+
     @SubscribeEvent
     public static void tickClient(ClientTickEvent.Pre event){
         Player player = FDClientHelpers.getClientPlayer();
@@ -52,6 +58,15 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
             iceTicker = 0;
             fireTicker = 0;
             return;
+        }
+
+        boolean spawnerNearby = hasMalkuthSpawnerNearby();
+
+        alphaO = alpha;
+        if (spawnerNearby){
+            alpha = Mth.clamp(alpha + 1,0, MAX_IN_TIME);
+        }else{
+            alpha = Mth.clamp(alpha - 1,0, MAX_IN_TIME);
         }
 
         MalkuthAttackType weakTo = MalkuthWeaknessHandler.getWeakTo(player);
@@ -68,30 +83,41 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
         }
 
 
-        Window window = Minecraft.getInstance().getWindow();
-        float w = window.getGuiScaledWidth();
-        float h = window.getGuiScaledHeight();
+        if (spawnerNearby) {
+            Window window = Minecraft.getInstance().getWindow();
+            float w = window.getGuiScaledWidth();
+            float h = window.getGuiScaledHeight();
 
-        for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 5; i++) {
 
-            Vector3f color = MalkuthEntity.getAndRandomizeColor(weakTo, player.level().random);
+                Vector3f color = MalkuthEntity.getAndRandomizeColor(weakTo, player.level().random);
 
-            float x = random.nextFloat() * w;
-            float y = h;
+                float x = random.nextFloat() * w;
+                float y = h;
 
-            FDTexturedSParticle.create(FDRenderUtil.ParticleRenderTypesS.TEXTURES_BLUR_ADDITIVE, BallParticle.LOCATION)
-                    .setPos(x, y, true)
-                    .setMaxQuadSize(3.5f)
-                    .setSpeed(0, -0.4)
-                    .setFriction(1f)
-                    .setColor(
-                            color.x,color.y,color.z,0.8f
-                    )
-                    .setLifetime(30)
-                    .setDefaultScaleOut()
-                    .sendToOverlay();
+                FDTexturedSParticle.create(FDRenderUtil.ParticleRenderTypesS.TEXTURES_BLUR_ADDITIVE, BallParticle.LOCATION)
+                        .setPos(x, y, true)
+                        .setMaxQuadSize(3.5f)
+                        .setSpeed(0, -0.4)
+                        .setFriction(1f)
+                        .setColor(
+                                color.x, color.y, color.z, 0.8f
+                        )
+                        .setLifetime(30)
+                        .setDefaultScaleOut()
+                        .sendToOverlay();
+            }
         }
 
+    }
+
+    private static boolean hasMalkuthSpawnerNearby(){
+
+        Player player = Minecraft.getInstance().player;
+
+        if (player == null) return false;
+
+        return !BossTargetFinder.getEntitiesInCylinder(MalkuthBossSpawner.class, player.level(), player.position().add(0,-40,0), 80, 130).isEmpty();
     }
 
     @Override
@@ -111,6 +137,10 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
         Vector3f fire = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.FIRE);
 
         float pticks = tracker.getGameTimeDeltaPartialTick(false);
+
+        float basicAlpha = FDMathUtil.lerp(alphaO,alpha,pticks) / MAX_IN_TIME;
+
+        if (basicAlpha == 0) return;
 
         float iceAlpha = FDMathUtil.lerp(iceTickerO,iceTicker,pticks) / MAX_IN_TIME;
         float fireAlpha = FDMathUtil.lerp(fireTickerO,fireTicker,pticks) / MAX_IN_TIME;
@@ -132,8 +162,8 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
             QuadRenderer.start(builder)
                 .pose(matrices)
                 .direction(new Vec3(0,0,-1))
-                .color1(ice.x,ice.y,ice.z,iceAlpha)
-                .color2(ice.x,ice.y,ice.z,iceAlpha)
+                .color1(ice.x,ice.y,ice.z,iceAlpha * basicAlpha)
+                .color2(ice.x,ice.y,ice.z,iceAlpha * basicAlpha)
                 .color3(ice.x,ice.y,ice.z,0)
                 .color4(ice.x,ice.y,ice.z,0)
                 .sizeX(w/2)
@@ -144,37 +174,13 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
             QuadRenderer.start(builder)
                     .pose(matrices)
                     .direction(new Vec3(0, 0, -1))
-                    .color1(fire.x, fire.y, fire.z, fireAlpha)
-                    .color2(fire.x, fire.y, fire.z, fireAlpha)
+                    .color1(fire.x, fire.y, fire.z, fireAlpha * basicAlpha)
+                    .color2(fire.x, fire.y, fire.z, fireAlpha * basicAlpha)
                     .color3(fire.x, fire.y, fire.z, 0)
                     .color4(fire.x, fire.y, fire.z, 0)
                     .sizeX(w/2)
                     .sizeY(size)
                     .render();
-
-//            matrices.translate(0,-h + size,0);
-//            QuadRenderer.start(builder)
-//                .pose(matrices)
-//                .direction(new Vec3(0,0,-1))
-//                .color1(ice.x,ice.y,ice.z,0)
-//                .color2(ice.x,ice.y,ice.z,0)
-//                .color3(ice.x,ice.y,ice.z,iceAlpha)
-//                .color4(ice.x,ice.y,ice.z,iceAlpha)
-//                .sizeX(w/2)
-//                .sizeY(size)
-//                .render();
-//
-//
-//            QuadRenderer.start(builder)
-//                    .pose(matrices)
-//                    .direction(new Vec3(0, 0, -1))
-//                    .color1(fire.x, fire.y, fire.z, 0)
-//                    .color2(fire.x, fire.y, fire.z, 0)
-//                    .color3(fire.x, fire.y, fire.z, fireAlpha)
-//                    .color4(fire.x, fire.y, fire.z, fireAlpha)
-//                    .sizeX(w/2)
-//                    .sizeY(size)
-//                    .render();
 
             matrices.popPose();
         }
@@ -204,15 +210,15 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
         sin = sin * 0.5f;
 
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        drawCircle(new Vector3f(),new Vector3f(),matrices, radius,innerRadius, 1f,1);
+        drawCircle(new Vector3f(),new Vector3f(),matrices, radius,innerRadius, basicAlpha,1);
 
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-        drawCircle(ice1,ice2,matrices, radius,innerRadius, iceAlpha,3);
-        drawCircle(ice1,ice2,matrices, radius,innerRadius, iceAlpha * sin,2);
+        drawCircle(ice1,ice2,matrices, radius,innerRadius, iceAlpha * basicAlpha,3);
+        drawCircle(ice1,ice2,matrices, radius,innerRadius, iceAlpha * basicAlpha * sin,2);
 
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-        drawCircle(fire1,fire2,matrices, radius,innerRadius, fireAlpha,3);
-        drawCircle(fire1,fire2,matrices, radius,innerRadius, fireAlpha * sin,2);
+        drawCircle(fire1,fire2,matrices, radius,innerRadius, fireAlpha * basicAlpha,3);
+        drawCircle(fire1,fire2,matrices, radius,innerRadius, fireAlpha * basicAlpha * sin,2);
 
 
         matrices.popPose();
