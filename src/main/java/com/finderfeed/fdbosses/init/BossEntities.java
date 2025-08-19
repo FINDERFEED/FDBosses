@@ -35,6 +35,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crys
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
+import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -261,6 +262,12 @@ public class BossEntities {
             )
             .sized(0.25f,0.25f)
             .build("malkuth_fireball"));
+
+    public static final Supplier<EntityType<MalkuthPlayerFireIceBall>> MALKUTH_PLAYER_FIREBALL = ENTITIES.register("malkuth_player_fireball",()->EntityType.Builder.of(
+                    MalkuthPlayerFireIceBall::new, MobCategory.MISC
+            )
+            .sized(0.25f,0.25f)
+            .build("malkuth_player_fireball"));
 
     public static final Supplier<EntityType<MalkuthWarriorEntity>> FIRE_MALKUTH_WARRIOR = ENTITIES.register("fire_malkuth_warrior",()->EntityType.Builder.<MalkuthWarriorEntity>of(
                     (type,lvl)->new MalkuthWarriorEntity(type,lvl, MalkuthAttackType.FIRE), MobCategory.MONSTER

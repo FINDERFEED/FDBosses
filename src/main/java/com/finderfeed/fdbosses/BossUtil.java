@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.config.BossConfig;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdlib.util.FDUtil;
 import net.minecraft.core.Holder;
@@ -12,17 +13,27 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlotGroup;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.common.util.AttributeUtil;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
+import java.util.*;
 import java.util.function.Predicate;
 
 public class BossUtil {
@@ -42,6 +53,18 @@ public class BossUtil {
     public static final int MALKUTH_FIREBALL_EXPLODE = 10;
     public static final int MALKUTH_VOLCANO_ERRUPTION = 11;
     public static final int MALKUTH_SWORD_INSERT_PARTICLES = 12;
+    public static final int MALKUTH_PLAYER_FIREBALL_EXPLODE = 13;
+
+    public static Vec3 matTransformDirectionVec3(Matrix4f mat, Vec3 v){
+        Vector3f v1 = mat.transformDirection(
+                (float)v.x,
+                (float)v.y,
+                (float)v.z,
+                new Vector3f()
+        );
+
+        return new Vec3(v1.x,v1.y,v1.z);
+    }
 
     /**
      * Air Friction? What?
@@ -91,6 +114,56 @@ public class BossUtil {
         }
     }
 
+    public static double getToolDamage(LivingEntity owner, Entity target, ItemStack itemStack){
+        var attribute = owner.getAttribute(Attributes.ATTACK_DAMAGE);
+
+        double base = attribute.getBaseValue();
+        double damage;
+
+        var map = AttributeUtil.getSortedModifiers(itemStack, EquipmentSlotGroup.MAINHAND);
+        if (map.containsKey(Attributes.ATTACK_DAMAGE)){
+            var attributes = map.get(Attributes.ATTACK_DAMAGE);
+
+            var operationAttributes = modifierCollectionToOperationMap(attributes);
+
+            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_VALUE)){
+                base += mod.amount();
+            }
+
+            damage = base;
+
+            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_MULTIPLIED_BASE)){
+                damage += base * mod.amount();
+            }
+
+            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)){
+                damage *= 1 + mod.amount();
+            }
+
+            DamageSource damageSource = owner.level().damageSources().mobAttack(owner);
+
+            damage = EnchantmentHelper.modifyDamage((ServerLevel) owner.level(), itemStack, target, damageSource, (float) damage);
+
+            return damage;
+        }
+
+        return 0;
+    }
+
+    private static Map<AttributeModifier.Operation, List<AttributeModifier>> modifierCollectionToOperationMap(Collection<AttributeModifier> collection){
+
+        Map<AttributeModifier.Operation, List<AttributeModifier>> operationListMap = new LinkedHashMap<>();
+        operationListMap.put(AttributeModifier.Operation.ADD_VALUE,new ArrayList<>());
+        operationListMap.put(AttributeModifier.Operation.ADD_MULTIPLIED_BASE,new ArrayList<>());
+        operationListMap.put(AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,new ArrayList<>());
+
+        for (var mod : collection){
+            operationListMap.get(mod.operation()).add(mod);
+        }
+
+        return operationListMap;
+    }
+
     public static Predicate<Entity> entityInVerticalRadiusPredicate(Vec3 pos,float radius){
         return (entity)->{
             double x = pos.x - entity.getX();
@@ -109,6 +182,10 @@ public class BossUtil {
 
     public static void malkuthFireballExplosionParticles(ServerLevel serverLevel, Vec3 pos, MalkuthAttackType type){
         posEvent(serverLevel, pos, MALKUTH_FIREBALL_EXPLODE, type.isFire() ? 0 : 1, 60);
+    }
+
+    public static void malkuthPlayerFireballExplosionParticles(ServerLevel serverLevel, Vec3 pos, MalkuthAttackType type){
+        posEvent(serverLevel, pos, MALKUTH_PLAYER_FIREBALL_EXPLODE, type.isFire() ? 0 : 1, 60);
     }
 
     public static void malkuthFloatParticles(ServerLevel serverLevel, MalkuthEntity malkuthEntity){

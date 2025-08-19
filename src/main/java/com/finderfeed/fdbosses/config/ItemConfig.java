@@ -15,4 +15,10 @@ public class ItemConfig {
     @Comment("Time in ticks")
     public int flyingSwordShockDuration = 200;
 
+    @ConfigValue
+    public float playerMalkuthFireballToolDamagePercent = 200;
+
+    @ConfigValue
+    public float playerMalkuthFireballAbilityCooldown = 200;
+
 }

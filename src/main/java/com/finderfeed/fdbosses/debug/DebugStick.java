@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.Malku
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlash;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
+import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.init.FDRenderTypes;
@@ -57,6 +58,9 @@ public class DebugStick extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 
         if (!level.isClientSide){
+
+            Vec3 look = player.getLookAngle();
+            MalkuthPlayerFireIceBall.summon(player, player.getEyePosition().add(look), look.multiply(4,4,4), MalkuthAttackType.FIRE, player.getItemInHand(InteractionHand.MAIN_HAND));
 
 //            Vec3 f = player.getLookAngle().multiply(1,0,1).normalize().multiply(10,10,10);
 //

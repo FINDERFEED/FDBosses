@@ -189,6 +189,9 @@ public class BossClientPackets {
             case BossUtil.MALKUTH_SWORD_INSERT_PARTICLES -> {
                 malkuthSwordInsertParticles(data);
             }
+            case BossUtil.MALKUTH_PLAYER_FIREBALL_EXPLODE -> {
+                malkuthPlayerFireballExplode(pos,data);
+            }
         }
     }
 
@@ -390,6 +393,88 @@ public class BossClientPackets {
         Vec3 stripePos = pos.add(randomDir);
 
         level.addParticle(stripeParticleOptions,true,stripePos.x,stripePos.y,stripePos.z,0,0,0);
+
+
+    }
+
+    public static void malkuthPlayerFireballExplode(Vec3 pos, int type){
+
+        MalkuthAttackType attackType = type == 1 ? MalkuthAttackType.ICE : MalkuthAttackType.FIRE;
+
+        Level level = FDClientHelpers.getClientLevel();
+
+        for (int i = 0; i < 200;i++){
+            Vector3f color = MalkuthEntity.getAndRandomizeColor(attackType, level.random);
+
+            ParticleOptions options;
+
+            float speedMd = 1f;
+
+            if (level.random.nextFloat() > 0.5f){
+                options = BallParticleOptions.builder()
+                        .brightness(3)
+                        .size(0.3f + random.nextFloat() * 0.2f)
+                        .color(color.x,color.y,color.z)
+                        .friction(0.7f)
+                        .scalingOptions(0,0,10 + random.nextInt(10))
+                        .build();
+            }else{
+                speedMd = 0.5f;
+                if (attackType.isFire()){
+                    if (random.nextFloat() > 0.3) {
+                        options = ParticleTypes.FLAME;
+                    }else {
+                        options = ParticleTypes.LAVA;
+                    }
+                }else{
+                    options = new GravityParticleOptions(BossParticles.ICE_CHUNK.get(),20 + random.nextInt(4),0.25f + random.nextFloat() * 0.2f,
+                            (float) Mob.DEFAULT_BASE_GRAVITY * 10,2f,true);
+                }
+            }
+
+            float rnds = random.nextFloat() * 0.5f + 0.5f;
+
+            Vec3 speed = new Vec3(random.nextFloat() * 2 - 1, random.nextFloat() * 2 - 1, random.nextFloat() * 2 - 1).normalize().multiply(speedMd * rnds,speedMd * rnds,speedMd * rnds);
+
+            float rnd = random.nextFloat();
+
+            Vec3 ppos = pos.add(speed.normalize().multiply(rnd,rnd,rnd));
+
+            level.addParticle(options,ppos.x,ppos.y,ppos.z,speed.x,speed.y,speed.z);
+
+
+        }
+
+        Vector3f color = MalkuthEntity.getAndRandomizeColor(attackType, level.random);
+
+        level.addParticle(BallParticleOptions.builder()
+                .scalingOptions(1,0,2)
+                .brightness(2)
+                .size(10f)
+                .color(color.x,color.y,color.z)
+                .build(),true, pos.x,pos.y,pos.z,0,0,0);
+
+        for (int i = 0; i < 100;i++){
+
+            float col = random.nextFloat() * 0.1f + 0.3f;
+
+            BigSmokeParticleOptions options = BigSmokeParticleOptions.builder()
+                    .color(col,col,col,1f)
+                    .size(1f + random.nextFloat() * 1)
+                    .minSpeed(0.01f)
+                    .friction(0.7f)
+                    .lifetime(0,0,25 + random.nextInt(5))
+                    .build();
+
+            float rnd = random.nextFloat() * 1f + 0.5f;
+
+            Vec3 speed = new Vec3(random.nextFloat() * 2 - 1, random.nextFloat() * 2 - 1, random.nextFloat() * 2 - 1).normalize().multiply(rnd,rnd,rnd);
+
+            Vec3 ppos = pos.add(speed.normalize().multiply(0.15f,0.15f,0.15f));
+
+            level.addParticle(options, ppos.x,ppos.y,ppos.z, speed.x,speed.y,speed.z);
+
+        }
 
 
     }

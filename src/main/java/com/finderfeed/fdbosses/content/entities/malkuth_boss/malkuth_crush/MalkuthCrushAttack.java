@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush;
 
 import com.finderfeed.fdbosses.BossTargetFinder;
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
@@ -21,9 +22,14 @@ import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
+import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -31,18 +37,26 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Matrix4f;
 import org.joml.Vector2d;
 import org.joml.Vector3f;
 
 public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
 
+    public static final EntityDataAccessor<Direction> DIRECTION = SynchedEntityData.defineId(MalkuthCrushAttack.class, EntityDataSerializers.DIRECTION);
+
     @SerializableField
     private float damage;
 
     public static MalkuthCrushAttack summon(Level level, Vec3 pos, float damage){
+        return summon(level, pos, damage, Direction.UP);
+    }
+
+    public static MalkuthCrushAttack summon(Level level, Vec3 pos, float damage, Direction direction){
         MalkuthCrushAttack malkuthCrushAttack = new MalkuthCrushAttack(BossEntities.MALKUTH_CRUSH.get(), level);
         malkuthCrushAttack.setPos(pos);
         malkuthCrushAttack.damage = damage;
+        malkuthCrushAttack.entityData.set(DIRECTION, direction);
         level.addFreshEntity(malkuthCrushAttack);
         return malkuthCrushAttack;
     }
@@ -64,13 +78,15 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
         }
         super.tick();
         if (!level().isClientSide){
-            if (tickCount > BossAnims.MALKUTH_CRUSH_ATTACK_CRUSH.get().getAnimTime()){
+            if (tickCount > BossAnims.MALKUTH_CRUSH_ATTACK_CRUSH.get().getAnimTime() - 10){
                 this.remove(RemovalReason.DISCARDED);
             }
         }
     }
 
     private void doDamage(){
+
+        if (damage == 0) return;
 
         float radius = 3f;
 
@@ -100,6 +116,12 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
     private void doParticles(){
 
         int count = 30;
+
+        Vec3i nrm = this.getEntityData().get(DIRECTION).getNormal();
+
+        Vec3 v = new Vec3(nrm.getX(),nrm.getY(),nrm.getZ());
+        Matrix4f mat = new Matrix4f();
+        FDRenderUtil.applyMovementMatrixRotations(mat,v);
 
         float angle = FDMathUtil.FPI * 2 / count;
 
@@ -136,13 +158,24 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
 
                 float hspeed = (0.1f + random.nextFloat() * 0.2f) * 2;
                 float vspeed = (0.05f + random.nextFloat() * 0.5f) * 2;
-                level().addParticle(ballParticleOptions,true,
-                        this.getX() + randomAngle.x * m,
-                        this.getY(),
-                        this.getZ() + randomAngle.y * m,
+
+                Vec3 speed = BossUtil.matTransformDirectionVec3(mat, new Vec3(
                         randomAngle.x * hspeed,
                         vspeed,
                         randomAngle.y * hspeed
+                ));
+
+                Vec3 spOffset = BossUtil.matTransformDirectionVec3(mat, new Vec3(
+                        randomAngle.x * m,
+                        0,
+                        randomAngle.y * m
+                ));
+
+                level().addParticle(ballParticleOptions,true,
+                        this.getX() + spOffset.x,
+                        this.getY() + spOffset.y,
+                        this.getZ() + spOffset.z,
+                        speed.x,speed.y,speed.z
                 );
             }
 
@@ -173,13 +206,25 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
 
                     float hspeed = (0.1f + random.nextFloat() * 0.05f);
                     float vspeed = (0.4f + random.nextFloat() * 0.25f);
-                    level().addParticle(particleOptions,true,
-                            this.getX() + randomAngle.x * m,
-                            this.getY(),
-                            this.getZ() + randomAngle.y * m,
+
+
+                    Vec3 speed = BossUtil.matTransformDirectionVec3(mat, new Vec3(
                             randomAngle.x * hspeed,
                             vspeed,
                             randomAngle.y * hspeed
+                    ));
+
+                    Vec3 spOffset = BossUtil.matTransformDirectionVec3(mat, new Vec3(
+                            randomAngle.x * m,
+                            0,
+                            randomAngle.y * m
+                    ));
+
+                    level().addParticle(particleOptions,true,
+                            this.getX() + spOffset.x,
+                            this.getY() + spOffset.y,
+                            this.getZ() + spOffset.z,
+                            speed.x,speed.y,speed.z
                     );
 
                 }
@@ -204,13 +249,24 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
             float rndOffs = random.nextFloat() * 0.5f;
             float rndSpeed = random.nextFloat() * 1 + 0.25f;
 
-            level().addParticle(smokeParticleOptions, true,
-                    this.getX() + randomAngle.x * rndOffs,
-                    this.getY() + random.nextFloat() * 0.5f,
-                    this.getZ() + randomAngle.y * rndOffs,
+
+            Vec3 speed = BossUtil.matTransformDirectionVec3(mat, new Vec3(
                     randomAngle.x * rndSpeed,
                     random.nextFloat() * 0.025f + 0.025f,
                     randomAngle.y * rndSpeed
+            ));
+
+            Vec3 spOffset = BossUtil.matTransformDirectionVec3(mat, new Vec3(
+                    randomAngle.x * rndOffs,
+                    random.nextFloat() * 0.5f,
+                    randomAngle.y * rndOffs
+            ));
+
+            level().addParticle(smokeParticleOptions, true,
+                    this.getX() + spOffset.x,
+                    this.getY() + spOffset.y,
+                    this.getZ() + spOffset.z,
+                    speed.x,speed.y,speed.z
             );
 
 
@@ -224,12 +280,12 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
 
 
         for (int i = 0; i < 15;i++) {
-            this.stripeParticles(MalkuthAttackType.FIRE);
-            this.stripeParticles(MalkuthAttackType.ICE);
+            this.stripeParticles(mat, MalkuthAttackType.FIRE);
+            this.stripeParticles(mat, MalkuthAttackType.ICE);
         }
     }
 
-    private void stripeParticles(MalkuthAttackType type){
+    private void stripeParticles(Matrix4f mat, MalkuthAttackType type){
 
 
         float rndRadius = 1 + FDEasings.easeOut(random.nextFloat()) * 4f;
@@ -240,7 +296,7 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
         float startOffsetRand = 0.1f + random.nextFloat() * 0.5f;
         Vec3 startOffset = dir.multiply(startOffsetRand,startOffsetRand,startOffsetRand);
 
-        Vec3 stripePos = this.position().add(startOffset);
+        Vec3 stripePos = this.position().add(BossUtil.matTransformDirectionVec3(mat, startOffset));
 
         Vector3f colFire = MalkuthEntity.getMalkuthAttackPreparationParticleColor(type);
 
@@ -250,9 +306,9 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
         float firstPointOffset = 2f + random.nextFloat() * 1f;
 
         StripeParticleOptions stripeParticleOptions = new StripeParticleOptions(fireColorStart,fireColor, 5 + random.nextInt(10), 50, 0.05f, 0.75f,
-                new Vec3(0.01f,0,0),
-                dir.multiply(firstPointOffset,0,firstPointOffset).add(0,0.5,0),
-                rnd.add(0,1.5f + random.nextFloat() * 2,0)
+                BossUtil.matTransformDirectionVec3(mat, new Vec3(0.01f,0,0)),
+                BossUtil.matTransformDirectionVec3(mat, dir.multiply(firstPointOffset,0,firstPointOffset).add(0,0.5,0)),
+                BossUtil.matTransformDirectionVec3(mat, rnd.add(0,1.5f + random.nextFloat() * 2,0))
         );
 
         level().addParticle(stripeParticleOptions, true, stripePos.x,stripePos.y,stripePos.z,0,0,0);
@@ -271,7 +327,7 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder data) {
-
+        data.define(DIRECTION, Direction.UP);
     }
 
     @Override
@@ -282,5 +338,10 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
         this.autoLoad(tag);
+    }
+
+    @Override
+    public boolean shouldRenderAtSqrDistance(double dist) {
+        return dist <= 60 * 60;
     }
 }

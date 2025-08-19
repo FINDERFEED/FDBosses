@@ -48,6 +48,8 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crys
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairEntityRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
+import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
+import com.finderfeed.fdbosses.content.projectiles.renderers.MalkuthPlayerFireIceBallRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
 import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
 import com.finderfeed.fdbosses.ik_2d.InverseKinematics2BoneTransform;
@@ -75,10 +77,12 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -364,6 +368,10 @@ public class BossClientModEvents {
 
         event.registerEntityRenderer(BossEntities.MALKUTH_CRUSH.get(), FDEntityRendererBuilder.<MalkuthCrushAttack>builder()
                         .addLayer(FDEntityRenderLayerOptions.<MalkuthCrushAttack>builder()
+                                .transformation(((malkuthCrushAttack, poseStack, v) -> {
+                                    Vec3i nrm = malkuthCrushAttack.getEntityData().get(MalkuthCrushAttack.DIRECTION).getNormal();
+                                    FDRenderUtil.applyMovementMatrixRotations(poseStack, new Vec3(nrm.getX(),nrm.getY(), nrm.getZ()));
+                                }))
                                 .light(LightTexture.FULL_BRIGHT)
                                 .model(BossModels.MALKUTH_CRUSH_ATTACK)
                                 .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_crash.png")))
@@ -608,6 +616,7 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.MALKUTH_EARTHQUAKE.get(), MalkuthEarthquakeRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_FLOOR.get(), MalkuthFloorRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_FIREBALL.get(), MalkuthFireballRenderer::new);
+        event.registerEntityRenderer(BossEntities.MALKUTH_PLAYER_FIREBALL.get(), MalkuthPlayerFireIceBallRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_REPAIR_ENTITY.get(), MalkuthRepairEntityRenderer::new);
     }
 }
