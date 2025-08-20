@@ -374,7 +374,15 @@ public class BossClientModEvents {
                                 }))
                                 .light(LightTexture.FULL_BRIGHT)
                                 .model(BossModels.MALKUTH_CRUSH_ATTACK)
-                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_crash.png")))
+                                .renderType(((malkuthCrushAttack, v) -> {
+                                    if (malkuthCrushAttack.isBothFireAndIce()){
+                                        return RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_crash.png"));
+                                    }else if (malkuthCrushAttack.isFire()){
+                                        return RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_crush_fire.png"));
+                                    }else{
+                                        return RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_crush_ice.png"));
+                                    }
+                                }))
                                 .build())
                 .build());
 

@@ -44,19 +44,29 @@ import org.joml.Vector3f;
 public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
 
     public static final EntityDataAccessor<Direction> DIRECTION = SynchedEntityData.defineId(MalkuthCrushAttack.class, EntityDataSerializers.DIRECTION);
+    public static final EntityDataAccessor<Byte> VISUAL_APPEARANCE = SynchedEntityData.defineId(MalkuthCrushAttack.class, EntityDataSerializers.BYTE);
 
     @SerializableField
     private float damage;
 
     public static MalkuthCrushAttack summon(Level level, Vec3 pos, float damage){
-        return summon(level, pos, damage, Direction.UP);
+        return summon(level, pos, damage, Direction.UP, null);
     }
 
-    public static MalkuthCrushAttack summon(Level level, Vec3 pos, float damage, Direction direction){
+    public static MalkuthCrushAttack summon(Level level, Vec3 pos, float damage, Direction direction, MalkuthAttackType visualAppearance){
         MalkuthCrushAttack malkuthCrushAttack = new MalkuthCrushAttack(BossEntities.MALKUTH_CRUSH.get(), level);
         malkuthCrushAttack.setPos(pos);
         malkuthCrushAttack.damage = damage;
         malkuthCrushAttack.entityData.set(DIRECTION, direction);
+
+        if (visualAppearance != null) {
+            if (visualAppearance.isFire()) {
+                malkuthCrushAttack.entityData.set(VISUAL_APPEARANCE, (byte) 1);
+            }else{
+                malkuthCrushAttack.entityData.set(VISUAL_APPEARANCE, (byte) 2);
+            }
+        }
+
         level.addFreshEntity(malkuthCrushAttack);
         return malkuthCrushAttack;
     }
@@ -82,6 +92,18 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
                 this.remove(RemovalReason.DISCARDED);
             }
         }
+    }
+
+    public boolean isBothFireAndIce(){
+        return this.entityData.get(VISUAL_APPEARANCE) == 0;
+    }
+
+    public boolean isFire(){
+        return this.entityData.get(VISUAL_APPEARANCE) == 1;
+    }
+
+    public boolean isIce(){
+        return this.entityData.get(VISUAL_APPEARANCE) == 2;
     }
 
     private void doDamage(){
@@ -139,14 +161,24 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
                 float g;
                 float b;
 
-                if (random.nextFloat() > 0.5f){
-                    r = random.nextFloat() * 0.2f;
-                    g = 0.7f + random.nextFloat() * 0.1f;
-                    b = 0.9f + random.nextFloat() * 0.1f;
-                }else{
+                if (this.isBothFireAndIce()) {
+                    if (random.nextFloat() > 0.5f) {
+                        r = random.nextFloat() * 0.2f;
+                        g = 0.7f + random.nextFloat() * 0.1f;
+                        b = 0.9f + random.nextFloat() * 0.1f;
+                    } else {
+                        r = 0.9f + random.nextFloat() * 0.1f;
+                        g = 0.2f + random.nextFloat() * 0.2f;
+                        b = random.nextFloat() * 0.2f;
+                    }
+                }else if (this.isFire()){
                     r = 0.9f + random.nextFloat() * 0.1f;
                     g = 0.2f + random.nextFloat() * 0.2f;
                     b = random.nextFloat() * 0.2f;
+                }else{
+                    r = random.nextFloat() * 0.2f;
+                    g = 0.7f + random.nextFloat() * 0.1f;
+                    b = 0.9f + random.nextFloat() * 0.1f;
                 }
 
                 BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
@@ -186,22 +218,32 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
 
 
                 if (random.nextFloat() > 0.66f) {
-                    level().addParticle(ParticleTypes.LAVA, true,
-                            this.getX() + randomAngle.x * m,
-                            this.getY(),
-                            this.getZ() + randomAngle.y * m,
-                            0, 0, 0
-                    );
+                    if (!this.isIce()) {
+                        level().addParticle(ParticleTypes.LAVA, true,
+                                this.getX() + randomAngle.x * m,
+                                this.getY(),
+                                this.getZ() + randomAngle.y * m,
+                                0, 0, 0
+                        );
+                    }
                 }else{
 
                     ParticleOptions particleOptions;
 
-                    if (random.nextFloat() > 0.5f){
-                        particleOptions = new GravityParticleOptions(BossParticles.FLAME_WITH_STONE.get(),20 + random.nextInt(4),0.5f + random.nextFloat() * 0.2f,
-                                (float)Mob.DEFAULT_BASE_GRAVITY * 20,2f,true);
+                    if (this.isBothFireAndIce()) {
+                        if (random.nextFloat() > 0.5f) {
+                            particleOptions = new GravityParticleOptions(BossParticles.FLAME_WITH_STONE.get(), 20 + random.nextInt(4), 0.5f + random.nextFloat() * 0.2f,
+                                    (float) Mob.DEFAULT_BASE_GRAVITY * 20, 2f, true);
+                        } else {
+                            particleOptions = new GravityParticleOptions(BossParticles.ICE_CHUNK.get(), 20 + random.nextInt(4), 0.5f + random.nextFloat() * 0.2f,
+                                    (float) Mob.DEFAULT_BASE_GRAVITY * 20, 2f, true);
+                        }
+                    }else if (this.isFire()){
+                        particleOptions = new GravityParticleOptions(BossParticles.FLAME_WITH_STONE.get(), 20 + random.nextInt(4), 0.5f + random.nextFloat() * 0.2f,
+                                (float) Mob.DEFAULT_BASE_GRAVITY * 20, 2f, true);
                     }else{
-                        particleOptions = new GravityParticleOptions(BossParticles.ICE_CHUNK.get(),20 + random.nextInt(4),0.5f + random.nextFloat() * 0.2f,
-                                (float)Mob.DEFAULT_BASE_GRAVITY * 20,2f,true);
+                        particleOptions = new GravityParticleOptions(BossParticles.ICE_CHUNK.get(), 20 + random.nextInt(4), 0.5f + random.nextFloat() * 0.2f,
+                                (float) Mob.DEFAULT_BASE_GRAVITY * 20, 2f, true);
                     }
 
                     float hspeed = (0.1f + random.nextFloat() * 0.05f);
@@ -280,8 +322,16 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
 
 
         for (int i = 0; i < 15;i++) {
-            this.stripeParticles(mat, MalkuthAttackType.FIRE);
-            this.stripeParticles(mat, MalkuthAttackType.ICE);
+            if (this.isBothFireAndIce()) {
+                this.stripeParticles(mat, MalkuthAttackType.FIRE);
+                this.stripeParticles(mat, MalkuthAttackType.ICE);
+            }else if (this.isFire()){
+                this.stripeParticles(mat, MalkuthAttackType.FIRE);
+                this.stripeParticles(mat, MalkuthAttackType.FIRE);
+            }else{
+                this.stripeParticles(mat, MalkuthAttackType.ICE);
+                this.stripeParticles(mat, MalkuthAttackType.ICE);
+            }
         }
     }
 
@@ -328,6 +378,7 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder data) {
         data.define(DIRECTION, Direction.UP);
+        data.define(VISUAL_APPEARANCE, (byte)0);
     }
 
     @Override

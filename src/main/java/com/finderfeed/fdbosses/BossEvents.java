@@ -209,8 +209,10 @@ public class BossEvents {
                 MalkuthAttackType attackType = player.isCrouching() ? MalkuthAttackType.ICE : MalkuthAttackType.FIRE;
                 MalkuthPlayerFireIceBall.summon(player, player.getEyePosition().add(0,-0.25f,0).add(look), speedVec, attackType, itemStack);
 
-                int cooldown = BossConfigs.BOSS_CONFIG.get().itemConfig.playerMalkuthFireballAbilityCooldown;
-//                player.getCooldowns().addCooldown(itemStack.getItem(), cooldown);
+                if (!player.isCreative()) {
+                    int cooldown = BossConfigs.BOSS_CONFIG.get().itemConfig.playerMalkuthFireballAbilityCooldown;
+                    player.getCooldowns().addCooldown(itemStack.getItem(), cooldown);
+                }
 
                 player.swing(event.getHand(), true);
 

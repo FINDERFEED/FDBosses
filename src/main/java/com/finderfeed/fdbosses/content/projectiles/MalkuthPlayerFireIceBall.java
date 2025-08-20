@@ -26,6 +26,8 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -127,7 +129,7 @@ public class MalkuthPlayerFireIceBall extends FDProjectile implements AutoSerial
         this.remove(RemovalReason.DISCARDED);
 
         if (crushDirectionOrNoCrush != null){
-            MalkuthCrushAttack.summon(level(), pos, 0, crushDirectionOrNoCrush);
+            MalkuthCrushAttack.summon(level(), pos, 0, crushDirectionOrNoCrush, this.getAttackType());
             level().playSound(null, pos.x,pos.y,pos.z, BossSounds.ROCK_IMPACT.get(), SoundSource.PLAYERS, 3f, 0.8f);
             level().playSound(null, pos.x,pos.y,pos.z, BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.PLAYERS, 3f, 0.8f);
         }
@@ -142,8 +144,19 @@ public class MalkuthPlayerFireIceBall extends FDProjectile implements AutoSerial
 
         for (var target : BossTargetFinder.getEntitiesInSphere(LivingEntity.class, level(), pos, 3)){
             double damage = 5;
+
+            if (target == this.getOwner()){
+                continue;
+            }
+
             if (this.getOwner() instanceof LivingEntity livingEntity){
                 damage = BossUtil.getToolDamage(livingEntity, target, this.itemStack) * dmgModifier;
+            }
+
+            if (this.getAttackType().isFire()){
+                target.setRemainingFireTicks(200);
+            }else{
+                target.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 2));
             }
 
             target.hurt(damageSource, (float) damage);
