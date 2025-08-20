@@ -31,6 +31,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -110,9 +111,9 @@ public class BossClientEvents {
         ItemStack itemStack = event.getItemStack();
         if (itemStack.has(BossDataComponents.ITEM_CORE.get())){
             ItemCoreDataComponent itemCoreDataComponent = itemStack.get(BossDataComponents.ITEM_CORE);
-            if (itemCoreDataComponent.getCoreType() == ItemCoreDataComponent.CoreType.LIGHTNING) {
-                componentList.add(BossItems.LIGHTNING_CORE.get().getDefaultInstance().getHoverName().copy().withStyle(Style.EMPTY.withColor(0x11ffff)));
-            }
+            ItemCoreDataComponent.CoreType coreType = itemCoreDataComponent.getCoreType();
+            Item item = coreType.getItem();
+            componentList.add(item.getDefaultInstance().getHoverName().copy().withStyle(Style.EMPTY.withColor(coreType.getTextColor())));
         }
     }
 

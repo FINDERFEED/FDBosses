@@ -1,7 +1,8 @@
 package com.finderfeed.fdbosses.init;
 
+import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.content.items.EyeOfChesed;
-import com.finderfeed.fdbosses.content.items.LightningCore;
+import com.finderfeed.fdbosses.content.items.WeaponCoreItem;
 import com.finderfeed.fdbosses.debug.DebugStick;
 import com.finderfeed.fdbosses.FDBosses;
 import net.minecraft.world.item.*;
@@ -22,7 +23,8 @@ public class BossItems {
     public static final Supplier<Item> MALKUTH_CANNON_REPAIR_MATERIAL_ICE = ITEMS.register("malkuth_cannon_repair_material_ice",()->new Item(new Item.Properties()));
     public static final Supplier<Item> MALKUTH_CANNON_REPAIR_MATERIAL_FIRE = ITEMS.register("malkuth_cannon_repair_material_fire",()->new Item(new Item.Properties()));
 
-    public static final Supplier<LightningCore> LIGHTNING_CORE = ITEMS.register("lightning_core",()->new LightningCore(new Item.Properties().stacksTo(1)));
+    public static final Supplier<WeaponCoreItem> LIGHTNING_CORE = ITEMS.register("lightning_core",()->new WeaponCoreItem(new Item.Properties().stacksTo(1), ItemCoreDataComponent.CoreType.LIGHTNING));
+    public static final Supplier<WeaponCoreItem> FIRE_AND_ICE_CORE = ITEMS.register("fire_and_ice_core",()->new WeaponCoreItem(new Item.Properties().stacksTo(1), ItemCoreDataComponent.CoreType.FIRE_AND_ICE));
 
     public static final Supplier<EyeOfChesed> EYE_OF_CHESED = ITEMS.register("eye_of_chesed", EyeOfChesed::new);
 

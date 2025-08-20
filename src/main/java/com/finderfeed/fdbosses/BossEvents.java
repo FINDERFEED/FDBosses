@@ -3,8 +3,10 @@ package com.finderfeed.fdbosses;
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.SetClientMalkuthWeaknessAmountPacket;
+import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossDataComponents;
@@ -19,6 +21,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,6 +33,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
@@ -37,6 +41,7 @@ import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.ExplosionEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -188,6 +193,32 @@ public class BossEvents {
     }
 
     @SubscribeEvent
+    public static void rightClickItem(PlayerInteractEvent.RightClickItem event){
+        ItemStack itemStack = event.getItemStack();
+        Player player = event.getEntity();
+        Level level = player.level();
+        if (!level.isClientSide && itemStack.has(BossDataComponents.ITEM_CORE)){
+
+            var itemCore = itemStack.get(BossDataComponents.ITEM_CORE).getCoreType();
+
+            if (itemCore == ItemCoreDataComponent.CoreType.FIRE_AND_ICE){
+
+                Vec3 look = player.getLookAngle();
+                float speed = 4f;
+                Vec3 speedVec = look.multiply(speed,speed,speed);
+                MalkuthAttackType attackType = player.isCrouching() ? MalkuthAttackType.ICE : MalkuthAttackType.FIRE;
+                MalkuthPlayerFireIceBall.summon(player, player.getEyePosition().add(0,-0.25f,0).add(look), speedVec, attackType, itemStack);
+
+                int cooldown = BossConfigs.BOSS_CONFIG.get().itemConfig.playerMalkuthFireballAbilityCooldown;
+//                player.getCooldowns().addCooldown(itemStack.getItem(), cooldown);
+
+                player.swing(event.getHand(), true);
+
+            }
+        }
+    }
+
+    @SubscribeEvent
     public static void onEntityAttack(AttackEntityEvent event){
         Player player = event.getEntity();
         ItemStack itemStack = player.getMainHandItem();
@@ -197,7 +228,7 @@ public class BossEvents {
             float power = player.getAttackStrengthScale(0.5f);
             ItemCoreDataComponent core = itemStack.get(BossDataComponents.ITEM_CORE);
 
-            if (power > 0.5f && BossUtil.itemContainsModifierForAttribute(itemStack, Attributes.ATTACK_DAMAGE) && core.getCoreType() == ItemCoreDataComponent.CoreType.LIGHTNING) {
+            if (power > 0.5f && core.getCoreType() == ItemCoreDataComponent.CoreType.LIGHTNING && BossUtil.itemContainsModifierForAttribute(itemStack, Attributes.ATTACK_DAMAGE)) {
 
                 float p = Mth.clamp(BossConfigs.BOSS_CONFIG.get().itemConfig.chanceToSummonFlyingSword / 100,0,1);
                 RandomSource randomSource = livingEntity.getRandom();

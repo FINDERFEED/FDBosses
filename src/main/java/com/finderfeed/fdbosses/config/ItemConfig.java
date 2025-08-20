@@ -19,6 +19,6 @@ public class ItemConfig {
     public float playerMalkuthFireballToolDamagePercent = 200;
 
     @ConfigValue
-    public float playerMalkuthFireballAbilityCooldown = 200;
+    public int playerMalkuthFireballAbilityCooldown = 200;
 
 }
