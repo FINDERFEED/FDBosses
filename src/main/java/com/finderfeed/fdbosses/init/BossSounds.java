@@ -43,6 +43,8 @@ public class BossSounds {
     public static final Supplier<SoundEvent> MONOLITH_HIT = SOUNDS.register("monolith_hit",()->SoundEvent.createVariableRangeEvent(FDBosses.location("monolith_hit")));
     public static final Supplier<SoundEvent> CHESED_IDLE = SOUNDS.register("chesed_idle",()->SoundEvent.createVariableRangeEvent(FDBosses.location("chesed_idle")));
 
+    public static final Supplier<SoundEvent> MALKUTH_THEME_INTRO = SOUNDS.register("malkuth_theme_intro",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_theme_intro")));
+    public static final Supplier<SoundEvent> MALKUTH_THEME_MAIN = SOUNDS.register("malkuth_theme_main",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_theme_main")));
     public static final Supplier<SoundEvent> MALKUTH_CANNON_SHOOT = SOUNDS.register("malkuth_cannon_shoot",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_cannon_shoot")));
     public static final Supplier<SoundEvent> MALKUTH_EARTHQUAKE_SPIKE = SOUNDS.register("malkuth_earthquake_spike",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_earthquake_spike")));
     public static final Supplier<SoundEvent> MALKUTH_EARTHQUAKE_ROLLING = SOUNDS.register("malkuth_earthquake_rolling",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_earthquake_rolling")));

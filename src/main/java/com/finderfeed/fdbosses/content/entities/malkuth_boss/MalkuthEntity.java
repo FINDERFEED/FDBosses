@@ -49,6 +49,11 @@ import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
 import com.finderfeed.fdlib.systems.hud.bossbars.FDServerBossBar;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
+import com.finderfeed.fdlib.systems.music.data.FDMusicData;
+import com.finderfeed.fdlib.systems.music.data.FDMusicPartData;
+import com.finderfeed.fdlib.systems.music.music_areas.FDMusicArea;
+import com.finderfeed.fdlib.systems.music.music_areas.FDMusicAreasHandler;
+import com.finderfeed.fdlib.systems.music.music_areas.shapes.FDMusicAreaCylinder;
 import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
@@ -95,6 +100,8 @@ import java.lang.Math;
 import java.util.*;
 
 public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, AutoSerializable, BossSpawnerContextAssignable {
+
+    public static final UUID BOSS_MUSIC_UUID = UUID.fromString("5c6cd8c0-7e3e-44a3-9c2e-2459a61377f3");
 
     public static float CHANCE_TO_CHOOSE_WEAK_TYPE = 0.75f;
 
@@ -337,8 +344,16 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.bossbar.setPercentage(this.hits / (float) this.getMaxHits());
 
             AnimationSystem animationSystem = this.getAnimationSystem();
-            if (animationSystem.getTicker(MAIN_LAYER) == null && malkuthBossInitializer.isFinished() && !this.isDeadOrDying()){
-                animationSystem.startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
+            if (malkuthBossInitializer.isFinished() && !this.isDeadOrDying()) {
+
+                if (animationSystem.getTicker(MAIN_LAYER) == null) {
+                    animationSystem.startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build());
+                }
+
+                if (!FDMusicAreasHandler.hasMusicArea(this.getUUID())){
+                    FDMusicAreasHandler.addArea(this.getUUID(), this.constructMusicArea());
+                }
+
             }
 
             if (!this.isDeadOrDying()) {
@@ -385,6 +400,17 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.setYRot(this.yBodyRot);
 
         }
+    }
+
+    private FDMusicArea constructMusicArea(){
+        return new FDMusicArea(this.level().dimension(), this.spawnPosition.add(0,-2,0), new FDMusicAreaCylinder(ENRAGE_RADIUS, ENRAGE_HEIGHT), this.constructMusicData());
+    }
+
+    private FDMusicData constructMusicData(){
+        return new FDMusicData(BOSS_MUSIC_UUID, new FDMusicPartData(BossSounds.MALKUTH_THEME_INTRO.get(),14.75f))
+                .addMusicPart(new FDMusicPartData(BossSounds.MALKUTH_THEME_MAIN.get(), 103.375f).setLooping(true))
+                .fadeInTime(80)
+                .inactiveDeleteTime(600);
     }
 
     private void preventEnteringLavaField(){
@@ -481,12 +507,16 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     @Override
     protected void tickDeath() {
+
         this.deathTime++;
 
         int animStartTime = 5;
         int animEndtime = animStartTime + BossAnims.MALKUTH_DEATH.get().getAnimTime();
 
         if (!level().isClientSide) {
+
+            FDMusicAreasHandler.removeArea(((ServerLevel)level()).getServer(), this.getUUID(), 40);
+
             if (this.deathTime == animStartTime) {
 
                 this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_DEATH).build());

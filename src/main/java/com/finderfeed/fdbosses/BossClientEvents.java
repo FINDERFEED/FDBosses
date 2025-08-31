@@ -64,46 +64,6 @@ public class BossClientEvents {
 
     private static GainLoseValue hellscapeSkyValue = new GainLoseValue(0,100);
 
-    private static int a;
-
-    @SubscribeEvent
-    public static void tickEventTest(ClientTickEvent.Pre pre){
-        if (true) return;
-        a++;
-        MusicManager manager = Minecraft.getInstance().getMusicManager();
-
-    }
-
-    @SubscribeEvent
-    public static void renderTickEvent(RenderFrameEvent.Pre event){
-
-        if (true) return;
-        DeltaTracker deltaTracker = event.getPartialTick();
-        float pticks = deltaTracker.getGameTimeDeltaPartialTick(false);
-
-        float time = (a + pticks) / 10f;
-        float volume = ((float) Math.sin(time) + 1) / 2f;
-        System.out.println(volume);
-
-        SoundEngine soundEngine = Minecraft.getInstance().getSoundManager().soundEngine;
-
-        var map = soundEngine.instanceToChannel;
-
-        for (var entry : map.entrySet()){
-
-            var channelHandler = entry.getValue();
-            var sound = entry.getKey();
-            var source = sound.getSource();
-            if (source != SoundSource.MUSIC) continue;
-
-            channelHandler.execute(channel->{
-                channel.setVolume(volume);
-                channel.setPitch(2 - volume);
-            });
-
-        }
-
-    }
 
     @SubscribeEvent
     public static void collectTooltips(ItemTooltipEvent event){

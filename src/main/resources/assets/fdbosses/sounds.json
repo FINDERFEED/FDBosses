@@ -137,5 +137,21 @@
   },
   "malkuth_warrior_hit": {
     "sounds": ["fdbosses:malkuth_warrior_hit"]
+  },
+  "malkuth_theme_intro": {
+    "sounds": [
+      {
+        "name": "fdbosses:music/malkuth_theme_intro",
+        "stream": true
+      }
+    ]
+  },
+  "malkuth_theme_main": {
+    "sounds": [
+      {
+        "name": "fdbosses:music/malkuth_theme_main",
+        "stream": true
+      }
+    ]
   }
 }
