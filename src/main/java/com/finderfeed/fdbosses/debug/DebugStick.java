@@ -24,6 +24,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -34,14 +35,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.joml.SimplexNoise;
 
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Predicate;
 
 public class DebugStick extends Item {
 
@@ -58,6 +59,8 @@ public class DebugStick extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 
         if (!level.isClientSide){
+
+
 
             Vec3 look = player.getLookAngle();
             MalkuthPlayerFireIceBall.summon(player, player.getEyePosition().add(look), look.multiply(4,4,4), MalkuthAttackType.FIRE, player.getItemInHand(InteractionHand.MAIN_HAND));

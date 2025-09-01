@@ -1,7 +1,10 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
+import com.finderfeed.fdbosses.init.BossCoreShaders;
+import com.finderfeed.fdlib.init.FDCoreShaders;
 import com.finderfeed.fdlib.systems.hud.bossbars.FDBossBarInterpolated;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.finderfeed.fdlib.util.rendering.FDShaderRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 
@@ -20,6 +23,12 @@ public class MalkuthBossBar extends FDBossBarInterpolated {
 
         FDRenderUtil.fill(matrices, -101, -1, 202, 12, 0f, 0f, 0f,1f);
         FDRenderUtil.fill(matrices, -100, 0, 200 * interpolatedPercent, 10, 1f, 0f, 0f,1f);
+
+        FDShaderRenderer.start(graphics, BossCoreShaders.MALKUTH_BOSS_BAR)
+                .position(0,0,0)
+                .setResolution(100,100)
+                .setUVSpan(1f,1)
+                .end();
 
     }
 
