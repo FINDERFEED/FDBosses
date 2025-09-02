@@ -128,20 +128,17 @@ vec2 normalizeCoords(vec2 coord){
     return coord;
 }
 
-float transformValue(float val){
-    return val;
-}
 
 float makeSmooth(float p){
     return smoothstep(0,1,p);
 }
 
 
-vec4 fromBlackToColorToColor(vec4 color, vec4 target, float edge, float p){
+vec4 fromTransparentToColorToColor(vec4 color, vec4 target, float edge, float p){
     vec4 result;
     if (p < edge){
         float localP = makeSmooth(p / edge);
-        result = mix(vec4(0,0,0,1), color, localP);
+        result = mix(vec4(0,0,0,0), color, localP);
     }else{
         float localP = ((p - edge) / (1 - edge));
         result = mix(color, target, localP);
@@ -149,24 +146,53 @@ vec4 fromBlackToColorToColor(vec4 color, vec4 target, float edge, float p){
     return result;
 }
 
+vec4 srcAlphaOneMinusSrcAlpha(vec4 dest, vec4 source){
+
+    float asour = source.w;
+
+    return vec4(
+        source.r * asour + dest.r * (1. - asour),
+        source.g * asour + dest.g * (1. - asour),
+        source.b * asour + dest.b * (1. - asour),
+        source.a * asour + dest.a * (1. - asour)
+    );
+
+}
+
+float transformValue(float val){
+    return val;
+}
+
 void main(){
 
 
     vec2 uv = normalizeCoords(texCoord0) + xyOffset;
 
-    float value = perlinNoise(uv.x, uv.y, 0, 5, 1);
+    float value = perlinNoise(uv.x + 100, uv.y + 100, time, 1, 8);
 
-    float noiseAmplitude = 0.5;
+    float noiseAmplitude = 0.4;
     value += noiseAmplitude; value /= (noiseAmplitude * 2);
     value = transformValue(value);
     value = clamp(value,0,1);
 
 
-    vec4 col = fromBlackToColorToColor(vec4(1,0.1,0,1),vec4(1,0.9,0,1),0.75,value);
-    vec4 col2 = fromBlackToColorToColor(vec4(0,0.1,1,1),vec4(0,1,1,1),0.6,1 - value);
+    float evalue = 1 - value;
 
-    vec4 color = col + col2;
+    vec4 col = mix(vec4(0,0,0,0.1), vec4(1.0,0.5,0.,1.), value);
+    vec4 colglow = mix(vec4(0,0,0,0.1), vec4(1.0,1.0,0.,1.), value);
+    vec4 col2 = mix(vec4(0,0,0,0.1), vec4(0.0,0.5,1.,1.), evalue);
+    vec4 col2glow = mix(vec4(0,0,0,0.1), vec4(0.0,0.5,1.,1.), evalue * evalue * evalue * evalue);
 
+    vec4 color = srcAlphaOneMinusSrcAlpha(col,col2);
+
+    colglow.rgb -= 0.75;
+    colglow = clamp(colglow,vec4(0),vec4(999));
+
+    color += colglow;
+
+    color.a = 1;
 
     fragColor = color;
 }
+
+
