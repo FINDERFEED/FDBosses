@@ -128,30 +128,45 @@ vec2 normalizeCoords(vec2 coord){
     return coord;
 }
 
+float transformValue(float val){
+    return val;
+}
+
+float makeSmooth(float p){
+    return smoothstep(0,1,p);
+}
+
+
+vec4 fromBlackToColorToColor(vec4 color, vec4 target, float edge, float p){
+    vec4 result;
+    if (p < edge){
+        float localP = makeSmooth(p / edge);
+        result = mix(vec4(0,0,0,1), color, localP);
+    }else{
+        float localP = ((p - edge) / (1 - edge));
+        result = mix(color, target, localP);
+    }
+    return result;
+}
 
 void main(){
 
 
     vec2 uv = normalizeCoords(texCoord0) + xyOffset;
 
-    float value = perlinNoise(uv.x, uv.y, 0, 1, 1);
-    float value2 = perlinNoise(uv.x + 100, uv.y + 100, 0, 1, 1);
-    float value3 = perlinNoise(uv.x + 200, uv.y + 200, 0, 1, 1);
+    float value = perlinNoise(uv.x, uv.y, 0, 5, 1);
 
-    value += 1;value /= 2;
-    value2 += 1;value2 /= 2;
-    value3 += 1;value3 /= 2;
+    float noiseAmplitude = 0.5;
+    value += noiseAmplitude; value /= (noiseAmplitude * 2);
+    value = transformValue(value);
+    value = clamp(value,0,1);
 
-    vec4 col1 = vec4(0,0,1,1);
-    vec4 col12 = vec4(0,1,1,1);
 
-    vec4 col2 = vec4(1,0,0,1);
-    vec4 col22 = vec4(1,0.5,0,1);
+    vec4 col = fromBlackToColorToColor(vec4(1,0.1,0,1),vec4(1,0.9,0,1),0.75,value);
+    vec4 col2 = fromBlackToColorToColor(vec4(0,0.1,1,1),vec4(0,1,1,1),0.6,1 - value);
 
-    vec4 colorBlue = mix(col1, col12, smoothstep(0,1,value));
-    vec4 colorOrange = mix(col2, col22, smoothstep(0,1,value2));
+    vec4 color = col + col2;
 
-    vec4 color = mix(colorBlue, colorOrange, smoothstep(0,1,value3));
 
     fragColor = color;
 }
