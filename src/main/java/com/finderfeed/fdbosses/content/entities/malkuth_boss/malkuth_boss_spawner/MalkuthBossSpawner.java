@@ -26,7 +26,6 @@ public class MalkuthBossSpawner extends BossSpawnerEntity {
         super.tick();
 
         if (!level().isClientSide){
-            this.setActive(true);
 
             for (var player : BossTargetFinder.getEntitiesInArc(Player.class, level(), this.position().add(0,-2,0), new Vec2(0,-1),
                     FDMathUtil.FPI, MalkuthEntity.ENRAGE_HEIGHT + 2, MalkuthEntity.ENRAGE_RADIUS)){

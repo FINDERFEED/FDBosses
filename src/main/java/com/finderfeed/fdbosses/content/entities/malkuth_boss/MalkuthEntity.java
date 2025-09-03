@@ -108,6 +108,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public static final Vec3 FIRE_PLAYER_CANNON_OFFSET = new Vec3(-6.5,-1,-25);
     public static final Vec3 ICE_PLAYER_CANNON_OFFSET = new Vec3(6.5,-1,-25);
 
+    public UUID bossSpawnerUUID;
 
     public static final Vec3 WALL_OFFSET = new Vec3(0, 13.0, 27.85);
 
@@ -166,6 +167,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     @SerializableField
     private int hits = 10;
+
+    @SerializableField
+    private boolean allowedToBeDamaged = false;
 
     private int maxHits = 10;
 
@@ -284,27 +288,25 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 .addAlwaysTryCastAttack(this::checkCanPunch, PULL_AND_PUNCH)
 
-
-//                .addAttack(0,CAROUSEL_SLASHES)
-                .addAttack(id++, slashOptions)
-                .addAttack(id++, randomJumpCrushNoJumpBack)
-                .addAttack(id++, cannonsNoJumpBack)
-                .addAttack(id++, randomJumpCrush)
-                .addAttack(id++, carouselEarthquakes)
-                .addAttack(id++, randomJumpCrushNoJumpBack)
-                .addAttack(id++, cannons)
-                .addAttack(id++, slashOptions)
+//                .addAttack(id++, slashOptions)
+//                .addAttack(id++, randomJumpCrushNoJumpBack)
+//                .addAttack(id++, cannonsNoJumpBack)
+//                .addAttack(id++, randomJumpCrush)
+//                .addAttack(id++, carouselEarthquakes)
+//                .addAttack(id++, randomJumpCrushNoJumpBack)
+//                .addAttack(id++, cannons)
+//                .addAttack(id++, slashOptions)
                 .addAttack(id++, GIANT_SWORDS_ULTIMATE)
-                .addAttack(id++, randomJumpCrushNoJumpBack)
-                .addAttack(id++, cannons)
-                .addAttack(id++, slashOptions)
-                .addAttack(id++, randomJumpCrush)
-                .addAttack(id++, boulders)
-                .addAttack(id++, AttackOptions.chainOptionsBuilder()
-                        .addAttack(JUMP_CRUSH)
-                        .addAttack(DELAY_10)
-                        .addAttack(PLATFORMS_N_FIREBALLS)
-                        .build())
+//                .addAttack(id++, randomJumpCrushNoJumpBack)
+//                .addAttack(id++, cannons)
+//                .addAttack(id++, slashOptions)
+//                .addAttack(id++, randomJumpCrush)
+//                .addAttack(id++, boulders)
+//                .addAttack(id++, AttackOptions.chainOptionsBuilder()
+//                        .addAttack(JUMP_CRUSH)
+//                        .addAttack(DELAY_10)
+//                        .addAttack(PLATFORMS_N_FIREBALLS)
+//                        .build())
 
 
                 .attackListener(this::attackListener)
@@ -336,6 +338,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         if (level().isClientSide){
             this.headControllerContainer.clientTick();
         }else{
+
 
             this.preventEnteringLavaField();
 
@@ -445,9 +448,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     public void hurtBoss(int amount){
-        this.hits = Math.clamp(this.hits - amount, 0, maxHits);
-        if (hits == 0){
-            this.kill();
+        if (allowedToBeDamaged) {
+            this.hits = Math.clamp(this.hits - amount, 0, maxHits);
+            if (hits == 0) {
+                this.kill();
+            }
         }
     }
 
@@ -536,7 +541,6 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             } else if (this.deathTime == animEndtime + 15) {
 
                 this.dropLoot = true;
-                this.dropAllDeathLoot((ServerLevel) level(), level().damageSources().generic());
 
                 Vector3f col1 = getAndRandomizeColor(MalkuthAttackType.FIRE, random);
                 Vector3f col2 = getAndRandomizeColor(MalkuthAttackType.ICE, random);
@@ -559,6 +563,15 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     player.connection.send(new ClientboundLevelParticlesPacket(options, true, this.getX(), this.getY(), this.getZ(), 1f, 1f, 1f,0.75f,400));
                     player.connection.send(new ClientboundLevelParticlesPacket(options2, true, this.getX(), this.getY(), this.getZ(), 1f, 1f, 1f,0.75f,400));
                 }
+
+                BossSpawnerEntity spawnerEntity = this.getSpawner();
+
+                if (spawnerEntity != null){
+                    spawnerEntity.setActive(true);
+                }
+
+                this.teleportTo(this.spawnPosition.x,this.spawnPosition.y,this.spawnPosition.z);
+                this.dropAllDeathLoot((ServerLevel) level(), level().damageSources().generic());
 
                 this.setRemoved(RemovalReason.KILLED);
 
@@ -1735,6 +1748,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private boolean jumpAndCommandCannons(AttackInstance attackInstance){
 
+        this.allowedToBeDamaged = true;
         this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
 
         this.lookAtTarget = false;
@@ -1798,6 +1812,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         else if (stage == 3){
             if (tick > 60){
+                allowedToBeDamaged = true;
                 lookAtTarget = true;
                 this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
                 return true;
@@ -1810,33 +1825,54 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     private void shootCannons(){
-        int attackPerCombatant = 10;
+        this.shootCannons(5);
+    }
+
+    private void shootCannons(int amountPerPoint){
         var cannons = this.getMalkuthCannons();
         if (cannons.isEmpty()){
             //summon them
+
             return;
         }
         var combatants = this.getCombatants(true);
 
         List<Vec3> positions = new ArrayList<>();
+
         for (var combatant : combatants){
-
-            float randomAngleStart = FDMathUtil.FPI / 4 * random.nextInt(4);
-            Vec3 base = combatant.position().add(0,combatant.getBbHeight()/2,0);
-
-
-            for (int i = 0; i < attackPerCombatant;i++){
-                float angle = randomAngleStart + FDMathUtil.FPI / 4 * i;
-                float rad = random.nextFloat() * 10 + 2;
-                Vec3 v = new Vec3(1,0,0)
-                        .yRot(angle - FDMathUtil.FPI / 4 + FDMathUtil.FPI / 2 * random.nextFloat())
-                        .multiply(rad,rad,rad)
-                        .add(combatant.position());
-
-                positions.add(v);
-            }
-            positions.add(base);
+            positions.add(combatant.position());
         }
+
+
+        Vec3 start = this.spawnPosition.add(0,-1,0);
+
+        Vec3 v = new Vec3(0,0,-ENRAGE_RADIUS / 2 - 2);
+
+
+
+        float rndRadius = ENRAGE_RADIUS / 2;
+        for (int i = 0; i < 3; i++){
+            Vec3 p1 = start.add(v.yRot(i * FDMathUtil.FPI / 8));
+            Vec3 p2 = start.add(v.yRot(-i * FDMathUtil.FPI / 8));
+            for (int k = 0; k < amountPerPoint;k++){
+                Vec3 rndPos = p1.add(
+                        random.nextFloat() * 2 * rndRadius - rndRadius,
+                        0,
+                        random.nextFloat() * 2 * rndRadius - rndRadius
+                );
+
+                Vec3 rndPos2 = p2.add(
+                        random.nextFloat() * 2 * rndRadius - rndRadius,
+                        0,
+                        random.nextFloat() * 2 * rndRadius - rndRadius
+                );
+                positions.add(rndPos);
+                if (i != 0){
+                    positions.add(rndPos2);
+                }
+            }
+        }
+
 
         int baseAmountPerCannon = positions.size() / cannons.size();
         int spreadAmount = baseAmountPerCannon * cannons.size();
@@ -2126,6 +2162,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 this.doSwordChargeStripe(MalkuthAttackType.ICE,1.75f, sizeModifier);
             }
 
+            if (tick < swordSpawnTick + MalkuthGiantSwordSlash.TIME_TO_RISE && tick % 25 == 0){
+                this.shootCannons(3);
+            }
 
             if (tick == swordSpawnTick - 5){
 
@@ -2150,6 +2189,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             } else if (tick == swordSpawnTick){
 
 
+
                 Vec3 offs1 = new Vec3(10, -1, 11);
                 Vec3 offs2 = new Vec3(-10, -1, 11);
 
@@ -2171,11 +2211,24 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         new ImpactFrame(base).setDuration(1),
                         new ImpactFrame(base).setDuration(1).setInverted(true),
                         new ImpactFrame(base).setDuration(1),
+                        new ImpactFrame(base).setDuration(1).setInverted(true),
+                        new ImpactFrame(base).setDuration(1),
                         new ImpactFrame(base).setDuration(1).setInverted(true)
                 );
 
 
             }else if (tick == MalkuthGiantSwordSlash.TIME_TO_HIT + MalkuthGiantSwordSlash.TIME_TO_RISE + swordSpawnTick){
+
+
+                for (var entity : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level(), this.spawnPosition.add(0,-5,0), 50,50)){
+                    PacketDistributor.sendToPlayer(entity, new PlaySoundInEarsPacket(BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(),1f,1));
+                    PacketDistributor.sendToPlayer(entity, new PlaySoundInEarsPacket(BossSounds.MALKUTH_SWORD_ULTIMATE_IMPACT.get(),1f,1));
+                }
+                PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                                .amplitude(4)
+                                .outTime(60)
+                                .frequency(100)
+                        .build(), this.spawnPosition, 50);
 
                 AABB firstBox = new AABB(0,-2,-29,29,10,0).move(this.spawnPosition);
                 AABB secondBox = new AABB(-29,-2,-29,0,10,0).move(this.spawnPosition);
@@ -2183,10 +2236,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 DamageSource damageSource = BossDamageSources.MALKUTH_TSARS_WRATH_SOURCE;
 
                 for (var entity : this.level().getEntitiesOfClass(LivingEntity.class, firstBox, entity -> !(entity instanceof MalkuthBossBuddy))){
+                    entity.invulnerableTime = 0;
                     entity.hurt(new MalkuthDamageSource(damageSource, giantSwordUltimateStartAttackType, 100), Integer.MAX_VALUE);
                 }
 
                 for (var entity : this.level().getEntitiesOfClass(LivingEntity.class, secondBox, entity -> !(entity instanceof MalkuthBossBuddy))){
+                    entity.invulnerableTime = 0;
                     entity.hurt(new MalkuthDamageSource(damageSource, MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType), 100), Integer.MAX_VALUE);
                 }
                 inst.nextStage();
@@ -2377,6 +2432,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         if (this.jumpOnWallPath != null){
             this.jumpOnWallPath.autoSave("jumpOnWallPath",tag);
         }
+        if (this.bossSpawnerUUID != null){
+            tag.putUUID("boss_spawner",this.bossSpawnerUUID);
+        }
         this.autoSave(tag);
     }
 
@@ -2384,6 +2442,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         this.autoLoad(tag);
+        if (tag.contains("boss_spawner")){
+            this.bossSpawnerUUID = tag.getUUID("boss_spawner");
+        }
         this.attackChain.load(tag);
         if (tag.contains("jumpCrushAttackMovementPath")){
             this.jumpCrushAttackMovementPath = new ProjectileMovementPath();
@@ -2495,7 +2556,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     @Override
     public void setSpawnedBy(BossSpawnerEntity bossSpawnerEntity) {
-
+        this.bossSpawnerUUID = bossSpawnerEntity.getUUID();
     }
 
     @Override
@@ -2505,6 +2566,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     @Override
     public BossSpawnerEntity getSpawner() {
+        if (this.bossSpawnerUUID != null && level() instanceof ServerLevel level){
+            return (BossSpawnerEntity) level.getEntity(bossSpawnerUUID);
+        }
         return null;
     }
 
@@ -2578,21 +2642,22 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             Level level = entity.level();
 
             if (!level.isClientSide){
-                if (!entity.hasEffect(BossEffects.MARK_OF_A_KNIGHT)
-//                        && (!entity.isSpectator() && !entity.isCreative())
-                ) return;
 
-                Vec3 cylinderStart = entity.position().add(0,-MalkuthEntity.ENRAGE_HEIGHT,0);
+                if (entity.hasEffect(BossEffects.MARK_OF_A_KNIGHT)) {
+                    Vec3 cylinderStart = entity.position().add(0, -MalkuthEntity.ENRAGE_HEIGHT, 0);
 
-                var spawners = BossTargetFinder.getEntitiesInArc(MalkuthBossSpawner.class, level, cylinderStart,new Vec2(0,1),FDMathUtil.FPI,
-                        MalkuthEntity.ENRAGE_HEIGHT + 2, MalkuthEntity.ENRAGE_RADIUS);
+                    var spawners = BossTargetFinder.getEntitiesInArc(MalkuthBossSpawner.class, level, cylinderStart, new Vec2(0, 1), FDMathUtil.FPI,
+                            MalkuthEntity.ENRAGE_HEIGHT + 2, MalkuthEntity.ENRAGE_RADIUS);
 
 
-                if (spawners.isEmpty()){
-                    entity.removeEffect(BossEffects.MARK_OF_A_KNIGHT);
-                    entity.addEffect(new MobEffectInstance(BossEffects.MARK_OF_A_COWARD, MARK_OF_A_COWARD_DURATION, 0, true, false));
-                }else{
-                    entity.removeEffect(BossEffects.MARK_OF_A_COWARD);
+                    if (spawners.isEmpty()) {
+                        entity.removeEffect(BossEffects.MARK_OF_A_KNIGHT);
+                        if (!entity.hasEffect(BossEffects.MARK_OF_A_COWARD)) {
+                            entity.addEffect(new MobEffectInstance(BossEffects.MARK_OF_A_COWARD, MARK_OF_A_COWARD_DURATION, 0, true, false));
+                        }
+                    } else {
+                        entity.removeEffect(BossEffects.MARK_OF_A_COWARD);
+                    }
                 }
 
             }
