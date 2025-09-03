@@ -17,6 +17,7 @@ public class MalkuthBossBar extends FDBossBarInterpolated {
 
     //217 67
     public static final ResourceLocation MAIN = FDBosses.location("textures/boss_bars/malkuth_bossbar.png");
+    public static final ResourceLocation MAIN_GLOW = FDBosses.location("textures/boss_bars/malkuth_bossbar_glow.png");
     public static final ResourceLocation ABOVE = FDBosses.location("textures/boss_bars/malkuth_bossbar_above.png");
 
     private int time;
@@ -37,23 +38,26 @@ public class MalkuthBossBar extends FDBossBarInterpolated {
 
         float verticalOffset = 2;
 
-        FDRenderUtil.bindTexture(MAIN);
+        FDRenderUtil.bindTexture(MAIN_GLOW);
         FDRenderUtil.blitWithBlend(matrices, -width / 2, -verticalOffset, width, height, 0,0,1,1,1,1,0,1f);
 
-        float t = (time + pticks) / 20f;
-//        FDShaderRenderer.start(graphics, BossCoreShaders.MALKUTH_BOSS_BAR)
-//                .position(-width/2 + 14.1f,-verticalOffset + 33,0.5f)
-//                .setResolution(189,5)
-//                .setUVSpan(6f,2)
-//                .setShaderUniform("time",t)
-//                .end();
+        float t = (time + FDRenderUtil.tryGetPartialTickIgnorePause()) / 100f;
+
+        float xHPPos = -width/2 + 14.1f;
+        float yHPPos = -verticalOffset + 33;
+
+        FDRenderUtil.Scissor.pushScissors(matrices,xHPPos, yHPPos, 189 * interpolatedPercent, 5);
+
         FDShaderRenderer.start(graphics, BossCoreShaders.MALKUTH_BOSS_BAR)
-                .position(0,0,0)
-                .setResolution(200,200)
-                .setUVSpan(10,10)
-                .setShaderUniform("time",0f)
+                .position(xHPPos,yHPPos,0.5f)
+                .setResolution(189,5)
+                .setUVSpan(12f,0.3f)
+                .setShaderUniform("xyOffset",0f,0f)
+                .setShaderUniform("time",t)
+                .setShaderUniform("uvSpan",12f,0.3f)
                 .end();
 
+        FDRenderUtil.Scissor.popScissors();
 
 
         FDRenderUtil.bindTexture(ABOVE);

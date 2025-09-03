@@ -73,23 +73,25 @@ public class MalkuthFloorEntity extends Entity {
 
     private void damageAndThrowUp(){
 
-        float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthFloorDamage);
+        if (tickCount > 10) {
+            float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthFloorDamage);
 
-        var targets = BossTargetFinder.getEntitiesInArc(LivingEntity.class, level(), this.position(), new Vec2(0,-1), FDMathUtil.FPI, 2.5f,RADIUS);
-        for (var target : targets){
+            var targets = BossTargetFinder.getEntitiesInArc(LivingEntity.class, level(), this.position(), new Vec2(0, -1), FDMathUtil.FPI, 2.5f, RADIUS);
+            for (var target : targets) {
 
-            if (target instanceof MalkuthBossBuddy) continue;
+                if (target instanceof MalkuthBossBuddy) continue;
 
-            target.hurt(BossDamageSources.MALKUTH_IMPALING_DOOM_SOURCE, damage);
+                target.hurt(BossDamageSources.MALKUTH_IMPALING_DOOM_SOURCE, damage);
 
-            double speed = 1.2f;
+                double speed = 1.2f;
 
-            if (target instanceof ServerPlayer serverPlayer){
-                FDLibCalls.setServerPlayerSpeed(serverPlayer, new Vec3(0,speed,0));
-            }else{
-                target.setDeltaMovement(0,speed,0);
+                if (target instanceof ServerPlayer serverPlayer) {
+                    FDLibCalls.setServerPlayerSpeed(serverPlayer, new Vec3(0, speed, 0));
+                } else {
+                    target.setDeltaMovement(0, speed, 0);
+                }
+
             }
-
         }
 
     }

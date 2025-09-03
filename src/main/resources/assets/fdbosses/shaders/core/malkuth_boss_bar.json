@@ -22,6 +22,7 @@
     { "name": "sections", "type": "float", "count": 1, "values": [ 10.0 ] },
     { "name": "size", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] },
     { "name": "xyOffset", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] },
+    { "name": "uvSpan", "type": "float", "count": 2, "values": [ 1.0, 1.0 ] },
     { "name": "octaves", "type": "float", "count": 1, "values": [ 1.0 ] }
   ]
 }

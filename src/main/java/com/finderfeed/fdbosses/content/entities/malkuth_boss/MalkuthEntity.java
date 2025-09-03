@@ -403,7 +403,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     private FDMusicArea constructMusicArea(){
-        return new FDMusicArea(this.level().dimension(), this.spawnPosition.add(0,-2,0), new FDMusicAreaCylinder(ENRAGE_RADIUS, ENRAGE_HEIGHT), this.constructMusicData());
+        return new FDMusicArea(this.level().dimension(), this.spawnPosition.add(0,-2,0), new FDMusicAreaCylinder(ENRAGE_RADIUS, ENRAGE_HEIGHT + 8), this.constructMusicData());
     }
 
     private FDMusicData constructMusicData(){
@@ -1049,7 +1049,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.impalingDoomDamage);
 
-                MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(),earthquakeToSummon, this.position().add(0, spawnYOffset, 0), direction, time, FDMathUtil.FPI / 9, damage);
+                MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(),earthquakeToSummon, this.position().add(0, spawnYOffset, 0), direction, time, FDMathUtil.FPI / 8, damage);
             }else if (tick == 9){
 
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
@@ -1773,8 +1773,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             if (this.jumpOnWallPath.isFinished()){
                 this.lookAt(EntityAnchorArgument.Anchor.EYES, this.position().add(0,0,-100));
+                Vec3 last = this.jumpOnWallPath.getPositions().getLast();
                 this.setNoGravity(false);
                 this.noPhysics = false;
+                this.teleportTo(last.x,last.y,last.z);
                 attackInstance.nextStage();
                 this.getAnimationSystem().startAnimation(MAIN_LAYER,AnimationTicker.builder(BossAnims.MALKUTH_SWORD_FORWARD)
                                 .setToNullTransitionTime(0)
@@ -2102,10 +2104,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
 
+            this.lookAtTarget = false;
+
+            this.getLookControl().setLookAt(new Vec3(0,0,-100).add(this.position()));
+
             inst.nextStage();
-
-
-
 
         }else if (stage == 1){
 
@@ -2126,7 +2129,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             if (tick == swordSpawnTick - 5){
 
-                this.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(-100,0,0).add(this.position()));
+                this.lookAt(EntityAnchorArgument.Anchor.EYES, new Vec3(0,0,-100).add(this.position()));
 
                 Vector3f red = MalkuthEntity.getMalkuthAttackPreparationParticleColor(giantSwordUltimateStartAttackType);
                 Vector3f blue = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType));

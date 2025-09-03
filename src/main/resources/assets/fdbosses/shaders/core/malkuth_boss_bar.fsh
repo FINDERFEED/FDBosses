@@ -6,6 +6,7 @@ uniform vec2 xyOffset;
 uniform float sections;
 uniform float octaves;
 uniform float time;
+uniform vec2 uvSpan;
 
 in vec2 texCoord0;
 in vec4 vertexColor;
@@ -159,8 +160,36 @@ vec4 srcAlphaOneMinusSrcAlpha(vec4 dest, vec4 source){
 
 }
 
+vec4 srcOneSrcAlpha(vec4 src, vec4 dest){
+
+    return vec4(
+    src.r + dest.r * src.a,
+    src.g + dest.g * src.a,
+    src.b + dest.b * src.a,
+    src.a + dest.a * src.a
+    );
+}
+
+
 float transformValue(float val){
-    return val;
+    return pow(val,8);
+}
+
+float transformNoiseValue(float value, float amplitude){
+    value += 1; value /= 2;
+    value /= amplitude;
+    return value;
+}
+
+float interpolateValue(float value, float maximum, float percent){
+
+    float p = value / maximum / percent;
+
+    if (p > 1){
+        p = 1;
+    }
+
+    return 1 - p;
 }
 
 void main(){
@@ -168,27 +197,53 @@ void main(){
 
     vec2 uv = normalizeCoords(texCoord0) + xyOffset;
 
-    float value = perlinNoise(uv.x + 100, uv.y + 100, time, 1, 8);
-
-    float noiseAmplitude = 0.4;
-    value += noiseAmplitude; value /= (noiseAmplitude * 2);
-    value = transformValue(value);
-    value = clamp(value,0,1);
+    float value = perlinNoise(uv.x + 100, uv.y + 100, time, 1, 2);
+    float value12 = perlinNoise(uv.x + 100, uv.y + 100, time, 3, 5);
+    float value2 = perlinNoise(uv.x + 200, uv.y + 200, time, 1, 2);
+    float value22 = perlinNoise(uv.x + 200, uv.y + 200, time, 3, 5);
 
 
-    float evalue = 1 - value;
 
-    vec4 col = mix(vec4(0,0,0,0.1), vec4(1.0,0.5,0.,1.), value);
-    vec4 colglow = mix(vec4(0,0,0,0.1), vec4(1.0,1.0,0.,1.), value);
-    vec4 col2 = mix(vec4(0,0,0,0.1), vec4(0.0,0.5,1.,1.), evalue);
-    vec4 col2glow = mix(vec4(0,0,0,0.1), vec4(0.0,0.5,1.,1.), evalue * evalue * evalue * evalue);
+    float uvalue = transformNoiseValue(value12, 0.7);
+    float uvalue2 = transformNoiseValue(value22, 0.7);
 
-    vec4 color = srcAlphaOneMinusSrcAlpha(col,col2);
+    value = 1 - abs(value);
+    value2 = 1 - abs(value2);
 
-    colglow.rgb -= 0.75;
-    colglow = clamp(colglow,vec4(0),vec4(999));
 
-    color += colglow;
+
+
+
+    vec4 firecolor = vec4(1.0,0.5,0.,1.);
+    vec4 icecolor = vec4(0.0,0.5,1.,1.);
+
+    float colorModifier = 0.75;
+
+    vec4 col1 = mix(vec4(0,0,0,0), firecolor, transformValue(value2));
+    vec4 col1b = mix(vec4(0,0,0,0), firecolor, pow(uvalue,8));
+
+    col1 = srcOneSrcAlpha(col1, col1);
+
+    vec4 col2 = mix(vec4(0,0,0,0), icecolor,transformValue(value));
+    vec4 col2b = mix(vec4(0,0,0,0), icecolor,pow(uvalue2,8));
+
+    col2 = srcOneSrcAlpha(col2,col2);
+
+    vec4 color = col1 + col2;
+    color *= colorModifier;
+    vec4 bg = col1b + col2b;
+    color = bg + color;
+
+
+    float yUvSpan = uvSpan.y;
+
+    float p1 = interpolateValue(texCoord0.y,yUvSpan,0.33);
+    float p2 = interpolateValue(yUvSpan - texCoord0.y,yUvSpan,0.33);
+
+    vec4 upGlow = mix(vec4(0),firecolor,p1); upGlow = srcOneSrcAlpha(upGlow,upGlow);
+    vec4 downGlow = mix(vec4(0),icecolor,p2); downGlow = srcOneSrcAlpha(downGlow,downGlow);
+
+    color = upGlow + downGlow + color;
 
     color.a = 1;
 

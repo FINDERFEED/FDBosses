@@ -212,18 +212,17 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
 
             BossUtil.malkuthFireballExplosionParticles((ServerLevel) level(), pos, this.getMalkuthAttackType());
 
-            var targets = BossTargetFinder.getEntitiesInSphere(LivingEntity.class, level(), pos, 2.5f);
+            var targets = BossTargetFinder.getEntitiesInSphere(LivingEntity.class, level(), pos, 2.5f, target -> !(target instanceof MalkuthEntity));
+            var malkuth = BossTargetFinder.getEntitiesInSphere(MalkuthEntity.class, level(), pos, 10);
+
+            for (var m : malkuth){
+                m.hurtBoss(1);
+            }
 
             for (var target : targets){
-
-                if (target instanceof MalkuthEntity malkuth){
-                    malkuth.hurtBoss(1);
-                }else {
-                    if (damage != 0) {
-                        target.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_CANNONS_SOURCE, this.getMalkuthAttackType(), 100), this.damage);
-                    }
+                if (damage != 0) {
+                    target.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_CANNONS_SOURCE, this.getMalkuthAttackType(), 100), this.damage);
                 }
-
             }
 
             this.remove(RemovalReason.DISCARDED);
