@@ -60,6 +60,7 @@ public class BossSounds {
     public static final Supplier<SoundEvent> MALKUTH_VOLCANO_RUMBLING_LOOP = SOUNDS.register("volcano_rumbling_loop",()->SoundEvent.createVariableRangeEvent(FDBosses.location("volcano_rumbling_loop")));
     public static final Supplier<SoundEvent> MALKUTH_HIT = SOUNDS.register("malkuth_hit",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_hit")));
     public static final Supplier<SoundEvent> MALKUTH_WARRIOR_HIT = SOUNDS.register("malkuth_warrior_hit",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_warrior_hit")));
+    public static final Supplier<SoundEvent> MALKUTH_SWORD_ULTIMATE_IMPACT = SOUNDS.register("malkuth_sword_ultimate_impact",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_sword_ultimate_impact")));
 
 
 }
