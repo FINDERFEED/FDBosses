@@ -145,7 +145,7 @@ public class QliphothAwakeningSocialsWidget extends FDWidget {
                 .setOnClickAction(((fdWidget, v, v1, i) -> {
                     URI uri = null;
                     try {
-                        uri = Util.parseAndValidateUntrustedUri("https://www.patreon.com/c/FDMods");
+                        uri = Util.parseAndValidateUntrustedUri("https://boosty.to/fdmods");
                         Util.getPlatform().openUri(uri);
                     } catch (URISyntaxException e) {
 
