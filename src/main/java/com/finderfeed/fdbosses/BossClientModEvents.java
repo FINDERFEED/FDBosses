@@ -51,6 +51,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.Mal
 import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
 import com.finderfeed.fdbosses.content.projectiles.renderers.MalkuthPlayerFireIceBallRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
+import com.finderfeed.fdbosses.content.tile_entities.MalkuthTrophyBlockEntity;
 import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
 import com.finderfeed.fdbosses.ik_2d.InverseKinematics2BoneTransform;
 import com.finderfeed.fdbosses.init.*;
@@ -129,6 +130,35 @@ public class BossClientModEvents {
                     return new Vector3f(0.1f,0f,0f);
                 })
         ), BossItems.CHESED_TROPHY.get());
+
+        event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
+                .addModel(BossModels.MALKUTH_SCREEN,RenderType.entityTranslucent(FDBosses.location("textures/entities/malkuth/malkuth_screen.png")))
+                .addModel(BossModels.MALKUTH_SCREEN,RenderType.text(FDBosses.location("textures/entities/malkuth/malkuth_screen_emissive.png")))
+                .setScale((ctx)->{
+                    if (ctx == ItemDisplayContext.GROUND){
+                        return 0.15f;
+                    }
+                    return 0.25f;
+                })
+                .addRotation((itemDisplayContext -> {
+                    if (itemDisplayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND || itemDisplayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND){
+                        return 180f;
+                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND){
+                        return 40f;
+                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND){
+                        return -40f;
+                    }
+                    return 0f;
+                }))
+                .addTranslation((ctx)->{
+                    if (ctx == ItemDisplayContext.GUI){
+                        return new Vector3f(0,-0.1f,0);
+                    }else if (ctx == ItemDisplayContext.GROUND){
+                        return new Vector3f();
+                    }
+                    return new Vector3f(0.1f,0f,0f);
+                })
+        ), BossItems.MALKUTH_TROPHY.get());
     }
 
     @SubscribeEvent
@@ -169,6 +199,30 @@ public class BossClientModEvents {
                                 return new FDColor(1f,1f,1f,1f);
                             })
                             .transformation(chesedTransform)
+                            .build())
+                    .build());
+
+            FDBlockEntityTransformation<MalkuthTrophyBlockEntity> malkuthTransform = (trophy, matrices, pticks)->{
+                matrices.scale(0.3f,0.3f,0.3f);
+                baseTransform.apply(trophy,matrices,pticks);
+            };
+
+
+            BlockEntityRenderers.register((BlockEntityType<MalkuthTrophyBlockEntity>)BossTileEntities.MALKUTH_TROPHY.get(),
+                    FDBlockEntityRendererBuilder.<MalkuthTrophyBlockEntity>builder()
+                    .addLayer(FDBlockRenderLayerOptions.<MalkuthTrophyBlockEntity>builder()
+                            .model(BossModels.MALKUTH_SCREEN)
+                            .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/malkuth/malkuth_screen.png")))
+                            .transformation(malkuthTransform)
+                            .build()
+                    )
+                    .addLayer(FDBlockRenderLayerOptions.<MalkuthTrophyBlockEntity>builder()
+                            .model(BossModels.MALKUTH_SCREEN)
+                            .light(LightTexture.FULL_BRIGHT)
+                            .renderType((entity,pticks)->{
+                                return RenderType.text(FDBosses.location("textures/entities/malkuth/malkuth_screen_emissive.png"));
+                            })
+                            .transformation(malkuthTransform)
                             .build())
                     .build());
         });

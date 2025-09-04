@@ -18,11 +18,11 @@
         {
           "type": "minecraft:item",
           "functions": [],
-          "name": "fdbosses:chesed_trophy"
+          "name": "fdbosses:malkuth_trophy"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "fdbosses:entities/chesed"
+  "random_sequence": "fdbosses:entities/malkuth"
 }

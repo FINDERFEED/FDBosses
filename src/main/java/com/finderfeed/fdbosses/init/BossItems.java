@@ -40,6 +40,9 @@ public class BossItems {
     public static final Supplier<Item> CHESED_TROPHY = ITEMS.register("chesed_trophy",
             ()->new BlockItem(BossBlocks.CHESED_TROPHY.get(), new Item.Properties().stacksTo(1)));
 
+    public static final Supplier<Item> MALKUTH_TROPHY = ITEMS.register("malkuth_trophy",
+            ()->new BlockItem(BossBlocks.MALKUTH_TROPHY.get(), new Item.Properties().stacksTo(1)));
+
     @EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
     public static class AddToCreativeTabs{
 
@@ -49,6 +52,7 @@ public class BossItems {
                 event.accept(LIGHTNING_CORE.get());
                 event.accept(EYE_OF_CHESED.get());
                 event.accept(CHESED_TROPHY.get());
+                event.accept(MALKUTH_TROPHY.get());
             }else if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)){
                 event.accept(MALKUTH_FIRE_WARRIOR_SPAWN_EGG.get());
                 event.accept(MALKUTH_ICE_WARRIOR_SPAWN_EGG.get());

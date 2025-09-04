@@ -513,6 +513,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     @Override
     protected void tickDeath() {
 
+
         this.deathTime++;
 
         int animStartTime = 5;
@@ -522,7 +523,13 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             FDMusicAreasHandler.removeArea(((ServerLevel)level()).getServer(), this.getUUID(), 40);
 
-            if (this.deathTime == animStartTime) {
+            if (deathTime == 1){
+                for (var combatant : this.getCombatants(true)){
+                    if (!combatant.isSpectator()){
+                        BossCriteriaTriggers.BOSS_KILLED.get().trigger((ServerPlayer) combatant,this);
+                    }
+                }
+            } else if (this.deathTime == animStartTime) {
 
                 this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_DEATH).build());
 

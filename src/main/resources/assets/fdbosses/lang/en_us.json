@@ -1,5 +1,6 @@
 {
   "block.fdbosses.chesed_trophy": "Chesed Trophy",
+  "block.fdbosses.malkuth_trophy": "Malkuth Trophy",
   "item.fdbosses.lightning_core": "Lightning Core",
   "item.fdbosses.fire_and_ice_core": "Fire and Ice Core",
   "item.fdbosses.eye_of_chesed": "Eye Of Chesed",
@@ -108,6 +109,8 @@
   "advancements.qliphoth_awakening.root.description": "And so it begins...",
   "advancements.qliphoth_awakening.chesed.title": "Chesed",
   "advancements.qliphoth_awakening.chesed.description": "No mercy for merciless",
+  "advancements.qliphoth_awakening.malkuth.title": "Malkuth",
+  "advancements.qliphoth_awakening.malkuth.description": "Consumed by rage, betrayed by life, now rests in peace the kingdoms tsar",
   "fdbosses.drops.chesed.trophy_description": "A trophy of Chesed to showcase your heroic deeds",
   "fdbosses.word.tried_to_break_arena": "An evil force prevents you from corrupting this place.",
   "fdbosses.tldr.chesed": "Chesed damage pierces armor and shields.\n\nTo damage Chesed:\n\nWait until lightning ray attack, kill a crystal with an axe to get {{(fdbosses:effect)id=fdbosses:chesed_energized,level=1}}, run to a ray reflector and make Chesed hit it. You are immune to lightning ray attack when you are {{(fdbosses:effect)id=fdbosses:chesed_energized}}.\n\nChesed has an attack which damage depends on the amount of active monoliths, if all monoliths are active - there is no way to survive the attack. To deactivate a monolith - kill it.",

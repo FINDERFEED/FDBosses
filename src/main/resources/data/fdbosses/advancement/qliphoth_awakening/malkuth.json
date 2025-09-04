@@ -1,0 +1,33 @@
+{
+  "parent": "fdbosses:qliphoth_awakening/root",
+  "criteria": {
+    "killed_malkuth": {
+      "conditions": {
+        "boss_entity_type": "fdbosses:malkuth"
+      },
+      "trigger": "fdbosses:boss_killed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.qliphoth_awakening.malkuth.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "fdbosses:malkuth_trophy"
+    },
+    "title": {
+      "translate": "advancements.qliphoth_awakening.malkuth.title"
+    }
+  },
+  "requirements": [
+    [
+      "killed_malkuth"
+    ]
+  ],
+  "rewards": {
+    "experience": 300
+  },
+  "sends_telemetry_event": true
+}

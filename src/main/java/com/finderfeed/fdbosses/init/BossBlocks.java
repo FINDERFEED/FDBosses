@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
+import java.util.Random;
 import java.util.function.Supplier;
 
 public class BossBlocks {
@@ -25,8 +26,19 @@ public class BossBlocks {
                     .instabreak()
                     .noOcclusion(),
             BossAnims.CHESED_IDLE,
-            BossAnims.CHESED_ATTACK,
+            null,
             (pos,state)-> BossTileEntities.CHESED_TROPHY.get().create(pos,state)
     ));
+
+    public static final Supplier<TrophyBlock> MALKUTH_TROPHY = BLOCKS.register("malkuth_trophy",()->new TrophyBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F)
+                    .instabreak()
+                    .noOcclusion(),
+            BossAnims.MALKUTH_SCREEN_IDLE,
+            null,
+            (pos,state)-> BossTileEntities.MALKUTH_TROPHY.get().create(pos,state)
+    ));
+
+
 
 }

@@ -2,11 +2,11 @@ package com.finderfeed.fdbosses.content.tile_entities;
 
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
+import com.finderfeed.fdbosses.content.blocks.TrophyBlock;
 import com.finderfeed.fdbosses.init.BossTileEntities;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Math;
@@ -17,6 +17,7 @@ public class ChesedTrophyTileEntity extends TrophyBlockEntity {
     public ChesedTrophyTileEntity(BlockPos pos, BlockState state) {
         super(BossTileEntities.CHESED_TROPHY.get(), pos, state);
     }
+
 
     @Override
     public void tick() {
