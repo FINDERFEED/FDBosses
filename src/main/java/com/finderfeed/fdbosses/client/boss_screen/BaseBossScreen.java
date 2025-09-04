@@ -26,15 +26,12 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -55,6 +52,8 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     protected FDButton skillStatsButton;
     protected FDButton skillInfoButton;
     protected float bossMenuXStart = 0;
+
+    protected QliphothAwakeningSocialsWidget socialsWidget;
 
     private DidntReadSkillWarningWidget didntReadSkillWarningWidget;
 
@@ -113,6 +112,8 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         this.addRenderableWidget(startFightButton);
 
         this.initTLDRButton();
+
+        this.initSocialsButton();
 
     }
 
@@ -283,6 +284,37 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         bossAbilitesWidget.bossAbilitiesButtonContainer.setCurrentScroll(0);
         bossAbilitesWidget.bossAbilitiesButtonContainer.removeAllChildren();
         this.initAbilitiesWidgetInfoButtons(bossAbilitesWidget.bossAbilitiesButtonContainer,bossInfos, malkuthShuffle);
+    }
+
+    private void initSocialsButton(){
+        Vector2f anchor = this.getAnchor(0,1);
+        Vector2f anchor2 = this.getAnchor(0.5f,0.5f);
+        float x = anchor2.x;
+        float y = anchor2.y;
+        socialsWidget = new QliphothAwakeningSocialsWidget(this, x - 50, y - 35, 120, 70);
+
+
+        FDButton button = new FDButtonWithTexture(this, anchor.x + 4,anchor.y - 36 * 2, 32, 32, FDBosses.location("textures/gui/link.png"))
+                .setTexture(new FDButtonTextures(
+                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),
+                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),1,1)
+                ))
+                .setSound(BossSounds.BUTTON_CLICK.get())
+                .setOnHoverAction(((fdWidget, guiGraphics, v, v1, v2) -> {
+                    PoseStack poseStack = guiGraphics.pose();
+                    poseStack.pushPose();
+                    poseStack.translate(0,0,100);
+                    BossRenderUtil.renderBossScreenTooltip(guiGraphics, Component.translatable("fdbosses.word.socials"),v,v1, 200, this.getBaseStringColor(), 1f);
+                    poseStack.popPose();
+                }))
+                .setOnClickAction(((fdWidget, v, v1, i) -> {
+                    this.socialsWidget.setActive(true);
+                    return true;
+                }));
+
+        this.addRenderableWidget(button);
+        this.socialsWidget.setActive(false);
+        this.addWidget(socialsWidget);
     }
 
     private void initTLDRButton(){
@@ -468,6 +500,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         this.renderSkillInfo(graphics,mx,my,pticks);
 
         this.renderDidntReadSkillInfoWidget(graphics,mx,my,pticks);
+        this.renderSocialsWidget(graphics,mx,my,pticks);
     }
 
     private void renderDidntReadSkillInfoWidget(GuiGraphics graphics, int mx, int my, float pticks){
@@ -483,6 +516,22 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         poseStack.translate(0,0,200);
         FDRenderUtil.fill(poseStack,0,0,anchorEnd.x,anchorEnd.y,0f,0f,0f,0.925f);
         didntReadSkillWarningWidget.render(graphics,mx,my,pticks);
+        poseStack.popPose();
+    }
+
+    private void renderSocialsWidget(GuiGraphics graphics, int mx, int my, float pticks){
+        if (!socialsWidget.isActive()) return;
+
+        Vector2f anchorEnd = this.getAnchor(1f,1f);
+
+        PoseStack poseStack = graphics.pose();
+
+
+
+        poseStack.pushPose();
+        poseStack.translate(0,0,200);
+        FDRenderUtil.fill(poseStack,0,0,anchorEnd.x,anchorEnd.y,0f,0f,0f,0.9f);
+        socialsWidget.render(graphics,mx,my,pticks);
         poseStack.popPose();
     }
 
@@ -518,7 +567,14 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                 return didntReadSkillWarningWidget.mouseClicked(mx,my, button);
             }
             return false;
-        } else if (this.skillOpened) {
+        } else if (socialsWidget.isActive()){
+            if (FDRenderUtil.isMouseInBounds((float) mx,(float) my,socialsWidget.getX(),socialsWidget.getY(),socialsWidget.getWidth(),socialsWidget.getHeight())){
+                return socialsWidget.mouseClicked(mx,my, button);
+            }else{
+                this.socialsWidget.setActive(false);
+            }
+            return false;
+        }else if (this.skillOpened) {
             float xBorder = this.skillInfoWidget.getX() + this.skillInfoWidget.getWidth();
             if (mx > xBorder) {
                 this.openSkillInfo(null,false);

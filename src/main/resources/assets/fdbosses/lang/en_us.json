@@ -157,6 +157,11 @@
   "fdbosses.skills.malkuth.tsars_wrath_description": "Damage type: §cFire§r / §bIce§r\n\nMalkuth summons two giant swords and orders them to slam the ground with devastating force.",
   "fdbosses.skills.malkuth.hellshaper": "Hellshaper",
   "fdbosses.skills.malkuth.hellshaper_stats": "Fireballs:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=malkuthConfig, value=fireballsDamage}}.",
-  "fdbosses.skills.malkuth.hellshaper_description": "Damage type: §cFire§r / §bIce§r\n\nMalkuth slams the earth, summoning floating islands, hurling everyone in the air and rendering the floor impossible to walk on.\n\nLaunches fireballs at these islands thereafter."
+  "fdbosses.skills.malkuth.hellshaper_description": "Damage type: §cFire§r / §bIce§r\n\nMalkuth slams the earth, summoning floating islands, hurling everyone in the air and rendering the floor impossible to walk on.\n\nLaunches fireballs at these islands thereafter.",
+  "fdbosses.word.socials": "Mod Socials",
+  "fdbosses.word.mod_discord": "Mod Discord Server",
+  "fdbosses.word.patreon": "Support me on Patreon (Shift+Click to see Patrons)",
+  "fdbosses.word.boosty": "Support me on Boosty (Shift+Click to see Boosters)",
+  "fdbosses.word.socials_word": "Socials"
 
 }
