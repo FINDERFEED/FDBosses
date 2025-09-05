@@ -191,6 +191,17 @@ public class BossScreens {
                         Component.translatable("fdbosses.skills.malkuth.hellshaper_stats"),
                         Component.translatable("fdbosses.skills.malkuth.hellshaper_description")
                 ))
+
+                .addDrop(new BossInfo(
+                        BossItems.FIRE_AND_ICE_CORE.get().getDefaultInstance(),
+                        Component.translatable("fdbosses.drops.chesed.fire_and_ice_core_stats"),
+                        Component.translatable("fdbosses.drops.chesed.fire_and_ice_core_description")
+                ))
+                .addDrop(new BossInfo(
+                        BossItems.MALKUTH_TROPHY.get().getDefaultInstance(),
+                        null,
+                        Component.translatable("fdbosses.drops.malkuth.trophy_description")
+                ))
         );
     });
 

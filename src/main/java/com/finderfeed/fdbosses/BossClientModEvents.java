@@ -20,6 +20,7 @@ import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.ChesedMiniRayRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_one_shot_vertical_ray.ChesedOneShotVerticalRayRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_vertical_ray.ChesedVerticalRayAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterRenderer;
@@ -681,5 +682,6 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.MALKUTH_FIREBALL.get(), MalkuthFireballRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_PLAYER_FIREBALL.get(), MalkuthPlayerFireIceBallRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_REPAIR_ENTITY.get(), MalkuthRepairEntityRenderer::new);
+        event.registerEntityRenderer(BossEntities.CHESED_MINI_RAY.get(), ChesedMiniRayRenderer::new);
     }
 }

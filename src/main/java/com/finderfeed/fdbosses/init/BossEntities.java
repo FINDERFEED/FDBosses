@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.EyeOfChesedEntity;
 import com.finderfeed.fdbosses.content.entities.EyeOfMalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossSpawner;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.ChesedMiniRay;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.ChesedKineticFieldEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedFireTrailEntity;
@@ -166,6 +167,14 @@ public class BossEntities {
             .updateInterval(1)
             .sized(0.2f,0.2f)
             .build("flying_sword"));
+
+
+    public static final Supplier<EntityType<ChesedMiniRay>> CHESED_MINI_RAY = ENTITIES.register("chesed_mini_ray",()->EntityType.Builder.of(
+            ChesedMiniRay::new, MobCategory.MISC
+    )
+            .updateInterval(1)
+            .sized(0.2f,0.2f)
+            .build("chesed_mini_ray"));
 
 
 

@@ -123,7 +123,6 @@
   "fdbosses.skills.malkuth.fire_and_ice_stats": "Damage reduction: {{(fdbosses:config_float) config=malkuthConfig, value=nonWeakToDamageReduction}}%",
   "fdbosses.skills.malkuth.fire_and_ice": "Fire and Ice",
   "fdbosses.bosses.description.malkuth": "The Qliphoth of Malkuth. Benevolent King who ruled over a once-prosperous land, whose blind, excessive generosity became his kingdoms demise.\n\n§5Devs Note: Its better to fight him at night.§r",
-  "fdbosses.tldr.malkuth": "",
   "fdbosses.skills.malkuth.slash": "Slashes",
   "fdbosses.skills.malkuth.slash_stats": "Slash:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=malkuthConfig, value=slashAttackDamage}}.",
   "fdbosses.skills.malkuth.slash_description": "Damage type: §cFire§r / §bIce§r\n\nCharges one if his swords and releases an aerial slash traveling towards the target.\n\nThe damage type of the slash is based on the sword that was charged.\n\nThis slash is capable of slicing through crystals.",
@@ -155,7 +154,7 @@
   "fdbosses.skills.malkuth.chainpunch_description": "Damage type: §7Basic§r\n\nMalkuth pulls every combatant, who were in the air, and punches them with overwhelming force.",
   "fdbosses.skills.malkuth.tsars_wrath": "Tsars Wrath",
   "fdbosses.skills.malkuth.tsars_wrath_stats": "Sword:\n{{(fdlib:image)path=fdbosses:boss_damage}}: Infinite\n\nThis attacks damage can be fully negated, despite the damage reduction value.",
-  "fdbosses.skills.malkuth.tsars_wrath_description": "Damage type: §cFire§r / §bIce§r\n\nMalkuth summons two giant swords and orders them to slam the ground with devastating force.",
+  "fdbosses.skills.malkuth.tsars_wrath_description": "Damage type: §cFire§r / §bIce§r\n\nMalkuth summons two giant swords and orders them to slam the ground with devastating force.\n\n§lSecond phase:§r\n\nAlso fires his cannons before the attack lands.",
   "fdbosses.skills.malkuth.hellshaper": "Hellshaper",
   "fdbosses.skills.malkuth.hellshaper_stats": "Fireballs:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=malkuthConfig, value=fireballsDamage}}.",
   "fdbosses.skills.malkuth.hellshaper_description": "Damage type: §cFire§r / §bIce§r\n\nMalkuth slams the earth, summoning floating islands, hurling everyone in the air and rendering the floor impossible to walk on.\n\nLaunches fireballs at these islands thereafter.",
@@ -163,6 +162,9 @@
   "fdbosses.word.mod_discord": "Mod Discord Server",
   "fdbosses.word.patreon": "Support me on Patreon (Shift+Click to see Patrons)",
   "fdbosses.word.boosty": "Support me on Boosty (Shift+Click to see Boosters)",
-  "fdbosses.word.socials_word": "Socials"
-
+  "fdbosses.word.socials_word": "Socials",
+  "fdbosses.drops.chesed.fire_and_ice_core_stats": "Damage:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballToolDamagePercent}}% of tool damage.\n\nItem ability cooldown:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballAbilityCooldown}} ticks",
+  "fdbosses.drops.chesed.fire_and_ice_core_description": "The core of Malkuth.\n\nCan be attached to any item that has damage to be able to summon Malkuth fireballs.\n\nUse an item to release a fireball that will deal a percentage of item damage and ignite the targets.\n\nCrouch while using an item to release an iceball that will slow the targets instead.",
+  "fdbosses.drops.malkuth.trophy_description": "A trophy of Malkuth to showcase your heroic deeds",
+  "fdbosses.tldr.malkuth": "Cannot be attacked directly.\n\nWhen player is weak to §cFire§r it receives decreased §bIce§r damage, and other way around if player is weak to §bIce§r, it receives decreased §cFire§r damage.\n\nCurrent weakness can be seen on the crosshair.\n\nUse cannons on the arena to attack Malkuth, you can only use the cannon of type you are currently weak to."
 }

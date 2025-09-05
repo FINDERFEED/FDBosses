@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.debug;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.ChesedMiniRay;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
@@ -62,8 +63,8 @@ public class DebugStick extends Item {
 
 
 
-            Vec3 look = player.getLookAngle();
-            MalkuthPlayerFireIceBall.summon(player, player.getEyePosition().add(look), look.multiply(4,4,4), MalkuthAttackType.FIRE, player.getItemInHand(InteractionHand.MAIN_HAND));
+//            Vec3 look = player.getLookAngle();
+//            MalkuthPlayerFireIceBall.summon(player, player.getEyePosition().add(look), look.multiply(4,4,4), MalkuthAttackType.FIRE, player.getItemInHand(InteractionHand.MAIN_HAND));
 
 //            Vec3 f = player.getLookAngle().multiply(1,0,1).normalize().multiply(10,10,10);
 //
@@ -75,6 +76,9 @@ public class DebugStick extends Item {
 //                    FDMathUtil.FPI, 1);
 
 
+            Vec3 pos = player.position().add(5,5,5);
+
+            ChesedMiniRay chesedMiniRay = ChesedMiniRay.summon(level, pos, player, player.getItemInHand(InteractionHand.MAIN_HAND), player);
 
 
 //            if (p1 == null){
@@ -104,23 +108,23 @@ public class DebugStick extends Item {
 //            }
 
 
-            if (player.isCrouching()){
-                anchor = player.position();
-            }else{
-                Vec3 eyePos = player.getEyePosition();
-                Vec3 offs = eyePos.subtract(anchor);
-                Vec3 lookAngle = player.getLookAngle();
-                new CameraPos(eyePos, lookAngle);
-                System.out.println("new CameraPos(base.add(%.3f,%.3f,%.3f), new Vec3(%.3f,%.3f,%.3f))".formatted(
-                        (float)offs.x,
-                        (float)offs.y,
-                        (float)offs.z,
-
-                        (float)lookAngle.x,
-                        (float)lookAngle.y,
-                        (float)lookAngle.z
-                ));
-            }
+//            if (player.isCrouching()){
+//                anchor = player.position();
+//            }else{
+//                Vec3 eyePos = player.getEyePosition();
+//                Vec3 offs = eyePos.subtract(anchor);
+//                Vec3 lookAngle = player.getLookAngle();
+//                new CameraPos(eyePos, lookAngle);
+//                System.out.println("new CameraPos(base.add(%.3f,%.3f,%.3f), new Vec3(%.3f,%.3f,%.3f))".formatted(
+//                        (float)offs.x,
+//                        (float)offs.y,
+//                        (float)offs.z,
+//
+//                        (float)lookAngle.x,
+//                        (float)lookAngle.y,
+//                        (float)lookAngle.z
+//                ));
+//            }
 
             if (true) return InteractionResultHolder.consume(player.getItemInHand(hand));
 
