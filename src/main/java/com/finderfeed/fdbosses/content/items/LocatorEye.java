@@ -2,33 +2,36 @@ package com.finderfeed.fdbosses.content.items;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.EyeOfChesedEntity;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
-import net.minecraft.tags.StructureTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.EyeOfEnder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.level.levelgen.structure.Structure;
 
-public class EyeOfChesed extends Item {
+import java.util.function.Supplier;
 
-    public EyeOfChesed() {
+public class LocatorEye<T extends EyeOfEnder> extends Item {
+
+    private TagKey<Structure> structureTagKey;
+    private Supplier<EntityType<T>> eyeType;
+
+    public LocatorEye(TagKey<Structure> structureTag, Supplier<EntityType<T>> eyeType) {
         super(new Properties().stacksTo(64).rarity(Rarity.EPIC));
+        this.structureTagKey = structureTag;
+        this.eyeType = eyeType;
     }
 
 
@@ -39,9 +42,11 @@ public class EyeOfChesed extends Item {
         player.startUsingItem(hand);
 
         if (level instanceof ServerLevel serverlevel) {
-            BlockPos blockpos = serverlevel.findNearestMapStructure(BossUtil.StructureTags.EYE_OF_CHESED_LOCATED, player.blockPosition(), 100, false);
+            BlockPos blockpos = serverlevel.findNearestMapStructure(structureTagKey, player.blockPosition(), 100, false);
             if (blockpos != null) {
-                EyeOfChesedEntity eyeofender = new EyeOfChesedEntity(level, player.getX(), player.getY(0.5), player.getZ());
+                T eyeofender = eyeType.get().create(level);
+                eyeofender.setPos(player.getX(), player.getY(0.5), player.getZ());
+
                 eyeofender.setItem(itemstack);
                 eyeofender.signalTo(blockpos);
                 level.gameEvent(GameEvent.PROJECTILE_SHOOT, eyeofender.position(), GameEvent.Context.of(player));

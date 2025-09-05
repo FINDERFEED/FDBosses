@@ -263,6 +263,7 @@ public class BossUtil {
     public static class StructureTags {
 
         public static final TagKey<Structure> EYE_OF_CHESED_LOCATED = create("eye_of_chesed_located");
+        public static final TagKey<Structure> EYE_OF_MALKUTH_LOCATED = create("eye_of_malkuth_located");
 
         private static TagKey<Structure> create(String id) {
             return TagKey.create(Registries.STRUCTURE, FDBosses.location(id));

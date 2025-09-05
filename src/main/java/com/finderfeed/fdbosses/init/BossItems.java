@@ -1,7 +1,8 @@
 package com.finderfeed.fdbosses.init;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
-import com.finderfeed.fdbosses.content.items.EyeOfChesed;
+import com.finderfeed.fdbosses.content.items.LocatorEye;
 import com.finderfeed.fdbosses.content.items.WeaponCoreItem;
 import com.finderfeed.fdbosses.debug.DebugStick;
 import com.finderfeed.fdbosses.FDBosses;
@@ -23,10 +24,11 @@ public class BossItems {
     public static final Supplier<Item> MALKUTH_CANNON_REPAIR_MATERIAL_ICE = ITEMS.register("malkuth_cannon_repair_material_ice",()->new Item(new Item.Properties()));
     public static final Supplier<Item> MALKUTH_CANNON_REPAIR_MATERIAL_FIRE = ITEMS.register("malkuth_cannon_repair_material_fire",()->new Item(new Item.Properties()));
 
-    public static final Supplier<WeaponCoreItem> LIGHTNING_CORE = ITEMS.register("lightning_core",()->new WeaponCoreItem(new Item.Properties().stacksTo(1), ItemCoreDataComponent.CoreType.LIGHTNING));
-    public static final Supplier<WeaponCoreItem> FIRE_AND_ICE_CORE = ITEMS.register("fire_and_ice_core",()->new WeaponCoreItem(new Item.Properties().stacksTo(1), ItemCoreDataComponent.CoreType.FIRE_AND_ICE));
+    public static final Supplier<WeaponCoreItem> LIGHTNING_CORE = ITEMS.register("lightning_core",()->new WeaponCoreItem(new Item.Properties().stacksTo(1), ItemCoreDataComponent.CoreType.LIGHTNING,false));
+    public static final Supplier<WeaponCoreItem> FIRE_AND_ICE_CORE = ITEMS.register("fire_and_ice_core",()->new WeaponCoreItem(new Item.Properties().stacksTo(1), ItemCoreDataComponent.CoreType.FIRE_AND_ICE, false));
 
-    public static final Supplier<EyeOfChesed> EYE_OF_CHESED = ITEMS.register("eye_of_chesed", EyeOfChesed::new);
+    public static final Supplier<LocatorEye<?>> EYE_OF_CHESED = ITEMS.register("eye_of_chesed", ()->new LocatorEye<>(BossUtil.StructureTags.EYE_OF_CHESED_LOCATED, BossEntities.EYE_OF_CHESED));
+    public static final Supplier<LocatorEye<?>> EYE_OF_MALKUTH = ITEMS.register("eye_of_malkuth", ()->new LocatorEye<>(BossUtil.StructureTags.EYE_OF_MALKUTH_LOCATED, BossEntities.EYE_OF_MALKUTH));
 
     public static final Supplier<SpawnEggItem> MALKUTH_FIRE_WARRIOR_SPAWN_EGG = ITEMS.register("malkuth_fire_warrior_spawn_egg", ()->new DeferredSpawnEggItem(BossEntities.FIRE_MALKUTH_WARRIOR,
             0xffffff,0xffffff,new Item.Properties()));
@@ -50,7 +52,9 @@ public class BossItems {
         public static void addToCreativeTabs(BuildCreativeModeTabContentsEvent event){
             if (event.getTab().equals(BossCreativeTabs.MAIN.get())){
                 event.accept(LIGHTNING_CORE.get());
+                event.accept(FIRE_AND_ICE_CORE.get());
                 event.accept(EYE_OF_CHESED.get());
+                event.accept(EYE_OF_MALKUTH.get());
                 event.accept(CHESED_TROPHY.get());
                 event.accept(MALKUTH_TROPHY.get());
             }else if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)){

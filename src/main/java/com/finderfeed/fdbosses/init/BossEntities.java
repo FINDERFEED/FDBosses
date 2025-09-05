@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.init;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.EyeOfChesedEntity;
+import com.finderfeed.fdbosses.content.entities.EyeOfMalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossSpawner;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.ChesedKineticFieldEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
@@ -107,6 +108,11 @@ public class BossEntities {
 
     public static final Supplier<EntityType<EyeOfChesedEntity>> EYE_OF_CHESED = ENTITIES.register("eye_of_chesed",()->EntityType.Builder.<EyeOfChesedEntity>of(
             EyeOfChesedEntity::new, MobCategory.MISC
+    )
+            .sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(4).build("eye_of_chesed"));
+
+    public static final Supplier<EntityType<EyeOfMalkuthEntity>> EYE_OF_MALKUTH = ENTITIES.register("eye_of_malkuth",()->EntityType.Builder.<EyeOfMalkuthEntity>of(
+            EyeOfMalkuthEntity::new, MobCategory.MISC
     )
             .sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(4).build("eye_of_chesed"));
 
