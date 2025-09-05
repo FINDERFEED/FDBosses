@@ -2,7 +2,7 @@ package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
-import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.ChesedMiniRay;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.SetClientMalkuthWeaknessAmountPacket;
@@ -21,7 +21,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.LivingEntity;
@@ -232,11 +231,11 @@ public class BossEvents {
 
             if (power > 0.5f && core.getCoreType() == ItemCoreDataComponent.CoreType.LIGHTNING && BossUtil.itemContainsModifierForAttribute(itemStack, Attributes.ATTACK_DAMAGE)) {
 
-                float p = Mth.clamp(BossConfigs.BOSS_CONFIG.get().itemConfig.chanceToSummonFlyingSword / 100,0,1);
+                float p = Mth.clamp(BossConfigs.BOSS_CONFIG.get().itemConfig.chanceToSummonLightningStrike / 100,0,1);
                 RandomSource randomSource = livingEntity.getRandom();
                 float n = randomSource.nextFloat();
                 if (n < p) {
-                    FlyingSwordEntity.summonAtTarget(player, livingEntity, player.getMainHandItem());
+                    ChesedMiniRay.summon(player.level(), livingEntity, player.getMainHandItem(), player);
                 }
 
             }

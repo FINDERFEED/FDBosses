@@ -310,11 +310,13 @@ public class BossEntities {
         event.put(MALKUTH_CANNON.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
 
         event.put(FIRE_MALKUTH_WARRIOR.get(), Mob.createMobAttributes()
+                        .add(Attributes.MAX_HEALTH,100)
                         .add(Attributes.MOVEMENT_SPEED, 0.23f)
                         .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
                 .build());
 
         event.put(ICE_MALKUTH_WARRIOR.get(), Mob.createMobAttributes()
+                        .add(Attributes.MAX_HEALTH,100)
                         .add(Attributes.MOVEMENT_SPEED, 0.23f)
                         .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
                 .build());

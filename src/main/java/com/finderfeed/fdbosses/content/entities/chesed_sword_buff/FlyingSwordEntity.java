@@ -330,7 +330,7 @@ public class FlyingSwordEntity extends FDProjectile {
                 damage *= 1 + mod.amount();
             }
 
-            float dmg = BossConfigs.BOSS_CONFIG.get().itemConfig.flyingSwordDamagePercent / 100f;
+            float dmg = BossConfigs.BOSS_CONFIG.get().itemConfig.lightningStrikeDamagePercent / 100f;
 
             DamageSource damageSource = level().damageSources().mobAttack(owner);
 
@@ -342,7 +342,7 @@ public class FlyingSwordEntity extends FDProjectile {
 
             target.invulnerableTime = 0;
             if (target.hurt(damageSource,(float) damage)){
-                int duration = BossConfigs.BOSS_CONFIG.get().itemConfig.flyingSwordShockDuration;
+                int duration = BossConfigs.BOSS_CONFIG.get().itemConfig.lightningStrikeShockDuration;
                 target.addEffect(new MobEffectInstance(BossEffects.SHOCKED,duration,0));
                 EnchantmentHelper.doPostAttackEffects((ServerLevel) level(), target, damageSource);
                 target.invulnerableTime = 0;

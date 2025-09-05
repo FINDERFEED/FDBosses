@@ -78,7 +78,7 @@ public class DebugStick extends Item {
 
             Vec3 pos = player.position().add(5,5,5);
 
-            ChesedMiniRay chesedMiniRay = ChesedMiniRay.summon(level, pos, player, player.getItemInHand(InteractionHand.MAIN_HAND), player);
+            ChesedMiniRay chesedMiniRay = ChesedMiniRay.summon(level, player, player.getItemInHand(InteractionHand.MAIN_HAND), player);
 
 
 //            if (p1 == null){

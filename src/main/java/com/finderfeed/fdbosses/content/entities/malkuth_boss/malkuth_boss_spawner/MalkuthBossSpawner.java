@@ -3,10 +3,12 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawn
 import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -14,6 +16,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
 public class MalkuthBossSpawner extends BossSpawnerEntity {
 
@@ -58,12 +61,25 @@ public class MalkuthBossSpawner extends BossSpawnerEntity {
 
     @Override
     public boolean canInteractWithBlockPos(BlockPos blockPos) {
+
+        Vec3 v = blockPos.getCenter();
+        Vec3 pos = this.position();
+
+        double yDiff = v.y - pos.y;
+
+        var hdist = v.multiply(1,0,1).distanceTo(pos.multiply(1,0,1));
+
+
+        if (hdist < MalkuthEntity.ENRAGE_RADIUS + 10 && yDiff > -4 && yDiff < MalkuthEntity.ENRAGE_HEIGHT + 200){
+            return false;
+        }
+
         return true;
     }
 
     @Override
     public Component onArenaDestructionMessage() {
-        return null;
+        return Component.translatable("fdbosses.word.tried_to_break_arena").withStyle(ChatFormatting.RED);
     }
 
     @Override

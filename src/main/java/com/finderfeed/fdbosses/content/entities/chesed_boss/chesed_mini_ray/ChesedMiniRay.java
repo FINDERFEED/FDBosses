@@ -1,18 +1,18 @@
 package com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray;
 
-import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
+import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
-import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
@@ -20,6 +20,8 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -54,13 +56,33 @@ public class ChesedMiniRay extends Entity implements AutoSerializable {
     @SerializableField
     private UUID owner;
 
-    public static ChesedMiniRay summon(Level level, Vec3 pos, LivingEntity target, ItemStack item, LivingEntity owner){
+    public static ChesedMiniRay summon(Level level, LivingEntity target, ItemStack item, LivingEntity owner){
         ChesedMiniRay chesedMiniRay = new ChesedMiniRay(BossEntities.CHESED_MINI_RAY.get(), level);
         chesedMiniRay.item = item;
         chesedMiniRay.target = target.getUUID();
         chesedMiniRay.owner = owner.getUUID();
         chesedMiniRay.entityData.set(TARGET, target.getId());
-        chesedMiniRay.setPos(pos);
+
+        Vec3 targetPos = target.position();
+
+        Vec3 between = targetPos.subtract(owner.position()).multiply(1,0,1).normalize();
+
+        float rndDistMod = Mth.clamp(target.getBbWidth() * 3,2, 10) + level.random.nextFloat() * 2;
+
+        float rndOffsNum = level.random.nextBoolean() ? 1 : -1;
+
+        Vec3 randomOffset = between
+                .multiply(rndDistMod,rndDistMod,rndDistMod)
+                .yRot(
+                        rndOffsNum * FDMathUtil.FPI / 2 + (-rndOffsNum) * FDMathUtil.FPI / 8
+                )
+                .add(0,1.5 + level.random.nextFloat() * 2,0);
+
+        Vec3 resultPos = targetPos.add(randomOffset);
+
+        chesedMiniRay.setPos(resultPos);
+
+
         level.addFreshEntity(chesedMiniRay);
         return chesedMiniRay;
     }
@@ -74,7 +96,11 @@ public class ChesedMiniRay extends Entity implements AutoSerializable {
         super.tick();
         if (!level().isClientSide){
             this.checkRemoved();
-            if (tickCount == TIME_UNTIL_ATTACK){
+            if (tickCount == 1){
+
+                level().playSound(null, this.getX(),this.getY(),this.getZ(), BossSounds.CHESED_RAY_CHARGE.get(), SoundSource.NEUTRAL,2f, 1.15f);
+
+            }else if (tickCount == TIME_UNTIL_ATTACK){
                 this.attack();
             }
         }else{
@@ -83,6 +109,44 @@ public class ChesedMiniRay extends Entity implements AutoSerializable {
                 LivingEntity target = this.getTarget();
                 if (target != null){
                     this.attackParticles(this.getTargetPos(target,0));
+                }
+            }
+
+            if (tickCount < TIME_UNTIL_ATTACK) {
+                for (int i = 0; i < 10; i++) {
+
+                    BallParticleOptions options = BallParticleOptions.builder()
+                            .friction(0.5f)
+                            .size(0.25f)
+                            .color(100 + random.nextInt(50), 255, 255)
+                            .scalingOptions(3, 0, 10)
+                            .build();
+
+                    LightningParticleOptions lightningParticleOptions = LightningParticleOptions.builder()
+                            .color(20, 150 + random.nextInt(50), 255)
+                            .lifetime(10)
+                            .maxLightningSegments(3)
+                            .randomRoll(true)
+                            .build();
+
+
+                    level().addParticle(options, this.getX(), this.getY(), this.getZ(),
+                            level().random.nextFloat() * 0.25f - 0.125,
+                            level().random.nextFloat() * 0.25f - 0.125,
+                            level().random.nextFloat() * 0.25f - 0.125
+                    );
+
+
+                    if (random.nextBoolean()) {
+                        level().addParticle(lightningParticleOptions, this.getX(), this.getY(), this.getZ(),
+                                level().random.nextFloat() * 0.1f - 0.05,
+                                level().random.nextFloat() * 0.1f - 0.05,
+                                level().random.nextFloat() * 0.1f - 0.05
+                        );
+                    }
+
+
+
                 }
             }
 
@@ -187,6 +251,9 @@ public class ChesedMiniRay extends Entity implements AutoSerializable {
                     .outTime(5)
                     .build(),end,30);
 
+
+            level().playSound(null, this.getX(),this.getY(),this.getZ(), BossSounds.CHESED_LIGHTNING_RAY.get(), SoundSource.NEUTRAL,2f, 1f);
+
             this.hurtTarget(owner, target);
         }
     }
@@ -255,7 +322,7 @@ public class ChesedMiniRay extends Entity implements AutoSerializable {
                 damage *= 1 + mod.amount();
             }
 
-            float dmg = BossConfigs.BOSS_CONFIG.get().itemConfig.flyingSwordDamagePercent / 100f;
+            float dmg = BossConfigs.BOSS_CONFIG.get().itemConfig.lightningStrikeDamagePercent / 100f;
 
             DamageSource damageSource = level().damageSources().mobAttack(owner);
 
@@ -267,7 +334,7 @@ public class ChesedMiniRay extends Entity implements AutoSerializable {
 
             target.invulnerableTime = 0;
             if (target.hurt(damageSource,(float) damage)){
-                int duration = BossConfigs.BOSS_CONFIG.get().itemConfig.flyingSwordShockDuration;
+                int duration = BossConfigs.BOSS_CONFIG.get().itemConfig.lightningStrikeShockDuration;
                 target.addEffect(new MobEffectInstance(BossEffects.SHOCKED,duration,0));
                 EnchantmentHelper.doPostAttackEffects((ServerLevel) level(), target, damageSource);
                 target.invulnerableTime = 0;

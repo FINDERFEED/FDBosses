@@ -6,14 +6,14 @@ import com.finderfeed.fdlib.systems.config.ConfigValue;
 public class ItemConfig {
 
     @ConfigValue
-    public float flyingSwordDamagePercent = 50;
+    public float lightningStrikeDamagePercent = 100;
 
     @ConfigValue
-    public float chanceToSummonFlyingSword = 75;
+    public float chanceToSummonLightningStrike = 33;
 
     @ConfigValue
     @Comment("Time in ticks")
-    public int flyingSwordShockDuration = 200;
+    public int lightningStrikeShockDuration = 200;
 
     @ConfigValue
     public float playerMalkuthFireballToolDamagePercent = 200;
