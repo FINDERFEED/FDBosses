@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "A": {
+      "item": "minecraft:ice"
+    },
+    "B": {
+      "item": "minecraft:magma_block"
+    },
+    "X": {
+      "item": "minecraft:ender_eye"
+    }
+  },
+  "pattern": [
+    "BBA",
+    "BXA",
+    "BAA"
+  ],
+  "result": {
+    "count": 1,
+    "id": "fdbosses:eye_of_malkuth"
+  }
+}
