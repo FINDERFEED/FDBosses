@@ -10,6 +10,7 @@ import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOption
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
+import com.finderfeed.fdbosses.content.entities.IEffectImmune;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_crystal.ChesedCrystalEntity;
@@ -117,7 +118,7 @@ import java.util.function.Function;
 import static com.finderfeed.fdbosses.init.BossAnims.CHESED_ATTACK;
 import static com.finderfeed.fdbosses.init.BossAnims.*;
 
-public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerContextAssignable {
+public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerContextAssignable, IEffectImmune {
 
     public static final String ROCKFALL_TICKER = "ROCKFALL";
 

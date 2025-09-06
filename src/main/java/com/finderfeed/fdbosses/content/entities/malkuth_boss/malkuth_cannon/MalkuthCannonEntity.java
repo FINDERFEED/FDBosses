@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
+import com.finderfeed.fdbosses.content.entities.IEffectImmune;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
@@ -38,7 +39,7 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializable {
+public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializable, IEffectImmune {
 
     private static FDModel CLIENT_MODEL;
 
@@ -110,6 +111,9 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
                 Vec3 iceOffset = new Vec3(-6.5, 14.0, 55);
                 this.shoot(List.of(iceOffset.add(this.position())), 1);
             }
+
+            player.swing(hand);
+
         }
 
         return super.interactAt(player, vec, hand);

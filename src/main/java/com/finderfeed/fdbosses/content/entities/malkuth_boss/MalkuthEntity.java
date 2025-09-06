@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
+import com.finderfeed.fdbosses.content.entities.IEffectImmune;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
@@ -99,7 +100,7 @@ import org.joml.*;
 import java.lang.Math;
 import java.util.*;
 
-public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, AutoSerializable, BossSpawnerContextAssignable {
+public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, AutoSerializable, BossSpawnerContextAssignable, IEffectImmune {
 
     public static final UUID BOSS_MUSIC_UUID = UUID.fromString("5c6cd8c0-7e3e-44a3-9c2e-2459a61377f3");
 
@@ -288,25 +289,25 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 .addAlwaysTryCastAttack(this::checkCanPunch, PULL_AND_PUNCH)
 
-//                .addAttack(id++, slashOptions)
-//                .addAttack(id++, randomJumpCrushNoJumpBack)
-//                .addAttack(id++, cannonsNoJumpBack)
-//                .addAttack(id++, randomJumpCrush)
-//                .addAttack(id++, carouselEarthquakes)
-//                .addAttack(id++, randomJumpCrushNoJumpBack)
-//                .addAttack(id++, cannons)
-//                .addAttack(id++, slashOptions)
+                .addAttack(id++, slashOptions)
+                .addAttack(id++, randomJumpCrushNoJumpBack)
+                .addAttack(id++, cannonsNoJumpBack)
+                .addAttack(id++, randomJumpCrush)
+                .addAttack(id++, carouselEarthquakes)
+                .addAttack(id++, randomJumpCrushNoJumpBack)
+                .addAttack(id++, cannons)
+                .addAttack(id++, slashOptions)
                 .addAttack(id++, GIANT_SWORDS_ULTIMATE)
-//                .addAttack(id++, randomJumpCrushNoJumpBack)
-//                .addAttack(id++, cannons)
-//                .addAttack(id++, slashOptions)
-//                .addAttack(id++, randomJumpCrush)
-//                .addAttack(id++, boulders)
-//                .addAttack(id++, AttackOptions.chainOptionsBuilder()
-//                        .addAttack(JUMP_CRUSH)
-//                        .addAttack(DELAY_10)
-//                        .addAttack(PLATFORMS_N_FIREBALLS)
-//                        .build())
+                .addAttack(id++, randomJumpCrushNoJumpBack)
+                .addAttack(id++, cannons)
+                .addAttack(id++, slashOptions)
+                .addAttack(id++, randomJumpCrush)
+                .addAttack(id++, boulders)
+                .addAttack(id++, AttackOptions.chainOptionsBuilder()
+                        .addAttack(JUMP_CRUSH)
+                        .addAttack(DELAY_10)
+                        .addAttack(PLATFORMS_N_FIREBALLS)
+                        .build())
 
 
                 .attackListener(this::attackListener)
@@ -2244,12 +2245,24 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 for (var entity : this.level().getEntitiesOfClass(LivingEntity.class, firstBox, entity -> !(entity instanceof MalkuthBossBuddy))){
                     entity.invulnerableTime = 0;
-                    entity.hurt(new MalkuthDamageSource(damageSource, giantSwordUltimateStartAttackType, 100), Integer.MAX_VALUE);
+                    float damage = Integer.MAX_VALUE;
+                    if (entity instanceof Player player){
+                        if (!MalkuthWeaknessHandler.isWeakTo(player, giantSwordUltimateStartAttackType)){
+                            damage = 0.1f;
+                        }
+                    }
+                    entity.hurt(new MalkuthDamageSource(damageSource, giantSwordUltimateStartAttackType, 100), damage);
                 }
 
                 for (var entity : this.level().getEntitiesOfClass(LivingEntity.class, secondBox, entity -> !(entity instanceof MalkuthBossBuddy))){
                     entity.invulnerableTime = 0;
-                    entity.hurt(new MalkuthDamageSource(damageSource, MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType), 100), Integer.MAX_VALUE);
+                    float damage = Integer.MAX_VALUE;
+                    if (entity instanceof Player player){
+                        if (!MalkuthWeaknessHandler.isWeakTo(player, MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType))){
+                            damage = 0.1f;
+                        }
+                    }
+                    entity.hurt(new MalkuthDamageSource(damageSource, MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType), 100), damage);
                 }
                 inst.nextStage();
             }
@@ -2578,6 +2591,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
         return null;
     }
+
 
     @Override
     public boolean fireImmune() {
