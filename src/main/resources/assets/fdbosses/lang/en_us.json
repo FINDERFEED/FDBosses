@@ -166,5 +166,8 @@
   "fdbosses.drops.chesed.fire_and_ice_core_stats": "Damage:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballToolDamagePercent}}% of tool damage.\n\nItem ability cooldown:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballAbilityCooldown}} ticks",
   "fdbosses.drops.chesed.fire_and_ice_core_description": "The core of Malkuth.\n\nCan be attached to any item that has damage to be able to summon Malkuth fireballs.\n\nUse an item to release a fireball that will deal a percentage of item damage and ignite the targets.\n\nCrouch while using an item to release an iceball that will slow the targets instead.",
   "fdbosses.drops.malkuth.trophy_description": "A trophy of Malkuth to showcase your heroic deeds",
-  "fdbosses.tldr.malkuth": "Cannot be attacked directly.\n\nWhen player is weak to §cFire§r it receives decreased §bIce§r damage, and other way around if player is weak to §bIce§r, it receives decreased §cFire§r damage.\n\nCurrent weakness can be seen on the crosshair.\n\nUse cannons on the arena to attack Malkuth, you can only use the cannon of type you are currently weak to."
+  "fdbosses.tldr.malkuth": "Cannot be attacked directly.\n\nWhen player is weak to §cFire§r it receives decreased §bIce§r damage, and other way around if player is weak to §bIce§r, it receives decreased §cFire§r damage.\n\nCurrent weakness can be seen on the crosshair.\n\nUse cannons on the arena to attack Malkuth, you can only use the cannon of type you are currently weak to.",
+  "fdbosses.word.patrons": "Patrons",
+  "fdbosses.word.boosters": "Boosters",
+  "fdbosses.word.not_updated": "The data is not updated online yet. I will add new subscribers with subsequent updates."
 }

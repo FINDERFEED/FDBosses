@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.client.boss_screen.widget;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.BossRenderUtil;
 import com.finderfeed.fdbosses.client.boss_screen.BaseBossScreen;
+import com.finderfeed.fdbosses.client.boss_screen.SubscribersScreen;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.systems.simple_screen.FDWidget;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDButton;
@@ -19,8 +20,13 @@ import net.minecraft.network.chat.Component;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.List;
 
 public class QliphothAwakeningSocialsWidget extends FDWidget {
+
+    public static final List<String> PATRONS = List.of(
+            "Veem Valentine"
+    );
 
     public QliphothAwakeningSocialsWidget(Screen screen, float x, float y, float width, float height) {
         super(screen, x,y, width, height);
@@ -95,13 +101,7 @@ public class QliphothAwakeningSocialsWidget extends FDWidget {
                     poseStack.popPose();
                 }))
                 .setOnClickAction(((fdWidget, v, v1, i) -> {
-                    URI uri = null;
-                    try {
-                        uri = Util.parseAndValidateUntrustedUri("https://discord.com/invite/tW6zFRHDxC");
-                        Util.getPlatform().openUri(uri);
-                    } catch (URISyntaxException e) {
-
-                    }
+                    this.openURL("https://discord.com/invite/tW6zFRHDxC");
                     return true;
                 }));
 
@@ -119,12 +119,10 @@ public class QliphothAwakeningSocialsWidget extends FDWidget {
                     poseStack.popPose();
                 }))
                 .setOnClickAction(((fdWidget, v, v1, i) -> {
-                    URI uri = null;
-                    try {
-                        uri = Util.parseAndValidateUntrustedUri("https://www.patreon.com/c/FDMods");
-                        Util.getPlatform().openUri(uri);
-                    } catch (URISyntaxException e) {
-
+                    if (!Screen.hasShiftDown()) {
+                        this.openURL("https://www.patreon.com/c/FDMods");
+                    }else {
+                        Minecraft.getInstance().setScreen(new SubscribersScreen(Component.translatable("fdbosses.word.patrons"), PATRONS));
                     }
                     return true;
                 }));
@@ -143,12 +141,20 @@ public class QliphothAwakeningSocialsWidget extends FDWidget {
                     poseStack.popPose();
                 }))
                 .setOnClickAction(((fdWidget, v, v1, i) -> {
-                    URI uri = null;
-                    try {
-                        uri = Util.parseAndValidateUntrustedUri("https://boosty.to/fdmods");
-                        Util.getPlatform().openUri(uri);
-                    } catch (URISyntaxException e) {
-
+                    if (!Screen.hasShiftDown()) {
+                        this.openURL("https://boosty.to/fdmods");
+                    }else{
+                        Minecraft.getInstance().setScreen(new SubscribersScreen(Component.translatable("fdbosses.word.boosters"), List.of(
+                                "TEST1",
+                                "TEST2",
+                                "TEST3",
+                                "TEST4",
+                                "TEST5asdasdsad",
+                                "TEST6",
+                                "TEST7",
+                                "TEST8",
+                                "TEST9"
+                        )));
                     }
                     return true;
                 }));
@@ -157,6 +163,16 @@ public class QliphothAwakeningSocialsWidget extends FDWidget {
         this.addChild("patreon", patreon);
         this.addChild("boosty", boosty);
 
+    }
+
+    private void openURL(String url){
+        URI uri = null;
+        try {
+            uri = Util.parseAndValidateUntrustedUri(url);
+            Util.getPlatform().openUri(uri);
+        } catch (URISyntaxException e) {
+
+        }
     }
 
 }

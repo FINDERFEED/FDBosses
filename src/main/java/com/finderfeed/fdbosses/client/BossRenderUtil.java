@@ -1,29 +1,19 @@
 package com.finderfeed.fdbosses.client;
 
 import com.finderfeed.fdbosses.FDBosses;
-import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
-import org.joml.Quaternionf;
 import org.joml.Vector2f;
-import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -73,12 +63,14 @@ public class BossRenderUtil {
         return renderBossScreenTooltip(matrices,x,y,inWidth,inHeight,0,0,window.getGuiScaledWidth(),window.getGuiScaledHeight());
     }
 
+    public static final int EDGE_SIZE = 7;
+
 
     public static Vector2f renderBossScreenTooltip(PoseStack matrices, float x, float y, float inWidth, float inHeight, float borderXStart, float borderYStart, float borderXEnd, float borderYEnd){
         FDRenderUtil.bindTexture(BOSS_TOOLTIP);
 
-        float edgeWidth = 7;
-        float edgeHeight = 7;
+        float edgeWidth = EDGE_SIZE;
+        float edgeHeight = EDGE_SIZE;
         float texWidth = 16;
         float texHeight = 16;
 

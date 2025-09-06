@@ -291,7 +291,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         Vector2f anchor2 = this.getAnchor(0.5f,0.5f);
         float x = anchor2.x;
         float y = anchor2.y;
-        socialsWidget = new QliphothAwakeningSocialsWidget(this, x - 50, y - 35, 120, 70);
+        socialsWidget = new QliphothAwakeningSocialsWidget(this, x - 60, y - 35, 120, 70);
 
 
         FDButton button = new FDButtonWithTexture(this, anchor.x + 4,anchor.y - 36 * 2, 32, 32, FDBosses.location("textures/gui/link.png"))

@@ -746,7 +746,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 var combatants = this.getCombatants(true);
                 for (var player : combatants) {
                     if (Math.abs(player.getY() - this.spawnPosition.y) <= 3) {
-                        FDLibCalls.setServerPlayerSpeed((ServerPlayer) player, new Vec3(0, 2, 0));
+                        FDLibCalls.setServerPlayerSpeed((ServerPlayer) player, new Vec3(0, 1.6, 0));
                     }
                 }
                 for (Vec3 offset : PLATFORM_SPAWN_OFFSETS) {
@@ -1820,7 +1820,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         else if (stage == 3){
             if (tick > 60){
-                allowedToBeDamaged = true;
+                allowedToBeDamaged = false;
                 lookAtTarget = true;
                 this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
                 return true;
@@ -2113,6 +2113,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     public boolean giantSwordUltimate(AttackInstance inst){
 
+        this.allowedToBeDamaged = false;
+
         int stage = inst.stage;
         int tick = inst.tick;
 
@@ -2170,7 +2172,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 this.doSwordChargeStripe(MalkuthAttackType.ICE,1.75f, sizeModifier);
             }
 
-            if (tick < swordSpawnTick + MalkuthGiantSwordSlash.TIME_TO_RISE && tick % 25 == 0){
+            if (this.isBelowHalfHP() && tick < swordSpawnTick + MalkuthGiantSwordSlash.TIME_TO_RISE && tick % 25 == 0){
                 this.shootCannons(3);
             }
 
@@ -2665,6 +2667,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             if (!level.isClientSide){
 
                 if (entity.hasEffect(BossEffects.MARK_OF_A_KNIGHT)) {
+
                     Vec3 cylinderStart = entity.position().add(0, -MalkuthEntity.ENRAGE_HEIGHT, 0);
 
                     var spawners = BossTargetFinder.getEntitiesInArc(MalkuthBossSpawner.class, level, cylinderStart, new Vec2(0, 1), FDMathUtil.FPI,

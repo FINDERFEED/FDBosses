@@ -485,7 +485,7 @@ public class BossClientPackets {
 
         Level level = FDClientHelpers.getClientLevel();
 
-        for (int i = 0; i < 200;i++){
+        for (int i = 0; i < 100;i++){
 
             Vector3f color = MalkuthEntity.getAndRandomizeColor(attackType, level.random);
 
@@ -534,7 +534,7 @@ public class BossClientPackets {
 
         }
 
-        for (int i = 0; i < 60;i++){
+        for (int i = 0; i < 30;i++){
 
             float col = random.nextFloat() * 0.1f + 0.3f;
 
