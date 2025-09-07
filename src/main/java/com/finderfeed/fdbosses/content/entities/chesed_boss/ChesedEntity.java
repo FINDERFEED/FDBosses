@@ -396,7 +396,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             AttributeModifier hpModifier = new AttributeModifier(FDBosses.location("monolith_hp"), monolithHPGain, AttributeModifier.Operation.ADD_VALUE);
             var attr = m.getAttribute(Attributes.MAX_HEALTH);
             if (attr != null) {
-                attr.addTransientModifier(
+                attr.addPermanentModifier(
                         hpModifier
                 );
             }
