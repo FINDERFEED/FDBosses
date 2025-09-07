@@ -144,17 +144,7 @@ public class QliphothAwakeningSocialsWidget extends FDWidget {
                     if (!Screen.hasShiftDown()) {
                         this.openURL("https://boosty.to/fdmods");
                     }else{
-                        Minecraft.getInstance().setScreen(new SubscribersScreen(Component.translatable("fdbosses.word.boosters"), List.of(
-                                "TEST1",
-                                "TEST2",
-                                "TEST3",
-                                "TEST4",
-                                "TEST5asdasdsad",
-                                "TEST6",
-                                "TEST7",
-                                "TEST8",
-                                "TEST9"
-                        )));
+                        Minecraft.getInstance().setScreen(new SubscribersScreen(Component.translatable("fdbosses.word.boosters"), List.of()));
                     }
                     return true;
                 }));

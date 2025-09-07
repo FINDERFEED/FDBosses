@@ -237,7 +237,7 @@ public class BossEntities {
     public static final Supplier<EntityType<MalkuthBossSpawner>> MALKUTH_BOSS_SPAWNER = ENTITIES.register("malkuth_boss_spawner",()->EntityType.Builder.of(
                     MalkuthBossSpawner::new, MobCategory.MISC
             )
-            .sized(0.5f,1f)
+            .sized(1f,2f)
             .build("malkuth_boss_spawner"));
 
     public static final Supplier<EntityType<MalkuthGiantSwordSlash>> MALKUTH_GIANT_SWORD = ENTITIES.register("malkuth_giant_sword_slash",()->EntityType.Builder.of(
@@ -310,13 +310,13 @@ public class BossEntities {
         event.put(MALKUTH_CANNON.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
 
         event.put(FIRE_MALKUTH_WARRIOR.get(), Mob.createMobAttributes()
-                        .add(Attributes.MAX_HEALTH,100)
+                        .add(Attributes.MAX_HEALTH,60)
                         .add(Attributes.MOVEMENT_SPEED, 0.23f)
                         .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
                 .build());
 
         event.put(ICE_MALKUTH_WARRIOR.get(), Mob.createMobAttributes()
-                        .add(Attributes.MAX_HEALTH,100)
+                        .add(Attributes.MAX_HEALTH,60)
                         .add(Attributes.MOVEMENT_SPEED, 0.23f)
                         .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
                 .build());

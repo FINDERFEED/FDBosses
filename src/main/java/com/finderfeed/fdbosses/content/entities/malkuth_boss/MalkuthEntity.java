@@ -289,25 +289,25 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 .addAlwaysTryCastAttack(this::checkCanPunch, PULL_AND_PUNCH)
 
-                .addAttack(id++, slashOptions)
-                .addAttack(id++, randomJumpCrushNoJumpBack)
-                .addAttack(id++, cannonsNoJumpBack)
-                .addAttack(id++, randomJumpCrush)
-                .addAttack(id++, carouselEarthquakes)
-                .addAttack(id++, randomJumpCrushNoJumpBack)
-                .addAttack(id++, cannons)
-                .addAttack(id++, slashOptions)
+//                .addAttack(id++, slashOptions)
+//                .addAttack(id++, randomJumpCrushNoJumpBack)
+//                .addAttack(id++, cannonsNoJumpBack)
+//                .addAttack(id++, randomJumpCrush)
+//                .addAttack(id++, carouselEarthquakes)
+//                .addAttack(id++, randomJumpCrushNoJumpBack)
+//                .addAttack(id++, cannons)
+//                .addAttack(id++, slashOptions)
                 .addAttack(id++, GIANT_SWORDS_ULTIMATE)
-                .addAttack(id++, randomJumpCrushNoJumpBack)
-                .addAttack(id++, cannons)
-                .addAttack(id++, slashOptions)
-                .addAttack(id++, randomJumpCrush)
-                .addAttack(id++, boulders)
-                .addAttack(id++, AttackOptions.chainOptionsBuilder()
-                        .addAttack(JUMP_CRUSH)
-                        .addAttack(DELAY_10)
-                        .addAttack(PLATFORMS_N_FIREBALLS)
-                        .build())
+//                .addAttack(id++, randomJumpCrushNoJumpBack)
+//                .addAttack(id++, cannons)
+//                .addAttack(id++, slashOptions)
+//                .addAttack(id++, randomJumpCrush)
+//                .addAttack(id++, boulders)
+//                .addAttack(id++, AttackOptions.chainOptionsBuilder()
+//                        .addAttack(JUMP_CRUSH)
+//                        .addAttack(DELAY_10)
+//                        .addAttack(PLATFORMS_N_FIREBALLS)
+//                        .build())
 
 
                 .attackListener(this::attackListener)
@@ -2701,7 +2701,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 MalkuthAttackType malkuthAttackType = damageSource.getMalkuthAttackType();
 
                 if (!MalkuthWeaknessHandler.isWeakTo(player, malkuthAttackType)) {
-                    float damage = event.getOriginalDamage();
+                    float damage = event.getNewDamage();
                     float reduction = 1 - BossConfigs.BOSS_CONFIG.get().malkuthConfig.nonWeakToDamageReduction / 100f;
                     event.setNewDamage(damage * reduction);
                 }

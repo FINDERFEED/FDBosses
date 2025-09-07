@@ -354,8 +354,25 @@ public class BossClientModEvents {
                 .build());
 
         event.registerEntityRenderer(BossEntities.MALKUTH_BOSS_SPAWNER.get(), FDEntityRendererBuilder.<MalkuthBossSpawner>builder()
-                        .freeRender(new MalkuthBossSpawnerRenderer())
-                        .shouldRender(((malkuthBossSpawner, frustum, v, v1, v2) -> true))
+
+
+                .addLayer(FDEntityRenderLayerOptions.<MalkuthBossSpawner>builder()
+                        .model(BossModels.MALKUTH_SPAWNER)
+                        .transformation(((malkuthBossSpawner, poseStack, v) -> poseStack.mulPose(Axis.YP.rotationDegrees(90))))
+                                .renderType(RenderType.eyes(FDBosses.location("textures/entities/malkuth/malkuth_boss_spawner_emissive.png")))
+                                .light(LightTexture.FULL_BRIGHT)
+                                .build())
+
+
+                .addLayer(FDEntityRenderLayerOptions.<MalkuthBossSpawner>builder()
+                        .model(BossModels.MALKUTH_SPAWNER)
+                        .transformation(((malkuthBossSpawner, poseStack, v) -> poseStack.mulPose(Axis.YP.rotationDegrees(90))))
+                        .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/malkuth/malkuth_boss_spawner_solid.png")))
+                        .build())
+
+                .shouldRender(((malkuthBossSpawner, frustum, v, v1, v2) -> {
+                            return malkuthBossSpawner.isActive();
+                }))
                 .build());
 
         event.registerEntityRenderer(BossEntities.MALKUTH_CANNON.get(), FDEntityRendererBuilder.<MalkuthCannonEntity>builder()

@@ -112,8 +112,8 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
                 this.shoot(List.of(iceOffset.add(this.position())), 1);
             }
 
-            player.swing(hand);
 
+            player.swing(hand);
         }
 
         return super.interactAt(player, vec, hand);

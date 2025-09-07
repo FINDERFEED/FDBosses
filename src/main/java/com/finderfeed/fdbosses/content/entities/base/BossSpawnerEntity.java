@@ -10,6 +10,8 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -25,9 +27,15 @@ public abstract class BossSpawnerEntity extends FDEntity {
 
     @Override
     public InteractionResult interact(Player player, InteractionHand hand) {
+
+        if (!this.isActive()){
+            return InteractionResult.PASS;
+        }
+
         if (level().isClientSide && hand == InteractionHand.MAIN_HAND && this.isActive()){
             BossClientPackets.openBossDossierScreen(this, this.getBossEntityType());
         }
+
         return super.interact(player, hand);
     }
 
@@ -53,6 +61,11 @@ public abstract class BossSpawnerEntity extends FDEntity {
             this.setActive(false);
 
         }
+    }
+
+    @Override
+    public boolean hurt(DamageSource src, float damage) {
+        return src.is(DamageTypes.GENERIC_KILL) || src.is(DamageTypes.FELL_OUT_OF_WORLD);
     }
 
     @Override

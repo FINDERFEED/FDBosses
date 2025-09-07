@@ -5,10 +5,10 @@ import com.finderfeed.fdlib.systems.config.ConfigValue;
 public class MalkuthConfig {
 
     @ConfigValue
-    public float slashAttackDamage = 10;
+    public float slashAttackDamage = 20;
 
     @ConfigValue
-    public float sideRocksDamage = 10;
+    public float sideRocksDamage = 40;
 
     @ConfigValue
     public float earthshatterDamage = 30;
@@ -26,7 +26,7 @@ public class MalkuthConfig {
     public float impalingDoomDamage = 30;
 
     @ConfigValue
-    public float fireballsDamage = 30;
+    public float fireballsDamage = 50;
 
     @ConfigValue
     public float cannonDamage = 20;
@@ -44,6 +44,6 @@ public class MalkuthConfig {
     public float malkuthWarriorEarthSlamDamage = 10;
 
     @ConfigValue
-    public float malkuthFloorDamage = 10;
+    public float malkuthFloorDamage = 20;
 
 }

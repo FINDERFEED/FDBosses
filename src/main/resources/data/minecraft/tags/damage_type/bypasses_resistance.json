@@ -8,7 +8,9 @@
     "fdbosses:chesed_vertical_ray",
     "fdbosses:chesed_earthquake",
     "fdbosses:chesed_roll_attack",
-    "fdbosses:chesed_rock_attack"
+    "fdbosses:chesed_rock_attack",
+    "fdbosses:malkuth_tsars_wrath",
+    "fdbosses:malkuth_cowardice"
 
   ],
   "replace": false

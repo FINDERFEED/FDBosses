@@ -53,6 +53,9 @@ public class MalkuthGiantSwordSlash extends Entity implements AutoSerializable {
     @SerializableField
     private float damage;
 
+    @SerializableField
+    private int serverTicks;
+
     public static MalkuthGiantSwordSlash summon(Level level, Vec3 pos, Vec3 direction, MalkuthAttackType attackType, float damage){
 
         MalkuthGiantSwordSlash slash = new MalkuthGiantSwordSlash(BossEntities.MALKUTH_GIANT_SWORD.get(), level);
@@ -74,6 +77,7 @@ public class MalkuthGiantSwordSlash extends Entity implements AutoSerializable {
     @Override
     public void tick() {
         super.tick();
+        this.serverTicks++;
         if (level().isClientSide){
 
             if (tickCount == TIME_TO_HIT + TIME_TO_RISE){
@@ -85,10 +89,10 @@ public class MalkuthGiantSwordSlash extends Entity implements AutoSerializable {
             }
 
         }else{
-            if (tickCount == TIME_TO_HIT + TIME_TO_RISE){
+            if (serverTicks == TIME_TO_HIT + TIME_TO_RISE){
                 this.impactBlocks();
                 this.doDamage();
-            }else if (tickCount >= TIME_TO_HIT + TIME_TO_RISE + DISSOLVE_TIME){
+            }else if (serverTicks >= TIME_TO_HIT + TIME_TO_RISE + DISSOLVE_TIME){
                 this.remove(RemovalReason.DISCARDED);
             }
         }

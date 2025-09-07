@@ -37,6 +37,7 @@ public class BossModels {
     public static final Supplier<FDModelInfo> MALKUTH_BOULDER_FIRE = INFOS.register("malkuth_boulder_fire",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_boulder_fire"),1f));
     public static final Supplier<FDModelInfo> MALKUTH_PLATFORM = INFOS.register("malkuth_platform",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_platform"),1f));
     public static final Supplier<FDModelInfo> MALKUTH_REPAIR_CRYSTAL = INFOS.register("malkuth_repair_crystal",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_repair_crystal"),1f));
+    public static final Supplier<FDModelInfo> MALKUTH_SPAWNER = INFOS.register("malkuth_boss_spawner",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_boss_spawner"),1f));
 
     public static final Supplier<FDModelInfo> MALKUTH_WARRIOR = INFOS.register("malkuth_warrior",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_warrior"),1f));
 
