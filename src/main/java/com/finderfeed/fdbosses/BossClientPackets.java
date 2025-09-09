@@ -509,8 +509,8 @@ public class BossClientPackets {
                         .build();
             }else{
                 if (attackType.isFire()){
-                    vspeed = vspeed * 0.5f;
-                    hspeed = hspeed * 0.5f;
+                    vspeed = vspeed * 0.25f;
+                    hspeed = hspeed * 0.25f;
                     if (random.nextFloat() > 0.3) {
                         options = ParticleTypes.FLAME;
                     }else {

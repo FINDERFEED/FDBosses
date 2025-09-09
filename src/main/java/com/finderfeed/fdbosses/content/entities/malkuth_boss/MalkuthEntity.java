@@ -176,6 +176,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private boolean dropLoot = true;
 
+    private Vec3 oldTargetPos;
+
     public MalkuthEntity(EntityType<? extends FDMob> type, Level level) {
         super(type, level);
         if (level.isClientSide){
@@ -218,11 +220,39 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         AttackOptions<?> jumpCrushSlashNEarthquake = AttackOptions.chainOptionsBuilder().addAttack(JUMP_CRUSH).addAttack(DELAY_10).addAttack(SLASH_ATTACK).addAttack(DELAY_5).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(SLASH_ATTACK).addAttack(DELAY_5).addAttack(JUMP_CRUSH).addAttack(DELAY_5).addAttack(JUMP_BACK_ON_SPAWN).build();
         AttackOptions<?> jumpCrushSlashNEarthquakeNoJumpBack = AttackOptions.chainOptionsBuilder().addAttack(JUMP_CRUSH).addAttack(DELAY_10).addAttack(SLASH_ATTACK).addAttack(DELAY_5).addAttack(SUMMON_EARTHQUAKE).addAttack(DELAY_5).addAttack(SLASH_ATTACK).addAttack(DELAY_5).addAttack(JUMP_CRUSH).addAttack(DELAY_5).build();
 
+        AttackOptions<?> jumpCrushMoreSlashNEarthquake = AttackOptions.chainOptionsBuilder()
+                .addAttack(JUMP_CRUSH)
+                .addAttack(DELAY_10)
+                .addAttack(SLASH_ATTACK)
+                .addAttack(DELAY_5)
+                .addAttack(SUMMON_EARTHQUAKE)
+                .addAttack(DELAY_5)
+                .addAttack(SLASH_ATTACK)
+                .addAttack(DELAY_5)
+                .addAttack(SLASH_ATTACK)
+                .addAttack(DELAY_5)
+                .addAttack(SUMMON_EARTHQUAKE)
+                .addAttack(JUMP_BACK_ON_SPAWN).build();
+
+        AttackOptions<?> jumpCrushMoreSlashNEarthquakeNoJumpBack = AttackOptions.chainOptionsBuilder()
+                .addAttack(JUMP_CRUSH)
+                .addAttack(DELAY_10)
+                .addAttack(SLASH_ATTACK)
+                .addAttack(DELAY_5)
+                .addAttack(SUMMON_EARTHQUAKE)
+                .addAttack(DELAY_5)
+                .addAttack(SLASH_ATTACK)
+                .addAttack(DELAY_5)
+                .addAttack(SLASH_ATTACK)
+                .addAttack(DELAY_5)
+                .addAttack(SUMMON_EARTHQUAKE).build();
+
 
         AttackOptions<?> randomJumpCrush = AttackOptions.builder()
                 .addAttack(jumpCrushEarthquake)
                 .addAttack(jumpCrushEarthquakeJumpCrushEarthquake)
                 .addAttack(jumpCrushSlashNEarthquake)
+                .addAttack(jumpCrushMoreSlashNEarthquake)
                 .build();
 
 
@@ -230,6 +260,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .addAttack(jumpCrushEarthquakeNoJumpBack)
                 .addAttack(jumpCrushEarthquakeJumpCrushEarthquakeNoJumpBack)
                 .addAttack(jumpCrushSlashNEarthquakeNoJumpBack)
+                .addAttack(jumpCrushMoreSlashNEarthquakeNoJumpBack)
                 .build();
 
 
@@ -289,6 +320,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 .addAlwaysTryCastAttack(this::checkCanPunch, PULL_AND_PUNCH)
 
+
+
                 .addAttack(id++, slashOptions)
                 .addAttack(id++, randomJumpCrushNoJumpBack)
                 .addAttack(id++, cannonsNoJumpBack)
@@ -340,10 +373,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.headControllerContainer.clientTick();
         }else{
 
-
             this.preventEnteringLavaField();
-
-//            BossUtil.malkuthSwordsInsertParticles((ServerLevel) level(), this.position(), 30, this.getId());
 
             this.bossbar.setPercentage(this.hits / (float) this.getMaxHits());
 
@@ -398,6 +428,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
 
+            if (this.getTarget() != null){
+                this.oldTargetPos = this.getTarget().position();
+            }
 
 
 
@@ -1066,11 +1099,17 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 double dist = direction.length();
 
-                int time = (int) Math.ceil(dist);
+                int time = (int) Math.ceil(dist * 0.9f);
 
                 float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().malkuthConfig.impalingDoomDamage);
 
-                MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(),earthquakeToSummon, this.position().add(0, spawnYOffset, 0), direction, time, FDMathUtil.FPI / 8, damage);
+                float arcAngle = FDMathUtil.FPI / 8f * 1.2f;
+                MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(),earthquakeToSummon, this.position().add(0, spawnYOffset, 0), direction, time, arcAngle, damage);
+
+                for (var e : BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position().add(0,-0.1,0), 4, 1f, entity->!(entity instanceof MalkuthBossBuddy))){
+                    e.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_IMPALING_DOOM_SOURCE,earthquakeToSummon,51),damage);
+                }
+
             }else if (tick == 9){
 
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
@@ -1432,6 +1471,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level(),spawnPos,speedv,this.slashAttackType, damage, 2.2f, rotation,0);
 
+
+
             }else if (tick == 20){
                 this.playSlashSound();
             } else if (tick >= 28){
@@ -1719,8 +1760,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                             if (livingEntity instanceof ServerPlayer player){
                                 FDLibCalls.setServerPlayerSpeed(player, speed);
 
-                                player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS,40,0,true,false));
-                                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,40,0,true,false));
+                                player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS,33,0,true,false));
+                                player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,5,0,true,false));
                                 player.addEffect(new MobEffectInstance(MobEffects.CONFUSION,100,0,true,false));
 
                                 PacketDistributor.sendToPlayer(player, new DefaultShakePacket(FDShakeData.builder()
@@ -1843,12 +1884,22 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             return;
         }
-        var combatants = this.getCombatants(true);
+        var combatants = this.getCombatants(false);
 
         List<Vec3> positions = new ArrayList<>();
 
         for (var combatant : combatants){
+
+            for (int i = 0; i < 4; i++){
+                Vec3 p = combatant.position().add(
+                        random.nextFloat() * 8 - 4,
+                        0,
+                        random.nextFloat() * 8 - 4
+                );
+                positions.add(p);
+            }
             positions.add(combatant.position());
+
         }
 
 
@@ -2377,10 +2428,30 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     private void changeTarget(){
         List<Player> combatants = this.getCombatants(false);
         if (combatants.isEmpty()){
+            this.oldTargetPos = null;
             this.setTarget(null);
         }else{
+            var oldTarget = this.getTarget();
             this.setTarget(combatants.get(random.nextInt(combatants.size())));
+            var newTarget = this.getTarget();
+            if (oldTarget != newTarget){
+                this.oldTargetPos = newTarget.position();
+            }
         }
+    }
+
+    private Vec3 vectorBetweenNewAndOldTargetPos(){
+        var target = this.getTarget();
+        if (target == null) return null;
+
+        Vec3 oldPos;
+        if (this.oldTargetPos == null) {
+            oldPos = target.position();
+        }else{
+            oldPos = this.oldTargetPos;
+        }
+
+        return target.position().subtract(oldPos);
     }
 
 
