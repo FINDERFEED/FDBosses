@@ -3150,6 +3150,15 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         return true;
     }
 
+    @Override
+    public void setDeltaMovement(double p_20335_, double p_20336_, double p_20337_) {
+        super.setDeltaMovement(0,0,0);
+    }
+
+    @Override
+    public void setDeltaMovement(Vec3 p_20257_) {
+        super.setDeltaMovement(Vec3.ZERO);
+    }
 
     @Override
     public int getHeadRotSpeed() {

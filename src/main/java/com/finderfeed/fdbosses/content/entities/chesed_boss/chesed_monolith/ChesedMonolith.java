@@ -94,6 +94,16 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
     }
 
     @Override
+    public void setDeltaMovement(double p_20335_, double p_20336_, double p_20337_) {
+        super.setDeltaMovement(0,0,0);
+    }
+
+    @Override
+    public void setDeltaMovement(Vec3 p_20257_) {
+        super.setDeltaMovement(Vec3.ZERO);
+    }
+
+    @Override
     public void die(DamageSource src) {
         if (src.is(DamageTypes.GENERIC_KILL) || src.is(DamageTypes.FELL_OUT_OF_WORLD)){
             super.die(src);
