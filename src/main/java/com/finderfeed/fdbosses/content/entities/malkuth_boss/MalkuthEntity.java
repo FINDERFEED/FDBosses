@@ -90,6 +90,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingUseTotemEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -2764,8 +2765,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
         @SubscribeEvent
-        public static void onLivingDamage(LivingDamageEvent.Pre event){
-
+        public static void onLivingDamaged(LivingIncomingDamageEvent event){
             LivingEntity living = event.getEntity();
             Level level = living.level();
 
@@ -2775,9 +2775,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 MalkuthAttackType malkuthAttackType = damageSource.getMalkuthAttackType();
 
                 if (!MalkuthWeaknessHandler.isWeakTo(player, malkuthAttackType)) {
-                    float damage = event.getNewDamage();
+                    float damage = event.getAmount();
                     float reduction = 1 - BossConfigs.BOSS_CONFIG.get().malkuthConfig.nonWeakToDamageReduction / 100f;
-                    event.setNewDamage(damage * reduction);
+                    event.setAmount(damage * reduction);
                 }
 
                 MalkuthWeaknessHandler.damageWeakness(malkuthAttackType, player, malkuthDamageAmount);
@@ -2785,6 +2785,29 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
         }
+
+//        @SubscribeEvent
+//        public static void onLivingDamage(LivingDamageEvent.Pre event){
+//
+//            LivingEntity living = event.getEntity();
+//            Level level = living.level();
+//
+//            if (!level.isClientSide && living instanceof Player player && event.getSource() instanceof MalkuthDamageSource damageSource) {
+//
+//                int malkuthDamageAmount = damageSource.getMalkuthAttackAmount();
+//                MalkuthAttackType malkuthAttackType = damageSource.getMalkuthAttackType();
+//
+//                if (!MalkuthWeaknessHandler.isWeakTo(player, malkuthAttackType)) {
+//                    float damage = event.getNewDamage();
+//                    float reduction = 1 - BossConfigs.BOSS_CONFIG.get().malkuthConfig.nonWeakToDamageReduction / 100f;
+//                    event.setNewDamage(damage * reduction);
+//                }
+//
+//                MalkuthWeaknessHandler.damageWeakness(malkuthAttackType, player, malkuthDamageAmount);
+//
+//            }
+//
+//        }
 
     }
 
