@@ -1473,7 +1473,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
                 for (var e : BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position().add(0,-0.1,0), 4, 1f, entity->!(entity instanceof MalkuthBossBuddy))){
-                    e.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_IMPALING_DOOM_SOURCE,this.slashAttackType,MalkuthWeaknessHandler.MAX / 3),damage * 2);
+                    e.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_SLASHES_SOURCE,this.slashAttackType,MalkuthWeaknessHandler.MAX / 3),damage * 2);
                 }
 
             }else if (tick == 20){
