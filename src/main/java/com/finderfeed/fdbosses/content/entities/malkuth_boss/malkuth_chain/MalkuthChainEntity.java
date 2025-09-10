@@ -90,7 +90,7 @@ public class MalkuthChainEntity extends LivingEntity implements AutoSerializable
                 this.entityData.set(MALKUTH_ID, malkuthEntity.getId());
             }
 
-            if (malkuthEntity == null || this.getTarget() == null){
+            if (malkuthEntity == null || this.getTarget() == null || this.getTarget().isDeadOrDying()){
                 this.setRemoved(RemovalReason.DISCARDED);
             }
 

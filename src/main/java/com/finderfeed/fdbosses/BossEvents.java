@@ -80,6 +80,13 @@ public class BossEvents {
     }
 
     @SubscribeEvent
+    public static void respawn(PlayerEvent.PlayerRespawnEvent event){
+        if (event.getEntity() instanceof ServerPlayer serverPlayer){
+            PacketDistributor.sendToPlayer(serverPlayer, new SetClientMalkuthWeaknessAmountPacket(MalkuthWeaknessHandler.getCurrentWeaknessLevel(serverPlayer)));
+        }
+    }
+
+    @SubscribeEvent
     public static void preventArenaDestruction(BlockEvent.BreakEvent event){
         LevelAccessor level = event.getLevel();
         if (!level.isClientSide()){

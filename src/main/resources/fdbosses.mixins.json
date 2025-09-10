@@ -8,6 +8,7 @@
     "CraftingMenuMixin",
     "EntityMixin",
     "JigsawPlacementMixin",
+    "LivingEntityAccessor",
     "PlayerMixin"
   ],
   "minVersion": "0.8",
