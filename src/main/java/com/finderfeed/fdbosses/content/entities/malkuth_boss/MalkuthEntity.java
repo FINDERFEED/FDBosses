@@ -1107,7 +1107,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level(),earthquakeToSummon, this.position().add(0, spawnYOffset, 0), direction, time, arcAngle, damage);
 
                 for (var e : BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position().add(0,-0.1,0), 4, 1f, entity->!(entity instanceof MalkuthBossBuddy))){
-                    e.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_IMPALING_DOOM_SOURCE,earthquakeToSummon,51),damage);
+                    e.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_IMPALING_DOOM_SOURCE,earthquakeToSummon,51),damage * 2);
                 }
 
             }else if (tick == 9){
@@ -1472,6 +1472,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 MalkuthSlashProjectile malkuthSlashProjectile = MalkuthSlashProjectile.summon(level(),spawnPos,speedv,this.slashAttackType, damage, 2.2f, rotation,0);
 
 
+                for (var e : BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position().add(0,-0.1,0), 4, 1f, entity->!(entity instanceof MalkuthBossBuddy))){
+                    e.hurt(new MalkuthDamageSource(BossDamageSources.MALKUTH_IMPALING_DOOM_SOURCE,this.slashAttackType,MalkuthWeaknessHandler.MAX / 3),damage * 2);
+                }
 
             }else if (tick == 20){
                 this.playSlashSound();

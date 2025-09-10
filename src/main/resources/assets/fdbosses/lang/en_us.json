@@ -171,5 +171,8 @@
   "fdbosses.tldr.malkuth": "Cannot be attacked directly.\n\nWhen player is weak to §cFire§r it receives decreased §bIce§r damage, and other way around if player is weak to §bIce§r, it receives decreased §cFire§r damage.\n\nCurrent weakness can be seen on the crosshair.\n\nUse cannons on the arena to attack Malkuth, you can only use the cannon of type you are currently weak to.",
   "fdbosses.word.patrons": "Patrons",
   "fdbosses.word.boosters": "Boosters",
-  "fdbosses.word.not_updated": "The data is not updated online yet. I will add new subscribers with subsequent updates."
+  "fdbosses.word.not_updated": "The data is not updated online yet. I will add new subscribers with subsequent updates.",
+  "fdbosses.word.core_lose": "WARNING: You cannot put two or more different cores on one item!",
+  "fdbosses.core_ability.lightning_core": "Can be combined with items that has damage. Gives an ability to summon Chesed lightnings on hit.",
+  "fdbosses.core_ability.fire_and_ice_core": "Can be combined with items that has damage. Allows summoning Malkuth fireballs on item use."
 }

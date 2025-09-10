@@ -32,14 +32,18 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector2d;
 import org.joml.Vector3f;
+
+import java.util.function.Predicate;
 
 public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
 
@@ -110,10 +114,13 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
 
         if (damage == 0) return;
 
-        float radius = 3f;
+        float radius = 4f;
 
-        var targets = BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position(), 2, radius, v->!(v instanceof MalkuthBossBuddy));
+        Predicate<LivingEntity> entityPredicate = v->!(v instanceof MalkuthBossBuddy);
 
+        var targets = BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position(), 2, radius, entityPredicate);
+
+//        var targets = level().getEntitiesOfClass(LivingEntity.class, new AABB(-radius,-1,-radius,radius,3,radius).move(this.position()),entityPredicate);
 
         for (var target : targets){
 
