@@ -85,16 +85,28 @@ public class BossTargetFinder {
         var entities = level.getEntitiesOfClass(clazz, box, entity->{
 
             Vec3 entityPos = entity.position();
-            Vec3 b = entityPos.subtract(cylinderStart);
-            double horizontalRadius = Math.sqrt(b.x * b.x + b.z * b.z);
+//            Vec3 b = entityPos.subtract(cylinderStart);
+//            double horizontalRadius = Math.sqrt(b.x * b.x + b.z * b.z);
+//
+//            double h = b.y;
 
-            double h = b.y;
-
-            return horizontalRadius <= cylinderRadius && (h >= 0 && h <= cylinderHeight) && predicate.test(entity);
+            return isPointInCylinder(entityPos, cylinderStart, cylinderHeight, cylinderRadius) && predicate.test(entity);
         });
 
         return entities;
     }
+
+
+    public static boolean isPointInCylinder(Vec3 point, Vec3 cylinderStart, float cylinderHeight, float cylinderRadius){
+        Vec3 entityPos = point;
+        Vec3 b = entityPos.subtract(cylinderStart);
+        double horizontalRadius = Math.sqrt(b.x * b.x + b.z * b.z);
+
+        double h = b.y;
+
+        return horizontalRadius <= cylinderRadius && (h >= 0 && h <= cylinderHeight);
+    }
+
 
     public static <T extends Entity> List<T> getEntitiesInSphere(Class<T> clazz, Level level, Vec3 center, float radius){
         return getEntitiesInSphere(clazz, level, center, radius, v -> true);

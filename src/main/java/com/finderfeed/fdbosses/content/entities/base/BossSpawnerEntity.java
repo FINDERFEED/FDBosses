@@ -15,6 +15,7 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public abstract class BossSpawnerEntity extends FDEntity {
@@ -64,11 +65,6 @@ public abstract class BossSpawnerEntity extends FDEntity {
     }
 
     @Override
-    public boolean hurt(DamageSource src, float damage) {
-        return src.is(DamageTypes.GENERIC_KILL) || src.is(DamageTypes.FELL_OUT_OF_WORLD);
-    }
-
-    @Override
     public boolean isPickable() {
         return true;
     }
@@ -82,6 +78,13 @@ public abstract class BossSpawnerEntity extends FDEntity {
     }
 
     public abstract EntityType<? extends BossSpawnerContextAssignable> getBossEntityType();
+
+    public abstract Vec3 getPlayerItemsDropPosition(Vec3 deathPosition);
+
+    @Override
+    public boolean hurt(DamageSource src, float damage) {
+        return src.is(DamageTypes.GENERIC_KILL) || src.is(DamageTypes.FELL_OUT_OF_WORLD);
+    }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {

@@ -82,10 +82,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec2;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -189,6 +186,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
         this.maxHits = BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthMaxHits;
+        this.hits = BossConfigs.BOSS_CONFIG.get().malkuthConfig.malkuthMaxHits;
 
         malkuthBossInitializer = new MalkuthBossInitializer(this);
         malkuthSecondPhaseInitializer = new MalkuthSecondPhaseInitializer(this);
@@ -1587,6 +1585,14 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     private void summonRepairCrystal(Vec3 pos){
 
+        Vec3 posBelow = pos.add(0,-20,0);
+        BlockHitResult result = level().clip(new ClipContext(pos,posBelow, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
+        pos = result.getLocation();
+
+        if (!BossTargetFinder.isPointInCylinder(pos, this.spawnPosition.add(0,-2,0),ENRAGE_HEIGHT + 10, ENRAGE_RADIUS)) return;
+
+
+
         var crystals = BossTargetFinder.getEntitiesInCylinder(MalkuthRepairCrystal.class, level(), this.spawnPosition.add(0,-2,0), 20, 30);
 
         var playerCannons = this.getPlayerCannons(true);
@@ -1669,7 +1675,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
     private boolean checkCanPunch(){
-        AABB box = new AABB(-ENRAGE_RADIUS,4,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(this.position());
+        AABB box = new AABB(-ENRAGE_RADIUS,5,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(this.position());
 
         List<Player> players = level().getEntitiesOfClass(Player.class, box);
 
@@ -2305,7 +2311,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                             damage = 0.1f;
                         }
                     }
-                    entity.hurt(new MalkuthDamageSource(damageSource, giantSwordUltimateStartAttackType, 100), damage);
+                    entity.hurt(new MalkuthDamageSource(damageSource, giantSwordUltimateStartAttackType, 101), damage);
                 }
 
                 for (var entity : this.level().getEntitiesOfClass(LivingEntity.class, secondBox, entity -> !(entity instanceof MalkuthBossBuddy))){
@@ -2316,7 +2322,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                             damage = 0.1f;
                         }
                     }
-                    entity.hurt(new MalkuthDamageSource(damageSource, MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType), 100), damage);
+                    entity.hurt(new MalkuthDamageSource(damageSource, MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType), 101), damage);
                 }
                 inst.nextStage();
             }

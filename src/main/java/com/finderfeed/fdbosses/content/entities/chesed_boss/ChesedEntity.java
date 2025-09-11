@@ -2795,6 +2795,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
         for (var entity : entities){
 
+            if (entity instanceof ItemEntity) continue;
+
             Vec3 b = this.position().subtract(entity.position());
             Vec3 h = b.multiply(1,0,1);
             double dist = h.length();

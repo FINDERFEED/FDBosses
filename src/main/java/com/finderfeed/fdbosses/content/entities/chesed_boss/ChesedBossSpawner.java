@@ -1,7 +1,9 @@
 package com.finderfeed.fdbosses.content.entities.chesed_boss;
 
+import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
 import com.finderfeed.fdlib.systems.particle.CompositeParticleProcessor;
@@ -78,6 +80,18 @@ public class ChesedBossSpawner extends BossSpawnerEntity {
     @Override
     public EntityType<? extends BossSpawnerContextAssignable> getBossEntityType() {
         return BossEntities.CHESED.get();
+    }
+
+    @Override
+    public Vec3 getPlayerItemsDropPosition(Vec3 deathPosition) {
+        if (BossTargetFinder.isPointInCylinder(deathPosition, this.position().add(0,-2,0), ChesedEntity.ARENA_HEIGHT, ChesedEntity.ARENA_RADIUS)){
+            Vec3 offset = this.getForward().multiply(1,0,1)
+                    .normalize()
+                    .multiply(ChesedEntity.ARENA_RADIUS + 4,0,ChesedEntity.ARENA_RADIUS + 4)
+                    .add(0,1,0);
+            return this.position().add(offset);
+        }
+        return null;
     }
 
     @Override

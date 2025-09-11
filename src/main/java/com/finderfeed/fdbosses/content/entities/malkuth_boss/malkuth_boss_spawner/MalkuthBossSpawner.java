@@ -110,6 +110,14 @@ public class MalkuthBossSpawner extends BossSpawnerEntity {
     }
 
     @Override
+    public Vec3 getPlayerItemsDropPosition(Vec3 deathPosition) {
+        if (BossTargetFinder.isPointInCylinder(deathPosition, this.position().add(0,-2,0), MalkuthEntity.ENRAGE_HEIGHT + 2, MalkuthEntity.ENRAGE_RADIUS)){
+            return this.position().add(0,3,-MalkuthEntity.ENRAGE_RADIUS - 5);
+        }
+        return null;
+    }
+
+    @Override
     public boolean canInteractWithBlockPos(BlockPos blockPos) {
 
         Vec3 v = blockPos.getCenter();

@@ -39,6 +39,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
@@ -259,6 +260,31 @@ public class BossEvents {
 
         }
 
+    }
+
+    @SubscribeEvent
+    public static void deathEvent(LivingDropsEvent event){
+        var entity = event.getEntity();
+        if (entity instanceof ServerPlayer serverPlayer){
+            Level level = serverPlayer.level();
+            Vec3 pos = serverPlayer.position();
+            float radius = 50;
+            var spawners = level.getEntitiesOfClass(BossSpawnerEntity.class, new AABB(-radius,-radius,-radius,radius,radius,radius).move(pos), bossSpawner -> !bossSpawner.isActive());
+
+            for (var spawner : spawners){
+
+                Vec3 itemsPos = spawner.getPlayerItemsDropPosition(pos);
+
+                if (itemsPos != null){
+                    for (ItemEntity itemEntity : event.getDrops()){
+                        itemEntity.setPos(itemsPos);
+                        itemEntity.setDeltaMovement(Vec3.ZERO);
+                    }
+                }
+
+            }
+
+        }
     }
 
     @SubscribeEvent
