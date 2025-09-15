@@ -6,6 +6,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -30,9 +32,10 @@ public class WeaponCoreItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext p_339594_, List<Component> components, TooltipFlag p_41424_) {
-        super.appendHoverText(stack, p_339594_, components, p_41424_);
+    public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> components, TooltipFlag p_41424_) {
+        super.appendHoverText(p_41421_, p_41422_, components, p_41424_);
         components.add(abilityText);
         components.add(Component.translatable("fdbosses.word.core_lose").withStyle(ChatFormatting.RED));
     }
+
 }

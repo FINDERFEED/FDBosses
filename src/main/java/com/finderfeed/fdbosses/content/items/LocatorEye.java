@@ -54,7 +54,8 @@ public class LocatorEye<T extends EyeOfEnder> extends Item {
 
                 float f = Mth.lerp(level.random.nextFloat(), 0.33F, 0.5F);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDER_EYE_LAUNCH, SoundSource.NEUTRAL, 1.0F, f);
-                itemstack.consume(1, player);
+                itemstack.shrink(1);
+
                 player.awardStat(Stats.ITEM_USED.get(this));
                 player.swing(hand, true);
                 return InteractionResultHolder.success(itemstack);

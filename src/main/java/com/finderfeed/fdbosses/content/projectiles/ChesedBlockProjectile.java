@@ -10,6 +10,7 @@ import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
@@ -26,7 +27,6 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
@@ -36,13 +36,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 import org.joml.*;
 
 import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class ChesedBlockProjectile extends FDProjectile implements AutoSerializable {
 
@@ -205,7 +204,7 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
             SlamParticlesPacket packet = new SlamParticlesPacket(
                     new SlamParticlesPacket.SlamData(blockHitResult.getBlockPos(),blockHitResult.getLocation(),this.getDeltaMovement())
             );
-            PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+            FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->this),packet);
             PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                     .frequency(1.5f)
                     .stayTime(0)
@@ -359,17 +358,11 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
 
 
     @Override
-    public void lerpTo(double x, double y, double z, float p_19899_, float p_19900_, int p_19901_) {
-        super.lerpTo(x, y, z, p_19899_, p_19900_, p_19901_);
-    }
-
-    @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
-        builder
-                .define(ROTATION_SPEED,20f)
-                .define(STATE, Blocks.DEEPSLATE.defaultBlockState())
-                .define(DROP_PARTICLES,false);
+        this.entityData.define(ROTATION_SPEED,20f);
+        this.entityData.define(STATE, Blocks.DEEPSLATE.defaultBlockState());
+        this.entityData.define(DROP_PARTICLES,false);
     }
 
 

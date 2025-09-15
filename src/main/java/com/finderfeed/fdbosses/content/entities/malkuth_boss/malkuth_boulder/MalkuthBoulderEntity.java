@@ -34,7 +34,6 @@ import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector3f;
 
 public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializable {

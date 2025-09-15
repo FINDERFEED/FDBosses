@@ -70,7 +70,7 @@ public class TrophyBlock extends FDEntityBlock {
     }
 
     @Override
-    protected RenderShape getRenderShape(BlockState p_60550_) {
+    public RenderShape getRenderShape(BlockState p_60550_) {
         return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 

@@ -5,9 +5,6 @@ import com.finderfeed.fdbosses.init.BossItems;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.NetworkCodec;
-import net.minecraft.network.codec.NetworkCodec;
-import net.minecraft.world.item.Item;
 
 import java.util.Objects;
 import java.util.function.Supplier;

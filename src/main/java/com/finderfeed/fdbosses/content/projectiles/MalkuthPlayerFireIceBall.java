@@ -250,7 +250,7 @@ public class MalkuthPlayerFireIceBall extends FDProjectile implements AutoSerial
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        tag.put("item", this.itemStack.save(level().registryAccess()));
+        tag.put("item", this.itemStack.save(new CompoundTag()));
         tag.putString("mtype", this.entityData.get(ATTACK_TYPE).name());
         this.autoSave(tag);
     }
@@ -263,7 +263,7 @@ public class MalkuthPlayerFireIceBall extends FDProjectile implements AutoSerial
         }
 
         if (tag.contains("item")){
-            this.itemStack = ItemStack.parse(level().registryAccess(), tag.getCompound("item")).get();
+            this.itemStack = ItemStack.of(tag.getCompound("item"));
         }
 
         this.autoLoad(tag);
