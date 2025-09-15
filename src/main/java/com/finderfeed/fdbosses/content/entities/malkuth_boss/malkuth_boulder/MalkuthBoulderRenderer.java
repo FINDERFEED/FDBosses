@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Math;
 import org.joml.Random;
 
 public class MalkuthBoulderRenderer extends EntityRenderer<MalkuthBoulderEntity> {

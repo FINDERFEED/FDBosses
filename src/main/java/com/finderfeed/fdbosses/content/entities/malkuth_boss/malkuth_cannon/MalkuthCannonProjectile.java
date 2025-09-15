@@ -15,6 +15,7 @@ import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -33,7 +34,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 
 public class MalkuthCannonProjectile extends FDProjectile implements AutoSerializable {
 
@@ -79,7 +80,8 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
     public void tick() {
         if (!level().isClientSide){
             this.setMalkuthAttackType(this.malkuthAttackType);
-            this.applyGravity();
+            BossUtil.applyGravity(this, -this.getDefaultGravity());
+
             if (reversedAge-- <= 0){
                 this.explode(this.position());
             }
@@ -208,7 +210,7 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
                             .maxVerticalSpeedEdges(0.15f)
                             .maxVerticalSpeedCenter(0.15f)
             );
-            PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+            FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->this), packet);
 
             BossUtil.malkuthFireballExplosionParticles((ServerLevel) level(), pos, this.getMalkuthAttackType());
 
@@ -243,7 +245,6 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
         this.setMalkuthAttackType(this.malkuthAttackType);
     }
 
-    @Override
     protected double getDefaultGravity() {
         return LivingEntity.DEFAULT_BASE_GRAVITY;
     }

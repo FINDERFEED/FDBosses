@@ -94,7 +94,7 @@ public class MalkuthRepairEntity extends Entity {
 
         if (cannons.isEmpty()) return false;
 
-        flyingTo = cannons.getFirst();
+        flyingTo = cannons.get(0);
 
         var startPos = this.position();
         var endPos = flyingTo.position().add(0,1,0);
@@ -133,9 +133,9 @@ public class MalkuthRepairEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder p) {
-        p.define(ATTACK_TYPE, MalkuthAttackType.FIRE);
-        p.define(RANDOMIZED_DIRECTION, 1);
+    protected void defineSynchedData() {
+        entityData.define(ATTACK_TYPE, MalkuthAttackType.FIRE);
+        entityData.define(RANDOMIZED_DIRECTION, 1);
     }
 
     @Override

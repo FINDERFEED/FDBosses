@@ -14,6 +14,7 @@ import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDProjectile;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
@@ -32,6 +33,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector3f;
 
@@ -175,7 +177,7 @@ public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializab
                                 .maxVerticalSpeedEdges(0.15f)
                                 .maxVerticalSpeedCenter(0.15f)
                 );
-                PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+                FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->this),packet);
 
             }
         }
@@ -278,11 +280,11 @@ public class MalkuthBoulderEntity extends FDProjectile implements AutoSerializab
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder p_326181_) {
-        super.defineSynchedData(p_326181_);
-        p_326181_.define(MALKUTH_ATTACK_TYPE, MalkuthAttackType.FIRE);
-        p_326181_.define(PREPARE_TIME, 20);
-        p_326181_.define(PREPARE_HEIGHT, 3f);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(MALKUTH_ATTACK_TYPE, MalkuthAttackType.FIRE);
+        this.entityData.define(PREPARE_TIME, 20);
+        this.entityData.define(PREPARE_HEIGHT, 3f);
     }
 
     @Override

@@ -15,6 +15,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -159,9 +160,19 @@ public class MalkuthChainEntity extends LivingEntity implements AutoSerializable
     }
 
     @Override
-    public Vec3 getPassengerRidingPosition(Entity entity) {
-        return this.position().add(0,-entity.getBbHeight()/2 + 0.25,0);
+    public double getPassengersRidingOffset() {
+        return 0.75f;
     }
+
+    @Override
+    protected void positionRider(Entity entity, MoveFunction p_19958_) {
+        super.positionRider(entity, p_19958_);
+//        if (this.hasPassenger(entity)) {
+//            Vec3 pos = this.position().add(0, -entity.getBbHeight() / 2 + 0.25, 0);
+//            entity.setPos(pos);
+//        }
+    }
+
 
     public LivingEntity getTarget(){
         if (targetUUID != null && !level().isClientSide){
@@ -296,10 +307,6 @@ public class MalkuthChainEntity extends LivingEntity implements AutoSerializable
 
     }
 
-    @Override
-    public void push(Vec3 p_347665_) {
-
-    }
 
     @Override
     protected void pushEntities() {

@@ -40,15 +40,15 @@ public class MalkuthBossSpawner extends BossSpawnerEntity {
                     FDMathUtil.FPI, MalkuthEntity.ENRAGE_HEIGHT + 2, MalkuthEntity.ENRAGE_RADIUS)){
 
                 if (!this.isActive()) {
-                    if (!player.hasEffect(BossEffects.MARK_OF_A_KNIGHT)) {
-                        player.addEffect(new MobEffectInstance(BossEffects.MARK_OF_A_KNIGHT, -1, 0, true, false));
+                    if (!player.hasEffect(BossEffects.MARK_OF_A_KNIGHT.get())) {
+                        player.addEffect(new MobEffectInstance(BossEffects.MARK_OF_A_KNIGHT.get(), -1, 0, true, false));
                     }
                 }else{
-                    if (player.hasEffect(BossEffects.MARK_OF_A_KNIGHT)) {
-                        player.removeEffect(BossEffects.MARK_OF_A_KNIGHT);
+                    if (player.hasEffect(BossEffects.MARK_OF_A_KNIGHT.get())) {
+                        player.removeEffect(BossEffects.MARK_OF_A_KNIGHT.get());
                     }
-                    if (player.hasEffect(BossEffects.MARK_OF_A_COWARD)) {
-                        player.removeEffect(BossEffects.MARK_OF_A_COWARD);
+                    if (player.hasEffect(BossEffects.MARK_OF_A_COWARD.get())) {
+                        player.removeEffect(BossEffects.MARK_OF_A_COWARD.get());
                     }
                 }
 

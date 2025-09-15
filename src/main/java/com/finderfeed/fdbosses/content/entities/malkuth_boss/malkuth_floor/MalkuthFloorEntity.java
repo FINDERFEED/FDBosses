@@ -30,6 +30,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Math;
 import org.joml.Vector3f;
 
 import java.util.List;

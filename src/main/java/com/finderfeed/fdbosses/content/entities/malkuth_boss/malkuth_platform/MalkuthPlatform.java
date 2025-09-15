@@ -52,10 +52,7 @@ public class MalkuthPlatform extends FDEntity {
         }
     }
 
-    @Override
-    public void onRemovedFromLevel() {
-        super.onRemovedFromLevel();
-    }
+
 
     @Override
     public void onClientRemoval() {
@@ -101,11 +98,6 @@ public class MalkuthPlatform extends FDEntity {
 
     @Override
     public void push(double p_20286_, double p_20287_, double p_20288_) {
-
-    }
-
-    @Override
-    public void push(Vec3 p_347665_) {
 
     }
 

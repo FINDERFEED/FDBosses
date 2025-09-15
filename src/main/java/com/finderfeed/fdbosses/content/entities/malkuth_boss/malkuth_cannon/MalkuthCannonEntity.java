@@ -321,10 +321,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
         return true;
     }
 
-    @Override
-    public void push(Vec3 p_347665_) {
 
-    }
 
     @Override
     public void push(Entity p_21294_) {

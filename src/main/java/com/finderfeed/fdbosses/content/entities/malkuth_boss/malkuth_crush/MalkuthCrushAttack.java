@@ -384,8 +384,8 @@ public class MalkuthCrushAttack extends FDEntity implements AutoSerializable {
 
     @Override
     protected void defineSynchedData() {
-        data.define(DIRECTION, Direction.UP);
-        data.define(VISUAL_APPEARANCE, (byte)0);
+        entityData.define(DIRECTION, Direction.UP);
+        entityData.define(VISUAL_APPEARANCE, (byte)0);
     }
 
     @Override

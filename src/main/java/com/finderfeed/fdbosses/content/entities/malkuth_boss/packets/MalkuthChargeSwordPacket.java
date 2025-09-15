@@ -10,6 +10,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.function.Supplier;
+
 
 @RegisterFDPacket("fdbosses:malkuth_charge_sword")
 public class MalkuthChargeSwordPacket extends FDPacket {

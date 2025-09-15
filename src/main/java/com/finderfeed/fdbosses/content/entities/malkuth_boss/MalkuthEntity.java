@@ -85,6 +85,11 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingUseTotemEvent;
+import net.minecraftforge.event.entity.living.MobEffectEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
@@ -2398,12 +2403,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.MALKUTH_HIT.get(), SoundSource.HOSTILE,1f,0.5f);
 
-                FDPacketHandler.INSTANCE.sendTo();
-
-                PacketDistributor.sendToPlayer(serverPlayer, new DefaultShakePacket(FDShakeData.builder()
+                FDPacketHandler.INSTANCE.sendTo(new DefaultShakePacket(FDShakeData.builder()
                         .outTime(5)
                         .amplitude(0.15f)
-                        .build()));
+                        .build()), serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+
 
                 serverPlayer.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 60, 2));
 
@@ -2417,7 +2421,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     private void causeSwordChargeParticles(MalkuthAttackType attackType){
-        PacketDistributor.sendToPlayersTrackingEntity(this, new MalkuthChargeSwordPacket(this,attackType));
+        FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->this),new MalkuthChargeSwordPacket(this,attackType));
     }
 
 
@@ -2639,10 +2643,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     }
 
-    @Override
-    public void push(Vec3 p_347665_) {
 
-    }
 
     @Override
     protected void pushEntities() {
@@ -2726,7 +2727,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             LivingEntity entity = event.getEntity();
 
-            if (!entity.level().isClientSide && effect.is(BossEffects.MARK_OF_A_COWARD)){
+            if (!entity.level().isClientSide && effect.equals(BossEffects.MARK_OF_A_COWARD.get())){
                 entity.hurt(BossDamageSources.MALKUTH_COWARDICE_SOURCE, Float.MAX_VALUE);
             }
 
@@ -2736,15 +2737,17 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         public static final int MARK_OF_A_COWARD_DURATION = 60;
 
         @SubscribeEvent
-        public static void livingTick(PlayerTickEvent.Post event){
+        public static void livingTick(TickEvent.PlayerTickEvent event){
 
-            var entity = event.getEntity();
+            if (event.phase != TickEvent.Phase.END) return;
+
+            var entity = event.player;
 
             Level level = entity.level();
 
             if (!level.isClientSide){
 
-                if (entity.hasEffect(BossEffects.MARK_OF_A_KNIGHT)) {
+                if (entity.hasEffect(BossEffects.MARK_OF_A_KNIGHT.get())) {
 
                     Vec3 cylinderStart = entity.position().add(0, -MalkuthEntity.ENRAGE_HEIGHT, 0);
 
@@ -2753,12 +2756,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
                     if (spawners.isEmpty()) {
-                        entity.removeEffect(BossEffects.MARK_OF_A_KNIGHT);
-                        if (!entity.hasEffect(BossEffects.MARK_OF_A_COWARD)) {
-                            entity.addEffect(new MobEffectInstance(BossEffects.MARK_OF_A_COWARD, MARK_OF_A_COWARD_DURATION, 0, true, false));
+                        entity.removeEffect(BossEffects.MARK_OF_A_KNIGHT.get());
+                        if (!entity.hasEffect(BossEffects.MARK_OF_A_COWARD.get())) {
+                            entity.addEffect(new MobEffectInstance(BossEffects.MARK_OF_A_COWARD.get(), MARK_OF_A_COWARD_DURATION, 0, true, false));
                         }
                     } else {
-                        entity.removeEffect(BossEffects.MARK_OF_A_COWARD);
+                        entity.removeEffect(BossEffects.MARK_OF_A_COWARD.get());
                     }
                 }
 

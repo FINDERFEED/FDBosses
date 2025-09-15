@@ -9,6 +9,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.MalkuthEarthquake;
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.TransitionAnimation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
@@ -35,7 +36,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
+import org.joml.Math;
 
 import java.util.List;
 
@@ -124,7 +126,7 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
                                 .maxVerticalSpeedEdges(0.15f)
                                 .maxVerticalSpeedCenter(0.4f)
                 );
-                PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+                FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->this),packet);
 
                 level().playSound(null, this.getX(), this.getY() + this.getBbHeight()/2f, this.getZ(), BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.HOSTILE, 1f, 1f);
 
@@ -386,8 +388,7 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
     }
 
     @Override
-    public boolean canBeLeashed() {
+    public boolean canBeLeashed(Player p_21418_) {
         return false;
     }
-
 }
