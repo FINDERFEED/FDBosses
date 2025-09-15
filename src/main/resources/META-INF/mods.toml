@@ -40,6 +40,7 @@ file="META-INF/accesstransformer.cfg"
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
+    mandatory = true
 
 [[dependencies.${mod_id}]]
     modId="fdlib"
@@ -47,5 +48,6 @@ file="META-INF/accesstransformer.cfg"
     versionRange="${fdlib_version_range}"
     ordering="NONE"
     side="BOTH"
+    mandatory = true
 
 

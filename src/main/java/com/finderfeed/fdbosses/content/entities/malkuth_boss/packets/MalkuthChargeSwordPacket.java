@@ -7,8 +7,8 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.Malku
 import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.RegisterFDPacket;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 
 @RegisterFDPacket("fdbosses:malkuth_charge_sword")
@@ -28,18 +28,18 @@ public class MalkuthChargeSwordPacket extends FDPacket {
     }
 
     @Override
-    public void write(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
-        registryFriendlyByteBuf.writeInt(this.entityId);
-        registryFriendlyByteBuf.writeEnum(this.malkuthAttackType);
+    public void write(FriendlyByteBuf FriendlyByteBuf) {
+        FriendlyByteBuf.writeInt(this.entityId);
+        FriendlyByteBuf.writeEnum(this.malkuthAttackType);
     }
 
     @Override
-    public void clientAction(IPayloadContext iPayloadContext) {
+    public void clientAction(Supplier<NetworkEvent.Context> iPayloadContext) {
         BossClientPackets.malkuthSwordCharge(this.malkuthAttackType,this.entityId);
     }
 
     @Override
-    public void serverAction(IPayloadContext iPayloadContext) {
+    public void serverAction(Supplier<NetworkEvent.Context> iPayloadContext) {
 
     }
 }

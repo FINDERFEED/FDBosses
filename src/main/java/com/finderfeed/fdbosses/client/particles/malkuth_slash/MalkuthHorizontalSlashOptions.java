@@ -10,14 +10,14 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
 
 public class MalkuthHorizontalSlashOptions implements ParticleOptions {
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, MalkuthHorizontalSlashOptions> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<FriendlyByteBuf, MalkuthHorizontalSlashOptions> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8,v->v.attackType.name(),
             FDByteBufCodecs.VEC3,v->v.slashDirection,
             ByteBufCodecs.FLOAT,v->v.slashWidth,

@@ -6,8 +6,8 @@ import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.RegisterFDPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 @RegisterFDPacket("fdbosses:force_dossier_screen_close_packet")
 public class ForceDossierClosePacket extends FDPacket {
@@ -16,21 +16,21 @@ public class ForceDossierClosePacket extends FDPacket {
 
     }
 
-    public ForceDossierClosePacket(RegistryFriendlyByteBuf buf){
+    public ForceDossierClosePacket(FriendlyByteBuf buf){
     }
 
     @Override
-    public void write(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
+    public void write(FriendlyByteBuf FriendlyByteBuf) {
 
     }
 
     @Override
-    public void clientAction(IPayloadContext iPayloadContext) {
+    public void clientAction(Supplier<NetworkEvent.Context> iPayloadContext) {
         BossClientPackets.closeDossierScreen();
     }
 
     @Override
-    public void serverAction(IPayloadContext iPayloadContext) {
+    public void serverAction(Supplier<NetworkEvent.Context> iPayloadContext) {
 
     }
 }

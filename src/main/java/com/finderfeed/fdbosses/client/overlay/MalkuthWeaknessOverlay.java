@@ -28,14 +28,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import org.joml.Matrix4f;
 import org.joml.Random;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.GAME)
+@Mod.EventBusSubscriber(modid = FDBosses.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
 
     public static Random random = new Random();

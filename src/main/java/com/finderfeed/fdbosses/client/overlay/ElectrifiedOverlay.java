@@ -21,14 +21,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.joml.Matrix4f;
 
 import java.util.List;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME,modid = FDBosses.MOD_ID,value = Dist.CLIENT)
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE,modid = FDBosses.MOD_ID,value = Dist.CLIENT)
 public class ElectrifiedOverlay implements LayeredDraw.Layer {
 
     private static int electrifiedEffectTick = 0;

@@ -38,7 +38,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.common.Mod.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 import net.neoforged.neoforge.client.event.RenderFrameEvent;
@@ -49,7 +49,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID,bus = EventBusSubscriber.Bus.GAME,value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = FDBosses.MOD_ID,bus = Mod.EventBusSubscriber.Bus.FORGE,value = Dist.CLIENT)
 public class BossClientEvents {
 
     public static Double cachedGamma = null;

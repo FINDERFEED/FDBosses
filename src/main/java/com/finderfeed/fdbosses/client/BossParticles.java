@@ -18,7 +18,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ParticleType;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 
 import net.minecraft.network.codec.StreamCodec;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -37,7 +37,7 @@ public class BossParticles {
         }
 
         @Override
-        public StreamCodec<? super RegistryFriendlyByteBuf, ChesedRayOptions> streamCodec() {
+        public StreamCodec<? super FriendlyByteBuf, ChesedRayOptions> streamCodec() {
             return ChesedRayOptions.STREAM_CODEC;
         }
     });
@@ -50,7 +50,7 @@ public class BossParticles {
         }
 
         @Override
-        public StreamCodec<? super RegistryFriendlyByteBuf, ArcLightningOptions> streamCodec() {
+        public StreamCodec<? super FriendlyByteBuf, ArcLightningOptions> streamCodec() {
             return ArcLightningOptions.createStreamCodec(this);
         }
     });
@@ -62,7 +62,7 @@ public class BossParticles {
         }
 
         @Override
-        public StreamCodec<? super RegistryFriendlyByteBuf, SonicParticleOptions> streamCodec() {
+        public StreamCodec<? super FriendlyByteBuf, SonicParticleOptions> streamCodec() {
             return SonicParticleOptions.STREAM_CODEC;
         }
     });
@@ -75,7 +75,7 @@ public class BossParticles {
         }
 
         @Override
-        public StreamCodec<? super RegistryFriendlyByteBuf, BigSmokeParticleOptions> streamCodec() {
+        public StreamCodec<? super FriendlyByteBuf, BigSmokeParticleOptions> streamCodec() {
             return BigSmokeParticleOptions.STREAM_CODEC;
         }
     });
@@ -87,7 +87,7 @@ public class BossParticles {
         }
 
         @Override
-        public StreamCodec<? super RegistryFriendlyByteBuf, RushParticleOptions> streamCodec() {
+        public StreamCodec<? super FriendlyByteBuf, RushParticleOptions> streamCodec() {
             return RushParticleOptions.STREAM_CODEC;
         }
     });
@@ -99,7 +99,7 @@ public class BossParticles {
         }
 
         @Override
-        public StreamCodec<? super RegistryFriendlyByteBuf, MalkuthHorizontalSlashOptions> streamCodec() {
+        public StreamCodec<? super FriendlyByteBuf, MalkuthHorizontalSlashOptions> streamCodec() {
             return MalkuthHorizontalSlashOptions.STREAM_CODEC;
         }
     });
@@ -111,7 +111,7 @@ public class BossParticles {
         }
 
         @Override
-        public StreamCodec<? super RegistryFriendlyByteBuf, ArcAttackPreparationParticleOptions> streamCodec() {
+        public StreamCodec<? super FriendlyByteBuf, ArcAttackPreparationParticleOptions> streamCodec() {
             return ArcAttackPreparationParticleOptions.STREAM_CODEC;
         }
     });
@@ -123,7 +123,7 @@ public class BossParticles {
         }
 
         @Override
-        public StreamCodec<? super RegistryFriendlyByteBuf, RectanglePreparationParticleOptions> streamCodec() {
+        public StreamCodec<? super FriendlyByteBuf, RectanglePreparationParticleOptions> streamCodec() {
             return RectanglePreparationParticleOptions.STREAM_CODEC;
         }
     });
@@ -135,7 +135,7 @@ public class BossParticles {
         }
 
         @Override
-        public StreamCodec<? super RegistryFriendlyByteBuf, StripeParticleOptions> streamCodec() {
+        public StreamCodec<? super FriendlyByteBuf, StripeParticleOptions> streamCodec() {
             return StripeParticleOptions.STREAM_CODEC;
         }
     });

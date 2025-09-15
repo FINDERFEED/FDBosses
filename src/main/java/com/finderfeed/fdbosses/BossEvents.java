@@ -14,8 +14,8 @@ import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossEffects;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
@@ -36,24 +36,22 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
-import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
-import net.neoforged.neoforge.event.level.BlockEvent;
-import net.neoforged.neoforge.event.level.ExplosionEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.event.entity.living.*;
+import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.level.ExplosionEvent;
+import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.NetworkDirection;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
+@Mod.EventBusSubscriber(modid = FDBosses.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BossEvents {
 
     public static final TagKey<MobEffect> NOT_CURABLE_EFFECTS = TagKey.create(Registries.MOB_EFFECT, FDBosses.location("not_curable"));
@@ -61,7 +59,7 @@ public class BossEvents {
     @SubscribeEvent
     public static void effectApplicable(MobEffectEvent.Applicable event){
         if (event.getEntity() instanceof IEffectImmune){
-            event.setResult(MobEffectEvent.Applicable.Result.DO_NOT_APPLY);
+            event.setResult(Event.Result.DENY);
         }
     }
 
@@ -76,7 +74,7 @@ public class BossEvents {
     @SubscribeEvent
     public static void playerEnterWorld(PlayerEvent.PlayerLoggedInEvent event){
         if (event.getEntity() instanceof ServerPlayer serverPlayer){
-            PacketDistributor.sendToPlayer(serverPlayer, new SetClientMalkuthWeaknessAmountPacket(MalkuthWeaknessHandler.getCurrentWeaknessLevel(serverPlayer)));
+            FDPacketHandler.INSTANCE.sendTo(new SetClientMalkuthWeaknessAmountPacket(MalkuthWeaknessHandler.getCurrentWeaknessLevel(serverPlayer)), serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
         }
     }
 
@@ -168,7 +166,7 @@ public class BossEvents {
 
             Iterator<BlockPos> blockPosIterator = list.listIterator();
 
-            var spawners = level.getEntitiesOfClass(BossSpawnerEntity.class, new AABB(-100, -100, -100, 100, 100, 100).move(event.getExplosion().center()));
+            var spawners = level.getEntitiesOfClass(BossSpawnerEntity.class, new AABB(-100, -100, -100, 100, 100, 100).move(event.getExplosion().getPosition()));
 
             Component message = null;
 
@@ -288,7 +286,7 @@ public class BossEvents {
     }
 
     @SubscribeEvent
-    public static void livingDamageEvent(LivingIncomingDamageEvent event){
+    public static void livingDamageEvent(LivingHurtEvent event){
         LivingEntity livingEntity = event.getEntity();
         if (!livingEntity.level().isClientSide){
             DamageSource damageSource = event.getSource();

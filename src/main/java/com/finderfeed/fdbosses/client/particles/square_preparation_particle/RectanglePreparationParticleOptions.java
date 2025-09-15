@@ -9,14 +9,14 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
 
 public class RectanglePreparationParticleOptions implements ParticleOptions {
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, RectanglePreparationParticleOptions> STREAM_CODEC = FDByteBufCodecs.composite(
+    public static final StreamCodec<FriendlyByteBuf, RectanglePreparationParticleOptions> STREAM_CODEC = FDByteBufCodecs.composite(
             FDByteBufCodecs.VEC3,v->v.horizontalDirection,
             ByteBufCodecs.FLOAT, v->v.length,
             ByteBufCodecs.FLOAT, v->v.width,

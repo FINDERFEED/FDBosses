@@ -4,8 +4,8 @@ import com.finderfeed.fdbosses.BossClientPackets;
 import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.RegisterFDPacket;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 @RegisterFDPacket("fdbosses:chesed_ray_reflect")
 public class ChesedRayReflectPacket extends FDPacket {
@@ -19,17 +19,17 @@ public class ChesedRayReflectPacket extends FDPacket {
     }
 
     @Override
-    public void write(RegistryFriendlyByteBuf friendlyByteBuf) {
+    public void write(FriendlyByteBuf friendlyByteBuf) {
 
     }
 
     @Override
-    public void clientAction(IPayloadContext iPayloadContext) {
+    public void clientAction(Supplier<NetworkEvent.Context> iPayloadContext) {
         BossClientPackets.chesedRayReflectParticles();
     }
 
     @Override
-    public void serverAction(IPayloadContext iPayloadContext) {
+    public void serverAction(Supplier<NetworkEvent.Context> iPayloadContext) {
 
     }
 }

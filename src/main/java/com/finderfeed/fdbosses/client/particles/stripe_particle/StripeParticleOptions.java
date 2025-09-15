@@ -11,7 +11,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
@@ -23,9 +23,9 @@ import java.util.List;
 
 public class StripeParticleOptions implements ParticleOptions {
 
-    public static final StreamCodec<? super RegistryFriendlyByteBuf, List<Vec3>> VEC3LIST = new StreamCodec<RegistryFriendlyByteBuf, List<Vec3>>() {
+    public static final StreamCodec<? super FriendlyByteBuf, List<Vec3>> VEC3LIST = new StreamCodec<FriendlyByteBuf, List<Vec3>>() {
         @Override
-        public List<Vec3> decode(RegistryFriendlyByteBuf buf) {
+        public List<Vec3> decode(FriendlyByteBuf buf) {
             int amount = buf.readInt();
             List<Vec3> v = new ArrayList<>();
             for (int i = 0; i < amount; i++){
@@ -35,7 +35,7 @@ public class StripeParticleOptions implements ParticleOptions {
         }
 
         @Override
-        public void encode(RegistryFriendlyByteBuf buf, List<Vec3> list) {
+        public void encode(FriendlyByteBuf buf, List<Vec3> list) {
             buf.writeInt(list.size());
             for (Vec3 v : list){
                 FDByteBufCodecs.VEC3.encode(buf, v);
@@ -68,7 +68,7 @@ public class StripeParticleOptions implements ParticleOptions {
                 .build();
     }));
 
-    public static final StreamCodec<? super RegistryFriendlyByteBuf, StripeParticleOptions> STREAM_CODEC = FDByteBufCodecs.composite(
+    public static final StreamCodec<? super FriendlyByteBuf, StripeParticleOptions> STREAM_CODEC = FDByteBufCodecs.composite(
             FDByteBufCodecs.COLOR,v->v.startColor,
             FDByteBufCodecs.COLOR,v->v.endColor,
             ByteBufCodecs.INT,v->v.lifetime,

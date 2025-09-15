@@ -8,7 +8,7 @@ import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 
@@ -23,7 +23,7 @@ public class GravityParticleOptions implements ParticleOptions {
             Codec.BOOL.fieldOf("fadeOut").forGetter(v->v.fadeOut)
     ).apply(p,GravityParticleOptions::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, GravityParticleOptions> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<FriendlyByteBuf, GravityParticleOptions> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.registry(Registries.PARTICLE_TYPE),v->v.particleType,
             ByteBufCodecs.INT,v->v.lifetime,
             ByteBufCodecs.FLOAT,v->v.quadSize,

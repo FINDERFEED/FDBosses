@@ -11,7 +11,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -128,7 +128,7 @@ public class WeaponCoreRecipe implements CraftingRecipe {
                 Codec.STRING.fieldOf("core_type").forGetter(v->v.coreType.name())
         ).apply(p, WeaponCoreRecipe::new));
 
-        public static final StreamCodec<RegistryFriendlyByteBuf, WeaponCoreRecipe> STREAM_CODEC = StreamCodec.composite(
+        public static final StreamCodec<FriendlyByteBuf, WeaponCoreRecipe> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.STRING_UTF8,v->v.coreType.name(),
                 WeaponCoreRecipe::new
         );
@@ -139,7 +139,7 @@ public class WeaponCoreRecipe implements CraftingRecipe {
         }
 
         @Override
-        public StreamCodec<RegistryFriendlyByteBuf, WeaponCoreRecipe> streamCodec() {
+        public StreamCodec<FriendlyByteBuf, WeaponCoreRecipe> streamCodec() {
             return STREAM_CODEC;
         }
 

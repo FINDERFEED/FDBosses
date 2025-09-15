@@ -9,7 +9,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
@@ -24,7 +24,7 @@ public class RushParticleOptions implements ParticleOptions {
             Codec.INT.fieldOf("lifetime").forGetter(v->v.lifetime)
     ).apply(p,RushParticleOptions::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, RushParticleOptions> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<FriendlyByteBuf, RushParticleOptions> STREAM_CODEC = StreamCodec.composite(
             FDByteBufCodecs.VEC3,v->v.rushDirection,
             FDByteBufCodecs.COLOR,v->v.color,
             ByteBufCodecs.FLOAT,v->v.length,
