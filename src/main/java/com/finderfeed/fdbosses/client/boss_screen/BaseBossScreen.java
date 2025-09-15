@@ -9,6 +9,7 @@ import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerStartFight;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.systems.simple_screen.FDScrollableWidget;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDButton;
@@ -27,7 +28,6 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
@@ -135,7 +135,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                 .setOnClickAction(((fdWidget1, v2, v11, i1) -> {
                     Level level = FDClientHelpers.getClientLevel();
                     if (level.getEntity(bossSpawnerId) instanceof BossSpawnerEntity bossSpawner) {
-                        PacketDistributor.sendToServer(new BossSpawnerStartFight(bossSpawnerId));
+                        FDPacketHandler.INSTANCE.sendToServer(new BossSpawnerStartFight(bossSpawnerId));
                     }
                     return true;
                 }));
@@ -477,7 +477,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     public void render(GuiGraphics graphics, int mx, int my, float pticks) {
 
 
-        this.renderBlurredBackground(pticks);
+        this.renderBackground(graphics);
 
 
         PoseStack matrices = graphics.pose();

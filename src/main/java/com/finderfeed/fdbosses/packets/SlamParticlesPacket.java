@@ -3,14 +3,14 @@ package com.finderfeed.fdbosses.packets;
 import com.finderfeed.fdbosses.BossClientPackets;
 import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.RegisterFDPacket;
-import com.finderfeed.fdlib.util.FDByteBufCodecs;
+import com.finderfeed.fdlib.util.NetworkCodec;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.codec.NetworkCodec;
+import net.minecraft.network.codec.NetworkCodec;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -43,19 +43,19 @@ public class SlamParticlesPacket extends FDPacket {
 
     public static class SlamData {
 
-        public static final StreamCodec<FriendlyByteBuf,SlamData> STREAM_CODEC = FDByteBufCodecs.composite(
-                FDByteBufCodecs.VEC3,v->v.pos,
-                FDByteBufCodecs.VEC3,v->v.direction,
-                FDByteBufCodecs.BLOCK_POS,v->v.bPos,
-                ByteBufCodecs.INT,v->v.collectRadius,
-                ByteBufCodecs.FLOAT,v->v.maxSpeed,
-                ByteBufCodecs.FLOAT,v->v.maxVerticalSpeedEdges,
-                ByteBufCodecs.FLOAT,v->v.maxVerticalSpeedCenter,
-                ByteBufCodecs.FLOAT,v->v.perRowDivide,
-                ByteBufCodecs.INT,v->v.count,
-                ByteBufCodecs.FLOAT,v->v.maxAngle,
-                ByteBufCodecs.INT,v->v.maxParticleLifetime,
-                ByteBufCodecs.FLOAT,v->v.particleSizeMult,
+        public static final NetworkCodec<FriendlyByteBuf,SlamData> STREAM_CODEC = NetworkCodec.composite(
+                NetworkCodec.VEC3,v->v.pos,
+                NetworkCodec.VEC3,v->v.direction,
+                NetworkCodec.BLOCK_POS,v->v.bPos,
+                NetworkCodec.INT,v->v.collectRadius,
+                NetworkCodec.FLOAT,v->v.maxSpeed,
+                NetworkCodec.FLOAT,v->v.maxVerticalSpeedEdges,
+                NetworkCodec.FLOAT,v->v.maxVerticalSpeedCenter,
+                NetworkCodec.FLOAT,v->v.perRowDivide,
+                NetworkCodec.INT,v->v.count,
+                NetworkCodec.FLOAT,v->v.maxAngle,
+                NetworkCodec.INT,v->v.maxParticleLifetime,
+                NetworkCodec.FLOAT,v->v.particleSizeMult,
                 ((pos,direction,bPos,collectRadius,maxSpeed,maxVerticalSpeedEdges,maxVerticalSpeedCenter,perRowDivide,count,maxAngle,maxParticleLifetime,particleSize)->{
                     SlamData data = new SlamData(bPos,pos,direction);
                     data.maxSpeed = maxSpeed;

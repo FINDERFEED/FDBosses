@@ -24,7 +24,7 @@ public class SubscribersScreen extends SimpleFDScreen {
     public void render(GuiGraphics graphics, int mx, int my, float pticks) {
         super.render(graphics, mx, my, pticks);
 
-        this.renderBackground(graphics, mx, my, pticks);
+        this.renderBackground(graphics);
 
         BossRenderUtil.renderBossScreenTooltip(graphics.pose(), this.relX - BossRenderUtil.EDGE_SIZE - 1, this.relY - BossRenderUtil.EDGE_SIZE - 1, this.getScreenWidth(), this.getScreenHeight());
 

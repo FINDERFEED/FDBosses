@@ -1,36 +1,48 @@
 package com.finderfeed.fdbosses.client.particles.arc_preparation_particle;
 
 import com.finderfeed.fdbosses.client.BossParticles;
-import com.finderfeed.fdlib.util.FDByteBufCodecs;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.finderfeed.fdlib.util.FDCodecs;
 import com.finderfeed.fdlib.util.FDColor;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
 
 public class ArcAttackPreparationParticleOptions implements ParticleOptions {
 
-    public static final StreamCodec<FriendlyByteBuf, ArcAttackPreparationParticleOptions> STREAM_CODEC = FDByteBufCodecs.composite(
-            FDByteBufCodecs.VEC3,v->v.horizontalDirection,
-            ByteBufCodecs.FLOAT,v->v.length,
-            ByteBufCodecs.FLOAT,v->v.halfAttackAngle,
-            ByteBufCodecs.INT,v->v.attackChargeTime,
-            ByteBufCodecs.INT,v->v.fadeIn,
-            ByteBufCodecs.INT,v->v.fadeOut,
-            FDByteBufCodecs.COLOR,v->v.color,
+    public static final Deserializer<ArcAttackPreparationParticleOptions> DESERIALIZER = new Deserializer<ArcAttackPreparationParticleOptions>() {
+        @Override
+        public ArcAttackPreparationParticleOptions fromCommand(ParticleType<ArcAttackPreparationParticleOptions> p_123733_, StringReader p_123734_) throws CommandSyntaxException {
+            return new ArcAttackPreparationParticleOptions(null,1,1,1,1,1,1,1,1,1);
+        }
+
+        @Override
+        public ArcAttackPreparationParticleOptions fromNetwork(ParticleType<ArcAttackPreparationParticleOptions> p_123735_, FriendlyByteBuf p_123736_) {
+            return ArcAttackPreparationParticleOptions.STREAM_CODEC.fromNetwork(p_123736_);
+        }
+    };
+
+    public static final NetworkCodec<ArcAttackPreparationParticleOptions> STREAM_CODEC = NetworkCodec.composite(
+            NetworkCodec.VEC3,v->v.horizontalDirection,
+            NetworkCodec.FLOAT,v->v.length,
+            NetworkCodec.FLOAT,v->v.halfAttackAngle,
+            NetworkCodec.INT,v->v.attackChargeTime,
+            NetworkCodec.INT,v->v.fadeIn,
+            NetworkCodec.INT,v->v.fadeOut,
+            NetworkCodec.COLOR,v->v.color,
             ((vec3, aFloat, aFloat2, integer, integer2, integer3, fdColor) -> {
                 ArcAttackPreparationParticleOptions options = new ArcAttackPreparationParticleOptions(vec3,aFloat,aFloat2,integer, integer2, integer3, fdColor.r,fdColor.g,fdColor.b,fdColor.a);
                 return options;
             })
     );
 
-    public static final MapCodec<ArcAttackPreparationParticleOptions> CODEC = RecordCodecBuilder.mapCodec(p->p.group(
+    public static final Codec<ArcAttackPreparationParticleOptions> CODEC = RecordCodecBuilder.create(p->p.group(
             FDCodecs.VEC3.fieldOf("horizontal_direction").forGetter(v->v.horizontalDirection),
             Codec.FLOAT.fieldOf("length").forGetter(v->v.length),
             Codec.FLOAT.fieldOf("halfAttackAngle").forGetter(v->v.halfAttackAngle),
@@ -92,5 +104,15 @@ public class ArcAttackPreparationParticleOptions implements ParticleOptions {
     @Override
     public ParticleType<?> getType() {
         return BossParticles.ARC_ATTACK_PREPARATION_PARTICLE.get();
+    }
+
+    @Override
+    public void writeToNetwork(FriendlyByteBuf p_123732_) {
+        STREAM_CODEC.toNetwork(p_123732_, this);
+    }
+
+    @Override
+    public String writeToString() {
+        return "zhopa";
     }
 }

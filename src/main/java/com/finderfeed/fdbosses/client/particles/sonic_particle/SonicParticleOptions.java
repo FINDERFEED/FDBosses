@@ -1,23 +1,34 @@
 package com.finderfeed.fdbosses.client.particles.sonic_particle;
 
 import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.finderfeed.fdlib.util.client.particles.options.AlphaOptions;
-import com.finderfeed.fdlib.util.FDByteBufCodecs;
 import com.finderfeed.fdlib.util.FDCodecs;
 import com.finderfeed.fdlib.util.FDColor;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
 
 public class SonicParticleOptions implements ParticleOptions {
 
+    public static final Deserializer<SonicParticleOptions> DESERIALIZER = new Deserializer<SonicParticleOptions>() {
+        @Override
+        public SonicParticleOptions fromCommand(ParticleType<SonicParticleOptions> p_123733_, StringReader p_123734_) throws CommandSyntaxException {
+            return new SonicParticleOptions();
+        }
+
+        @Override
+        public SonicParticleOptions fromNetwork(ParticleType<SonicParticleOptions> p_123735_, FriendlyByteBuf p_123736_) {
+            return STREAM_CODEC.fromNetwork(p_123736_);
+        }
+
+    };
 
     public static final Codec<SonicParticleOptions> CODEC = RecordCodecBuilder.create(p->p.group(
             FDCodecs.COLOR.fieldOf("color").forGetter(v->v.color),
@@ -42,15 +53,15 @@ public class SonicParticleOptions implements ParticleOptions {
     }));
 
 
-    public static final StreamCodec<FriendlyByteBuf,SonicParticleOptions> STREAM_CODEC = FDByteBufCodecs.composite(
-            FDByteBufCodecs.COLOR,v->v.color,
+    public static final NetworkCodec<SonicParticleOptions> STREAM_CODEC = NetworkCodec.composite(
+            NetworkCodec.COLOR,v->v.color,
             AlphaOptions.STREAM_CODEC,v->v.alphaOptions,
-            FDByteBufCodecs.VEC3,v->v.facingDirection,
-            ByteBufCodecs.FLOAT,v->v.startSize,
-            ByteBufCodecs.FLOAT,v->v.endSize,
-            ByteBufCodecs.FLOAT,v->v.resizeSpeed,
-            ByteBufCodecs.FLOAT,v->v.resizeAcceleration,
-            ByteBufCodecs.INT,v->v.lifetime,
+            NetworkCodec.VEC3,v->v.facingDirection,
+            NetworkCodec.FLOAT,v->v.startSize,
+            NetworkCodec.FLOAT,v->v.endSize,
+            NetworkCodec.FLOAT,v->v.resizeSpeed,
+            NetworkCodec.FLOAT,v->v.resizeAcceleration,
+            NetworkCodec.INT,v->v.lifetime,
     (color,alpha,facing,startSize,endSize,resizeSpeed,resizeAcceleration,lifetime)->{
         SonicParticleOptions o = new SonicParticleOptions();
         o.color = color;
@@ -63,7 +74,6 @@ public class SonicParticleOptions implements ParticleOptions {
         o.endSize = endSize;
         return o;
     });
-
 
 
     public FDColor color = new FDColor(1,1,1,1);
@@ -85,6 +95,16 @@ public class SonicParticleOptions implements ParticleOptions {
     @Override
     public ParticleType<?> getType() {
         return BossParticles.SONIC_PARTICLE.get();
+    }
+
+    @Override
+    public void writeToNetwork(FriendlyByteBuf p_123732_) {
+        STREAM_CODEC.toNetwork(p_123732_,this);
+    }
+
+    @Override
+    public String writeToString() {
+        return "zhopa";
     }
 
     public static Builder builder(){

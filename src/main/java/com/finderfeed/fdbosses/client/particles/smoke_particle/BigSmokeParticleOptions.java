@@ -1,21 +1,32 @@
 package com.finderfeed.fdbosses.client.particles.smoke_particle;
 
 import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.finderfeed.fdlib.util.client.particles.options.AlphaOptions;
-import com.finderfeed.fdlib.util.FDByteBufCodecs;
 import com.finderfeed.fdlib.util.FDCodecs;
 import com.finderfeed.fdlib.util.FDColor;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-
 public class BigSmokeParticleOptions implements ParticleOptions {
+
+    public static final Deserializer<BigSmokeParticleOptions> DESERIALIZER = new Deserializer<BigSmokeParticleOptions>() {
+        @Override
+        public BigSmokeParticleOptions fromCommand(ParticleType<BigSmokeParticleOptions> p_123733_, StringReader p_123734_) throws CommandSyntaxException {
+            return new BigSmokeParticleOptions();
+        }
+
+        @Override
+        public BigSmokeParticleOptions fromNetwork(ParticleType<BigSmokeParticleOptions> p_123735_, FriendlyByteBuf p_123736_) {
+            return STREAM_CODEC.fromNetwork(p_123736_);
+        }
+    };
 
     public static final Codec<BigSmokeParticleOptions> CODEC = RecordCodecBuilder.create(p->p.group(
             AlphaOptions.CODEC.fieldOf("inOutOptions").forGetter(v->v.intOut),
@@ -33,14 +44,13 @@ public class BigSmokeParticleOptions implements ParticleOptions {
         return d;
     }));
 
-    public static final MapCodec<BigSmokeParticleOptions> MAP_CODEC = CODEC.fieldOf("options");
 
-    public static final StreamCodec<FriendlyByteBuf,BigSmokeParticleOptions> STREAM_CODEC = StreamCodec.composite(
+    public static final NetworkCodec<BigSmokeParticleOptions> STREAM_CODEC = NetworkCodec.composite(
             AlphaOptions.STREAM_CODEC,v->v.intOut,
-            FDByteBufCodecs.COLOR, v->v.color,
-            ByteBufCodecs.FLOAT,v->v.minSpeed,
-            ByteBufCodecs.FLOAT,v->v.size,
-            ByteBufCodecs.FLOAT,v->v.friction,
+            NetworkCodec.COLOR, v->v.color,
+            NetworkCodec.FLOAT,v->v.minSpeed,
+            NetworkCodec.FLOAT,v->v.size,
+            NetworkCodec.FLOAT,v->v.friction,
             (alpha,color,minSpeed,size,friction)->{
                 BigSmokeParticleOptions d = new BigSmokeParticleOptions();
                 d.intOut = alpha;
@@ -65,6 +75,16 @@ public class BigSmokeParticleOptions implements ParticleOptions {
     @Override
     public ParticleType<?> getType() {
         return BossParticles.BIS_SMOKE.get();
+    }
+
+    @Override
+    public void writeToNetwork(FriendlyByteBuf p_123732_) {
+        STREAM_CODEC.toNetwork(p_123732_,this);
+    }
+
+    @Override
+    public String writeToString() {
+        return "zhopa";
     }
 
     public static class Builder{

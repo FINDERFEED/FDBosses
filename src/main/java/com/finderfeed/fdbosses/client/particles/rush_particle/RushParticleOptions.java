@@ -1,22 +1,35 @@
 package com.finderfeed.fdbosses.client.particles.rush_particle;
 
 import com.finderfeed.fdbosses.client.BossParticles;
-import com.finderfeed.fdlib.util.FDByteBufCodecs;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.finderfeed.fdlib.util.FDCodecs;
 import com.finderfeed.fdlib.util.FDColor;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
+import org.stringtemplate.v4.ST;
 
 public class RushParticleOptions implements ParticleOptions {
 
-    public static final MapCodec<RushParticleOptions> CODEC = RecordCodecBuilder.mapCodec(p->p.group(
+    public static final Deserializer<RushParticleOptions> DESERIALIZER = new Deserializer<RushParticleOptions>() {
+        @Override
+        public RushParticleOptions fromCommand(ParticleType<RushParticleOptions> p_123733_, StringReader p_123734_) throws CommandSyntaxException {
+            return new RushParticleOptions(null,null,1,1,1);
+        }
+
+        @Override
+        public RushParticleOptions fromNetwork(ParticleType<RushParticleOptions> p_123735_, FriendlyByteBuf p_123736_) {
+            return STREAM_CODEC.fromNetwork(p_123736_);
+        }
+    };
+
+    public static final Codec<RushParticleOptions> CODEC = RecordCodecBuilder.create(p->p.group(
             FDCodecs.VEC3.fieldOf("rushDirection").forGetter(v->v.rushDirection),
             FDCodecs.COLOR.fieldOf("color").forGetter(v->v.color),
             Codec.FLOAT.fieldOf("length").forGetter(v->v.length),
@@ -24,12 +37,12 @@ public class RushParticleOptions implements ParticleOptions {
             Codec.INT.fieldOf("lifetime").forGetter(v->v.lifetime)
     ).apply(p,RushParticleOptions::new));
 
-    public static final StreamCodec<FriendlyByteBuf, RushParticleOptions> STREAM_CODEC = StreamCodec.composite(
-            FDByteBufCodecs.VEC3,v->v.rushDirection,
-            FDByteBufCodecs.COLOR,v->v.color,
-            ByteBufCodecs.FLOAT,v->v.length,
-            ByteBufCodecs.FLOAT,v->v.width,
-            ByteBufCodecs.INT, v->v.lifetime,
+    public static final NetworkCodec<RushParticleOptions> STREAM_CODEC = NetworkCodec.composite(
+            NetworkCodec.VEC3,v->v.rushDirection,
+            NetworkCodec.COLOR,v->v.color,
+            NetworkCodec.FLOAT,v->v.length,
+            NetworkCodec.FLOAT,v->v.width,
+            NetworkCodec.INT, v->v.lifetime,
             RushParticleOptions::new
     );
 
@@ -50,6 +63,16 @@ public class RushParticleOptions implements ParticleOptions {
     @Override
     public ParticleType<?> getType() {
         return BossParticles.RUSH_PARTICLE.get();
+    }
+
+    @Override
+    public void writeToNetwork(FriendlyByteBuf p_123732_) {
+        STREAM_CODEC.toNetwork(p_123732_,this);
+    }
+
+    @Override
+    public String writeToString() {
+        return "zhopa";
     }
 
     public float getLength() {

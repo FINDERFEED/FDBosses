@@ -4,7 +4,7 @@ package com.finderfeed.fdbosses.packets;
 import com.finderfeed.fdbosses.BossClientPackets;
 import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.RegisterFDPacket;
-import com.finderfeed.fdlib.util.FDByteBufCodecs;
+import com.finderfeed.fdlib.util.NetworkCodec;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
@@ -24,14 +24,14 @@ public class PosLevelEventPacket extends FDPacket {
     }
 
     public PosLevelEventPacket(FriendlyByteBuf buf){
-        this.pos = FDByteBufCodecs.VEC3.decode(buf);
+        this.pos = NetworkCodec.VEC3.decode(buf);
         this.event = buf.readInt();
         this.data = buf.readInt();
     }
 
     @Override
     public void write(FriendlyByteBuf buf) {
-        FDByteBufCodecs.VEC3.encode(buf,pos);
+        NetworkCodec.VEC3.encode(buf,pos);
         buf.writeInt(event);
         buf.writeInt(data);
     }

@@ -1,19 +1,18 @@
 package com.finderfeed.fdbosses.client.particles.stripe_particle;
 
 import com.finderfeed.fdbosses.client.BossParticles;
-import com.finderfeed.fdlib.util.FDByteBufCodecs;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.finderfeed.fdlib.util.FDCodecs;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -23,27 +22,20 @@ import java.util.List;
 
 public class StripeParticleOptions implements ParticleOptions {
 
-    public static final StreamCodec<? super FriendlyByteBuf, List<Vec3>> VEC3LIST = new StreamCodec<FriendlyByteBuf, List<Vec3>>() {
+    public static final Deserializer<StripeParticleOptions> DESERIALIZER = new Deserializer<StripeParticleOptions>() {
         @Override
-        public List<Vec3> decode(FriendlyByteBuf buf) {
-            int amount = buf.readInt();
-            List<Vec3> v = new ArrayList<>();
-            for (int i = 0; i < amount; i++){
-                v.add(FDByteBufCodecs.VEC3.decode(buf));
-            }
-            return v;
+        public StripeParticleOptions fromCommand(ParticleType<StripeParticleOptions> p_123733_, StringReader p_123734_) throws CommandSyntaxException {
+            return new StripeParticleOptions();
         }
 
         @Override
-        public void encode(FriendlyByteBuf buf, List<Vec3> list) {
-            buf.writeInt(list.size());
-            for (Vec3 v : list){
-                FDByteBufCodecs.VEC3.encode(buf, v);
-            }
+        public StripeParticleOptions fromNetwork(ParticleType<StripeParticleOptions> p_123735_, FriendlyByteBuf p_123736_) {
+            return STREAM_CODEC.fromNetwork(p_123736_);
         }
     };
 
-    public static final MapCodec<StripeParticleOptions> CODEC = RecordCodecBuilder.mapCodec(p->p.group(
+
+    public static final Codec<StripeParticleOptions> CODEC = RecordCodecBuilder.create(p->p.group(
             FDCodecs.COLOR.fieldOf("startColor").forGetter(v->v.startColor),
             FDCodecs.COLOR.fieldOf("endColor").forGetter(v->v.endColor),
             Codec.INT.fieldOf("lifetime").forGetter(v->v.lifetime),
@@ -68,17 +60,17 @@ public class StripeParticleOptions implements ParticleOptions {
                 .build();
     }));
 
-    public static final StreamCodec<? super FriendlyByteBuf, StripeParticleOptions> STREAM_CODEC = FDByteBufCodecs.composite(
-            FDByteBufCodecs.COLOR,v->v.startColor,
-            FDByteBufCodecs.COLOR,v->v.endColor,
-            ByteBufCodecs.INT,v->v.lifetime,
-            ByteBufCodecs.INT,v->v.shapeVertices,
-            ByteBufCodecs.INT,v->v.lod,
-            ByteBufCodecs.FLOAT,v->v.scale,
-            ByteBufCodecs.FLOAT,v->v.stripePercentLength,
-            ByteBufCodecs.FLOAT,v->v.startInPercent,
-            ByteBufCodecs.FLOAT,v->v.endOutPercent,
-            VEC3LIST,v->v.offsets,
+    public static final NetworkCodec<StripeParticleOptions> STREAM_CODEC = NetworkCodec.composite(
+            NetworkCodec.COLOR,v->v.startColor,
+            NetworkCodec.COLOR,v->v.endColor,
+            NetworkCodec.INT,v->v.lifetime,
+            NetworkCodec.INT,v->v.shapeVertices,
+            NetworkCodec.INT,v->v.lod,
+            NetworkCodec.FLOAT,v->v.scale,
+            NetworkCodec.FLOAT,v->v.stripePercentLength,
+            NetworkCodec.FLOAT,v->v.startInPercent,
+            NetworkCodec.FLOAT,v->v.endOutPercent,
+            NetworkCodec.listOf(NetworkCodec.VEC3),v->v.offsets,
             (startColor,endColor,lifetime, shapeVertices,lod,scale,stripePercentLength,startInPercent,endOutPercent,offsets)->{
                 return StripeParticleOptions.builder()
                         .startColor(startColor)
@@ -213,6 +205,16 @@ public class StripeParticleOptions implements ParticleOptions {
     @Override
     public ParticleType<?> getType() {
         return BossParticles.STRIPE_PARTICLE.get();
+    }
+
+    @Override
+    public void writeToNetwork(FriendlyByteBuf p_123732_) {
+        STREAM_CODEC.toNetwork(p_123732_,this);
+    }
+
+    @Override
+    public String writeToString() {
+        return "zhopa";
     }
 
     public static Builder builder(){

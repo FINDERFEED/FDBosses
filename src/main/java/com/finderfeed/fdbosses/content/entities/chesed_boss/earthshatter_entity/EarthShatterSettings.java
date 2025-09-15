@@ -4,20 +4,20 @@ import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.codec.NetworkCodec;
+import net.minecraft.network.codec.NetworkCodec;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 public class EarthShatterSettings implements AutoSerializable {
 
-    public static StreamCodec<FriendlyByteBuf,EarthShatterSettings> NETWORK_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT,t->t.delay,
-            ByteBufCodecs.FLOAT,t->t.upDistance,
-            ByteBufCodecs.INT,t->t.upTime,
-            ByteBufCodecs.INT,t->t.stayTime,
-            ByteBufCodecs.INT,t->t.downTime,
-            ByteBufCodecs.VECTOR3F,t->new Vector3f((float)t.direction.x,(float)t.direction.y,(float)t.direction.z),
+    public static NetworkCodec<FriendlyByteBuf,EarthShatterSettings> NETWORK_CODEC = NetworkCodec.composite(
+            NetworkCodec.INT,t->t.delay,
+            NetworkCodec.FLOAT,t->t.upDistance,
+            NetworkCodec.INT,t->t.upTime,
+            NetworkCodec.INT,t->t.stayTime,
+            NetworkCodec.INT,t->t.downTime,
+            NetworkCodec.VECTOR3F,t->new Vector3f((float)t.direction.x,(float)t.direction.y,(float)t.direction.z),
             EarthShatterSettings::new
     );
 

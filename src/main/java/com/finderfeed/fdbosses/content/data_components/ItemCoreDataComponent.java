@@ -5,8 +5,8 @@ import com.finderfeed.fdbosses.init.BossItems;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.codec.NetworkCodec;
+import net.minecraft.network.codec.NetworkCodec;
 import net.minecraft.world.item.Item;
 
 import java.util.Objects;
@@ -18,8 +18,8 @@ public class ItemCoreDataComponent {
             Codec.STRING.fieldOf("type").forGetter(v->v.getCoreType().name())
     ).apply(p,ItemCoreDataComponent::new));
 
-    public static final StreamCodec<FriendlyByteBuf, ItemCoreDataComponent> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,v->v.getCoreType().name(),
+    public static final NetworkCodec<FriendlyByteBuf, ItemCoreDataComponent> STREAM_CODEC = NetworkCodec.composite(
+            NetworkCodec.STRING_UTF8,v->v.getCoreType().name(),
             ItemCoreDataComponent::new
     );
 

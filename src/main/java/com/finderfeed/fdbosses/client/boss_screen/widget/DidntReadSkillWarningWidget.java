@@ -39,7 +39,7 @@ public class DidntReadSkillWarningWidget extends FDWidget {
     }
 
     @Override
-    public boolean onMouseScroll(float v, float v1, float v2, float v3) {
+    public boolean onMouseScroll(float v, float v1, float v3) {
         return false;
     }
 

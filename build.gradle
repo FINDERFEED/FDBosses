@@ -86,8 +86,6 @@ dependencies {
 
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-//    implementation fileTree(dir: 'build/jarmods', include: ['*.jar'])
-
     if (file("build/jarmods").isDirectory()) {
         file("build/jarmods").eachFile { file ->
             def splitPos = file.name.lastIndexOf("-")

@@ -62,7 +62,7 @@ public class QliphothAwakeningSocialsWidget extends FDWidget {
     }
 
     @Override
-    public boolean onMouseScroll(float v, float v1, float v2, float v3) {
+    public boolean onMouseScroll(float v, float v1, float v3) {
         return false;
     }
 
@@ -156,13 +156,7 @@ public class QliphothAwakeningSocialsWidget extends FDWidget {
     }
 
     private void openURL(String url){
-        URI uri = null;
-        try {
-            uri = Util.parseAndValidateUntrustedUri(url);
-            Util.getPlatform().openUri(uri);
-        } catch (URISyntaxException e) {
-
-        }
+        Util.getPlatform().openUri(url);
     }
 
 }

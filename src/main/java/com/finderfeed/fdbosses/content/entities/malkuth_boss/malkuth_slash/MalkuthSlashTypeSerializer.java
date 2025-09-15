@@ -3,19 +3,19 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.codec.NetworkCodec;
+import net.minecraft.network.codec.NetworkCodec;
 import net.minecraft.network.syncher.EntityDataSerializer;
 
 public class MalkuthSlashTypeSerializer implements EntityDataSerializer<MalkuthAttackType> {
 
-    public static final StreamCodec<FriendlyByteBuf, MalkuthAttackType> CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8, Enum::name,
+    public static final NetworkCodec<FriendlyByteBuf, MalkuthAttackType> CODEC = NetworkCodec.composite(
+            NetworkCodec.STRING_UTF8, Enum::name,
             MalkuthAttackType::valueOf
     );
 
     @Override
-    public StreamCodec<? super FriendlyByteBuf, MalkuthAttackType> codec() {
+    public NetworkCodec<? super FriendlyByteBuf, MalkuthAttackType> codec() {
         return CODEC;
     }
 

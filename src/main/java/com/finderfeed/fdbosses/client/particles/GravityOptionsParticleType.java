@@ -4,7 +4,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.codec.NetworkCodec;
 
 public class GravityOptionsParticleType extends ParticleType<GravityParticleOptions> {
 
@@ -20,7 +20,7 @@ public class GravityOptionsParticleType extends ParticleType<GravityParticleOpti
     }
 
     @Override
-    public StreamCodec<? super FriendlyByteBuf, GravityParticleOptions> streamCodec() {
+    public NetworkCodec<? super FriendlyByteBuf, GravityParticleOptions> NetworkCodec() {
         return GravityParticleOptions.STREAM_CODEC;
     }
 }

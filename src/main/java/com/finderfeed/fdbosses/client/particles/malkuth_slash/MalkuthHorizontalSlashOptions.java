@@ -2,27 +2,38 @@ package com.finderfeed.fdbosses.client.particles.malkuth_slash;
 
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
-import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
-import com.finderfeed.fdlib.util.FDByteBufCodecs;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.finderfeed.fdlib.util.FDCodecs;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
 
 public class MalkuthHorizontalSlashOptions implements ParticleOptions {
 
-    public static final StreamCodec<FriendlyByteBuf, MalkuthHorizontalSlashOptions> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.STRING_UTF8,v->v.attackType.name(),
-            FDByteBufCodecs.VEC3,v->v.slashDirection,
-            ByteBufCodecs.FLOAT,v->v.slashWidth,
-            ByteBufCodecs.INT,v->v.lifetime,
-            ByteBufCodecs.FLOAT,v->v.rotation,
+    public static final Deserializer<MalkuthHorizontalSlashOptions> DESERIALIZER = new Deserializer<MalkuthHorizontalSlashOptions>() {
+        @Override
+        public MalkuthHorizontalSlashOptions fromCommand(ParticleType<MalkuthHorizontalSlashOptions> p_123733_, StringReader p_123734_) throws CommandSyntaxException {
+            return new MalkuthHorizontalSlashOptions(MalkuthAttackType.FIRE,null,1,1,1);
+        }
+
+        @Override
+        public MalkuthHorizontalSlashOptions fromNetwork(ParticleType<MalkuthHorizontalSlashOptions> p_123735_, FriendlyByteBuf p_123736_) {
+            return STREAM_CODEC.fromNetwork(p_123736_);
+        }
+    };
+
+    public static final NetworkCodec<MalkuthHorizontalSlashOptions> STREAM_CODEC = NetworkCodec.composite(
+            NetworkCodec.STRING,v->v.attackType.name(),
+            NetworkCodec.VEC3,v->v.slashDirection,
+            NetworkCodec.FLOAT,v->v.slashWidth,
+            NetworkCodec.INT,v->v.lifetime,
+            NetworkCodec.FLOAT,v->v.rotation,
             (type,dir,width,lifetime,rotation)->{
                 MalkuthHorizontalSlashOptions options = new MalkuthHorizontalSlashOptions(
                         MalkuthAttackType.valueOf(type),
@@ -32,7 +43,7 @@ public class MalkuthHorizontalSlashOptions implements ParticleOptions {
             }
     );
 
-    public static final MapCodec<MalkuthHorizontalSlashOptions> CODEC = RecordCodecBuilder.mapCodec(p->p.group(
+    public static final Codec<MalkuthHorizontalSlashOptions> CODEC = RecordCodecBuilder.create(p->p.group(
             Codec.STRING.fieldOf("attackType").forGetter(v->v.attackType.name()),
             FDCodecs.VEC3.fieldOf("slashDirection").forGetter(v->v.slashDirection),
             Codec.FLOAT.fieldOf("slashWidth").forGetter(v->v.slashWidth),
@@ -84,5 +95,15 @@ public class MalkuthHorizontalSlashOptions implements ParticleOptions {
     @Override
     public ParticleType<?> getType() {
         return BossParticles.MALKUTH_HORIZONTAL_SLASH.get();
+    }
+
+    @Override
+    public void writeToNetwork(FriendlyByteBuf p_123732_) {
+        STREAM_CODEC.toNetwork(p_123732_,this);
+    }
+
+    @Override
+    public String writeToString() {
+        return "zhopa";
     }
 }

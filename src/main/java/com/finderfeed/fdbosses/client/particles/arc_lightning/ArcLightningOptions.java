@@ -1,17 +1,16 @@
 package com.finderfeed.fdbosses.client.particles.arc_lightning;
 
-import com.finderfeed.fdlib.util.FDByteBufCodecs;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.finderfeed.fdlib.util.FDCodecs;
 import com.finderfeed.fdlib.util.FDColor;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Random;
@@ -19,7 +18,20 @@ import org.joml.Vector3f;
 
 public class ArcLightningOptions implements ParticleOptions {
 
-    private static final Codec<ArcLightningOptions> CODEC = RecordCodecBuilder.create(p->p.group(
+    public static final Deserializer<ArcLightningOptions> DESERIALIZER = new Deserializer<ArcLightningOptions>() {
+        @Override
+        public ArcLightningOptions fromCommand(ParticleType<ArcLightningOptions> p_123733_, StringReader p_123734_) throws CommandSyntaxException {
+            return new ArcLightningOptions(null,null,0,0,0,0,0,0,null);
+        }
+
+        @Override
+        public ArcLightningOptions fromNetwork(ParticleType<ArcLightningOptions> p_123735_, FriendlyByteBuf p_123736_) {
+            return STREAM_CODEC.fromNetwork(p_123736_);
+        }
+
+    };
+
+    public static final Codec<ArcLightningOptions> CODEC = RecordCodecBuilder.create(p->p.group(
             FDCodecs.VEC3.fieldOf("end").forGetter(v->v.end),
             FDCodecs.VEC3.fieldOf("endSpeed").forGetter(v->v.end),
             Codec.INT.fieldOf("lifetime").forGetter(v->v.lifetime),
@@ -32,26 +44,18 @@ public class ArcLightningOptions implements ParticleOptions {
             ).apply(p,ArcLightningOptions::new)
     );
 
-    private static final StreamCodec<FriendlyByteBuf,ArcLightningOptions> STREAM_CODEC = FDByteBufCodecs.composite(
-            FDByteBufCodecs.VEC3, v->v.end,
-            FDByteBufCodecs.VEC3, v->v.endSpeed,
-            ByteBufCodecs.INT,v->v.lifetime,
-            ByteBufCodecs.INT,v->v.seed,
-            ByteBufCodecs.INT,v->v.lightningSegments,
-            ByteBufCodecs.FLOAT,v->v.lightningRandomSpread,
-            ByteBufCodecs.FLOAT,v->v.lightningWidth,
-            ByteBufCodecs.FLOAT,v->v.circleOffset,
-            FDByteBufCodecs.COLOR,v->v.color,
+    private static final NetworkCodec<ArcLightningOptions> STREAM_CODEC = NetworkCodec.composite(
+            NetworkCodec.VEC3, v->v.end,
+            NetworkCodec.VEC3, v->v.endSpeed,
+            NetworkCodec.INT,v->v.lifetime,
+            NetworkCodec.INT,v->v.seed,
+            NetworkCodec.INT,v->v.lightningSegments,
+            NetworkCodec.FLOAT,v->v.lightningRandomSpread,
+            NetworkCodec.FLOAT,v->v.lightningWidth,
+            NetworkCodec.FLOAT,v->v.circleOffset,
+            NetworkCodec.COLOR,v->v.color,
             ArcLightningOptions::new
     );
-
-    public static MapCodec<ArcLightningOptions> createCodec(ParticleType<?> type){
-        return CODEC.xmap(a->new ArcLightningOptions(type,a.end,a.endSpeed,a.lifetime,a.seed,a.lightningSegments,a.lightningRandomSpread,a.lightningWidth,a.circleOffset,a.color),f->f).fieldOf("options");
-    }
-
-    public static StreamCodec<FriendlyByteBuf,ArcLightningOptions> createStreamCodec(ParticleType<?> type){
-        return STREAM_CODEC.map(a->new ArcLightningOptions(type,a.end,a.endSpeed,a.lifetime,a.seed,a.lightningSegments,a.lightningRandomSpread,a.lightningWidth,a.circleOffset,a.color),opt->opt);
-    }
 
     public ParticleType<?> particleType;
     public Vec3 end;
@@ -89,6 +93,16 @@ public class ArcLightningOptions implements ParticleOptions {
     @Override
     public ParticleType<?> getType() {
         return particleType;
+    }
+
+    @Override
+    public void writeToNetwork(FriendlyByteBuf p_123732_) {
+        STREAM_CODEC.toNetwork(p_123732_,this);
+    }
+
+    @Override
+    public String writeToString() {
+        return "zhopa";
     }
 
     public static class Builder {

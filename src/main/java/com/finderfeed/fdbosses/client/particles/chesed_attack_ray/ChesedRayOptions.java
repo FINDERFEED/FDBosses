@@ -3,22 +3,33 @@ package com.finderfeed.fdbosses.client.particles.chesed_attack_ray;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdlib.systems.particle.EmptyParticleProcessor;
 import com.finderfeed.fdlib.systems.particle.ParticleProcessor;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.finderfeed.fdlib.util.client.particles.options.AlphaOptions;
-import com.finderfeed.fdlib.util.FDByteBufCodecs;
 import com.finderfeed.fdlib.util.FDCodecs;
 import com.finderfeed.fdlib.util.FDColor;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.phys.Vec3;
 
 public class ChesedRayOptions implements ParticleOptions {
+
+    public static final Deserializer<ChesedRayOptions> DESERIALIZER = new Deserializer<ChesedRayOptions>() {
+        @Override
+        public ChesedRayOptions fromCommand(ParticleType<ChesedRayOptions> p_123733_, StringReader p_123734_) throws CommandSyntaxException {
+            return new ChesedRayOptions();
+        }
+
+        @Override
+        public ChesedRayOptions fromNetwork(ParticleType<ChesedRayOptions> p_123735_, FriendlyByteBuf p_123736_) {
+            return STREAM_CODEC.fromNetwork(p_123736_);
+        }
+    };
 
     public static final Codec<ChesedRayOptions> CODEC = RecordCodecBuilder.create(p->p.group(
             ParticleProcessor.CODEC.fieldOf("particleProcessor").forGetter(v->v.particleProcessor),
@@ -38,17 +49,13 @@ public class ChesedRayOptions implements ParticleOptions {
         return ray;
     }));
 
-    public static MapCodec<ChesedRayOptions> mapCodec(){
-        return CODEC.xmap(x->x,x->x).fieldOf("options");
-    }
-
-    public static final StreamCodec<FriendlyByteBuf,ChesedRayOptions> STREAM_CODEC = StreamCodec.composite(
+    public static final NetworkCodec<ChesedRayOptions> STREAM_CODEC = NetworkCodec.composite(
             ParticleProcessor.STREAM_CODEC,v->v.particleProcessor,
-            FDByteBufCodecs.VEC3,v->v.rayEnd,
+            NetworkCodec.VEC3,v->v.rayEnd,
             AlphaOptions.STREAM_CODEC,v->v.rayOptions,
-            FDByteBufCodecs.COLOR,v->v.color,
-            FDByteBufCodecs.COLOR,v->v.lightningColor,
-            ByteBufCodecs.FLOAT,v->v.rayWidth,
+            NetworkCodec.COLOR,v->v.color,
+            NetworkCodec.COLOR,v->v.lightningColor,
+            NetworkCodec.FLOAT,v->v.rayWidth,
             (particleProcessor,rayEnd,alpha,color,lcolor,width)->{
                 ChesedRayOptions ray = new ChesedRayOptions();
                 ray.particleProcessor = particleProcessor;
@@ -76,6 +83,16 @@ public class ChesedRayOptions implements ParticleOptions {
     @Override
     public ParticleType<?> getType() {
         return BossParticles.CHESED_RAY_ATTACK.get();
+    }
+
+    @Override
+    public void writeToNetwork(FriendlyByteBuf p_123732_) {
+        STREAM_CODEC.toNetwork(p_123732_,this);
+    }
+
+    @Override
+    public String writeToString() {
+        return "zhopa";
     }
 
     public static Builder builder(){

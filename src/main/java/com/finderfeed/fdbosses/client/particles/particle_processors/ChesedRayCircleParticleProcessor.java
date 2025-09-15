@@ -4,7 +4,7 @@ import com.finderfeed.fdbosses.BossModEvents;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdlib.systems.particle.ParticleProcessor;
 import com.finderfeed.fdlib.systems.particle.ParticleProcessorType;
-import com.finderfeed.fdlib.util.FDByteBufCodecs;
+import com.finderfeed.fdlib.util.NetworkCodec;
 import com.finderfeed.fdlib.util.FDCodecs;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -15,8 +15,8 @@ import net.minecraft.client.particle.Particle;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.codec.NetworkCodec;
+import net.minecraft.network.codec.NetworkCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import org.joml.AxisAngle4f;
@@ -97,10 +97,10 @@ public class ChesedRayCircleParticleProcessor implements ParticleProcessor<Chese
 
     public static class Type implements ParticleProcessorType<ChesedRayCircleParticleProcessor>{
 
-        public static final StreamCodec<FriendlyByteBuf, ChesedRayCircleParticleProcessor> STREAM_CODEC = StreamCodec.composite(
-                FDByteBufCodecs.VEC3,v->v.circleAround,
-                ByteBufCodecs.FLOAT,v->v.circleCount,
-                ByteBufCodecs.BOOL,v->v.forward,
+        public static final NetworkCodec<FriendlyByteBuf, ChesedRayCircleParticleProcessor> STREAM_CODEC = NetworkCodec.composite(
+                NetworkCodec.VEC3,v->v.circleAround,
+                NetworkCodec.FLOAT,v->v.circleCount,
+                NetworkCodec.BOOL,v->v.forward,
                 ChesedRayCircleParticleProcessor::new
         );
 
@@ -111,7 +111,7 @@ public class ChesedRayCircleParticleProcessor implements ParticleProcessor<Chese
         ).apply(p, ChesedRayCircleParticleProcessor::new));
 
         @Override
-        public StreamCodec<FriendlyByteBuf, ChesedRayCircleParticleProcessor> streamCodec() {
+        public NetworkCodec<FriendlyByteBuf, ChesedRayCircleParticleProcessor> NetworkCodec() {
             return STREAM_CODEC;
         }
 
