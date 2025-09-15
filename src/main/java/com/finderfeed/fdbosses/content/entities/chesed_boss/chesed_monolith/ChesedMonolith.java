@@ -65,10 +65,12 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
         super.onSyncedDataUpdated(accessor);
     }
 
+  
+
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(DEACTIVATED,false);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(DEACTIVATED,false);
     }
 
     public boolean isDeactivated() {
@@ -77,11 +79,6 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
         }else {
             return this.entityData.get(DEACTIVATED);
         }
-    }
-
-    @Override
-    public void onAddedToLevel() {
-        super.onAddedToLevel();
     }
 
     @Override

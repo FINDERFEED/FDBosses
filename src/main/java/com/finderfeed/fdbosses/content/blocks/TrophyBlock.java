@@ -6,6 +6,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.FDE
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -45,14 +46,15 @@ public class TrophyBlock extends FDEntityBlock {
     }
 
     @Override
-    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+    public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand p_60507_, BlockHitResult p_60508_) {
         if (level instanceof ServerLevel serverLevel){
             BlockEntity block = serverLevel.getBlockEntity(pos);
             if (block instanceof TrophyBlockEntity trophy){
                 trophy.onClick(player);
             }
         }
-        return super.useWithoutItem(state, level, pos, player, hitResult);
+
+        return super.use(state, level, pos, player, p_60507_, p_60508_);
     }
 
     @Override

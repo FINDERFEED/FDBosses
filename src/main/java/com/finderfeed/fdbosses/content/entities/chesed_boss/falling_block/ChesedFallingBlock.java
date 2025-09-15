@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDProjectile;
@@ -32,6 +33,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public class ChesedFallingBlock extends FDProjectile implements AutoSerializable {
@@ -64,7 +66,7 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
     public void tick() {
         super.tick();
         if (!level().isClientSide){
-            this.applyGravity();
+            this.setDeltaMovement(this.getDeltaMovement().add(0,-this.getDefaultGravity(),0));
         }
     }
 
@@ -109,7 +111,7 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
                                 .maxVerticalSpeedEdges(0.15f)
                                 .maxVerticalSpeedCenter(0.15f)
                 );
-                PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+                FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->this), packet);
             }
 
 
@@ -126,10 +128,8 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder data) {
-        data
-
-                .define(STATE, Blocks.STONE.defaultBlockState());
+    protected void defineSynchedData() {
+        this.entityData.define(STATE, Blocks.STONE.defaultBlockState());
     }
 
     @Override

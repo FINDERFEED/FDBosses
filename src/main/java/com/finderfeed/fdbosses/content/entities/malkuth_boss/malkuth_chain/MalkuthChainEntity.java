@@ -255,10 +255,10 @@ public class MalkuthChainEntity extends LivingEntity implements AutoSerializable
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(MALKUTH_ID, -1);
-        builder.define(MALKUTH_ATTACK_TYPE, MalkuthAttackType.FIRE);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(MALKUTH_ID, -1);
+        this.entityData.define(MALKUTH_ATTACK_TYPE, MalkuthAttackType.FIRE);
     }
 
     @Override

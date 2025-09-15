@@ -78,10 +78,10 @@ public class RushParticle extends Particle {
             return;
         }
 
-        vertex.addVertex(mat, -w/2, addl, 0).setColor(color.r,color.g,color.b,color.a);
-        vertex.addVertex(mat, w/2, addl, 0).setColor(color.r,color.g,color.b,color.a);
-        vertex.addVertex(mat, w/2, l, 0).setColor(color.r,color.g,color.b,color.a);
-        vertex.addVertex(mat, -w/2, l, 0).setColor(color.r,color.g,color.b,color.a);
+        vertex.vertex(mat, -w/2, addl, 0).color(color.r,color.g,color.b,color.a);
+        vertex.vertex(mat, w/2, addl, 0).color(color.r,color.g,color.b,color.a);
+        vertex.vertex(mat, w/2, l, 0).color(color.r,color.g,color.b,color.a);
+        vertex.vertex(mat, -w/2, l, 0).color(color.r,color.g,color.b,color.a);
 
 
     }
@@ -96,21 +96,20 @@ public class RushParticle extends Particle {
         return LightTexture.FULL_BRIGHT;
     }
 
-    public static final FDParticleRenderType RENDER_TYPE = new FDParticleRenderType() {
+    public static final ParticleRenderType RENDER_TYPE = new ParticleRenderType() {
         @Override
-        public void end() {
-
+        public void end(Tesselator tesselator) {
+            tesselator.end();
         }
 
         @Nullable
         @Override
-        public BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
+        public void begin(BufferBuilder tesselator, TextureManager textureManager) {
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.depthMask(true);
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            BufferBuilder builder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-            return builder;
+            tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         }
     };
 

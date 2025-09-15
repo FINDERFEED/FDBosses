@@ -249,8 +249,8 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(MALKUTH_ATTACK_TYPE, MalkuthAttackType.FIRE);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(MALKUTH_ATTACK_TYPE, MalkuthAttackType.FIRE);
     }
 }

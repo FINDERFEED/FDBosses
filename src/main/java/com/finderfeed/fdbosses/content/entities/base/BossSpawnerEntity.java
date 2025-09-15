@@ -86,8 +86,8 @@ public abstract class BossSpawnerEntity extends FDEntity {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(ACTIVE,true);
+    protected void defineSynchedData() {
+        this.entityData.define(ACTIVE,true);
     }
 
     @Override

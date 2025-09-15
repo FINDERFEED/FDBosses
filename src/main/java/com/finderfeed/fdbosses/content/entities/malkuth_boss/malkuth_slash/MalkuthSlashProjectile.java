@@ -373,12 +373,12 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(MAX_SLASH_SIZE, 1f);
-        builder.define(INCREMENT_SIZE_TIME, 0);
-        builder.define(ROTATION, 0f);
-        builder.define(ATTACK_TYPE, MalkuthAttackType.FIRE);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(MAX_SLASH_SIZE, 1f);
+        this.entityData.define(INCREMENT_SIZE_TIME, 0);
+        this.entityData.define(ROTATION, 0f);
+        this.entityData.define(ATTACK_TYPE, MalkuthAttackType.FIRE);
     }
 
     @Override

@@ -384,11 +384,11 @@ public class MalkuthEarthquake extends Entity implements AutoSerializable {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(MALKUTH_ATTACK_TYPE,MalkuthAttackType.FIRE);
-        builder.define(DIRECTION, new Vec3(1,0,0));
-        builder.define(TIME, 20);
-        builder.define(ANGLE, FDMathUtil.FPI/6);
+    protected void defineSynchedData() {
+        this.entityData.define(MALKUTH_ATTACK_TYPE,MalkuthAttackType.FIRE);
+        this.entityData.define(DIRECTION, new Vec3(1,0,0));
+        this.entityData.define(TIME, 20);
+        this.entityData.define(ANGLE, FDMathUtil.FPI/6);
     }
 
     @Override

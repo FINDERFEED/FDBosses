@@ -1,6 +1,9 @@
 package com.finderfeed.fdbosses.client.particles;
 
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.finderfeed.fdlib.util.client.particles.options.AlphaOptions;
+import com.mojang.brigadier.StringReader;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -9,12 +12,23 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.NetworkCodec;
-import net.minecraft.network.codec.NetworkCodec;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class GravityParticleOptions implements ParticleOptions {
 
-    public static final MapCodec<GravityParticleOptions> CODEC = RecordCodecBuilder.mapCodec(p->p.group(
+    public static final Deserializer<GravityParticleOptions> DESERIALIZER = new Deserializer<GravityParticleOptions>() {
+        @Override
+        public GravityParticleOptions fromCommand(ParticleType<GravityParticleOptions> p_123733_, StringReader p_123734_) throws CommandSyntaxException {
+            return null;
+        }
+
+        @Override
+        public GravityParticleOptions fromNetwork(ParticleType<GravityParticleOptions> p_123735_, FriendlyByteBuf p_123736_) {
+            return STREAM_CODEC.fromNetwork(p_123736_);
+        }
+    };
+
+    public static final Codec<GravityParticleOptions> CODEC = RecordCodecBuilder.create(p->p.group(
             BuiltInRegistries.PARTICLE_TYPE.byNameCodec().fieldOf("type").forGetter(v->v.particleType),
             Codec.INT.fieldOf("lifetime").forGetter(v->v.lifetime),
             Codec.FLOAT.fieldOf("quadSize").forGetter(v->v.quadSize),
@@ -23,8 +37,8 @@ public class GravityParticleOptions implements ParticleOptions {
             Codec.BOOL.fieldOf("fadeOut").forGetter(v->v.fadeOut)
     ).apply(p,GravityParticleOptions::new));
 
-    public static final NetworkCodec<FriendlyByteBuf, GravityParticleOptions> STREAM_CODEC = NetworkCodec.composite(
-            NetworkCodec.registry(Registries.PARTICLE_TYPE),v->v.particleType,
+    public static final NetworkCodec<GravityParticleOptions> STREAM_CODEC = NetworkCodec.composite(
+            NetworkCodec.registry(()->ForgeRegistries.PARTICLE_TYPES), v->v.particleType,
             NetworkCodec.INT,v->v.lifetime,
             NetworkCodec.FLOAT,v->v.quadSize,
             NetworkCodec.FLOAT,v->v.gravity,
@@ -72,6 +86,16 @@ public class GravityParticleOptions implements ParticleOptions {
     @Override
     public ParticleType<?> getType() {
         return particleType;
+    }
+
+    @Override
+    public void writeToNetwork(FriendlyByteBuf p_123732_) {
+        STREAM_CODEC.toNetwork(p_123732_,this);
+    }
+
+    @Override
+    public String writeToString() {
+        return "";
     }
 
 }

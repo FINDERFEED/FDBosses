@@ -131,8 +131,8 @@ public class MalkuthPlatform extends FDEntity {
 
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(CAN_BE_COLLIDED_WITH, false);
+    protected void defineSynchedData() {
+        this.entityData.define(CAN_BE_COLLIDED_WITH, false);
     }
 
     @Override

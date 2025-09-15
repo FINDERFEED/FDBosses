@@ -17,7 +17,7 @@ public class BossClientMixinHandle {
 
     public static void darknessCalculate(LivingEntity entity, float pticks, CallbackInfoReturnable<Float> cir){
 
-        if (entity.hasEffect(BossEffects.CHESED_DARKEN) || entity.hasEffect(BossEffects.CHESED_GAZE)) {
+        if (entity.hasEffect(BossEffects.CHESED_DARKEN.get()) || entity.hasEffect(BossEffects.CHESED_GAZE.get())) {
 //            float value = cir.getReturnValue();
 
             //Hope it won't change in the future...

@@ -851,7 +851,7 @@ public class BossClientPackets {
                     .setMaxQuadSize(size * sizeP)
                     .setSpeed(sp.x * speedMod,sp.y * speedMod)
                     .setFriction(frictionP)
-                    .setColor(
+                    .color(
                             0.1f + random.nextFloat() * 0.1f - 0.05f,
                             0.8f + random.nextFloat() * 0.1f - 0.05f,
                             0.8f + random.nextFloat() * 0.1f - 0.05f,

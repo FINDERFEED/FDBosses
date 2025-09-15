@@ -122,26 +122,26 @@ public class ChesedAttackRayParticle extends Particle {
 
 
         float w = options.rayWidth * p;
-        vertex.addVertex(mat,0,0,0).setColor(options.color.r,options.color.g,options.color.b,alpha);
-        vertex.addVertex(mat,w,0,0).setColor(options.color.r,options.color.g,options.color.b,0f);
-        vertex.addVertex(mat,w,(float)len,0).setColor(options.color.r,options.color.g,options.color.b,0f);
-        vertex.addVertex(mat,0,(float)len,0).setColor(options.color.r,options.color.g,options.color.b,alpha);
+        vertex.vertex(mat,0,0,0).color(options.color.r,options.color.g,options.color.b,alpha);
+        vertex.vertex(mat,w,0,0).color(options.color.r,options.color.g,options.color.b,0f);
+        vertex.vertex(mat,w,(float)len,0).color(options.color.r,options.color.g,options.color.b,0f);
+        vertex.vertex(mat,0,(float)len,0).color(options.color.r,options.color.g,options.color.b,alpha);
 
-        vertex.addVertex(mat,0,0,0).setColor(options.color.r,options.color.g,options.color.b,alpha);
-        vertex.addVertex(mat,-w,0,0).setColor(options.color.r,options.color.g,options.color.b,0f);
-        vertex.addVertex(mat,-w,(float)len,0).setColor(options.color.r,options.color.g,options.color.b,0f);
-        vertex.addVertex(mat,0,(float)len,0).setColor(options.color.r,options.color.g,options.color.b,alpha);
+        vertex.vertex(mat,0,0,0).color(options.color.r,options.color.g,options.color.b,alpha);
+        vertex.vertex(mat,-w,0,0).color(options.color.r,options.color.g,options.color.b,0f);
+        vertex.vertex(mat,-w,(float)len,0).color(options.color.r,options.color.g,options.color.b,0f);
+        vertex.vertex(mat,0,(float)len,0).color(options.color.r,options.color.g,options.color.b,alpha);
 
         mat.translate(0,0,0.01f);
-        vertex.addVertex(mat,0,0,0f).setColor(1f,1f,1f,alpha);
-        vertex.addVertex(mat,w * 0.15f,0,0f).setColor(1f,1f,1f,0f);
-        vertex.addVertex(mat,w * 0.15f,(float)len,0f).setColor(1f,1f,1f,0f);
-        vertex.addVertex(mat,0,(float)len,0f).setColor(1f,1f,1f,alpha);
+        vertex.vertex(mat,0,0,0f).color(1f,1f,1f,alpha);
+        vertex.vertex(mat,w * 0.15f,0,0f).color(1f,1f,1f,0f);
+        vertex.vertex(mat,w * 0.15f,(float)len,0f).color(1f,1f,1f,0f);
+        vertex.vertex(mat,0,(float)len,0f).color(1f,1f,1f,alpha);
 
-        vertex.addVertex(mat,0,0,0f).setColor(1f,1f,1f,alpha);
-        vertex.addVertex(mat,-w * 0.15f,0,0f).setColor(1f,1f,1f,0f);
-        vertex.addVertex(mat,-w * 0.15f,(float)len,0f).setColor(1f,1f,1f,0f);
-        vertex.addVertex(mat,0,(float)len,0f).setColor(1f,1f,1f,alpha);
+        vertex.vertex(mat,0,0,0f).color(1f,1f,1f,alpha);
+        vertex.vertex(mat,-w * 0.15f,0,0f).color(1f,1f,1f,0f);
+        vertex.vertex(mat,-w * 0.15f,(float)len,0f).color(1f,1f,1f,0f);
+        vertex.vertex(mat,0,(float)len,0f).color(1f,1f,1f,alpha);
 
 
 

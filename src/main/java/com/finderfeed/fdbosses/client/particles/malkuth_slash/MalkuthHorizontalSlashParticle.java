@@ -80,37 +80,39 @@ public class MalkuthHorizontalSlashParticle extends Particle {
         }
     }
 
-    public static final FDParticleRenderType ICE_RENDER_TYPE = new FDParticleRenderType(){
+    public static final ParticleRenderType ICE_RENDER_TYPE = new ParticleRenderType(){
         @Override
-        public void end() {
+        public void end(Tesselator tesselator) {
+            tesselator.end();
         }
 
         @Nullable
         @Override
-        public BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
+        public void begin(BufferBuilder tesselator, TextureManager textureManager) {
             RenderSystem.depthMask(true);
             RenderSystem.setShaderTexture(0, MalkuthSlashRenderer.ICE_LOCATION);
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.setShader(GameRenderer::getParticleShader);
-            return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
+            tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
         }
     };
 
-    public static final FDParticleRenderType FIRE_RENDER_TYPE = new FDParticleRenderType(){
+    public static final ParticleRenderType FIRE_RENDER_TYPE = new ParticleRenderType(){
         @Override
-        public void end() {
+        public void end(Tesselator tesselator) {
+            tesselator.end();
         }
 
         @Nullable
         @Override
-        public BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
+        public void begin(BufferBuilder tesselator, TextureManager textureManager) {
             RenderSystem.depthMask(true);
             RenderSystem.setShaderTexture(0, MalkuthSlashRenderer.FIRE_LOCATION);
             RenderSystem.enableBlend();
             RenderSystem.defaultBlendFunc();
             RenderSystem.setShader(GameRenderer::getParticleShader);
-            return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
+            tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
         }
     };
 

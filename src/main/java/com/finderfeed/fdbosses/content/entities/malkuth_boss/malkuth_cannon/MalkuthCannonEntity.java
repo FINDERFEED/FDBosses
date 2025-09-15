@@ -302,12 +302,12 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(MALKUTH_ATTACK_TYPE, MalkuthAttackType.FIRE);
-        builder.define(BROKEN_REQUIRES_MATERIALS, false);
-        builder.define(PLAYER_CONTROLLED, false);
-        builder.define(BROKEN, false);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(MALKUTH_ATTACK_TYPE, MalkuthAttackType.FIRE);
+        this.entityData.define(BROKEN_REQUIRES_MATERIALS, false);
+        this.entityData.define(PLAYER_CONTROLLED, false);
+        this.entityData.define(BROKEN, false);
     }
 
     @Override

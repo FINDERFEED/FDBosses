@@ -235,9 +235,9 @@ public class ChesedOneShotVerticalRayEntity extends Entity implements AutoSerial
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(ATTACK_PREPARATION_TIME,20);
-        builder.define(HEIGHT,40f);
+    protected void defineSynchedData() {
+        this.entityData.define(ATTACK_PREPARATION_TIME,20);
+        this.entityData.define(HEIGHT,40f);
 
     }
 

@@ -34,6 +34,7 @@ import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDScreenEffects;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.network.lib_packets.PlaySoundInEarsPacket;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
@@ -75,7 +76,6 @@ import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -104,9 +104,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.neoforged.fml.common.Mod.EventBusSubscriber;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.PacketDistributor;
 import org.joml.*;
 import org.joml.Math;
 
@@ -393,7 +392,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         var monoliths = this.getMonoliths();
         float monolithHPGain = BossConfigs.BOSS_CONFIG.get().chesedConfig.additionalSecondPhaseMonolithHP;
         for (var m : monoliths){
-            AttributeModifier hpModifier = new AttributeModifier(FDBosses.location("monolith_hp"), monolithHPGain, AttributeModifier.Operation.ADD_VALUE);
+            AttributeModifier hpModifier = new AttributeModifier(FDBosses.location("monolith_hp").toString(), monolithHPGain, AttributeModifier.Operation.ADDITION);
             var attr = m.getAttribute(Attributes.MAX_HEALTH);
             if (attr != null) {
                 attr.addPermanentModifier(
@@ -840,16 +839,16 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             player.addEffect(new MobEffectInstance(MobEffects.NIGHT_VISION,400,0,true,false));
             if (!(player.isCreative() || player.isSpectator())) {
                 if (doBlinding) {
-                    if (lookAngle.dot(b) > 0.05 && !player.hasEffect(BossEffects.CHESED_ENERGIZED)) {
-                        player.addEffect(new MobEffectInstance(BossEffects.CHESED_GAZE, 200, 0, true, true));
+                    if (lookAngle.dot(b) > 0.05 && !player.hasEffect(BossEffects.CHESED_ENERGIZED.get())) {
+                        player.addEffect(new MobEffectInstance(BossEffects.CHESED_GAZE.get(), 200, 0, true, true));
                     } else {
-                        player.removeEffect(BossEffects.CHESED_GAZE);
+                        player.removeEffect(BossEffects.CHESED_GAZE.get());
                     }
                 }else{
-                    player.removeEffect(BossEffects.CHESED_GAZE);
+                    player.removeEffect(BossEffects.CHESED_GAZE.get());
                 }
             }else{
-                player.removeEffect(BossEffects.CHESED_GAZE);
+                player.removeEffect(BossEffects.CHESED_GAZE.get());
             }
 
         }
@@ -1210,9 +1209,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         for (Player player : this.getCombatants(true)){
 
             if (clear){
-                player.removeEffect(BossEffects.CHESED_DARKEN);
+                player.removeEffect(BossEffects.CHESED_DARKEN.get());
             }else{
-                player.addEffect(new MobEffectInstance(BossEffects.CHESED_DARKEN,duration,0,true,false));
+                player.addEffect(new MobEffectInstance(BossEffects.CHESED_DARKEN.get(),duration,0,true,false));
             }
 
         }
@@ -1379,7 +1378,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             chesedCrystal.kill();
         }
         for (Player player : this.getCombatants(true)){
-            player.removeEffect(BossEffects.CHESED_ENERGIZED);
+            player.removeEffect(BossEffects.CHESED_ENERGIZED.get());
         }
     }
 
@@ -1502,7 +1501,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 Vec3 end = p.add(look.multiply(60,60,60));
 
 
-                ClipContext clipContext = new ClipContext(p,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+                ClipContext clipContext = new ClipContext(p,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
                 var result = level().clip(clipContext);
                 end = result.getLocation();
 
@@ -1641,17 +1640,17 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         boolean targetHadEnergized = false;
 
         for (LivingEntity target : targets){
-            if (target.hasEffect(BossEffects.CHESED_ENERGIZED)){
+            if (target.hasEffect(BossEffects.CHESED_ENERGIZED.get())){
 
                 if (target instanceof ServerPlayer serverPlayer){
-                    PacketDistributor.sendToPlayer(serverPlayer, new ChesedRayReflectPacket());
+                    FDPacketHandler.INSTANCE.sendTo(new ChesedRayReflectPacket(),serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
                 }
 
-                MobEffectInstance instance = target.getEffect(BossEffects.CHESED_ENERGIZED);
+                MobEffectInstance instance = target.getEffect(BossEffects.CHESED_ENERGIZED.get());
                 int amplifier = instance.getAmplifier();
-                target.removeEffect(BossEffects.CHESED_ENERGIZED);
+                target.removeEffect(BossEffects.CHESED_ENERGIZED.get());
                 if (amplifier > 0 && !chesedRayReflectorHit){
-                    target.addEffect(new MobEffectInstance(BossEffects.CHESED_ENERGIZED,400,amplifier - 1,false,true));
+                    target.addEffect(new MobEffectInstance(BossEffects.CHESED_ENERGIZED.get(),400,amplifier - 1,false,true));
                 }
                 targetHadEnergized = true;
             }else{
@@ -2095,7 +2094,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                         .maxVerticalSpeedEdges(0.2f)
                         .maxVerticalSpeedCenter(0.2f)
         );
-        PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+        FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->this),packet);
 
         RadialEarthquakeEntity radialEarthquakeEntity = RadialEarthquakeEntity.summon(level(),this.getOnPos(),1,radius,1f,
                 BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().chesedConfig.eartquakeDamage)
@@ -2205,7 +2204,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
 
     private void throwBlock(LivingEntity player,float height){
-        ChesedBlockProjectile next = this.blockAttackProjectiles.removeLast();
+        ChesedBlockProjectile next = this.blockAttackProjectiles.remove(this.blockAttackProjectiles.size() - 1);
         next.noPhysics = false;
         next.movementPath = null;
         Vec3 tpos = this.targetGroundPosition(player);
@@ -2269,7 +2268,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             path.setNext(next);
             projectile.setDamage(BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().chesedConfig.blockAttackDamage));
             projectile.noPhysics = true;
-            projectile.setPos(path.getPositions().getFirst());
+            projectile.setPos(path.getPositions().get(0));
             projectile.movementPath = path;
             blockAttackProjectiles.add(projectile);
             level().addFreshEntity(projectile);
@@ -2803,7 +2802,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
             if (dist >= arenaRadius && dist <= arenaRadius + pullRadius){
 
-                ClipContext clipContext = new ClipContext(entity.position().add(0,entity.getBbHeight()/2,0),this.position().add(0,2,0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+                ClipContext clipContext = new ClipContext(entity.position().add(0,entity.getBbHeight()/2,0),this.position().add(0,2,0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
 
                 BlockHitResult result = level().clip(clipContext);
 
@@ -2859,7 +2858,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     public void playInEarsSound(SoundEvent soundEvent, float volume, float pitch){
         for (var player : this.getCombatants(true, 10)){
-            PacketDistributor.sendToPlayer((ServerPlayer) player, new PlaySoundInEarsPacket(soundEvent,pitch,volume));
+            FDPacketHandler.INSTANCE.sendTo(new PlaySoundInEarsPacket(soundEvent,pitch,volume),((ServerPlayer)player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
         }
     }
 
@@ -2895,7 +2894,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 }else if (this.deathTime == CHESED_DEATH.get().getAnimTime()){
 
                     dropLoot = true;
-                    this.dropAllDeathLoot((ServerLevel) level(),level().damageSources().generic());
+                    this.dropAllDeathLoot(level().damageSources().generic());
 
                     for (var combatant : this.getCombatants(true)){
                         if (!combatant.isSpectator()){
@@ -3047,12 +3046,12 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(IS_ROLLING,false);
-        builder.define(IS_LAUNCHING_ORBS,false);
-        builder.define(IS_DRAINING_MONOLITHS,false);
-        builder.define(DRAIN_PERCENT,0f);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(IS_ROLLING,false);
+        this.entityData.define(IS_LAUNCHING_ORBS,false);
+        this.entityData.define(IS_DRAINING_MONOLITHS,false);
+        this.entityData.define(DRAIN_PERCENT,0f);
     }
 
     @Override
@@ -3136,9 +3135,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         this.entityData.set(DRAIN_PERCENT,Mth.clamp(percent,0,1));
     }
 
-    public void sendPacketToCombatants(CustomPacketPayload customPacketPayload){
+    public void sendPacketToCombatants(Object msg){
         for (Player player : this.getCombatants(true)){
-            PacketDistributor.sendToPlayer((ServerPlayer) player,customPacketPayload);
+            FDPacketHandler.INSTANCE.sendTo(msg,((ServerPlayer)player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
         }
     }
 
@@ -3209,14 +3208,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             entity.hasImpulse = true;
         }
     }
-
-
-    @Override
-    public void push(Vec3 p_347665_) {
-
-    }
-
-
+    
     @Override
     protected void doPush(Entity entity) {
         if (!this.isRolling() && !(entity instanceof ChesedBossBuddy)) {

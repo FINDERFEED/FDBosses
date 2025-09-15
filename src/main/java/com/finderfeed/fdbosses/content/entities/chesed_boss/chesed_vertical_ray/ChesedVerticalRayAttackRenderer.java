@@ -68,27 +68,27 @@ public class ChesedVerticalRayAttackRenderer extends EntityRenderer<ChesedMoving
 
 
 
-        vertex.addVertex(m,0,0,0f).setColor(0.3f, 1f, 1f,1);
-        vertex.addVertex(m,0,height,0f).setColor(0.3f, 1f, 1f,1);
-        vertex.addVertex(m,-width,height,0f).setColor(0.3f, 1f, 1f,0);
-        vertex.addVertex(m,-width,0,0f).setColor(0.3f, 1f, 1f,0);
+        vertex.vertex(m,0,0,0f).color(0.3f, 1f, 1f,1);
+        vertex.vertex(m,0,height,0f).color(0.3f, 1f, 1f,1);
+        vertex.vertex(m,-width,height,0f).color(0.3f, 1f, 1f,0);
+        vertex.vertex(m,-width,0,0f).color(0.3f, 1f, 1f,0);
 
 
-        vertex.addVertex(m,width,0,0f).setColor(0.3f, 1f, 1f,0);
-        vertex.addVertex(m,width,height,0f).setColor(0.3f, 1f, 1f,0);
-        vertex.addVertex(m,0,height,0f).setColor(0.3f, 1f, 1f,1);
-        vertex.addVertex(m,0,0,0f).setColor(0.3f, 1f, 1f,1);
+        vertex.vertex(m,width,0,0f).color(0.3f, 1f, 1f,0);
+        vertex.vertex(m,width,height,0f).color(0.3f, 1f, 1f,0);
+        vertex.vertex(m,0,height,0f).color(0.3f, 1f, 1f,1);
+        vertex.vertex(m,0,0,0f).color(0.3f, 1f, 1f,1);
 
-        vertex.addVertex(m,0,0,0.01f).setColor(1f, 1f, 1f,1);
-        vertex.addVertex(m,0,height,0.01f).setColor(1f, 1f, 1f,1);
-        vertex.addVertex(m,-width/4f,height,0.01f).setColor(1f, 1f, 1f,0);
-        vertex.addVertex(m,-width/4f,0,0.01f).setColor(1f, 1f, 1f,0);
+        vertex.vertex(m,0,0,0.01f).color(1f, 1f, 1f,1);
+        vertex.vertex(m,0,height,0.01f).color(1f, 1f, 1f,1);
+        vertex.vertex(m,-width/4f,height,0.01f).color(1f, 1f, 1f,0);
+        vertex.vertex(m,-width/4f,0,0.01f).color(1f, 1f, 1f,0);
 
 
-        vertex.addVertex(m,width/4f,0,0.01f).setColor(1f, 1f, 1f,0);
-        vertex.addVertex(m,width/4f,height,0.01f).setColor(1f, 1f, 1f,0);
-        vertex.addVertex(m,0,height,0.01f).setColor(1f, 1f, 1f,1);
-        vertex.addVertex(m,0,0,0.01f).setColor(1f, 1f, 1f,1);
+        vertex.vertex(m,width/4f,0,0.01f).color(1f, 1f, 1f,0);
+        vertex.vertex(m,width/4f,height,0.01f).color(1f, 1f, 1f,0);
+        vertex.vertex(m,0,height,0.01f).color(1f, 1f, 1f,1);
+        vertex.vertex(m,0,0,0.01f).color(1f, 1f, 1f,1);
 
 
         matrices.popPose();

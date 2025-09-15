@@ -10,9 +10,11 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.AxisAngle4f;
 import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 public class SonicParticle extends TextureSheetParticle {
 
@@ -81,13 +83,48 @@ public class SonicParticle extends TextureSheetParticle {
     }
 
 
-    @Override
-    public void render(VertexConsumer p_107678_, Camera p_107679_, float p_107680_) {
-        float pticks = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(Minecraft.getInstance().isPaused());
+
+
+
+    public void render(VertexConsumer vertex, Camera camera, float pticks) {
+
         float q = FDMathUtil.lerp(oldQuadSize,currentQuadSize,pticks);
         this.quadSize = q;
-        super.render(p_107678_, p_107679_, p_107680_);
+
+        Vec3 vec3 = camera.getPosition();
+        float f = (float)(Mth.lerp((double)pticks, this.xo, this.x) - vec3.x());
+        float f1 = (float)(Mth.lerp((double)pticks, this.yo, this.y) - vec3.y());
+        float f2 = (float)(Mth.lerp((double)pticks, this.zo, this.z) - vec3.z());
+        Quaternionf quaternionf;
+        if (this.roll == 0.0F) {
+            quaternionf = this.facing;
+        } else {
+            quaternionf = new Quaternionf(this.facing);
+            quaternionf.rotateZ(Mth.lerp(pticks, this.oRoll, this.roll));
+        }
+
+        Vector3f[] avector3f = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
+        float f3 = this.getQuadSize(pticks);
+
+        for(int i = 0; i < 4; ++i) {
+            Vector3f vector3f = avector3f[i];
+            vector3f.rotate(quaternionf);
+            vector3f.mul(f3);
+            vector3f.add(f, f1, f2);
+        }
+
+        float f6 = this.getU0();
+        float f7 = this.getU1();
+        float f4 = this.getV0();
+        float f5 = this.getV1();
+        int j = this.getLightColor(pticks);
+        vertex.vertex((double)avector3f[0].x(), (double)avector3f[0].y(), (double)avector3f[0].z()).uv(f7, f5).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(j).endVertex();
+        vertex.vertex((double)avector3f[1].x(), (double)avector3f[1].y(), (double)avector3f[1].z()).uv(f7, f4).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(j).endVertex();
+        vertex.vertex((double)avector3f[2].x(), (double)avector3f[2].y(), (double)avector3f[2].z()).uv(f6, f4).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(j).endVertex();
+        vertex.vertex((double)avector3f[3].x(), (double)avector3f[3].y(), (double)avector3f[3].z()).uv(f6, f5).color(this.rCol, this.gCol, this.bCol, this.alpha).uv2(j).endVertex();
     }
+
+
 
     @Override
     public void tick() {
@@ -114,14 +151,6 @@ public class SonicParticle extends TextureSheetParticle {
     @Override
     public ParticleRenderType getRenderType() {
         return ParticleRenderType.PARTICLE_SHEET_LIT;
-    }
-
-
-    @Override
-    public FacingCameraMode getFacingCameraMode() {
-        return (quaternion,camera,pticks)->{
-            quaternion.set(facing);
-        };
     }
 
     public static class Factory implements ParticleProvider<SonicParticleOptions>{

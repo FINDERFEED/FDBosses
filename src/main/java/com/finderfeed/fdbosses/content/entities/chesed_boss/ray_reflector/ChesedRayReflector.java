@@ -258,8 +258,8 @@ public class ChesedRayReflector extends FDEntity {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(ACTIVE,false);
+    protected void defineSynchedData() {
+        this.entityData.define(ACTIVE,false);
     }
 
     @Override

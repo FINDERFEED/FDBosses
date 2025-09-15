@@ -2,11 +2,11 @@ package com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity
 
 
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.NetworkDirection;
 
 import java.util.function.Consumer;
 
@@ -78,14 +79,14 @@ public class EarthShatterEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(STATE, Blocks.STONE.defaultBlockState());
+    protected void defineSynchedData() {
+        this.entityData.define(STATE, Blocks.STONE.defaultBlockState());
     }
 
     @Override
-    public void sendPairingData(ServerPlayer player, Consumer<CustomPacketPayload> bundleBuilder) {
-        super.sendPairingData(player, bundleBuilder);
-        bundleBuilder.accept(new EarthShatterEntitySpawnPacket(this,this.settings));
+    public void startSeenByPlayer(ServerPlayer p_20119_) {
+        super.startSeenByPlayer(p_20119_);
+        FDPacketHandler.INSTANCE.sendTo(new EarthShatterEntitySpawnPacket(this,this.settings),p_20119_.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     @Override

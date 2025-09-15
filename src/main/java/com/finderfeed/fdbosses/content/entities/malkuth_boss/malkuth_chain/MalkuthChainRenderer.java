@@ -51,26 +51,26 @@ public class MalkuthChainRenderer extends EntityRenderer<MalkuthChainEntity> {
         if (!chain.getPassengers().isEmpty()) {
             matrices.mulPose(Axis.YP.rotationDegrees(-135));
         }
-        b.addVertex(m, -width,0,0).setColor(1f,1f,1f,1f).setUv(0,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-        b.addVertex(m, -width,length,0).setColor(1f,1f,1f,1f).setUv(length * 4,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-        b.addVertex(m, width,length,0).setColor(1f,1f,1f,1f).setUv(length * 4,1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-        b.addVertex(m, width,0,0).setColor(1f,1f,1f,1f).setUv(0,1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, -width,0,0).color(1f,1f,1f,1f).uv(0,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, -width,length,0).color(1f,1f,1f,1f).uv(length * 4,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, width,length,0).color(1f,1f,1f,1f).uv(length * 4,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, width,0,0).color(1f,1f,1f,1f).uv(0,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
 
-        b.addVertex(m, width,0,0).setColor(1f,1f,1f,1f).setUv(0,1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-        b.addVertex(m, width,length,0).setColor(1f,1f,1f,1f).setUv(length * 4,1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-        b.addVertex(m, -width,length,0).setColor(1f,1f,1f,1f).setUv(length * 4,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-        b.addVertex(m, -width,0,0).setColor(1f,1f,1f,1f).setUv(0,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, width,0,0).color(1f,1f,1f,1f).uv(0,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, width,length,0).color(1f,1f,1f,1f).uv(length * 4,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, -width,length,0).color(1f,1f,1f,1f).uv(length * 4,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, -width,0,0).color(1f,1f,1f,1f).uv(0,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
 
 
-        b.addVertex(m, 0,0,-width).setColor(1f,1f,1f,1f).setUv(0,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-        b.addVertex(m, 0,length,-width).setColor(1f,1f,1f,1f).setUv(length * 4,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-        b.addVertex(m, 0,length,width).setColor(1f,1f,1f,1f).setUv(length * 4,1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-        b.addVertex(m, 0,0,width).setColor(1f,1f,1f,1f).setUv(0,1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, 0,0,-width).color(1f,1f,1f,1f).uv(0,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, 0,length,-width).color(1f,1f,1f,1f).uv(length * 4,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, 0,length,width).color(1f,1f,1f,1f).uv(length * 4,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, 0,0,width).color(1f,1f,1f,1f).uv(0,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
 
-        b.addVertex(m, 0,0,width).setColor(1f,1f,1f,1f).setUv(0,1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-        b.addVertex(m, 0,length,width).setColor(1f,1f,1f,1f).setUv(length * 4,1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-        b.addVertex(m, 0,length,-width).setColor(1f,1f,1f,1f).setUv(length * 4,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-        b.addVertex(m, 0,0,-width).setColor(1f,1f,1f,1f).setUv(0,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, 0,0,width).color(1f,1f,1f,1f).uv(0,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, 0,length,width).color(1f,1f,1f,1f).uv(length * 4,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, 0,length,-width).color(1f,1f,1f,1f).uv(length * 4,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
+        b.vertex(m, 0,0,-width).color(1f,1f,1f,1f).uv(0,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY);
 
         matrices.popPose();
     }

@@ -241,9 +241,9 @@ public class MalkuthPlayerFireIceBall extends FDProjectile implements AutoSerial
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(ATTACK_TYPE, MalkuthAttackType.ICE);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(ATTACK_TYPE, MalkuthAttackType.ICE);
     }
 
 

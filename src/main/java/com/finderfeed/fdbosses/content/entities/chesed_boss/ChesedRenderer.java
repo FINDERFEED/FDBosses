@@ -109,27 +109,27 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
 
         float width = 0.25f;
 
-        vertex.addVertex(m,0,0,0f).setColor(0.3f, 1f, 1f,p);
-        vertex.addVertex(m,0,height,0f).setColor(0.3f, 1f, 1f,p);
-        vertex.addVertex(m,-width,height,0f).setColor(0.3f, 1f, 1f,0);
-        vertex.addVertex(m,-width,0,0f).setColor(0.3f, 1f, 1f,0);
+        vertex.vertex(m,0,0,0f).color(0.3f, 1f, 1f,p);
+        vertex.vertex(m,0,height,0f).color(0.3f, 1f, 1f,p);
+        vertex.vertex(m,-width,height,0f).color(0.3f, 1f, 1f,0);
+        vertex.vertex(m,-width,0,0f).color(0.3f, 1f, 1f,0);
 
 
-        vertex.addVertex(m,width,0,0f).setColor(0.3f, 1f, 1f,0);
-        vertex.addVertex(m,width,height,0f).setColor(0.3f, 1f, 1f,0);
-        vertex.addVertex(m,0,height,0f).setColor(0.3f, 1f, 1f,p);
-        vertex.addVertex(m,0,0,0f).setColor(0.3f, 1f, 1f,p);
+        vertex.vertex(m,width,0,0f).color(0.3f, 1f, 1f,0);
+        vertex.vertex(m,width,height,0f).color(0.3f, 1f, 1f,0);
+        vertex.vertex(m,0,height,0f).color(0.3f, 1f, 1f,p);
+        vertex.vertex(m,0,0,0f).color(0.3f, 1f, 1f,p);
 
-        vertex.addVertex(m,0,0,0.01f).setColor(1f, 1f, 1f,p);
-        vertex.addVertex(m,0,height,0.01f).setColor(1f, 1f, 1f,p);
-        vertex.addVertex(m,-width/4f,height,0.01f).setColor(1f, 1f, 1f,0);
-        vertex.addVertex(m,-width/4f,0,0.01f).setColor(1f, 1f, 1f,0);
+        vertex.vertex(m,0,0,0.01f).color(1f, 1f, 1f,p);
+        vertex.vertex(m,0,height,0.01f).color(1f, 1f, 1f,p);
+        vertex.vertex(m,-width/4f,height,0.01f).color(1f, 1f, 1f,0);
+        vertex.vertex(m,-width/4f,0,0.01f).color(1f, 1f, 1f,0);
 
 
-        vertex.addVertex(m,width/4f,0,0.01f).setColor(1f, 1f, 1f,0);
-        vertex.addVertex(m,width/4f,height,0.01f).setColor(1f, 1f, 1f,0);
-        vertex.addVertex(m,0,height,0.01f).setColor(1f, 1f, 1f,p);
-        vertex.addVertex(m,0,0,0.01f).setColor(1f, 1f, 1f,p);
+        vertex.vertex(m,width/4f,0,0.01f).color(1f, 1f, 1f,0);
+        vertex.vertex(m,width/4f,height,0.01f).color(1f, 1f, 1f,0);
+        vertex.vertex(m,0,height,0.01f).color(1f, 1f, 1f,p);
+        vertex.vertex(m,0,0,0.01f).color(1f, 1f, 1f,p);
 
         poseStack.popPose();
     }
@@ -190,23 +190,23 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
             }
 
 
-            vertexConsumer.addVertex(matrix4f,radius, -crackHeightRad, 0).setColor(1f,1f,1f,1f).setUv(texId * 0.25f + 0.25f,0).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY)
-                    .setNormal(poseStack.last(), -1,0,0);
+            vertexConsumer.vertex(matrix4f,radius, -crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f + 0.25f,0).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY)
+                    .normal(poseStack.last(), -1,0,0);
 
 
-            vertexConsumer.addVertex(matrix4f,radius, crackHeightRad, 0).setColor(1f,1f,1f,1f).setUv(texId * 0.25f + 0.25f,1).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY)
-                    .setNormal(poseStack.last(), -1,0,0);
+            vertexConsumer.vertex(matrix4f,radius, crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f + 0.25f,1).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY)
+                    .normal(poseStack.last(), -1,0,0);
 
             poseStack.mulPose(Axis.YP.rotation(angle));
 
             matrix4f = poseStack.last().pose();
 
 
-            vertexConsumer.addVertex(matrix4f,radius, crackHeightRad, 0).setColor(1f,1f,1f,1f).setUv(texId * 0.25f,1).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY)
-                    .setNormal(poseStack.last(), -1,0,0);
+            vertexConsumer.vertex(matrix4f,radius, crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f,1).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY)
+                    .normal(poseStack.last(), -1,0,0);
 
-            vertexConsumer.addVertex(matrix4f,radius, -crackHeightRad, 0).setColor(1f,1f,1f,1f).setUv(texId * 0.25f,0).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY)
-                    .setNormal(poseStack.last(), -1,0,0);
+            vertexConsumer.vertex(matrix4f,radius, -crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f,0).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY)
+                    .normal(poseStack.last(), -1,0,0);
 
             poseStack.popPose();
         }

@@ -51,7 +51,7 @@ public class MalkuthBossBar extends FDBossBarInterpolated {
         FDShaderRenderer.start(graphics, BossCoreShaders.MALKUTH_BOSS_BAR)
                 .position(xHPPos,yHPPos,0.5f)
                 .setResolution(189,5)
-                .setUVSpan(12f,0.3f)
+                .uvSpan(12f,0.3f)
                 .setShaderUniform("xyOffset",0f,0f)
                 .setShaderUniform("time",t)
                 .setShaderUniform("uvSpan",12f,0.3f)

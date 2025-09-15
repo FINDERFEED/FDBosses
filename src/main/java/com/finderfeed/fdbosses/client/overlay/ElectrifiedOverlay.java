@@ -6,30 +6,29 @@ import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdlib.init.FDCoreShaders;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
-import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.finderfeed.fdlib.util.rendering.FDShaderRenderer;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 
 import java.util.List;
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE,modid = FDBosses.MOD_ID,value = Dist.CLIENT)
-public class ElectrifiedOverlay implements LayeredDraw.Layer {
+public class ElectrifiedOverlay implements IGuiOverlay {
 
     private static int electrifiedEffectTick = 0;
     private static int electrifiedEffectTickO = 0;
@@ -37,7 +36,10 @@ public class ElectrifiedOverlay implements LayeredDraw.Layer {
 
 
     @SubscribeEvent
-    public static void detectChesedEffect(ClientTickEvent.Pre event){
+    public static void detectChesedEffect(TickEvent.ClientTickEvent event){
+
+        if (event.phase != TickEvent.Phase.START) return;
+        if (event.side != LogicalSide.CLIENT) return;
 
         Player player = Minecraft.getInstance().player;
         if (player == null) {
@@ -50,7 +52,7 @@ public class ElectrifiedOverlay implements LayeredDraw.Layer {
 
 
         electrifiedEffectTickO = electrifiedEffectTick;
-        if (player.hasEffect(BossEffects.CHESED_ENERGIZED)){
+        if (player.hasEffect(BossEffects.CHESED_ENERGIZED.get())){
             electrifiedEffectTick = Mth.clamp(electrifiedEffectTick + 1,0,electrifiedEffectTickMax);
         }else{
             electrifiedEffectTick = Mth.clamp(electrifiedEffectTick - 1,0,electrifiedEffectTickMax);
@@ -64,7 +66,7 @@ public class ElectrifiedOverlay implements LayeredDraw.Layer {
 
 
     @Override
-    public void render(GuiGraphics graphics, DeltaTracker tracker) {
+    public void render(ForgeGui gui, GuiGraphics graphics, float partialTick, int screenWidth, int screenHeight) {
 
         if (electrifiedEffectTick == 0 && electrifiedEffectTickO == 0) return;
 
@@ -76,7 +78,7 @@ public class ElectrifiedOverlay implements LayeredDraw.Layer {
         PoseStack matrices = graphics.pose();
         matrices.pushPose();
 
-        float alphamod = getElectrifiedEffectPercent(tracker.getGameTimeDeltaPartialTick(true));
+        float alphamod = getElectrifiedEffectPercent(partialTick);
 
         alphamod = FDEasings.easeOut(alphamod);
 

@@ -8,35 +8,35 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHand
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
-import com.finderfeed.fdlib.systems.screen.screen_particles.ScreenParticlesRenderEvent;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticle;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
-import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.common.Mod;
+import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Random;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 @Mod.EventBusSubscriber(modid = FDBosses.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
+public class MalkuthWeaknessOverlay implements IGuiOverlay {
 
     public static Random random = new Random();
 
@@ -52,8 +52,13 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
     private static int alphaO = 0;
 
     @SubscribeEvent
-    public static void tickClient(ClientTickEvent.Pre event){
+    public static void tickClient(TickEvent.ClientTickEvent event){
+
+        if (event.phase != TickEvent.Phase.START) return;
+        if (event.side != LogicalSide.CLIENT) return;
+        
         Player player = FDClientHelpers.getClientPlayer();
+        
         if (player == null) {
             iceTicker = 0;
             fireTicker = 0;
@@ -100,7 +105,7 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
                         .setMaxQuadSize(3.5f)
                         .setSpeed(0, -0.4)
                         .setFriction(1f)
-                        .setColor(
+                        .color(
                                 color.x, color.y, color.z, 0.8f
                         )
                         .setLifetime(30)
@@ -121,7 +126,7 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
     }
 
     @Override
-    public void render(GuiGraphics graphics, DeltaTracker tracker) {
+    public void render(ForgeGui gui, GuiGraphics graphics, float pticks, int screenWidth, int screenHeight) {
 
         if (FDClientHelpers.getClientLevel() == null || Minecraft.getInstance().options.hideGui) return;
 
@@ -130,13 +135,15 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
         float w = window.getGuiScaledWidth();
         float h = window.getGuiScaledHeight();
 
-        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        BufferBuilder builder = Tesselator.getInstance().getBuilder();
+        
+        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
 
         Vector3f ice = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.ICE);
         Vector3f fire = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.FIRE);
 
-        float pticks = tracker.getGameTimeDeltaPartialTick(false);
+        
 
         float basicAlpha = FDMathUtil.lerp(alphaO,alpha,pticks) / MAX_IN_TIME;
 
@@ -185,7 +192,7 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
             matrices.popPose();
         }
 
-        BufferUploader.drawWithShader(builder.build());
+        BufferUploader.drawWithShader(builder.end());
 
         matrices.pushPose();
         matrices.translate(w/2 - 0.5f,h/2 - 0.5f,0);
@@ -233,7 +240,8 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
 
         Tesselator tesselator = Tesselator.getInstance();
 
-        BufferBuilder vertex = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        BufferBuilder vertex = tesselator.getBuilder();
+        vertex.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
 
         Vec3 v = new Vec3(radius,0,0);
@@ -266,18 +274,18 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
             Vec3 noffset2 = offset2.normalize().multiply(innerRadius,innerRadius,innerRadius);
 
             for (int g = 0; g < renderAmount;g++) {
-                vertex.addVertex(m, (float) (offset.x - noffset.x), (float) (offset.y - noffset.y), 0).setColor((float) color1.x, (float) color1.y, (float) color1.z, 0f);
-                vertex.addVertex(m, (float) offset.x, (float) offset.y, 0).setColor((float) color1.x, (float) color1.y, (float) color1.z, a);
+                vertex.vertex(m, (float) (offset.x - noffset.x), (float) (offset.y - noffset.y), 0).color((float) color1.x, (float) color1.y, (float) color1.z, 0f).endVertex();
+                vertex.vertex(m, (float) offset.x, (float) offset.y, 0).color((float) color1.x, (float) color1.y, (float) color1.z, a).endVertex();
 
-                vertex.addVertex(m, (float) offset2.x, (float) offset2.y, 0).setColor((float) color2.x, (float) color2.y, (float) color2.z, a);
-                vertex.addVertex(m, (float) (offset2.x - noffset2.x), (float) (offset2.y - noffset2.y), 0).setColor((float) color2.x, (float) color2.y, (float) color2.z, 0f);
+                vertex.vertex(m, (float) offset2.x, (float) offset2.y, 0).color((float) color2.x, (float) color2.y, (float) color2.z, a).endVertex();
+                vertex.vertex(m, (float) (offset2.x - noffset2.x), (float) (offset2.y - noffset2.y), 0).color((float) color2.x, (float) color2.y, (float) color2.z, 0f).endVertex();
 
 
-                vertex.addVertex(m, (float) offset.x, (float) offset.y, 0).setColor((float) color1.x, (float) color1.y, (float) color1.z, a);
-                vertex.addVertex(m, (float) (offset.x + noffset.x), (float) (offset.y + noffset.y), 0).setColor((float) color1.x, (float) color1.y, (float) color1.z, 0f);
+                vertex.vertex(m, (float) offset.x, (float) offset.y, 0).color((float) color1.x, (float) color1.y, (float) color1.z, a).endVertex();
+                vertex.vertex(m, (float) (offset.x + noffset.x), (float) (offset.y + noffset.y), 0).color((float) color1.x, (float) color1.y, (float) color1.z, 0f).endVertex();
 
-                vertex.addVertex(m, (float) (offset2.x + noffset2.x), (float) (offset2.y + noffset2.y), 0).setColor((float) color2.x, (float) color2.y, (float) color2.z, 0f);
-                vertex.addVertex(m, (float) offset2.x, (float) offset2.y, 0).setColor((float) color2.x, (float) color2.y, (float) color2.z, a);
+                vertex.vertex(m, (float) (offset2.x + noffset2.x), (float) (offset2.y + noffset2.y), 0).color((float) color2.x, (float) color2.y, (float) color2.z, 0f).endVertex();
+                vertex.vertex(m, (float) offset2.x, (float) offset2.y, 0).color((float) color2.x, (float) color2.y, (float) color2.z, a).endVertex();
             }
 
 
@@ -285,11 +293,11 @@ public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
 
         }
 
-//        vertex.addVertex(m, (float) radius,(float) 0,0).setColor(1f,1f,1f,1f);
-//        vertex.addVertex(m, (float) radius - innerRadius,(float) 0,0).setColor(1f,1f,1f,1f);
+//        vertex.vertex(m, (float) radius,(float) 0,0).color(1f,1f,1f,1f);
+//        vertex.vertex(m, (float) radius - innerRadius,(float) 0,0).color(1f,1f,1f,1f);
 
 
-        BufferUploader.drawWithShader(vertex.build());
+        BufferUploader.drawWithShader(vertex.end());
 
         RenderSystem.defaultBlendFunc();
         RenderSystem.enableCull();

@@ -39,12 +39,15 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
 
     public ChesedElectricSphereEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
+        if (level().isClientSide){
+            this.getAnimationSystem().startAnimation("IDLE", AnimationTicker.builder(BossAnims.ELECTRIC_ORB_IDLE.get()).build());
+        }
     }
 
     public static ChesedElectricSphereEntity summon(Level level,float damage, ProjectileMovementPath path){
 
         ChesedElectricSphereEntity sphereEntity = new ChesedElectricSphereEntity(BossEntities.CHESED_ELECTRIC_SPHERE.get(),level);
-        sphereEntity.setPos(path.getPositions().getFirst());
+        sphereEntity.setPos(path.getPositions().get(0));
         sphereEntity.path = path;
         sphereEntity.damage = damage;
         level.addFreshEntity(sphereEntity);
@@ -108,14 +111,6 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
         this.explode();
 
         this.discard();
-    }
-
-    @Override
-    public void onAddedToLevel() {
-        super.onAddedToLevel();
-        if (level().isClientSide){
-            this.getAnimationSystem().startAnimation("IDLE", AnimationTicker.builder(BossAnims.ELECTRIC_ORB_IDLE.get()).build());
-        }
     }
 
     private void explode(){

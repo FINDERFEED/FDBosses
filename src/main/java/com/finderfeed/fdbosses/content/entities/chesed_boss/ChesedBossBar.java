@@ -91,7 +91,7 @@ public class ChesedBossBar extends FDBossBarInterpolated {
         FDShaderRenderer.start(graphics,FDCoreShaders.NOISE)
                 .position(hpPosX,hpPosY,0)
                 .setResolution(hpW,5)
-                .setUVSpan(0.5f,1)
+                .uvSpan(0.5f,1)
                 .setUpColor(0.1f,0.8f,0.8f,0f)
                 .setDownColor(0.5f,1f,1f,0.8f)
                 .setShaderUniform("size",hpW,5)
@@ -158,7 +158,7 @@ public class ChesedBossBar extends FDBossBarInterpolated {
                     .setMaxQuadSize(3.5f)
                     .setSpeed(0, -0.1)
                     .setFriction(0.99f)
-                    .setColor(
+                    .color(
                             0.1f + r.nextFloat() * 0.1f - 0.05f,
                             0.8f + r.nextFloat() * 0.1f - 0.05f,
                             0.8f + r.nextFloat() * 0.1f - 0.05f,
@@ -172,7 +172,7 @@ public class ChesedBossBar extends FDBossBarInterpolated {
                     .setMaxQuadSize(3.5f)
                     .setSpeed(0, 0.1)
                     .setFriction(0.99f)
-                    .setColor(
+                    .color(
                             0.1f + r.nextFloat() * 0.1f - 0.05f,
                             0.8f + r.nextFloat() * 0.1f - 0.05f,
                             0.8f + r.nextFloat() * 0.1f - 0.05f,

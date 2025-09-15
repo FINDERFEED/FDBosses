@@ -151,15 +151,9 @@ public class ChesedMovingVerticalRay extends LivingEntity implements AutoSeriali
     }
 
     @Override
-    protected double getDefaultGravity() {
-        return 0;
-    }
-
-
-    @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(HEIGHT,30f);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(HEIGHT,30f);
     }
 
     @Override

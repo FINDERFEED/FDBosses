@@ -440,8 +440,8 @@ public class MalkuthGiantSwordSlash extends Entity implements AutoSerializable {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(MALKUTH_ATTACK_TYPE, MalkuthAttackType.FIRE);
+    protected void defineSynchedData() {
+        this.entityData.define(MALKUTH_ATTACK_TYPE, MalkuthAttackType.FIRE);
     }
 
     @Override

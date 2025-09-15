@@ -4,19 +4,14 @@ import com.finderfeed.fdbosses.BossModEvents;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdlib.systems.particle.ParticleProcessor;
 import com.finderfeed.fdlib.systems.particle.ParticleProcessorType;
-import com.finderfeed.fdlib.util.NetworkCodec;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.finderfeed.fdlib.util.FDCodecs;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.Particle;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.NetworkCodec;
-import net.minecraft.network.codec.NetworkCodec;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import org.joml.AxisAngle4f;
@@ -97,7 +92,7 @@ public class ChesedRayCircleParticleProcessor implements ParticleProcessor<Chese
 
     public static class Type implements ParticleProcessorType<ChesedRayCircleParticleProcessor>{
 
-        public static final NetworkCodec<FriendlyByteBuf, ChesedRayCircleParticleProcessor> STREAM_CODEC = NetworkCodec.composite(
+        public static final NetworkCodec<ChesedRayCircleParticleProcessor> STREAM_CODEC = NetworkCodec.composite(
                 NetworkCodec.VEC3,v->v.circleAround,
                 NetworkCodec.FLOAT,v->v.circleCount,
                 NetworkCodec.BOOL,v->v.forward,
@@ -111,7 +106,7 @@ public class ChesedRayCircleParticleProcessor implements ParticleProcessor<Chese
         ).apply(p, ChesedRayCircleParticleProcessor::new));
 
         @Override
-        public NetworkCodec<FriendlyByteBuf, ChesedRayCircleParticleProcessor> NetworkCodec() {
+        public NetworkCodec<ChesedRayCircleParticleProcessor> networkCodec() {
             return STREAM_CODEC;
         }
 

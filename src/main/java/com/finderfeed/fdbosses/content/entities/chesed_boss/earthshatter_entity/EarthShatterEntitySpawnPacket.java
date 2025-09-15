@@ -9,6 +9,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.function.Supplier;
+
 @RegisterFDPacket("fdbosses:earth_shatter_entity_spawn")
 public class EarthShatterEntitySpawnPacket extends FDPacket {
 
@@ -19,7 +21,7 @@ public class EarthShatterEntitySpawnPacket extends FDPacket {
 
     public EarthShatterEntitySpawnPacket(FriendlyByteBuf buf){
         this.entityId = buf.readInt();
-        this.settings = EarthShatterSettings.NETWORK_CODEC.decode(buf);
+        this.settings = EarthShatterSettings.NETWORK_CODEC.fromNetwork(buf);
     }
 
     public EarthShatterEntitySpawnPacket(EarthShatterEntity entity, EarthShatterSettings settings){
@@ -30,7 +32,7 @@ public class EarthShatterEntitySpawnPacket extends FDPacket {
     @Override
     public void write(FriendlyByteBuf buf) {
         buf.writeInt(this.entityId);
-        EarthShatterSettings.NETWORK_CODEC.encode(buf,settings);
+        EarthShatterSettings.NETWORK_CODEC.toNetwork(buf,settings);
     }
 
     @Override

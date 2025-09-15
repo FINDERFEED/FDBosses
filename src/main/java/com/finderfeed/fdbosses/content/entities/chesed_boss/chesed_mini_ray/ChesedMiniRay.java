@@ -26,7 +26,6 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -34,7 +33,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.util.AttributeUtil;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -366,13 +364,13 @@ public class ChesedMiniRay extends Entity implements AutoSerializable {
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
-        this.item = ItemStack.parse(this.level().registryAccess(), tag.get("item")).get();
+        this.item = ItemStack.of(tag.getCompound("item"));
         this.autoLoad(tag);
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
-        Tag item = this.item.save(this.level().registryAccess());
+        Tag item = this.item.save(new CompoundTag());
         tag.put("item", item);
         this.autoSave(tag);
     }

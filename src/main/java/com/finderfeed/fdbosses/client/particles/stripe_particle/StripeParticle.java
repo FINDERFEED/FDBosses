@@ -20,6 +20,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Math;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
@@ -47,10 +48,12 @@ public class StripeParticle extends Particle {
         points = stripeParticleOptions.getOffsets().stream().map(v->new Vector3f((float) v.x + 0.001f,(float) v.y + 0.001f,(float) v.z + 0.001f)).toList();
     }
 
+
     @Override
-    public AABB getRenderBoundingBox(float partialTicks) {
-        return AABB.INFINITE;
+    public boolean shouldCull() {
+        return false;
     }
+
 
     @Override
     public void render(VertexConsumer vertex, Camera camera, float pticks) {
@@ -122,16 +125,17 @@ public class StripeParticle extends Particle {
         return RENDER_TYPE;
     }
 
-    public static final ParticleRenderType RENDER_TYPE = new FDParticleRenderType() {
+    public static final ParticleRenderType RENDER_TYPE = new ParticleRenderType() {
         @Override
-        public void end() {
+        public void end(Tesselator tesselator) {
+            tesselator.end();
             RenderSystem.setShader(GameRenderer::getParticleShader);
             RenderSystem.defaultBlendFunc();
         }
 
         @Nullable
         @Override
-        public BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
+        public void begin(BufferBuilder tesselator, TextureManager textureManager) {
 
 
             if (Minecraft.useShaderTransparency()){
@@ -145,7 +149,7 @@ public class StripeParticle extends Particle {
             RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
             RenderSystem.enableCull();
 
-            return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         }
     };
 

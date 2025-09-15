@@ -428,43 +428,43 @@ public class BossClientEvents {
 
 
         //back (z is back)
-        vertexConsumer.addVertex(m, -boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0,0).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,0).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, boxRadius,boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,0.25f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, -boxRadius,boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0,0.25f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(0,0).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
 
 
         //front
-        vertexConsumer.addVertex(m, -boxRadius,boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.5f,0.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, boxRadius,boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.0f,0.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.0f,0.25f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, -boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.5f,0.25f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0.5f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0.0f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(0.0f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(0.5f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
 
         //left
-        vertexConsumer.addVertex(m, boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,0.25f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(1f,0.25f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, boxRadius,boxRadius,boxRadius).setColor(r,g,b,a).setUv(1f,0.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, boxRadius,boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,0.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(1f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(1f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
 
 
         //right
-        vertexConsumer.addVertex(m, -boxRadius,boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,0.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, -boxRadius,boxRadius,boxRadius).setColor(r,g,b,a).setUv(0f,0.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, -boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(0f,0.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, -boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,0.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0f,0.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(0f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
 
 
         //down (but for some reason its up)
-        vertexConsumer.addVertex(m, boxRadius,boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0f,1f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, boxRadius,boxRadius,boxRadius).setColor(r,g,b,a).setUv(0f,.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, -boxRadius,boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.5f,.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, -boxRadius,boxRadius,-boxRadius).setColor(r,g,b,a).setUv(0.5f,1f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0f,1f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0f,.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0.5f,.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,1f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
 
         //up (but for some reason its down
-        vertexConsumer.addVertex(m, -boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(1f,.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, -boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(1f,.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.5f,.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.addVertex(m, boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(.5f,.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(1f,.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(1f,.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(0.5f,.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(.5f,.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
 
 
     }

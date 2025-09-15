@@ -131,7 +131,7 @@ public class MalkuthBossScreen extends BaseBossScreen{
                         .setDefaultScaleOut()
                         .setMaxQuadSize(20f + random.nextFloat() * 5)
                         .setSpeed(v.x, v.y)
-                        .setColor(color.x,color.y,color.z,1f)
+                        .color(color.x,color.y,color.z,1f)
                         .setLifetime(15 + random.nextInt(5))
                         .sendToScreen();
             }

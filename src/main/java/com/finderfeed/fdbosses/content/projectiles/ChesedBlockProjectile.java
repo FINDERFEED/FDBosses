@@ -364,8 +364,8 @@ public class ChesedBlockProjectile extends FDProjectile implements AutoSerializa
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
         builder
                 .define(ROTATION_SPEED,20f)
                 .define(STATE, Blocks.DEEPSLATE.defaultBlockState())

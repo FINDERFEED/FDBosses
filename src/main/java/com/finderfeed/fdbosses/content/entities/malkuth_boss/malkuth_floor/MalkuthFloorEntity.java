@@ -236,8 +236,8 @@ public class MalkuthFloorEntity extends Entity {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(IS_DEAD,false);
+    protected void defineSynchedData() {
+        this.entityData.define(IS_DEAD,false);
     }
 
     @Override

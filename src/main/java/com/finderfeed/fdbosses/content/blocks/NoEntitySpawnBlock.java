@@ -11,7 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.fml.util.thread.EffectiveSide;
+import net.minecraftforge.fml.util.thread.EffectiveSide;
 
 public class NoEntitySpawnBlock extends Block {
 
@@ -19,7 +19,7 @@ public class NoEntitySpawnBlock extends Block {
 
     public NoEntitySpawnBlock() {
         super(
-                Properties.ofFullCopy(Blocks.BEDROCK)
+                Properties.copy(Blocks.BEDROCK)
                         .noCollission()
                         .isValidSpawn((state,getter,pos,type)->false)
                         .noOcclusion()
@@ -29,7 +29,7 @@ public class NoEntitySpawnBlock extends Block {
 
 
     @Override
-    protected VoxelShape getShape(BlockState p_60555_, BlockGetter p_60556_, BlockPos p_60557_, CollisionContext p_60558_) {
+    public VoxelShape getShape(BlockState p_60555_, BlockGetter p_60556_, BlockPos p_60557_, CollisionContext p_60558_) {
         if (EffectiveSide.get().isClient()){
             Player player = BossClientPackets.getClientPlayer();
             if (player != null && player.level().isClientSide && player.isCreative()){
@@ -41,7 +41,7 @@ public class NoEntitySpawnBlock extends Block {
     }
 
     @Override
-    protected RenderShape getRenderShape(BlockState p_60550_) {
+    public RenderShape getRenderShape(BlockState p_60550_) {
         return RenderShape.INVISIBLE;
     }
 }

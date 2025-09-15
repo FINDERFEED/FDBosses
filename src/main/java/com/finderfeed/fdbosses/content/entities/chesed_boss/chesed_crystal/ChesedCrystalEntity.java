@@ -56,7 +56,7 @@ public class ChesedCrystalEntity extends FDLivingEntity implements ChesedBossBud
     public void die(DamageSource src) {
         if (!level().isClientSide){
             if (this.lastHurtByPlayer != null){
-                this.lastHurtByPlayer.addEffect(new MobEffectInstance(BossEffects.CHESED_ENERGIZED,400,1,false,true));
+                this.lastHurtByPlayer.addEffect(new MobEffectInstance(BossEffects.CHESED_ENERGIZED.get(),400,1,false,true));
             }
             dead = true;
             deathTime = 10;

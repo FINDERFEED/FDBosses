@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Math;
 import org.lwjgl.opengl.GL11;
 
 public class ArcAttackPreparationParticle extends Particle {
@@ -75,21 +76,21 @@ public class ArcAttackPreparationParticle extends Particle {
         }
 
         float colmod = 0.75f;
-        vertex.addVertex((float) pos.x,(float) pos.y,(float) pos.z).setColor(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.addVertex((float) pos2.x,(float) pos2.y,(float) pos2.z).setColor(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.addVertex((float) center.x,(float) center.y,(float) center.z).setColor(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
+        vertex.vertex((float) pos.x,(float) pos.y,(float) pos.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
+        vertex.vertex((float) pos2.x,(float) pos2.y,(float) pos2.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
+        vertex.vertex((float) center.x,(float) center.y,(float) center.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
 
-        vertex.addVertex((float) pos.x,(float) pos.y,(float) pos.z).setColor(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.addVertex((float) pos3.x,(float) pos3.y,(float) pos3.z).setColor(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.addVertex((float) center.x,(float) center.y,(float) center.z).setColor(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
+        vertex.vertex((float) pos.x,(float) pos.y,(float) pos.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
+        vertex.vertex((float) pos3.x,(float) pos3.y,(float) pos3.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
+        vertex.vertex((float) center.x,(float) center.y,(float) center.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
 
-        vertex.addVertex((float) pos.x,(float) pos.y + 0.005f,(float) pos.z).setColor(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.addVertex((float) pos2p.x,(float) pos.y + 0.005f,(float) pos2p.z).setColor(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.addVertex((float) centerp.x,(float) pos.y + 0.005f,(float) centerp.z).setColor(color.r,color.g,color.b,color.a * fadeOutP);
+        vertex.vertex((float) pos.x,(float) pos.y + 0.005f,(float) pos.z).color(color.r,color.g,color.b,color.a * fadeOutP);
+        vertex.vertex((float) pos2p.x,(float) pos.y + 0.005f,(float) pos2p.z).color(color.r,color.g,color.b,color.a * fadeOutP);
+        vertex.vertex((float) centerp.x,(float) pos.y + 0.005f,(float) centerp.z).color(color.r,color.g,color.b,color.a * fadeOutP);
 
-        vertex.addVertex((float) pos.x,(float) pos.y + 0.005f,(float) pos.z).setColor(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.addVertex((float) pos3p.x,(float) pos.y + 0.005f,(float) pos3p.z).setColor(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.addVertex((float) centerp.x,(float) pos.y + 0.005f,(float) centerp.z).setColor(color.r,color.g,color.b,color.a * fadeOutP);
+        vertex.vertex((float) pos.x,(float) pos.y + 0.005f,(float) pos.z).color(color.r,color.g,color.b,color.a * fadeOutP);
+        vertex.vertex((float) pos3p.x,(float) pos.y + 0.005f,(float) pos3p.z).color(color.r,color.g,color.b,color.a * fadeOutP);
+        vertex.vertex((float) centerp.x,(float) pos.y + 0.005f,(float) centerp.z).color(color.r,color.g,color.b,color.a * fadeOutP);
 
     }
 
@@ -104,9 +105,10 @@ public class ArcAttackPreparationParticle extends Particle {
         return RENDER_TYPE;
     }
 
-    public static final ParticleRenderType RENDER_TYPE = new FDParticleRenderType() {
+    public static final ParticleRenderType RENDER_TYPE = new ParticleRenderType() {
         @Override
-        public void end() {
+        public void end(Tesselator tesselator) {
+            tesselator.end();
             RenderSystem.setShader(GameRenderer::getParticleShader);
             RenderSystem.defaultBlendFunc();
             RenderSystem.enableCull();
@@ -114,28 +116,22 @@ public class ArcAttackPreparationParticle extends Particle {
 
         @Nullable
         @Override
-        public BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
+        public void begin(BufferBuilder tesselator, TextureManager textureManager) {
 
             RenderSystem.enableBlend();
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             RenderSystem.disableCull();
 
-            return tesselator.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
+            tesselator.begin(VertexFormat.Mode.TRIANGLES, DefaultVertexFormat.POSITION_COLOR);
         }
     };
 
     @Override
-    public AABB getRenderBoundingBox(float partialTicks) {
-        return new AABB(
-                -this.options.getLength(),
-                -this.options.getLength(),
-                -this.options.getLength(),
-                this.options.getLength(),
-                this.options.getLength(),
-                this.options.getLength()
-        ).move(x,y,z);
+    public boolean shouldCull() {
+        return false;
     }
+
 
     public static class Factory implements ParticleProvider<ArcAttackPreparationParticleOptions>{
         @Nullable

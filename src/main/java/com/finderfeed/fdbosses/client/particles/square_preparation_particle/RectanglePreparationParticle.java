@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Math;
 import org.lwjgl.opengl.GL11;
 
 public class RectanglePreparationParticle extends Particle {
@@ -76,19 +77,19 @@ public class RectanglePreparationParticle extends Particle {
         float endcolg = Math.clamp(color.g * colmod * 2f, 0, 1);
         float endcolb = Math.clamp(color.b * colmod * 2f, 0, 1);
 
-        vertex.addVertex((float)pos1.x,(float)pos1.y,(float)pos1.z).setColor(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.addVertex((float)pos2.x,(float)pos2.y,(float)pos2.z).setColor(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.addVertex((float)pos3.x,(float)pos3.y,(float)pos3.z).setColor(endcolr,endcolg,endcolb,color.a * fadeOutP);
-        vertex.addVertex((float)pos4.x,(float)pos4.y,(float)pos4.z).setColor(endcolr,endcolg,endcolb,color.a * fadeOutP);
+        vertex.vertex((float)pos1.x,(float)pos1.y,(float)pos1.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
+        vertex.vertex((float)pos2.x,(float)pos2.y,(float)pos2.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
+        vertex.vertex((float)pos3.x,(float)pos3.y,(float)pos3.z).color(endcolr,endcolg,endcolb,color.a * fadeOutP);
+        vertex.vertex((float)pos4.x,(float)pos4.y,(float)pos4.z).color(endcolr,endcolg,endcolb,color.a * fadeOutP);
 //
 
         float endcolr2 = Math.clamp(color.r * 2f, 0, 1);
         float endcolg2 = Math.clamp(color.g * 2f, 0, 1);
         float endcolb2 = Math.clamp(color.b * 2f, 0, 1);
-        vertex.addVertex((float)pos1p.x,(float)pos1p.y + 0.005f,(float)pos1p.z).setColor(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.addVertex((float)pos2p.x,(float)pos2p.y + 0.005f,(float)pos2p.z).setColor(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.addVertex((float)pos3p.x,(float)pos3p.y + 0.005f,(float)pos3p.z).setColor(endcolr2,endcolg2,endcolb2,color.a * fadeOutP);
-        vertex.addVertex((float)pos4p.x,(float)pos4p.y + 0.005f,(float)pos4p.z).setColor(endcolr2,endcolg2,endcolb2,color.a * fadeOutP);
+        vertex.vertex((float)pos1p.x,(float)pos1p.y + 0.005f,(float)pos1p.z).color(color.r,color.g,color.b,color.a * fadeOutP);
+        vertex.vertex((float)pos2p.x,(float)pos2p.y + 0.005f,(float)pos2p.z).color(color.r,color.g,color.b,color.a * fadeOutP);
+        vertex.vertex((float)pos3p.x,(float)pos3p.y + 0.005f,(float)pos3p.z).color(endcolr2,endcolg2,endcolb2,color.a * fadeOutP);
+        vertex.vertex((float)pos4p.x,(float)pos4p.y + 0.005f,(float)pos4p.z).color(endcolr2,endcolg2,endcolb2,color.a * fadeOutP);
 
     }
 
@@ -103,9 +104,10 @@ public class RectanglePreparationParticle extends Particle {
         return RENDER_TYPE;
     }
 
-    public static final ParticleRenderType RENDER_TYPE = new FDParticleRenderType() {
+    public static final ParticleRenderType RENDER_TYPE = new ParticleRenderType() {
         @Override
-        public void end() {
+        public void end(Tesselator tesselator) {
+            tesselator.end();
             RenderSystem.setShader(GameRenderer::getParticleShader);
             RenderSystem.defaultBlendFunc();
             RenderSystem.enableCull();
@@ -113,27 +115,20 @@ public class RectanglePreparationParticle extends Particle {
 
         @Nullable
         @Override
-        public BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
+        public void begin(BufferBuilder tesselator, TextureManager textureManager) {
 
             RenderSystem.enableBlend();
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
             RenderSystem.disableCull();
 
-            return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         }
     };
 
     @Override
-    public AABB getRenderBoundingBox(float partialTicks) {
-        return new AABB(
-                -this.options.getLength(),
-                -this.options.getLength(),
-                -this.options.getLength(),
-                this.options.getLength(),
-                this.options.getLength(),
-                this.options.getLength()
-        ).move(x,y,z);
+    public boolean shouldCull() {
+        return false;
     }
 
     public static class Factory implements ParticleProvider<RectanglePreparationParticleOptions> {

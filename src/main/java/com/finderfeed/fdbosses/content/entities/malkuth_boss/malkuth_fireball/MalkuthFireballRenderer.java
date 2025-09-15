@@ -90,10 +90,10 @@ public class MalkuthFireballRenderer extends EntityRenderer<MalkuthFireball> {
             Matrix4f mat = matrices.last().pose();
 
             for(int k = 0; k < timesRendered; k++) {
-                vertex.addVertex(mat, -half, -half, -half).setColor(r, g, b, a);
-                vertex.addVertex(mat, -half, -half, half).setColor(r, g, b, a);
-                vertex.addVertex(mat, -half, half, half).setColor(r, g, b, a);
-                vertex.addVertex(mat, -half, half, -half).setColor(r, g, b, a);
+                vertex.vertex(mat, -half, -half, -half).color(r, g, b, a);
+                vertex.vertex(mat, -half, -half, half).color(r, g, b, a);
+                vertex.vertex(mat, -half, half, half).color(r, g, b, a);
+                vertex.vertex(mat, -half, half, -half).color(r, g, b, a);
             }
 
             matrices.popPose();
@@ -103,16 +103,16 @@ public class MalkuthFireballRenderer extends EntityRenderer<MalkuthFireball> {
         Matrix4f mat = matrices.last().pose();
         for (int k = 0; k < timesRendered;k++){
 
-            vertex.addVertex(mat, -half, -half, -half).setColor(r,g,b,a);
-            vertex.addVertex(mat, half, -half, -half).setColor(r,g,b,a);
-            vertex.addVertex(mat, half, -half, half).setColor(r,g,b,a);
-            vertex.addVertex(mat, -half, -half, half).setColor(r,g,b,a);
+            vertex.vertex(mat, -half, -half, -half).color(r,g,b,a);
+            vertex.vertex(mat, half, -half, -half).color(r,g,b,a);
+            vertex.vertex(mat, half, -half, half).color(r,g,b,a);
+            vertex.vertex(mat, -half, -half, half).color(r,g,b,a);
 
 
-            vertex.addVertex(mat, -half, half, half).setColor(r,g,b,a);
-            vertex.addVertex(mat, half, half, half).setColor(r,g,b,a);
-            vertex.addVertex(mat, half, half, -half).setColor(r,g,b,a);
-            vertex.addVertex(mat, -half, half, -half).setColor(r,g,b,a);
+            vertex.vertex(mat, -half, half, half).color(r,g,b,a);
+            vertex.vertex(mat, half, half, half).color(r,g,b,a);
+            vertex.vertex(mat, half, half, -half).color(r,g,b,a);
+            vertex.vertex(mat, -half, half, -half).color(r,g,b,a);
         }
 
         matrices.popPose();

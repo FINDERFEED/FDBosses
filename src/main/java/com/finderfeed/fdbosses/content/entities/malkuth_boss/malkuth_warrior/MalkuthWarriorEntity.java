@@ -250,9 +250,9 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
 
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(WARRIOR_TYPE, MalkuthAttackType.FIRE);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(WARRIOR_TYPE, MalkuthAttackType.FIRE);
     }
 
     @Override

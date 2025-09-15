@@ -2,16 +2,13 @@ package com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity
 
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.NetworkCodec;
-import net.minecraft.network.codec.NetworkCodec;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 public class EarthShatterSettings implements AutoSerializable {
 
-    public static NetworkCodec<FriendlyByteBuf,EarthShatterSettings> NETWORK_CODEC = NetworkCodec.composite(
+    public static NetworkCodec<EarthShatterSettings> NETWORK_CODEC = NetworkCodec.composite(
             NetworkCodec.INT,t->t.delay,
             NetworkCodec.FLOAT,t->t.upDistance,
             NetworkCodec.INT,t->t.upTime,
