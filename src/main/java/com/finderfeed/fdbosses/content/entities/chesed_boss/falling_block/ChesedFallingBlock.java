@@ -1,7 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block;
 
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossBuddy;
-import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossSounds;
@@ -21,9 +20,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractHurtingProjectile;
@@ -34,7 +31,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.PacketDistributor;
 
 public class ChesedFallingBlock extends FDProjectile implements AutoSerializable {
 
@@ -147,7 +143,7 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
     }
 
 
-    @Override
+
     protected double getDefaultGravity() {
         return 0.025;
     }

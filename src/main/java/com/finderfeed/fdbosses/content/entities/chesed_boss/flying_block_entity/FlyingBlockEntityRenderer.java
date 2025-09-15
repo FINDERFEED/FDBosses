@@ -12,7 +12,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.minecraftforge.client.model.data.ModelData;
 
 public class FlyingBlockEntityRenderer extends EntityRenderer<FlyingBlockEntity> {
     public FlyingBlockEntityRenderer(EntityRendererProvider.Context p_174008_) {

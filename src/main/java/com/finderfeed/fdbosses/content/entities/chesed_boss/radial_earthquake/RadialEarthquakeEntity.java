@@ -126,7 +126,7 @@ public class RadialEarthquakeEntity extends Entity implements AutoSerializable {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder data) {
+    protected void defineSynchedData() {
 
     }
 

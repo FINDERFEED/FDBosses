@@ -1,38 +1,29 @@
 package com.finderfeed.fdbosses;
 
-import com.finderfeed.fdbosses.config.BossConfig;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossConfigs;
-import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.util.FDUtil;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Difficulty;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
-import net.neoforged.neoforge.common.util.AttributeUtil;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -117,35 +108,38 @@ public class BossUtil {
         }
     }
 
+    public static void applyGravity(Entity entity, double gravity){
+        entity.setDeltaMovement(entity.getDeltaMovement().add(0,-gravity,0));
+    }
+
     public static double getToolDamage(LivingEntity owner, Entity target, ItemStack itemStack){
         var attribute = owner.getAttribute(Attributes.ATTACK_DAMAGE);
 
         double base = attribute.getBaseValue();
         double damage;
 
-        var map = AttributeUtil.getSortedModifiers(itemStack, EquipmentSlotGroup.MAINHAND);
-        if (map.containsKey(Attributes.ATTACK_DAMAGE)){
-            var attributes = map.get(Attributes.ATTACK_DAMAGE);
+        var modifiers = itemStack.getAttributeModifiers(EquipmentSlot.MAINHAND);
+
+        if (modifiers.containsKey(Attributes.ATTACK_DAMAGE)){
+            var attributes = modifiers.get(Attributes.ATTACK_DAMAGE);
 
             var operationAttributes = modifierCollectionToOperationMap(attributes);
 
-            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_VALUE)){
-                base += mod.amount();
+            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADDITION)){
+                base += mod.getAmount();
             }
 
             damage = base;
 
-            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_MULTIPLIED_BASE)){
-                damage += base * mod.amount();
+            for (var mod : operationAttributes.get(AttributeModifier.Operation.MULTIPLY_BASE)){
+                damage += base * mod.getAmount();
             }
 
-            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)){
-                damage *= 1 + mod.amount();
+            for (var mod : operationAttributes.get(AttributeModifier.Operation.MULTIPLY_TOTAL)){
+                damage *= 1 + mod.getAmount();
             }
 
-            DamageSource damageSource = owner.level().damageSources().mobAttack(owner);
-
-            damage = EnchantmentHelper.modifyDamage((ServerLevel) owner.level(), itemStack, target, damageSource, (float) damage);
+            damage += EnchantmentHelper.getDamageBonus(itemStack, MobType.UNDEFINED);
 
             return damage;
         }
@@ -156,12 +150,12 @@ public class BossUtil {
     private static Map<AttributeModifier.Operation, List<AttributeModifier>> modifierCollectionToOperationMap(Collection<AttributeModifier> collection){
 
         Map<AttributeModifier.Operation, List<AttributeModifier>> operationListMap = new LinkedHashMap<>();
-        operationListMap.put(AttributeModifier.Operation.ADD_VALUE,new ArrayList<>());
-        operationListMap.put(AttributeModifier.Operation.ADD_MULTIPLIED_BASE,new ArrayList<>());
-        operationListMap.put(AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,new ArrayList<>());
+        operationListMap.put(AttributeModifier.Operation.ADDITION,new ArrayList<>());
+        operationListMap.put(AttributeModifier.Operation.MULTIPLY_BASE,new ArrayList<>());
+        operationListMap.put(AttributeModifier.Operation.MULTIPLY_TOTAL,new ArrayList<>());
 
         for (var mod : collection){
-            operationListMap.get(mod.operation()).add(mod);
+            operationListMap.get(mod.getOperation()).add(mod);
         }
 
         return operationListMap;

@@ -37,6 +37,7 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
 
     public ChesedMonolith(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
+        this.setNoGravity(true);
     }
 
 
@@ -156,18 +157,10 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
         return true;
     }
 
-    @Override
-    protected double getDefaultGravity() {
-        return 0;
-    }
+
 
     @Override
     public void push(Entity p_21294_) {
-
-    }
-
-    @Override
-    public void push(Vec3 p_347665_) {
 
     }
 

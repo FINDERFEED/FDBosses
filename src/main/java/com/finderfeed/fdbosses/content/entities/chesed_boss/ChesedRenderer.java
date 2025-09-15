@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Random;
 import org.joml.Vector3f;
@@ -191,11 +192,11 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
 
 
             vertexConsumer.vertex(matrix4f,radius, -crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f + 0.25f,0).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY)
-                    .normal(poseStack.last(), -1,0,0);
+                    .normal(poseStack.last().normal(), -1,0,0).endVertex();
 
 
             vertexConsumer.vertex(matrix4f,radius, crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f + 0.25f,1).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY)
-                    .normal(poseStack.last(), -1,0,0);
+                    .normal(poseStack.last().normal(), -1,0,0).endVertex();
 
             poseStack.mulPose(Axis.YP.rotation(angle));
 
@@ -203,10 +204,10 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
 
 
             vertexConsumer.vertex(matrix4f,radius, crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f,1).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY)
-                    .normal(poseStack.last(), -1,0,0);
+                    .normal(poseStack.last().normal(), -1,0,0).endVertex();
 
             vertexConsumer.vertex(matrix4f,radius, -crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f,0).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY)
-                    .normal(poseStack.last(), -1,0,0);
+                    .normal(poseStack.last().normal(), -1,0,0).endVertex();
 
             poseStack.popPose();
         }

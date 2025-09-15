@@ -105,35 +105,16 @@ public class ChesedCrystalEntity extends FDLivingEntity implements ChesedBossBud
         return BossSounds.CHESED_CRYSTAL_HIT.get();
     }
 
-    @Override
-    public void onAddedToLevel() {
-        super.onAddedToLevel();
-
-    }
-
-    @Override
-    public void onRemovedFromLevel() {
-        super.onRemovedFromLevel();
-
-    }
 
     @Override
     public boolean isNoGravity() {
         return true;
     }
 
-    @Override
-    protected void applyGravity() {
-
-    }
 
     @Override
     public void knockback(double p_147241_, double p_147242_, double p_147243_) {
 
-    }
-
-    @Override
-    public void push(Vec3 p_347665_) {
     }
 
     @Override
@@ -173,9 +154,9 @@ public class ChesedCrystalEntity extends FDLivingEntity implements ChesedBossBud
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder data) {
-        super.defineSynchedData(data);
-        data.define(DIRECTION,new Vec3(0,1,0));
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        entityData.define(DIRECTION,new Vec3(0,1,0));
     }
 
 }

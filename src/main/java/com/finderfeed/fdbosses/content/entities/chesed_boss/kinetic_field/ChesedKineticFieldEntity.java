@@ -47,8 +47,8 @@ public class ChesedKineticFieldEntity extends FDEntity {
     }
 
     @Override
-    public void onRemovedFromLevel() {
-        super.onRemovedFromLevel();
+    public void remove(RemovalReason p_146834_) {
+        super.remove(p_146834_);
         if (level().isClientSide){
 
             double radius = this.getSquareRadius();
@@ -57,9 +57,9 @@ public class ChesedKineticFieldEntity extends FDEntity {
             this.spawnSpearParticles(-radius,radius);
             this.spawnSpearParticles(radius,radius);
             this.spawnSpearParticles(radius,-radius);
-
         }
     }
+
 
     @Override
     public boolean isPickable() {
@@ -130,7 +130,7 @@ public class ChesedKineticFieldEntity extends FDEntity {
 
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder p_326003_) {
+    protected void defineSynchedData() {
 
     }
 

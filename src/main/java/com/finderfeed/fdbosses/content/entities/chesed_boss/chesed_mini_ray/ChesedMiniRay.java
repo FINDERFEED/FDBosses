@@ -24,9 +24,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
@@ -300,31 +298,34 @@ public class ChesedMiniRay extends Entity implements AutoSerializable {
         double base = attribute.getBaseValue();
         double damage;
 
-        var map = AttributeUtil.getSortedModifiers(item, EquipmentSlotGroup.MAINHAND);
+        var map = item.getAttributeModifiers(EquipmentSlot.MAINHAND);
+
+
+
         if (map.containsKey(Attributes.ATTACK_DAMAGE)){
             var attributes = map.get(Attributes.ATTACK_DAMAGE);
 
             var operationAttributes = modifierCollectionToOperationMap(attributes);
 
-            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_VALUE)){
-                base += mod.amount();
+            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADDITION)){
+                base += mod.getAmount();
             }
 
             damage = base;
 
-            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_MULTIPLIED_BASE)){
-                damage += base * mod.amount();
+            for (var mod : operationAttributes.get(AttributeModifier.Operation.MULTIPLY_BASE)){
+                damage += base * mod.getAmount();
             }
 
-            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)){
-                damage *= 1 + mod.amount();
+            for (var mod : operationAttributes.get(AttributeModifier.Operation.MULTIPLY_TOTAL)){
+                damage *= 1 + mod.getAmount();
             }
 
             float dmg = BossConfigs.BOSS_CONFIG.get().itemConfig.lightningStrikeDamagePercent / 100f;
 
             DamageSource damageSource = level().damageSources().mobAttack(owner);
 
-            damage = EnchantmentHelper.modifyDamage((ServerLevel) level(), item, target, damageSource, (float) damage);
+            damage += EnchantmentHelper.getDamageBonus(item, MobType.UNDEFINED);
 
             damage *= dmg;
 
@@ -333,8 +334,9 @@ public class ChesedMiniRay extends Entity implements AutoSerializable {
             target.invulnerableTime = 0;
             if (target.hurt(damageSource,(float) damage)){
                 int duration = BossConfigs.BOSS_CONFIG.get().itemConfig.lightningStrikeShockDuration;
-                target.addEffect(new MobEffectInstance(BossEffects.SHOCKED,duration,0));
-                EnchantmentHelper.doPostAttackEffects((ServerLevel) level(), target, damageSource);
+                target.addEffect(new MobEffectInstance(BossEffects.SHOCKED.get(),duration,0));
+                EnchantmentHelper.doPostHurtEffects(target,owner);
+                EnchantmentHelper.doPostDamageEffects(owner, target);
                 target.invulnerableTime = 0;
             }
 
@@ -344,12 +346,12 @@ public class ChesedMiniRay extends Entity implements AutoSerializable {
     private Map<AttributeModifier.Operation, List<AttributeModifier>> modifierCollectionToOperationMap(Collection<AttributeModifier> collection){
 
         Map<AttributeModifier.Operation, List<AttributeModifier>> operationListMap = new LinkedHashMap<>();
-        operationListMap.put(AttributeModifier.Operation.ADD_VALUE,new ArrayList<>());
-        operationListMap.put(AttributeModifier.Operation.ADD_MULTIPLIED_BASE,new ArrayList<>());
-        operationListMap.put(AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,new ArrayList<>());
+        operationListMap.put(AttributeModifier.Operation.ADDITION,new ArrayList<>());
+        operationListMap.put(AttributeModifier.Operation.MULTIPLY_BASE,new ArrayList<>());
+        operationListMap.put(AttributeModifier.Operation.MULTIPLY_TOTAL,new ArrayList<>());
 
         for (var mod : collection){
-            operationListMap.get(mod.operation()).add(mod);
+            operationListMap.get(mod.getOperation()).add(mod);
         }
 
         return operationListMap;
@@ -358,8 +360,8 @@ public class ChesedMiniRay extends Entity implements AutoSerializable {
 
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder data) {
-        data.define(TARGET, -1);
+    protected void defineSynchedData() {
+        this.entityData.define(TARGET, -1);
     }
 
     @Override

@@ -85,7 +85,7 @@ public class MalkuthRepairCrystal extends FDEntity implements AutoSerializable {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder data) {
+    protected void defineSynchedData() {
         data.define(CRYSTAL_TYPE, MalkuthAttackType.FIRE);
         data.define(HIDDEN, false);
     }

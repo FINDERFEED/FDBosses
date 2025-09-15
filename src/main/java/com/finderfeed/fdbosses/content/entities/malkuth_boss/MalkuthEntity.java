@@ -30,6 +30,7 @@ import com.finderfeed.fdlib.init.FDRenderTypes;
 import com.finderfeed.fdlib.init.FDScreenEffects;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.network.lib_packets.PlaySoundInEarsPacket;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
@@ -84,11 +85,8 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.*;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.joml.*;
 
@@ -479,7 +477,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     public void hurtBoss(int amount){
         if (allowedToBeDamaged) {
-            this.hits = Math.clamp(this.hits - amount, 0, maxHits);
+            this.hits = org.joml.Math.clamp(this.hits - amount, 0, maxHits);
             if (hits == 0) {
                 this.kill();
             }
@@ -569,8 +567,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         .outTime(30)
                         .build());
                 for (var player : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level(), this.spawnPosition.subtract(0,2,0),40,40)){
-                    PacketDistributor.sendToPlayer(player, new PlaySoundInEarsPacket(BossSounds.MALKUTH_HIT.get(),0.75f,1f));
-                    PacketDistributor.sendToPlayer(player, new PlaySoundInEarsPacket(BossSounds.MALKUTH_VOLCANO_ERRUPTION.get(),1.75f,1f));
+                    FDPacketHandler.INSTANCE.sendTo(new PlaySoundInEarsPacket(BossSounds.MALKUTH_HIT.get(),0.75f,1f),player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                    FDPacketHandler.INSTANCE.sendTo(new PlaySoundInEarsPacket(BossSounds.MALKUTH_VOLCANO_ERRUPTION.get(),1.75f,1f),player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
                 }
             }else if (this.deathTime == animEndtime - 37) {
                 BossUtil.malkuthSwordsInsertParticles((ServerLevel) level(), this.spawnPosition, 100, this.getId());
@@ -608,7 +606,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 }
 
                 this.teleportTo(this.spawnPosition.x,this.spawnPosition.y,this.spawnPosition.z);
-                this.dropAllDeathLoot((ServerLevel) level(), level().damageSources().generic());
+                this.dropAllDeathLoot(level().damageSources().generic());
 
                 this.setRemoved(RemovalReason.KILLED);
 
@@ -1008,7 +1006,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         double len = between.length();
         if (len > 0.025){
 
-            float p = (float) Math.clamp(len / 15f, 0, 1);
+            float p = (float) org.joml.Math.clamp(len / 15f, 0, 1);
 
             float speed = (float) FDMathUtil.lerp(0.025, 2, p);
 
@@ -1088,7 +1086,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                                 .maxVerticalSpeedEdges(0.15f)
                                 .maxVerticalSpeedCenter(0.4f)
                 );
-                PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+                FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->this),packet);
 
                 level().playSound(null, this.getX(),this.getY(),this.getZ(), BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.HOSTILE, 3f ,1f + random.nextFloat() * 0.2f);
 
@@ -1174,7 +1172,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     Vec3 clipdir = new Vec3(k * 30, 0,0);
                     Vec3 cliplastpos = startPos.add(clipdir);
 
-                    ClipContext clipContext = new ClipContext(startPos, cliplastpos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+                    ClipContext clipContext = new ClipContext(startPos, cliplastpos, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
 
                     var ctx = level().clip(clipContext);
 
@@ -1281,7 +1279,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         float radius = 28;
 
         if (stage == 1) {
-            Vec3 lastpos = this.jumpBackOnSpawnPath.getPositions().getLast();
+            Vec3 lastpos = this.jumpBackOnSpawnPath.getPositions().get(this.jumpBackOnSpawnPath.getPositions().size() - 1);
             if (crush){
                 if (tick == 10){
                     this.jumpEndEarthquakePrepareParticles(lastpos.add(0,-0.99,0),earthquakesCount,angle,radius);
@@ -1513,7 +1511,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     .build());
             if (tick == 5){
                 this.jumpCrushAttackMovementPath = this.createJumpCrushAttackMovementPath(15);
-                this.lookAt(EntityAnchorArgument.Anchor.FEET, this.jumpCrushAttackMovementPath.getPositions().getLast());
+                this.lookAt(EntityAnchorArgument.Anchor.FEET, this.jumpCrushAttackMovementPath.getPositions().get(this.jumpCrushAttackMovementPath.getPositions().size() - 1));
 
                 inst.nextStage();
             }
@@ -1529,7 +1527,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.ANIMATION);
             if (this.jumpCrushAttackMovementPath.isFinished()){
 
-                Vec3 lastPos = this.jumpCrushAttackMovementPath.getPositions().getLast();
+                Vec3 lastPos = this.jumpCrushAttackMovementPath.getPositions().get(this.jumpCrushAttackMovementPath.getPositions().size() - 1);
 
                 Vec3 between = lastPos.subtract(this.position());
 
@@ -1586,7 +1584,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     private void summonRepairCrystal(Vec3 pos){
 
         Vec3 posBelow = pos.add(0,-20,0);
-        BlockHitResult result = level().clip(new ClipContext(pos,posBelow, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
+        BlockHitResult result = level().clip(new ClipContext(pos,posBelow, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null));
         pos = result.getLocation();
 
         if (!BossTargetFinder.isPointInCylinder(pos, this.spawnPosition.add(0,-2,0),ENRAGE_HEIGHT + 10, ENRAGE_RADIUS)) return;
@@ -1634,7 +1632,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         Vec3 end = crushBasePos.add(0,-5,0);
 
-        ClipContext clipContext = new ClipContext(crushBasePos, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+        ClipContext clipContext = new ClipContext(crushBasePos, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
 
         var res = level().clip(clipContext);
 
@@ -1771,12 +1769,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                                 player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN,5,0,true,false));
                                 player.addEffect(new MobEffectInstance(MobEffects.CONFUSION,100,0,true,false));
 
-                                PacketDistributor.sendToPlayer(player, new DefaultShakePacket(FDShakeData.builder()
+                                FDPacketHandler.INSTANCE.sendTo(new DefaultShakePacket(FDShakeData.builder()
                                         .stayTime(0)
                                         .inTime(0)
                                         .outTime(35)
                                         .amplitude(0.2f)
-                                        .build()));
+                                        .build()),player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
 
 
                             }else{
@@ -1843,7 +1841,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             if (this.jumpOnWallPath.isFinished()){
                 this.lookAt(EntityAnchorArgument.Anchor.EYES, this.position().add(0,0,-100));
-                Vec3 last = this.jumpOnWallPath.getPositions().getLast();
+                Vec3 last = this.jumpOnWallPath.getPositions().get(this.jumpOnWallPath.getPositions().size() - 1);
                 this.setNoGravity(false);
                 this.noPhysics = false;
                 this.teleportTo(last.x,last.y,last.z);
@@ -1948,7 +1946,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         int currentCannon = 0;
         while (!positions.isEmpty()){
-            Vec3 pos = positions.removeFirst();
+            Vec3 pos = positions.remove(0);
             MalkuthCannonEntity cannon = cannons.get(currentCannon);
             cannonTargets.computeIfAbsent(cannon, c->new ArrayList<>()).add(pos);
             currentCannon = (currentCannon + 1) % cannons.size();
@@ -2010,7 +2008,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         .maxVerticalSpeedEdges(0.15f)
                         .maxVerticalSpeedCenter(0.15f)
         );
-        PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+        FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->this),packet);
     }
 
     private void hideRepairCrystals(boolean hide){
@@ -2141,9 +2139,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         Vector3f color = getMalkuthAttackPreparationParticleColor(malkuthAttackType);
 
-        color.x = Math.clamp(color.x + random.nextFloat() * 0.2f, 0, 1);
-        color.y = Math.clamp(color.y + random.nextFloat() * 0.2f, 0, 1);
-        color.z = Math.clamp(color.z + random.nextFloat() * 0.2f, 0, 1);
+        color.x = org.joml.Math.clamp(color.x + random.nextFloat() * 0.2f, 0, 1);
+        color.y = org.joml.Math.clamp(color.y + random.nextFloat() * 0.2f, 0, 1);
+        color.z = org.joml.Math.clamp(color.z + random.nextFloat() * 0.2f, 0, 1);
 
         return color;
     }
@@ -2189,12 +2187,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     return true;
                 });
                 if (!players.isEmpty()){
-                    Player firstPlayer = players.getFirst();
+                    Player firstPlayer = players.get(0);
                     MalkuthAttackType weakTo = MalkuthWeaknessHandler.getWeakTo(firstPlayer);
                     giantSwordUltimateStartAttackType = MalkuthAttackType.getOpposite(weakTo);
                 }
             }else{
-                Player firstPlayer = players.getFirst();
+                Player firstPlayer = players.get(0);
                 MalkuthAttackType weakTo = MalkuthWeaknessHandler.getWeakTo(firstPlayer);
                 giantSwordUltimateStartAttackType = weakTo;
             }
@@ -2289,8 +2287,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
                 for (var entity : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level(), this.spawnPosition.add(0,-5,0), 50,50)){
-                    PacketDistributor.sendToPlayer(entity, new PlaySoundInEarsPacket(BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(),1f,1));
-                    PacketDistributor.sendToPlayer(entity, new PlaySoundInEarsPacket(BossSounds.MALKUTH_SWORD_ULTIMATE_IMPACT.get(),1f,1));
+                    FDPacketHandler.INSTANCE.sendTo(new PlaySoundInEarsPacket(BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(),1f,1),entity.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                    FDPacketHandler.INSTANCE.sendTo(new PlaySoundInEarsPacket(BossSounds.MALKUTH_SWORD_ULTIMATE_IMPACT.get(),1f,1),entity.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
                 }
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                                 .amplitude(4)
@@ -2399,6 +2397,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             if (dist < 5){
 
                 level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.MALKUTH_HIT.get(), SoundSource.HOSTILE,1f,0.5f);
+
+                FDPacketHandler.INSTANCE.sendTo();
 
                 PacketDistributor.sendToPlayer(serverPlayer, new DefaultShakePacket(FDShakeData.builder()
                         .outTime(5)

@@ -1,8 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.chesed_sword_buff;
 
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOptions;
-import com.finderfeed.fdbosses.init.BossConfigs;
-import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDLibCalls;
@@ -12,27 +10,20 @@ import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOpti
 import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.common.util.AttributeUtil;
+import org.joml.Math;
 
 import java.util.*;
 
@@ -274,7 +265,7 @@ public class FlyingSwordEntity extends FDProjectile {
                         level().playSound(null, targetPos.x,targetPos.y,targetPos.z, BossSounds.FAST_LIGHTNING_STRIKE.get(), SoundSource.HOSTILE, 2f, 1 + random.nextFloat() * 0.5f);
 
 
-                        this.hurtTarget(owner, livingTarget);
+//                        this.hurtTarget(owner, livingTarget);
                         this.remove(RemovalReason.DISCARDED);
                     }
 
@@ -304,66 +295,66 @@ public class FlyingSwordEntity extends FDProjectile {
         super.onHitEntity(hitResult);
     }
 
-    private void hurtTarget(LivingEntity owner, LivingEntity target){
-        var attribute = owner.getAttribute(Attributes.ATTACK_DAMAGE);
-
-        double base = attribute.getBaseValue();
-        double damage;
-
-        var map = AttributeUtil.getSortedModifiers(this.getItem(), EquipmentSlotGroup.MAINHAND);
-        if (map.containsKey(Attributes.ATTACK_DAMAGE)){
-            var attributes = map.get(Attributes.ATTACK_DAMAGE);
-
-            var operationAttributes = modifierCollectionToOperationMap(attributes);
-
-            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_VALUE)){
-                base += mod.amount();
-            }
-
-            damage = base;
-
-            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_MULTIPLIED_BASE)){
-                damage += base * mod.amount();
-            }
-
-            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)){
-                damage *= 1 + mod.amount();
-            }
-
-            float dmg = BossConfigs.BOSS_CONFIG.get().itemConfig.lightningStrikeDamagePercent / 100f;
-
-            DamageSource damageSource = level().damageSources().mobAttack(owner);
-
-            damage = EnchantmentHelper.modifyDamage((ServerLevel) level(), this.getItem(), target, damageSource, (float) damage);
-
-            damage *= dmg;
-
-            target.setRemainingFireTicks(0);
-
-            target.invulnerableTime = 0;
-            if (target.hurt(damageSource,(float) damage)){
-                int duration = BossConfigs.BOSS_CONFIG.get().itemConfig.lightningStrikeShockDuration;
-                target.addEffect(new MobEffectInstance(BossEffects.SHOCKED,duration,0));
-                EnchantmentHelper.doPostAttackEffects((ServerLevel) level(), target, damageSource);
-                target.invulnerableTime = 0;
-            }
-
-        }
-    }
-
-    private Map<AttributeModifier.Operation, List<AttributeModifier>> modifierCollectionToOperationMap(Collection<AttributeModifier> collection){
-
-        Map<AttributeModifier.Operation, List<AttributeModifier>> operationListMap = new LinkedHashMap<>();
-        operationListMap.put(AttributeModifier.Operation.ADD_VALUE,new ArrayList<>());
-        operationListMap.put(AttributeModifier.Operation.ADD_MULTIPLIED_BASE,new ArrayList<>());
-        operationListMap.put(AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,new ArrayList<>());
-
-        for (var mod : collection){
-            operationListMap.get(mod.operation()).add(mod);
-        }
-
-        return operationListMap;
-    }
+//    private void hurtTarget(LivingEntity owner, LivingEntity target){
+//        var attribute = owner.getAttribute(Attributes.ATTACK_DAMAGE);
+//
+//        double base = attribute.getBaseValue();
+//        double damage;
+//
+//        var map = AttributeUtil.getSortedModifiers(this.getItem(), EquipmentSlotGroup.MAINHAND);
+//        if (map.containsKey(Attributes.ATTACK_DAMAGE)){
+//            var attributes = map.get(Attributes.ATTACK_DAMAGE);
+//
+//            var operationAttributes = modifierCollectionToOperationMap(attributes);
+//
+//            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_VALUE)){
+//                base += mod.amount();
+//            }
+//
+//            damage = base;
+//
+//            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_MULTIPLIED_BASE)){
+//                damage += base * mod.amount();
+//            }
+//
+//            for (var mod : operationAttributes.get(AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL)){
+//                damage *= 1 + mod.amount();
+//            }
+//
+//            float dmg = BossConfigs.BOSS_CONFIG.get().itemConfig.lightningStrikeDamagePercent / 100f;
+//
+//            DamageSource damageSource = level().damageSources().mobAttack(owner);
+//
+//            damage = EnchantmentHelper.modifyDamage((ServerLevel) level(), this.getItem(), target, damageSource, (float) damage);
+//
+//            damage *= dmg;
+//
+//            target.setRemainingFireTicks(0);
+//
+//            target.invulnerableTime = 0;
+//            if (target.hurt(damageSource,(float) damage)){
+//                int duration = BossConfigs.BOSS_CONFIG.get().itemConfig.lightningStrikeShockDuration;
+//                target.addEffect(new MobEffectInstance(BossEffects.SHOCKED,duration,0));
+//                EnchantmentHelper.doPostAttackEffects((ServerLevel) level(), target, damageSource);
+//                target.invulnerableTime = 0;
+//            }
+//
+//        }
+//    }
+//
+//    private Map<AttributeModifier.Operation, List<AttributeModifier>> modifierCollectionToOperationMap(Collection<AttributeModifier> collection){
+//
+//        Map<AttributeModifier.Operation, List<AttributeModifier>> operationListMap = new LinkedHashMap<>();
+//        operationListMap.put(AttributeModifier.Operation.ADD_VALUE,new ArrayList<>());
+//        operationListMap.put(AttributeModifier.Operation.ADD_MULTIPLIED_BASE,new ArrayList<>());
+//        operationListMap.put(AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,new ArrayList<>());
+//
+//        for (var mod : collection){
+//            operationListMap.get(mod.operation()).add(mod);
+//        }
+//
+//        return operationListMap;
+//    }
 
     @Override
     protected void onHitBlock(BlockHitResult hitResult) {
@@ -380,9 +371,9 @@ public class FlyingSwordEntity extends FDProjectile {
 
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder b) {
-        b.define(ITEM, Items.WOODEN_SWORD.getDefaultInstance());
-        b.define(TARGET_ID, 0);
+    protected void defineSynchedData() {
+        this.entityData.define(ITEM, Items.WOODEN_SWORD.getDefaultInstance());
+        this.entityData.define(TARGET_ID, 0);
     }
 
     @Override
@@ -392,28 +383,28 @@ public class FlyingSwordEntity extends FDProjectile {
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
-
-        if (tag.contains("item")) {
-            Tag t = tag.get("item");
-            var opt = ItemStack.parse(level().registryAccess(),t);
-            if (opt.isPresent()) {
-                this.setItem(opt.get());
-            }
-        }
-
-        if (tag.contains("target")){
-            this.target = tag.getUUID("target");
-        }
+//
+//        if (tag.contains("item")) {
+//            Tag t = tag.get("item");
+//            var opt = ItemStack.parse(level().registryAccess(),t);
+//            if (opt.isPresent()) {
+//                this.setItem(opt.get());
+//            }
+//        }
+//
+//        if (tag.contains("target")){
+//            this.target = tag.getUUID("target");
+//        }
 
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
-        Tag t = this.getItem().save(level().registryAccess());
-        tag.put("item",t);
-
-        if (target != null){
-            tag.putUUID("target",target);
-        }
+//        Tag t = this.getItem().save(level().registryAccess());
+//        tag.put("item",t);
+//
+//        if (target != null){
+//            tag.putUUID("target",target);
+//        }
     }
 }

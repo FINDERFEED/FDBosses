@@ -84,7 +84,7 @@ public class ChesedFireTrailEntity extends Entity implements AutoSerializable {
 
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder p_326003_) {
+    protected void defineSynchedData() {
 
     }
 

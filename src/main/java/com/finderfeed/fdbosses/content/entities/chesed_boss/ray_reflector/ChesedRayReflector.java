@@ -229,7 +229,7 @@ public class ChesedRayReflector extends FDEntity {
         Vec3 hpos = this.position().multiply(1,0,1);
 
         List<Player> players = this.level().getEntitiesOfClass(Player.class, box, player->{
-            if (!player.hasEffect(BossEffects.CHESED_ENERGIZED) || player.isSpectator()){
+            if (!player.hasEffect(BossEffects.CHESED_ENERGIZED.get()) || player.isSpectator()){
                 return false;
             }
             Vec3 playerPos = player.position().multiply(1,0,1);

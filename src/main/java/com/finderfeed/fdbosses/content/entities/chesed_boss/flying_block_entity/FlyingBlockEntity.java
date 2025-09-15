@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.chesed_boss.flying_block_entity;
 
 
+import com.finderfeed.fdbosses.BossUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -40,11 +41,14 @@ public class FlyingBlockEntity extends Entity {
                 this.discard();
             }
         }
+
         float friction = this.getAirFriction();
         this.setDeltaMovement(
                 this.getDeltaMovement().multiply(friction,1f,friction)
         );
-        this.applyGravity();
+
+        BossUtil.applyGravity(this, -this.getDefaultGravity());
+
         this.move(MoverType.SELF,this.getDeltaMovement());
     }
 
@@ -84,17 +88,15 @@ public class FlyingBlockEntity extends Entity {
     protected void playStepSound(BlockPos p_20135_, BlockState p_20136_) {
     }
 
-    @Override
     protected double getDefaultGravity() {
         return 0.04;
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder data) {
-        data
-                .define(ROTATION_SPEED,1f)
-                .define(FRICTION,1f)
-                .define(STATE, Blocks.STONE.defaultBlockState());
+    protected void defineSynchedData() {
+        this.entityData.define(ROTATION_SPEED,1f);
+        this.entityData.define(FRICTION,1f);
+        this.entityData.define(STATE, Blocks.STONE.defaultBlockState());
     }
 
     @Override

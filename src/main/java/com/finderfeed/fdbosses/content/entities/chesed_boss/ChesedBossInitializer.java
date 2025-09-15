@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDLib;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDScreenEffects;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
@@ -25,7 +26,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -171,7 +172,8 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
 
             entity.level().playSound(null, entity.getX(),entity.getY(),entity.getZ(), BossSounds.CHESED_FLOOR_SMASH.get(), SoundSource.HOSTILE, 10f, 1f);
 
-            PacketDistributor.sendToPlayersTrackingEntity(entity,packet);
+            FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(this::getBoss),packet);
+
 
             DefaultShakePacket defaultShakePacket = new DefaultShakePacket(FDShakeData.builder()
                     .inTime(2)
@@ -181,7 +183,8 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
                     .amplitude(0.2f)
                     .frequency(50f)
                     .build());
-            PacketDistributor.sendToPlayersTrackingEntity(entity,defaultShakePacket);
+            FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(this::getBoss),defaultShakePacket);
+
         }else if (this.getTick() == 72 || this.getTick() == 82){
 //            entity.level().playSound(null, entity.getX(),entity.getY(),entity.getZ(), BossSounds.CHESED_OPEN.get(), SoundSource.HOSTILE, 10f, 1f);
         } else if (this.getTick() >= endTick + idleAfterEnd){
