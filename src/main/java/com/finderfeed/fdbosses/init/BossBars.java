@@ -6,7 +6,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthBossBar;
 import com.finderfeed.fdlib.systems.FDRegistries;
 import com.finderfeed.fdlib.systems.hud.bossbars.FDBossBarFactory;
 import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import net.minecraftforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 

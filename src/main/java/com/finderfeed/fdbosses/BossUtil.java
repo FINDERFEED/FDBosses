@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.util.FDUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -16,6 +17,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -28,6 +30,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.PacketDistributor;
 import net.neoforged.neoforge.common.util.AttributeUtil;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix4f;
@@ -239,7 +242,7 @@ public class BossUtil {
     }
 
     public static void posEvent(ServerLevel level, Vec3 pos, int event,int data,double radius){
-        PacketDistributor.sendToPlayersNear(level,null,pos.x,pos.y,pos.z,radius,new PosLevelEventPacket(pos,event,data));
+        FDPacketHandler.INSTANCE.send(PacketDistributor.NEAR.with(PacketDistributor.TargetPoint.p(pos.x,pos.y,pos.z,radius,level.dimension())), new PosLevelEventPacket(pos,event,data));
     }
 
     //easings.net
@@ -249,14 +252,9 @@ public class BossUtil {
         return c3 * x * x * x - c1 * x * x;
     }
 
-    public static boolean itemContainsModifierForAttribute(ItemStack itemStack, Holder<Attribute> attributeHolder){
-        ItemAttributeModifiers modifiers = itemStack.getAttributeModifiers();
-        for (var modifier : modifiers.modifiers()){
-            if (modifier.attribute().value().equals(attributeHolder.value())){
-                return true;
-            }
-        }
-        return false;
+    public static boolean itemContainsModifierForAttribute(ItemStack itemStack, Attribute attributeHolder){
+        var modifiers = itemStack.getAttributeModifiers(EquipmentSlot.MAINHAND);
+        return modifiers.containsKey(attributeHolder);
     }
 
 

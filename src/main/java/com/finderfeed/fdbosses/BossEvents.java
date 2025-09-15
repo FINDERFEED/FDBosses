@@ -65,8 +65,11 @@ public class BossEvents {
 
     @SubscribeEvent
     public static void preventRemovingEffects(MobEffectEvent.Remove event){
-        var effect = event.getEffect();
-        if (effect.is(NOT_CURABLE_EFFECTS) && event.getCure() != null){
+        List<MobEffect> NOT_CURABLE = List.of(
+                BossEffects.MARK_OF_A_COWARD.get(),
+                BossEffects.MARK_OF_A_KNIGHT.get()
+        );
+        if (NOT_CURABLE.contains(event.getEffect())){
             event.setCanceled(true);
         }
     }
@@ -81,7 +84,7 @@ public class BossEvents {
     @SubscribeEvent
     public static void respawn(PlayerEvent.PlayerRespawnEvent event){
         if (event.getEntity() instanceof ServerPlayer serverPlayer){
-            PacketDistributor.sendToPlayer(serverPlayer, new SetClientMalkuthWeaknessAmountPacket(MalkuthWeaknessHandler.getCurrentWeaknessLevel(serverPlayer)));
+            FDPacketHandler.INSTANCE.sendTo(new SetClientMalkuthWeaknessAmountPacket(MalkuthWeaknessHandler.getCurrentWeaknessLevel(serverPlayer)),serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
         }
     }
 
@@ -290,7 +293,7 @@ public class BossEvents {
         LivingEntity livingEntity = event.getEntity();
         if (!livingEntity.level().isClientSide){
             DamageSource damageSource = event.getSource();
-            if (damageSource.getEntity() instanceof LivingEntity damager && damager.hasEffect(BossEffects.SHOCKED)){
+            if (damageSource.getEntity() instanceof LivingEntity damager && damager.hasEffect(BossEffects.SHOCKED.get())){
                 float amount = event.getAmount();
 
                 float p = Mth.clamp(1 - BossConfigs.BOSS_CONFIG.get().effectConfig.shockDamageReductionPercent / 100f,0,1);

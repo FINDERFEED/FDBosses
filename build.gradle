@@ -5,7 +5,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
 }
 
-version = mod_version + " " + minecraft_version
+version = mod_version + "-" + minecraft_version
 group = mod_group_id
 
 base {
@@ -73,17 +73,45 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+
+    mavenLocal()
+
+     flatDir {
+         dir 'build/jarmods'
+     }
+
 }
 
 dependencies {
 
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    implementation fileTree(dir: 'build/libraries', include: ['*.jar'])
+//    implementation fileTree(dir: 'build/jarmods', include: ['*.jar'])
 
-    print("Added Libraries: \n")
-    fileTree('build/libraries').visit { FileVisitDetails details ->
-        print(details.name + '\n')
+    if (file("build/jarmods").isDirectory()) {
+        file("build/jarmods").eachFile { file ->
+            def splitPos = file.name.lastIndexOf("-")
+
+            if (file.name != "desktop.ini") {
+                println file.name
+
+                def modartifact = file.name.substring(0, splitPos)
+                def modversion = file.name.substring(splitPos + 1, file.name.length() - 4)
+                def modreference = "lib:$modartifact:$modversion"
+
+                dependencies {
+                    implementation fg.deobf(project.dependencies.create(modreference) {
+                        transitive = false
+                    })
+                }
+            }
+        }
+    } else file("build/jarmods").mkdir()
+
+
+    compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.5.0"))
+    implementation(jarJar("io.github.llamalad7:mixinextras-forge:0.5.0")) {
+        jarJar.ranged(it, "[0.5.0,)")
     }
 
 }

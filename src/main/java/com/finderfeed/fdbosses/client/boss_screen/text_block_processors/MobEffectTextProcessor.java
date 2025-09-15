@@ -22,6 +22,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +37,7 @@ public class MobEffectTextProcessor extends TextBlockProcessor {
         String id = arguments.get("id");
         ResourceLocation effectId = ResourceLocation.parse(id);
 
-        MobEffect effect = BuiltInRegistries.MOB_EFFECT.get(effectId);
+        MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue(effectId);
 
         if (effect == null) throw new RuntimeException("Unknown effect provided in mob effect text processor: " + id);
 
@@ -44,14 +45,14 @@ public class MobEffectTextProcessor extends TextBlockProcessor {
 
         MobEffectTextureManager mobeffecttexturemanager = Minecraft.getInstance().getMobEffectTextures();
 
-        TextureAtlasSprite sprite = mobeffecttexturemanager.get(BuiltInRegistries.MOB_EFFECT.wrapAsHolder(effect));
+        TextureAtlasSprite sprite = mobeffecttexturemanager.get(effect);
 
         TextureAtlas atlas = mobeffecttexturemanager.textureAtlas;
 
         ImageInText imageInText = new ImageInText(sprite.atlasLocation(),sprite.getU0(),sprite.getV0(),sprite.getU1(),sprite.getV1(),atlas.width,atlas.height);
 
 
-        ResourceLocation location = BuiltInRegistries.MOB_EFFECT.getKey(effect);
+        ResourceLocation location = ForgeRegistries.MOB_EFFECTS.getKey(effect);
 
         String key = Util.makeDescriptionId("effect_description",location);
 
