@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.structures;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.init.BossStructures;
+import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.*;
@@ -16,7 +17,7 @@ import java.util.Optional;
 
 public class MalkuthArenaStructure extends Structure {
 
-    public static final MapCodec<MalkuthArenaStructure> CODEC = RecordCodecBuilder.mapCodec(p->p.group(
+    public static final Codec<MalkuthArenaStructure> CODEC = RecordCodecBuilder.create(p->p.group(
             settingsCodec(p),
             StructureTemplatePool.CODEC.fieldOf("start_pool").forGetter(structure -> structure.startPool)
     ).apply(p, MalkuthArenaStructure::new));

@@ -9,17 +9,18 @@ import com.finderfeed.fdbosses.FDBosses;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod.EventBusSubscriber;
-import net.neoforged.neoforge.common.DeferredSpawnEggItem;
-import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.common.ForgeSpawnEggItem;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
 public class BossItems {
 
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.createItems(FDBosses.MOD_ID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, FDBosses.MOD_ID);
 
     public static final Supplier<Item> DEBUG_STICK = ITEMS.register("debug",()->new DebugStick(new Item.Properties()));
 
@@ -34,10 +35,10 @@ public class BossItems {
     public static final Supplier<LocatorEye<?>> EYE_OF_CHESED = ITEMS.register("eye_of_chesed", ()->new LocatorEye<>(BossUtil.StructureTags.EYE_OF_CHESED_LOCATED, BossEntities.EYE_OF_CHESED));
     public static final Supplier<LocatorEye<?>> EYE_OF_MALKUTH = ITEMS.register("eye_of_malkuth", ()->new LocatorEye<>(BossUtil.StructureTags.EYE_OF_MALKUTH_LOCATED, BossEntities.EYE_OF_MALKUTH));
 
-    public static final Supplier<SpawnEggItem> MALKUTH_FIRE_WARRIOR_SPAWN_EGG = ITEMS.register("malkuth_fire_warrior_spawn_egg", ()->new DeferredSpawnEggItem(BossEntities.FIRE_MALKUTH_WARRIOR,
+    public static final Supplier<SpawnEggItem> MALKUTH_FIRE_WARRIOR_SPAWN_EGG = ITEMS.register("malkuth_fire_warrior_spawn_egg", ()->new ForgeSpawnEggItem(BossEntities.FIRE_MALKUTH_WARRIOR,
             0xffffff,0xffffff,new Item.Properties()));
 
-    public static final Supplier<SpawnEggItem> MALKUTH_ICE_WARRIOR_SPAWN_EGG = ITEMS.register("malkuth_ice_warrior_spawn_egg", ()->new DeferredSpawnEggItem(BossEntities.ICE_MALKUTH_WARRIOR,
+    public static final Supplier<SpawnEggItem> MALKUTH_ICE_WARRIOR_SPAWN_EGG = ITEMS.register("malkuth_ice_warrior_spawn_egg", ()->new ForgeSpawnEggItem(BossEntities.ICE_MALKUTH_WARRIOR,
             0xffffff,0xffffff,new Item.Properties()));
 
     public static final Supplier<Item> NO_ENTITY_SPAWN_BLOCK = ITEMS.register("no_entity_spawn_block",

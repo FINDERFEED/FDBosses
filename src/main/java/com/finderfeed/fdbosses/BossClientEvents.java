@@ -3,10 +3,10 @@ package com.finderfeed.fdbosses;
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
+import com.finderfeed.fdbosses.content.items.WeaponCoreItem;
 import com.finderfeed.fdbosses.content.util.GainLoseValue;
 import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossEffects;
-import com.finderfeed.fdbosses.init.BossItems;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -17,17 +17,13 @@ import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.sounds.MusicManager;
-import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -36,15 +32,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.client.event.ViewportEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.player.ItemTooltipEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-import net.neoforged.neoforge.client.event.RenderFrameEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
-import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
@@ -69,16 +64,18 @@ public class BossClientEvents {
     public static void collectTooltips(ItemTooltipEvent event){
         var componentList = event.getToolTip();
         ItemStack itemStack = event.getItemStack();
-        if (itemStack.has(BossDataComponents.ITEM_CORE.get())){
-            ItemCoreDataComponent itemCoreDataComponent = itemStack.get(BossDataComponents.ITEM_CORE);
-            ItemCoreDataComponent.CoreType coreType = itemCoreDataComponent.getCoreType();
+        ItemCoreDataComponent.CoreType coreType = WeaponCoreItem.getItemCore(itemStack);
+        if (coreType != null){
             Item item = coreType.getItem();
             componentList.add(item.getDefaultInstance().getHoverName().copy().withStyle(Style.EMPTY.withColor(coreType.getTextColor())));
         }
     }
 
     @SubscribeEvent
-    public static void tickEvent(ClientTickEvent.Pre event){
+    public static void tickEvent(TickEvent.ClientTickEvent event){
+
+        if (event.phase != TickEvent.Phase.START) return;
+
         Player player = Minecraft.getInstance().player;
         if (player != null) {
             tickChesedGaze(player);
@@ -90,7 +87,7 @@ public class BossClientEvents {
 
     private static void lowerGammaWhenAnyDarkenEffect(Player player){
         Options options = Minecraft.getInstance().options;
-        if (player.hasEffect(MobEffects.NIGHT_VISION) && player.hasEffect(BossEffects.CHESED_DARKEN)){
+        if (player.hasEffect(MobEffects.NIGHT_VISION) && player.hasEffect(BossEffects.CHESED_DARKEN.get())){
             if (cachedGamma == null){
                 cachedGamma = options.gamma().get();
             }
@@ -106,7 +103,7 @@ public class BossClientEvents {
     private static void tickChesedGaze(Player player){
         if (player != null){
             chesedGazeEffectTickO = chesedGazeEffectTick;
-            if (player.hasEffect(BossEffects.CHESED_GAZE)){
+            if (player.hasEffect(BossEffects.CHESED_GAZE.get())){
                 chesedGazeEffectTick = Mth.clamp(chesedGazeEffectTick + 1,0,chesedGazeEffectTickMax);
             }else{
                 chesedGazeEffectTick = Mth.clamp(chesedGazeEffectTick - 1,0,chesedGazeEffectTickMax);
@@ -119,7 +116,7 @@ public class BossClientEvents {
     private static void tickChesedDarken(Player player){
         if (player != null){
             chesedDarkenEffectTickO = chesedDarkenEffectTick;
-            if (player.hasEffect(BossEffects.CHESED_DARKEN)){
+            if (player.hasEffect(BossEffects.CHESED_DARKEN.get())){
                 chesedDarkenEffectTick = Mth.clamp(chesedDarkenEffectTick + 1,0,chesedDarkenEffectTickMax);
             }else{
                 chesedDarkenEffectTick = Mth.clamp(chesedDarkenEffectTick - chesedDarkenEffectTickMax / 4,0,chesedDarkenEffectTickMax);
@@ -204,16 +201,15 @@ public class BossClientEvents {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL){
             renderHellscapeSkybox(event);
         }else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS){
-            renderMalkuthCowardExecution(event);
+            renderMalkuthCowardExecution(event, event.getPartialTick());
         }
     }
 
     private static FDModel SWORD_MODEL;
     public static final ResourceLocation MALKUTH_FIRE_SWORD = FDBosses.location("textures/item/malkuth_sword_fire.png");
     private static final ResourceLocation MALKUTH_COWARD_EXECUTION_SQUARE = FDBosses.location("textures/util/malkuth_cowardice_prepare.png");
-    private static void renderMalkuthCowardExecution(RenderLevelStageEvent event){
+    private static void renderMalkuthCowardExecution(RenderLevelStageEvent event, float pticks){
 
-        float pticks = event.getPartialTick().getGameTimeDeltaPartialTick(false);
 
         Player player = Minecraft.getInstance().player;
 
@@ -228,9 +224,9 @@ public class BossClientEvents {
 
         Vec3 offset = offsetPos.subtract(camPos);
 
-        if (!player.hasEffect(BossEffects.MARK_OF_A_COWARD)) return;
+        if (!player.hasEffect(BossEffects.MARK_OF_A_COWARD.get())) return;
 
-        var instance = player.getEffect(BossEffects.MARK_OF_A_COWARD);
+        var instance = player.getEffect(BossEffects.MARK_OF_A_COWARD.get());
 
         int duration = instance.getDuration();
 
@@ -251,7 +247,8 @@ public class BossClientEvents {
         float easeOut = FDEasings.easeIn(1 - p);
         float easeInP2 = FDEasings.easeOutBack(p2);
 
-        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        BufferBuilder builder = Tesselator.getInstance().getBuilder();
+        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 
 
         FDRenderUtil.bindTexture(MALKUTH_COWARD_EXECUTION_SQUARE);
@@ -277,7 +274,7 @@ public class BossClientEvents {
         RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
 
-        BufferUploader.drawWithShader(builder.build());
+        BufferUploader.drawWithShader(builder.end());
         matrices.popPose();
 
         RenderSystem.disableDepthTest();
@@ -286,7 +283,8 @@ public class BossClientEvents {
             SWORD_MODEL = new FDModel(BossModels.MALKUTH_SWORD.get());
         }
 
-        builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        builder = Tesselator.getInstance().getBuilder();
+        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 
         FDRenderUtil.bindTexture(MALKUTH_FIRE_SWORD);
 
@@ -305,7 +303,7 @@ public class BossClientEvents {
         RenderSystem.enableDepthTest();
         RenderSystem.enableBlend();
 
-        BufferUploader.drawWithShader(builder.build());
+        BufferUploader.drawWithShader(builder.end());
         matrices.popPose();
 
         RenderSystem.disableDepthTest();
@@ -350,7 +348,7 @@ public class BossClientEvents {
 
     private static void renderHellscapeSkybox(RenderLevelStageEvent event){
         float alpha;
-        if ((alpha = hellscapeSkyValue.getPercent(event.getPartialTick().getGameTimeDeltaPartialTick(false))) == 0) return;
+        if ((alpha = hellscapeSkyValue.getPercent(event.getPartialTick())) == 0) return;
 
 
 
@@ -363,10 +361,11 @@ public class BossClientEvents {
         //right   top
         //bottom  *empty*
 
-        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        BufferBuilder builder = Tesselator.getInstance().getBuilder();
+        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 
 
-        float time = (level.getGameTime() + event.getPartialTick().getGameTimeDeltaPartialTick(false));
+        float time = (level.getGameTime() + event.getPartialTick());
 
         float flash = (float) (Math.sin(time * 0.025f) + 1) / 2;
         flash = flash * 0.8f + 0.2f;
@@ -384,8 +383,8 @@ public class BossClientEvents {
 
         matrices.pushPose();
 
-        Matrix4f mat = event.getModelViewMatrix();
-        matrices.mulPose(mat);
+        Matrix4f mat = RenderSystem.getModelViewMatrix();
+        matrices.mulPoseMatrix(mat);
         matrices.pushPose();
         matrices.mulPose(Axis.ZP.rotationDegrees(-90));
         matrices.mulPose(Axis.XP.rotationDegrees( time * 0.015f));
@@ -394,12 +393,13 @@ public class BossClientEvents {
 
         renderSkybox(matrices, builder, 300, 1f, 1f ,1f, 0.5f * alpha);
         renderSkybox(matrices, builder, 300, 1f, 1f ,1f, flash * alpha);
-        BufferUploader.drawWithShader(builder.build());
+        BufferUploader.drawWithShader(builder.end());
         matrices.popPose();
 
 
         matrices.pushPose();
-        builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        builder = Tesselator.getInstance().getBuilder();
+        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         FDRenderUtil.bindTexture(HELL_FROST_LIGHT);
         matrices.mulPose(Axis.XP.rotationDegrees( 180));
         matrices.mulPose(Axis.YP.rotationDegrees( time * 0.015f + 90));
@@ -409,7 +409,7 @@ public class BossClientEvents {
 
         renderSkybox(matrices, builder, 299f, 1f, 1f ,1f, 0.5f * alpha);
         renderSkybox(matrices, builder, 299f, 1f, 1f ,1f, flashCounter * 0.8f * alpha);
-        BufferUploader.drawWithShader(builder.build());
+        BufferUploader.drawWithShader(builder.end());
         matrices.popPose();
 
 
@@ -428,43 +428,43 @@ public class BossClientEvents {
 
 
         //back (z is back)
-        vertexConsumer.vertex(m, -boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(0,0).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, -boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(0,0).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
 
 
         //front
-        vertexConsumer.vertex(m, -boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0.5f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0.0f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(0.0f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, -boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(0.5f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0.5f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0.0f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(0.0f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(0.5f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
 
         //left
-        vertexConsumer.vertex(m, boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(1f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(1f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(1f,0.25f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(1f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
 
 
         //right
-        vertexConsumer.vertex(m, -boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, -boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0f,0.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, -boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(0f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, -boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0f,0.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(0f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,0.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
 
 
         //down (but for some reason its up)
-        vertexConsumer.vertex(m, boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0f,1f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0f,.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, -boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0.5f,.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, -boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,1f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0f,1f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0f,.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,boxRadius).color(r,g,b,a).uv(0.5f,.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,-boxRadius).color(r,g,b,a).uv(0.5f,1f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
 
         //up (but for some reason its down
-        vertexConsumer.vertex(m, -boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(1f,.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, -boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(1f,.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(0.5f,.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
-        vertexConsumer.vertex(m, boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(.5f,.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY);
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(1f,.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(1f,.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,boxRadius).color(r,g,b,a).uv(0.5f,.75f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,-boxRadius).color(r,g,b,a).uv(.5f,.5f).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
 
 
     }

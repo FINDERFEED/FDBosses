@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 public class BossModels {
 
-    public static final DeferredRegister<FDModelInfo> INFOS = DeferredRegister.create(FDRegistries.MODELS, FDBosses.MOD_ID);
+    public static final DeferredRegister<FDModelInfo> INFOS = DeferredRegister.create(FDRegistries.BEDROCK_MODEL_INFOS_KEY, FDBosses.MOD_ID);
 
     public static final Supplier<FDModelInfo> CHESED = INFOS.register("chesed",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"),1f));
     public static final Supplier<FDModelInfo> CHESED_INFLATED = INFOS.register("chesed_inflated",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed"),1.2f));

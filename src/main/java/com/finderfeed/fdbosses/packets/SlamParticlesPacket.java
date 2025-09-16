@@ -3,16 +3,14 @@ package com.finderfeed.fdbosses.packets;
 import com.finderfeed.fdbosses.BossClientPackets;
 import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.RegisterFDPacket;
-import com.finderfeed.fdlib.util.NetworkCodec;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.NetworkCodec;
-import net.minecraft.network.codec.NetworkCodec;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 @RegisterFDPacket("fdbosses:slam_particles")
 public class SlamParticlesPacket extends FDPacket {
@@ -23,12 +21,12 @@ public class SlamParticlesPacket extends FDPacket {
         this.slamData = data;
     }
     public SlamParticlesPacket(FriendlyByteBuf buf){
-        this.slamData = SlamData.STREAM_CODEC.decode(buf);
+        this.slamData = SlamData.STREAM_CODEC.fromNetwork(buf);
     }
 
     @Override
     public void write(FriendlyByteBuf buf) {
-        SlamData.STREAM_CODEC.encode(buf,slamData);
+        SlamData.STREAM_CODEC.toNetwork(buf,slamData);
     }
 
     @Override
@@ -43,7 +41,7 @@ public class SlamParticlesPacket extends FDPacket {
 
     public static class SlamData {
 
-        public static final NetworkCodec<FriendlyByteBuf,SlamData> STREAM_CODEC = NetworkCodec.composite(
+        public static final NetworkCodec<SlamData> STREAM_CODEC = NetworkCodec.composite(
                 NetworkCodec.VEC3,v->v.pos,
                 NetworkCodec.VEC3,v->v.direction,
                 NetworkCodec.BLOCK_POS,v->v.bPos,

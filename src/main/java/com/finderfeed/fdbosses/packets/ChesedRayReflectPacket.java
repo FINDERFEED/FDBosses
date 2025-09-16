@@ -7,6 +7,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.function.Supplier;
+
 @RegisterFDPacket("fdbosses:chesed_ray_reflect")
 public class ChesedRayReflectPacket extends FDPacket {
 
