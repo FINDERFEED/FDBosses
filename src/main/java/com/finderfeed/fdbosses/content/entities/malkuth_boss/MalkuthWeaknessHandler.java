@@ -1,12 +1,33 @@
 package com.finderfeed.fdbosses.content.entities.malkuth_boss;
 
+import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.SetClientMalkuthWeaknessAmountPacket;
 import com.finderfeed.fdbosses.init.BossDataAttachments;
+import com.finderfeed.fdlib.network.FDPacketHandler;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.NetworkDirection;
+import org.joml.Math;
 
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = FDBosses.MOD_ID)
 public class MalkuthWeaknessHandler {
+
+    @SubscribeEvent
+    public static void cloneEvent(PlayerEvent.Clone event){
+        Player original = event.getOriginal();
+        Player newPlayer = event.getEntity();
+        if (!original.level().isClientSide){
+            setCurrentWeakness(newPlayer, getCurrentWeaknessLevel(original));
+        }
+    }
+
+
+    public static String WEAKNESS_LEVEL = "weakness_level";
 
     //positive - fire weakness
     //negative - ice weakness
@@ -14,14 +35,22 @@ public class MalkuthWeaknessHandler {
     public static final int MAX = 100;
     public static final int MIN = -MAX;
 
+    public static CompoundTag getWeaknessTag(Player player){
+        return BossUtil.getOrCreateTag(BossUtil.getPlayerTag(player),"malkuth_weakness");
+    }
+
+
     public static int getCurrentWeaknessLevel(Player player){
-        return Math.clamp(player.getData(BossDataAttachments.MALKUTH_WEAKNESS.get()), MIN, MAX);
+        var tag = getWeaknessTag(player);
+        return Math.clamp(tag.getInt(WEAKNESS_LEVEL), MIN, MAX);
     }
 
     public static void setCurrentWeakness(Player player, int amount){
-        player.setData(BossDataAttachments.MALKUTH_WEAKNESS.get(), Math.clamp(amount,MIN,MAX));
+        amount = Math.clamp(amount, MIN, MAX);
+        var tag = getWeaknessTag(player);
+        tag.putInt(WEAKNESS_LEVEL, amount);
         if (player instanceof ServerPlayer serverPlayer){
-            PacketDistributor.sendToPlayer(serverPlayer, new SetClientMalkuthWeaknessAmountPacket(amount));
+            FDPacketHandler.INSTANCE.sendTo(new SetClientMalkuthWeaknessAmountPacket(amount), serverPlayer.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
         }
     }
 

@@ -1,7 +1,9 @@
 package com.finderfeed.fdbosses.content.items;
 
+import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import net.minecraft.ChatFormatting;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -12,6 +14,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class WeaponCoreItem extends Item {
+
+    public static final String CORE_TAG_NAME = "weapon_core";
 
     public final ItemCoreDataComponent.CoreType coreType;
 
@@ -25,6 +29,29 @@ public class WeaponCoreItem extends Item {
         this.hasGlint = glint;
         this.abilityText = abilityText;
     }
+
+    public static void setItemCore(ItemCoreDataComponent.CoreType coreType, ItemStack item){
+        CompoundTag tag = getItemTag(item);
+        tag.putString(CORE_TAG_NAME, coreType.name());
+    }
+
+    public static boolean hasCore(ItemStack item){
+        return getItemCore(item) != null;
+    }
+
+    public static ItemCoreDataComponent.CoreType getItemCore(ItemStack itemStack){
+        CompoundTag tag = getItemTag(itemStack);
+        if (tag.contains(CORE_TAG_NAME)){
+            return ItemCoreDataComponent.CoreType.valueOf(tag.getString(CORE_TAG_NAME));
+        }else{
+            return null;
+        }
+    }
+
+    public static CompoundTag getItemTag(ItemStack itemStack){
+        return itemStack.getOrCreateTagElement(FDBosses.MOD_ID);
+    }
+
 
     @Override
     public boolean isFoil(ItemStack p_41453_) {

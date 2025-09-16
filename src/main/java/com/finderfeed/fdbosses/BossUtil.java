@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.util.FDUtil;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Difficulty;
@@ -18,6 +19,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
@@ -48,6 +50,18 @@ public class BossUtil {
     public static final int MALKUTH_VOLCANO_ERRUPTION = 11;
     public static final int MALKUTH_SWORD_INSERT_PARTICLES = 12;
     public static final int MALKUTH_PLAYER_FIREBALL_EXPLODE = 13;
+
+    public static CompoundTag getOrCreateTag(CompoundTag main, String name){
+        if (!main.contains(name)){
+            main.put(name,new CompoundTag());
+        }
+        return main.getCompound(name);
+    }
+
+    public static CompoundTag getPlayerTag(Player player){
+        CompoundTag persistentData = player.getPersistentData();
+        return getOrCreateTag(persistentData,FDBosses.MOD_ID + "_data");
+    }
 
     public static Vec3 matTransformDirectionVec3(Matrix4f mat, Vec3 v){
         Vector3f v1 = mat.transformDirection(

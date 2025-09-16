@@ -9,9 +9,9 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod.EventBusSubscriber;
-import net.neoforged.neoforge.event.server.ServerStartedEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = FDBosses.MOD_ID,bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class BossDamageSources {
@@ -73,27 +73,28 @@ public class BossDamageSources {
     public static void registerDamageTypes(ServerStartedEvent event){
         RegistryAccess access = event.getServer().registryAccess();
 
+        var registry = access.registryOrThrow(Registries.DAMAGE_TYPE);
 
 
-        CHESED_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_ATTACK));
-        CHESED_LOR_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_LOR_EASTER_EGG_ATTACK));
-        CHESED_BA_ATTACK_SOURCE = new EntityDamageSource(access.holderOrThrow(CHESED_BA_EASTER_EGG_ATTACK));
-        CHESED_ELECTRIC_SPHERE_SOURCE = new DamageSource(access.holderOrThrow(CHESED_ELECTRIC_SPHERE));
-        CHESED_FALLING_BLOCK_SOURCE = new DamageSource(access.holderOrThrow(CHESED_FALLING_BLOCK));
-        CHESED_VERTICAL_RAY_SOURCE = new DamageSource(access.holderOrThrow(CHESED_VERTICAL_RAY));
-        CHESED_EARTHQUAKE_SOURCE = new DamageSource(access.holderOrThrow(CHESED_EARTHQUAKE));
-        CHESED_ROLL_SOURCE = new DamageSource(access.holderOrThrow(CHESED_ROLL));
-        CHESED_BLOCK_ATTACK_SOURCE = new DamageSource(access.holderOrThrow(CHESED_BLOCK_ATTACK));
+        CHESED_ATTACK_SOURCE = new EntityDamageSource(registry.getHolderOrThrow(CHESED_ATTACK));
+        CHESED_LOR_ATTACK_SOURCE = new EntityDamageSource(registry.getHolderOrThrow(CHESED_LOR_EASTER_EGG_ATTACK));
+        CHESED_BA_ATTACK_SOURCE = new EntityDamageSource(registry.getHolderOrThrow(CHESED_BA_EASTER_EGG_ATTACK));
+        CHESED_ELECTRIC_SPHERE_SOURCE = new DamageSource(registry.getHolderOrThrow(CHESED_ELECTRIC_SPHERE));
+        CHESED_FALLING_BLOCK_SOURCE = new DamageSource(registry.getHolderOrThrow(CHESED_FALLING_BLOCK));
+        CHESED_VERTICAL_RAY_SOURCE = new DamageSource(registry.getHolderOrThrow(CHESED_VERTICAL_RAY));
+        CHESED_EARTHQUAKE_SOURCE = new DamageSource(registry.getHolderOrThrow(CHESED_EARTHQUAKE));
+        CHESED_ROLL_SOURCE = new DamageSource(registry.getHolderOrThrow(CHESED_ROLL));
+        CHESED_BLOCK_ATTACK_SOURCE = new DamageSource(registry.getHolderOrThrow(CHESED_BLOCK_ATTACK));
 
-        MALKUTH_COWARDICE_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_COWARDICE));
-        MALKUTH_CANNONS_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_CANNONS));
-        MALKUTH_CHAINPUNCH_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_CHAINPUNCH));
-        MALKUTH_HELLSHAPER_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_HELLSHAPER));
-        MALKUTH_IMPALING_DOOM_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_IMPALING_DOOM));
-        MALKUTH_SIDE_ROCKS_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_SIDE_ROCKS));
-        MALKUTH_SLASHES_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_SLASHES));
-        MALKUTH_TSARS_WRATH_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_TSARS_WRATH));
-        MALKUTH_EARTHSHATTER_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_EARTHSHATTER));
+        MALKUTH_COWARDICE_SOURCE = new DamageSource(registry.getHolderOrThrow(MALKUTH_COWARDICE));
+        MALKUTH_CANNONS_SOURCE = new DamageSource(registry.getHolderOrThrow(MALKUTH_CANNONS));
+        MALKUTH_CHAINPUNCH_SOURCE = new DamageSource(registry.getHolderOrThrow(MALKUTH_CHAINPUNCH));
+        MALKUTH_HELLSHAPER_SOURCE = new DamageSource(registry.getHolderOrThrow(MALKUTH_HELLSHAPER));
+        MALKUTH_IMPALING_DOOM_SOURCE = new DamageSource(registry.getHolderOrThrow(MALKUTH_IMPALING_DOOM));
+        MALKUTH_SIDE_ROCKS_SOURCE = new DamageSource(registry.getHolderOrThrow(MALKUTH_SIDE_ROCKS));
+        MALKUTH_SLASHES_SOURCE = new DamageSource(registry.getHolderOrThrow(MALKUTH_SLASHES));
+        MALKUTH_TSARS_WRATH_SOURCE = new DamageSource(registry.getHolderOrThrow(MALKUTH_TSARS_WRATH));
+        MALKUTH_EARTHSHATTER_SOURCE = new DamageSource(registry.getHolderOrThrow(MALKUTH_EARTHSHATTER));
 
     }
 

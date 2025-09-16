@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.client.model.data.ModelData;
+import net.minecraftforge.client.model.data.ModelData;
 import org.joml.Quaternionf;
 
 public class BlockProjectileRenderer extends EntityRenderer<ChesedBlockProjectile> {

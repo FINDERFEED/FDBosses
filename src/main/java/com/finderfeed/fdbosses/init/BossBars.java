@@ -14,7 +14,7 @@ public class BossBars {
 
     public static final DeferredRegister<FDBossBarFactory<?>> BOSS_BARS = DeferredRegister.create(FDRegistries.FD_BOSS_BARS, FDBosses.MOD_ID);
 
-    public static final RegistryObject<FDBossBarFactory<?>,FDBossBarFactory<ChesedBossBar>> CHESED_BOSS_BAR = BOSS_BARS.register("chesed_boss_bar",()->ChesedBossBar::new);
-    public static final RegistryObject<FDBossBarFactory<?>,FDBossBarFactory<MalkuthBossBar>> MALKUTH_BOSS_BAR = BOSS_BARS.register("malkuth_boss_bar",()->MalkuthBossBar::new);
+    public static final RegistryObject<FDBossBarFactory<ChesedBossBar>> CHESED_BOSS_BAR = BOSS_BARS.register("chesed_boss_bar",()->ChesedBossBar::new);
+    public static final RegistryObject<FDBossBarFactory<MalkuthBossBar>> MALKUTH_BOSS_BAR = BOSS_BARS.register("malkuth_boss_bar",()->MalkuthBossBar::new);
 
 }

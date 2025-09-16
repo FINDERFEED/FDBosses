@@ -10,7 +10,7 @@ import java.util.function.Supplier;
 
 public class BossConfigs {
 
-    public static final DeferredRegister<JsonConfig> CONFIGS = DeferredRegister.create(FDRegistries.CONFIGS, FDBosses.MOD_ID);
+    public static final DeferredRegister<JsonConfig> CONFIGS = DeferredRegister.create(FDRegistries.CONFIGS_KEY, FDBosses.MOD_ID);
 
     public static final Supplier<BossConfig> BOSS_CONFIG = CONFIGS.register("bosses", BossConfig::new);
 

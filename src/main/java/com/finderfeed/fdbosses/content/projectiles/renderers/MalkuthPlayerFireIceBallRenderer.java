@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Math;
 import org.joml.Matrix4f;
 import org.joml.Random;
 import org.joml.Vector3f;
