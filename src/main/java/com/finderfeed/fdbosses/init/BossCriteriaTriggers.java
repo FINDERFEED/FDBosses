@@ -10,8 +10,8 @@ import java.util.function.Supplier;
 
 public class BossCriteriaTriggers {
 
-    public static final DeferredRegister<CriterionTrigger<?>> CRITERION_TRIGGERS = DeferredRegister.create(BuiltInRegistries.TRIGGER_TYPES, FDBosses.MOD_ID);
-
-    public static final Supplier<BossKilledCriterionTrigger> BOSS_KILLED = CRITERION_TRIGGERS.register("boss_killed", BossKilledCriterionTrigger::new);
+//    public static final DeferredRegister<CriterionTrigger<?>> CRITERION_TRIGGERS = DeferredRegister.create(BuiltInRegistries.TRIGGER_TYPES, FDBosses.MOD_ID);
+//
+//    public static final Supplier<BossKilledCriterionTrigger> BOSS_KILLED = CRITERION_TRIGGERS.register("boss_killed", BossKilledCriterionTrigger::new);
 
 }

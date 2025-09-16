@@ -84,10 +84,14 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
+import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import org.joml.Math;
 import org.joml.Random;
 import org.joml.Vector3f;
 
@@ -95,66 +99,66 @@ import org.joml.Vector3f;
 public class BossClientModEvents {
 
 
-    @SubscribeEvent
-    public static void registerClientExtensions(RegisterClientExtensionsEvent event){
-        event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
-                .addModel(BossModels.CHESED,RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")))
-                .addModel(BossModels.CHESED_CRYSTAL_LAYER,RenderType.eyes(FDBosses.location("textures/entities/chesed_crystals.png")))
-                .setScale((ctx)->{
-                    if (ctx == ItemDisplayContext.GROUND){
-                        return 0.15f;
-                    }
-                    return 0.25f;
-                })
-                .addRotation((itemDisplayContext -> {
-                    if (itemDisplayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND || itemDisplayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND){
-                        return 180f;
-                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND){
-                        return 40f;
-                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND){
-                        return -40f;
-                    }
-                    return 0f;
-                }))
-                .addTranslation((ctx)->{
-                    if (ctx == ItemDisplayContext.GUI){
-                        return new Vector3f(0.1f,-0.1f,0);
-                    }else if (ctx == ItemDisplayContext.GROUND){
-                        return new Vector3f();
-                    }
-                    return new Vector3f(0.1f,0f,0f);
-                })
-        ), BossItems.CHESED_TROPHY.get());
-
-        event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
-                .addModel(BossModels.MALKUTH_SCREEN,RenderType.entityTranslucent(FDBosses.location("textures/entities/malkuth/malkuth_screen.png")))
-                .addModel(BossModels.MALKUTH_SCREEN,RenderType.text(FDBosses.location("textures/entities/malkuth/malkuth_screen_emissive.png")))
-                .setScale((ctx)->{
-                    if (ctx == ItemDisplayContext.GROUND){
-                        return 0.15f;
-                    }
-                    return 0.25f;
-                })
-                .addRotation((itemDisplayContext -> {
-                    if (itemDisplayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND || itemDisplayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND){
-                        return 180f;
-                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND){
-                        return 40f;
-                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND){
-                        return -40f;
-                    }
-                    return 0f;
-                }))
-                .addTranslation((ctx)->{
-                    if (ctx == ItemDisplayContext.GUI){
-                        return new Vector3f(-0.2f,-0.1f,0);
-                    }else if (ctx == ItemDisplayContext.GROUND){
-                        return new Vector3f();
-                    }
-                    return new Vector3f(0.1f,0f,0f);
-                })
-        ), BossItems.MALKUTH_TROPHY.get());
-    }
+//    @SubscribeEvent
+//    public static void registerClientExtensions(RegisterClientExtensionsEvent event){
+//        event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
+//                .addModel(BossModels.CHESED,RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")))
+//                .addModel(BossModels.CHESED_CRYSTAL_LAYER,RenderType.eyes(FDBosses.location("textures/entities/chesed_crystals.png")))
+//                .setScale((ctx)->{
+//                    if (ctx == ItemDisplayContext.GROUND){
+//                        return 0.15f;
+//                    }
+//                    return 0.25f;
+//                })
+//                .addRotation((itemDisplayContext -> {
+//                    if (itemDisplayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND || itemDisplayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND){
+//                        return 180f;
+//                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND){
+//                        return 40f;
+//                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND){
+//                        return -40f;
+//                    }
+//                    return 0f;
+//                }))
+//                .addTranslation((ctx)->{
+//                    if (ctx == ItemDisplayContext.GUI){
+//                        return new Vector3f(0.1f,-0.1f,0);
+//                    }else if (ctx == ItemDisplayContext.GROUND){
+//                        return new Vector3f();
+//                    }
+//                    return new Vector3f(0.1f,0f,0f);
+//                })
+//        ), BossItems.CHESED_TROPHY.get());
+//
+//        event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
+//                .addModel(BossModels.MALKUTH_SCREEN,RenderType.entityTranslucent(FDBosses.location("textures/entities/malkuth/malkuth_screen.png")))
+//                .addModel(BossModels.MALKUTH_SCREEN,RenderType.text(FDBosses.location("textures/entities/malkuth/malkuth_screen_emissive.png")))
+//                .setScale((ctx)->{
+//                    if (ctx == ItemDisplayContext.GROUND){
+//                        return 0.15f;
+//                    }
+//                    return 0.25f;
+//                })
+//                .addRotation((itemDisplayContext -> {
+//                    if (itemDisplayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND || itemDisplayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND){
+//                        return 180f;
+//                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND){
+//                        return 40f;
+//                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND){
+//                        return -40f;
+//                    }
+//                    return 0f;
+//                }))
+//                .addTranslation((ctx)->{
+//                    if (ctx == ItemDisplayContext.GUI){
+//                        return new Vector3f(-0.2f,-0.1f,0);
+//                    }else if (ctx == ItemDisplayContext.GROUND){
+//                        return new Vector3f();
+//                    }
+//                    return new Vector3f(0.1f,0f,0f);
+//                })
+//        ), BossItems.MALKUTH_TROPHY.get());
+//    }
 
     @SubscribeEvent
     public static void clientSetup(FMLClientSetupEvent event){
@@ -225,8 +229,8 @@ public class BossClientModEvents {
 
     @SubscribeEvent
     public static void registerOverlays(RegisterGuiOverlaysEvent event){
-        event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("electrified"),new ElectrifiedOverlay());
-        event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("malkuth_weakness"),new MalkuthWeaknessOverlay());
+        event.registerBelow(VanillaGuiOverlay.HOTBAR.id(), "electrified",new ElectrifiedOverlay());
+        event.registerBelow(VanillaGuiOverlay.HOTBAR.id(), "malkuth_weakness",new MalkuthWeaknessOverlay());
     }
 
 
@@ -267,6 +271,8 @@ public class BossClientModEvents {
                         .addBoneController("head", new HeadBoneTransformation<>())
                         .build())
                 .build();
+
+
 
         event.registerEntityRenderer(BossEntities.FIRE_MALKUTH_WARRIOR.get(), warriorRenderer);
         event.registerEntityRenderer(BossEntities.ICE_MALKUTH_WARRIOR.get(), warriorRenderer);
@@ -632,9 +638,9 @@ public class BossClientModEvents {
                                         float p2;
 
                                         if (t2 <= 0.25){
-                                            p2 = 1 - (float) Math.pow(4 * t2 - 1,2);
+                                            p2 = 1 - (float) java.lang.Math.pow(4 * t2 - 1,2);
                                         }else{
-                                            p2 = 1 - (float) Math.pow(1.335 * (t2 - 0.25),2);
+                                            p2 = 1 - (float) java.lang.Math.pow(1.335 * (t2 - 0.25),2);
                                         }
 
                                         r = FDMathUtil.lerp(r,1,p2);

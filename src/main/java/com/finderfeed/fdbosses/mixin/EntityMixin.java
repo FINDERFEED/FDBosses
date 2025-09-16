@@ -19,6 +19,8 @@ import java.util.List;
 public class EntityMixin {
 
 
+
+
     @Inject(method = "collectColliders",at = @At(value = "INVOKE", target = "Lcom/google/common/collect/ImmutableList$Builder;addAll(Ljava/lang/Iterable;)Lcom/google/common/collect/ImmutableList$Builder;"))
     private static void collectColliders(Entity entity, Level level, List<VoxelShape> shapes, AABB box, CallbackInfoReturnable<List<VoxelShape>> cir, @Local ImmutableList.Builder<VoxelShape> builder){
         BossCommonMixinHandle.entityCollidersMixin(entity, level, shapes, box, cir, builder);

@@ -2,7 +2,9 @@ package com.finderfeed.fdbosses.init;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
+import com.finderfeed.fdbosses.content.items.ChesedTrophyItem;
 import com.finderfeed.fdbosses.content.items.LocatorEye;
+import com.finderfeed.fdbosses.content.items.MalkuthTrophyItem;
 import com.finderfeed.fdbosses.content.items.WeaponCoreItem;
 import com.finderfeed.fdbosses.debug.DebugStick;
 import com.finderfeed.fdbosses.FDBosses;
@@ -45,10 +47,10 @@ public class BossItems {
             ()->new BlockItem(BossBlocks.NO_ENTITY_SPAWN_BLOCK.get(), new Item.Properties()));
 
     public static final Supplier<Item> CHESED_TROPHY = ITEMS.register("chesed_trophy",
-            ()->new BlockItem(BossBlocks.CHESED_TROPHY.get(), new Item.Properties().stacksTo(1)));
+            ()->new ChesedTrophyItem(BossBlocks.CHESED_TROPHY.get(), new Item.Properties().stacksTo(1)));
 
     public static final Supplier<Item> MALKUTH_TROPHY = ITEMS.register("malkuth_trophy",
-            ()->new BlockItem(BossBlocks.MALKUTH_TROPHY.get(), new Item.Properties().stacksTo(1)));
+            ()->new MalkuthTrophyItem(BossBlocks.MALKUTH_TROPHY.get(), new Item.Properties().stacksTo(1)));
 
     @Mod.EventBusSubscriber(modid = FDBosses.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class AddToCreativeTabs{

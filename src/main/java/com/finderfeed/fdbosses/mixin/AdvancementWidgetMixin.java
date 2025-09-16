@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.mixin;
 
-import net.minecraft.advancements.AdvancementNode;
+
+import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.advancements.DisplayInfo;
 import net.minecraft.client.Minecraft;
@@ -33,7 +34,9 @@ public class AdvancementWidgetMixin {
     private static List<FormattedCharSequence> sequences = new ArrayList<>();
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    public void init(AdvancementTab p_97255_, Minecraft p_97256_, AdvancementNode p_300868_, DisplayInfo p_97258_, CallbackInfo ci){
+    public void init(AdvancementTab p_97255_, Minecraft p_97256_, Advancement p_97257_, DisplayInfo p_97258_, CallbackInfo ci){
+
+        if (this.tab.getTitle() == null) return;
 
         String title = this.tab.getTitle().getString();
         if (title.equals("Qliphoth Awakening")) {
@@ -44,6 +47,8 @@ public class AdvancementWidgetMixin {
 
     @Inject(method = "drawHover", at = @At("HEAD"))
     public void drawHover(GuiGraphics p_283068_, int p_281304_, int p_281253_, float p_281848_, int p_282097_, int p_281537_, CallbackInfo ci){
+
+        if (this.tab.getTitle() == null) return;
 
         String title = this.tab.getTitle().getString();
 
@@ -66,6 +71,8 @@ public class AdvancementWidgetMixin {
 
     @Inject(method = "drawHover", at = @At("TAIL"))
     public void drawHoverPost(GuiGraphics p_283068_, int p_281304_, int p_281253_, float p_281848_, int p_282097_, int p_281537_, CallbackInfo ci){
+
+        if (this.tab.getTitle() == null) return;
 
         String title = this.tab.getTitle().getString();
 
