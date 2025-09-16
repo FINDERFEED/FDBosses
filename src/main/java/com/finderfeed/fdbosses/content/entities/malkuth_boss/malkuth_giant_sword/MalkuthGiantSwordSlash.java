@@ -144,9 +144,9 @@ public class MalkuthGiantSwordSlash extends Entity implements AutoSerializable {
 
             Vector3f color = MalkuthEntity.getMalkuthAttackPreparationParticleColor(this.getAttackType());
 
-            color.x = Math.clamp(color.x + 0.2f,0,1);
-            color.y = Math.clamp(color.y + 0.2f,0,1);
-            color.z = Math.clamp(color.z + 0.2f,0,1);
+            color.x = FDMathUtil.clamp(color.x + 0.2f,0,1);
+            color.y = FDMathUtil.clamp(color.y + 0.2f,0,1);
+            color.z = FDMathUtil.clamp(color.z + 0.2f,0,1);
 
 
             float rndRadius = FDEasings.easeOut(random.nextFloat()) * 4f;
@@ -421,15 +421,15 @@ public class MalkuthGiantSwordSlash extends Entity implements AutoSerializable {
     }
 
     public float getCurrentMoveUpTime(float pticks){
-        return Math.clamp(this.tickCount + pticks, 0, TIME_TO_RISE);
+        return FDMathUtil.clamp(this.tickCount + pticks, 0, TIME_TO_RISE);
     }
 
     public float getCurrentHitTime(float pticks){
-        return Math.clamp(this.tickCount - TIME_TO_RISE + pticks, 0, TIME_TO_HIT);
+        return FDMathUtil.clamp(this.tickCount - TIME_TO_RISE + pticks, 0, TIME_TO_HIT);
     }
 
     public float getDissolveTime(float pticks){
-        return Math.clamp(this.tickCount - TIME_TO_RISE - TIME_TO_HIT + pticks,0, DISSOLVE_TIME);
+        return FDMathUtil.clamp(this.tickCount - TIME_TO_RISE - TIME_TO_HIT + pticks,0, DISSOLVE_TIME);
     }
 
     public MalkuthAttackType getAttackType(){

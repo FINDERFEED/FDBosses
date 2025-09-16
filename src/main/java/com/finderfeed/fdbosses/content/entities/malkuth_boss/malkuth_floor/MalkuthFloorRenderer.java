@@ -55,7 +55,7 @@ public class MalkuthFloorRenderer extends EntityRenderer<MalkuthFloorEntity> {
                     downPercent = ((floor.deathTicks - pticks)/MalkuthFloorEntity.DEATH_TME);
                 }
 
-                float riseP = Math.clamp(time / riseTime,0, 1) * downPercent;
+                float riseP = FDMathUtil.clamp(time / riseTime,0, 1) * downPercent;
 
                 float p = i / currentArcLength;
 

@@ -339,7 +339,7 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
             }
 
             if (!this.isDeadOrDying()) {
-                slamCooldown = Math.clamp(slamCooldown - 1, 0, Integer.MAX_VALUE);
+                slamCooldown = FDMathUtil.clamp(slamCooldown - 1, 0, Integer.MAX_VALUE);
 
                 this.attackChain.tick();
 

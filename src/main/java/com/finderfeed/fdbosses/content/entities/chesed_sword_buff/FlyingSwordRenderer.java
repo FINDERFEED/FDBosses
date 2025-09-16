@@ -50,7 +50,7 @@ public class FlyingSwordRenderer extends EntityRenderer<FlyingSwordEntity> {
         }
 
         float time = entity.tickCount + pticks;
-        float p = Math.clamp(time / FlyingSwordEntity.DELAY_UNTIL_LAUNCH,0,1);
+        float p = FDMathUtil.clamp(time / FlyingSwordEntity.DELAY_UNTIL_LAUNCH,0,1);
         float offset = -Mth.sin(p * (FDMathUtil.FPI)) * 2;
         matrices.translate(0,offset,0);
 
@@ -60,7 +60,7 @@ public class FlyingSwordRenderer extends EntityRenderer<FlyingSwordEntity> {
 
         matrices.mulPose(Axis.ZN.rotationDegrees(45));
 
-        float scale = Math.clamp(p *2,0,1);
+        float scale = FDMathUtil.clamp(p *2,0,1);
         matrices.scale(scale,scale,scale);
 
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();

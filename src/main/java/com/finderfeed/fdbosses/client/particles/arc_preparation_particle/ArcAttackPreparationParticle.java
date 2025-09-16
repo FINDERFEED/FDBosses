@@ -48,8 +48,8 @@ public class ArcAttackPreparationParticle extends Particle {
         Vec3 hdir = options.getHorizontalDirection().multiply(1,0,1).normalize().multiply(options.getLength(),options.getLength(),options.getLength());
 
 
-        float distanceModifier = FDEasings.easeOut(Math.clamp ((this.age + pticks) / (this.options.getFadeIn()), 0, 1));
-        float attackPreparationModifier = Math.clamp ((this.age + pticks) / (this.options.getAttackChargeTime()), 0, 1);
+        float distanceModifier = FDEasings.easeOut(FDMathUtil.clamp ((this.age + pticks) / (this.options.getFadeIn()), 0, 1));
+        float attackPreparationModifier = FDMathUtil.clamp ((this.age + pticks) / (this.options.getAttackChargeTime()), 0, 1);
 
 
         Vec3 toPos2 = hdir.yRot(options.getHalfAttackAngle());
@@ -72,7 +72,7 @@ public class ArcAttackPreparationParticle extends Particle {
 
         float fadeOutP = 1;
         if (this.age - this.options.getAttackChargeTime() >= 0){
-            fadeOutP = 1 - Math.clamp((this.age + pticks - this.options.getAttackChargeTime()) / (float) this.options.getFadeOut(),0, 1);
+            fadeOutP = 1 - FDMathUtil.clamp((this.age + pticks - this.options.getAttackChargeTime()) / (float) this.options.getFadeOut(),0, 1);
         }
 
         float colmod = 0.75f;

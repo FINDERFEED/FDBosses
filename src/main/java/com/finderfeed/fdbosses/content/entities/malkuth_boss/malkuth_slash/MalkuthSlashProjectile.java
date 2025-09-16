@@ -105,7 +105,7 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
             this.slashSizeOld = this.getMaxSlashSize();
             return;
         }else{
-            float p = Math.clamp(this.currentIncrementSizeTime / (float) incrementSizeTime,0,1);
+            float p = FDMathUtil.clamp(this.currentIncrementSizeTime / (float) incrementSizeTime,0,1);
             float size = this.getMaxSlashSize() * p;
             this.slashSizeCurrent = size;
             this.currentIncrementSizeTime = Mth.clamp(this.currentIncrementSizeTime + 1,0, incrementSizeTime);

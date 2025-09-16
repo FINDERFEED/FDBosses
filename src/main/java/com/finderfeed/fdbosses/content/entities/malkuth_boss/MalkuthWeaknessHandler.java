@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.SetClientMalkuthWeaknessAmountPacket;
 import com.finderfeed.fdbosses.init.BossDataAttachments;
 import com.finderfeed.fdlib.network.FDPacketHandler;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -42,11 +43,11 @@ public class MalkuthWeaknessHandler {
 
     public static int getCurrentWeaknessLevel(Player player){
         var tag = getWeaknessTag(player);
-        return Math.clamp(tag.getInt(WEAKNESS_LEVEL), MIN, MAX);
+        return FDMathUtil.clamp(tag.getInt(WEAKNESS_LEVEL), MIN, MAX);
     }
 
     public static void setCurrentWeakness(Player player, int amount){
-        amount = Math.clamp(amount, MIN, MAX);
+        amount = FDMathUtil.clamp(amount, MIN, MAX);
         var tag = getWeaknessTag(player);
         tag.putInt(WEAKNESS_LEVEL, amount);
         if (player instanceof ServerPlayer serverPlayer){

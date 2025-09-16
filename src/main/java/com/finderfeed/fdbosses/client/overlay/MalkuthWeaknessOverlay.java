@@ -80,11 +80,11 @@ public class MalkuthWeaknessOverlay implements IGuiOverlay {
         fireTickerO = fireTicker;
 
         if (weakTo.isIce()){
-            iceTicker = Math.clamp(iceTicker + 1, 0, MAX_IN_TIME);
-            fireTicker = Math.clamp(fireTicker - 1, 0, MAX_IN_TIME);
+            iceTicker = FDMathUtil.clamp(iceTicker + 1, 0, MAX_IN_TIME);
+            fireTicker = FDMathUtil.clamp(fireTicker - 1, 0, MAX_IN_TIME);
         }else{
-            iceTicker = Math.clamp(iceTicker - 1, 0, MAX_IN_TIME);
-            fireTicker = Math.clamp(fireTicker + 1, 0, MAX_IN_TIME);
+            iceTicker = FDMathUtil.clamp(iceTicker - 1, 0, MAX_IN_TIME);
+            fireTicker = FDMathUtil.clamp(fireTicker + 1, 0, MAX_IN_TIME);
         }
 
 

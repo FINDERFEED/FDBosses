@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_fireball.MalkuthFireball;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_fireball.MalkuthFireballRenderer;
 import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -30,7 +31,7 @@ public class MalkuthPlayerFireIceBallRenderer extends EntityRenderer<MalkuthPlay
     public void render(MalkuthPlayerFireIceBall fireball, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light) {
         matrices.pushPose();
 
-        float scale = Math.clamp((fireball.tickCount + pticks) / 5,0,1);
+        float scale = FDMathUtil.clamp((fireball.tickCount + pticks) / 5,0,1);
 
         matrices.scale(scale,scale,scale);
 
@@ -43,9 +44,9 @@ public class MalkuthPlayerFireIceBallRenderer extends EntityRenderer<MalkuthPlay
 
         if (fireball.getAttackType().isFire()) {
             Vector3f color = MalkuthEntity.getMalkuthAttackPreparationParticleColor(fireball.getAttackType());
-            ri = Math.clamp(color.x * 1.5f, 0, 1);
-            gi = Math.clamp(color.y * 1.5f, 0, 1);
-            bi = Math.clamp(color.z * 1.5f, 0, 1);
+            ri = FDMathUtil.clamp(color.x * 1.5f, 0, 1);
+            gi = FDMathUtil.clamp(color.y * 1.5f, 0, 1);
+            bi = FDMathUtil.clamp(color.z * 1.5f, 0, 1);
             r = color.x;
             g = color.y;
             b = color.z;

@@ -94,11 +94,11 @@ public class StripeParticle extends Particle {
                     }
 
 
-                    float startp = Math.clamp(v / stripeParticleOptions.getStartInPercent(),0,1);
-                    float endp = Math.clamp((1 - v) / stripeParticleOptions.getEndOutPercent(),0,1);
+                    float startp = FDMathUtil.clamp(v / stripeParticleOptions.getStartInPercent(),0,1);
+                    float endp = FDMathUtil.clamp((1 - v) / stripeParticleOptions.getEndOutPercent(),0,1);
 
 
-                    return Math.clamp(FDEasings.easeOut(p),0,1) * startp * endp;
+                    return FDMathUtil.clamp(FDEasings.easeOut(p),0,1) * startp * endp;
                 })
                     .renderCount(2)
                 .startPercent(startP)
@@ -108,7 +108,7 @@ public class StripeParticle extends Particle {
                 .startColor(stripeParticleOptions.getStartColor())
                 .endColor(stripeParticleOptions.getEndColor())
                 .curvePositions(points)
-                .lod(Math.clamp(stripeParticleOptions.getLOD(),0,200))
+                .lod(FDMathUtil.clamp(stripeParticleOptions.getLOD(),0,200))
                 .render();
 
         matrix.popPose();

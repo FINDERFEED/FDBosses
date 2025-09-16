@@ -483,7 +483,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     public void hurtBoss(int amount){
         if (allowedToBeDamaged) {
-            this.hits = org.joml.Math.clamp(this.hits - amount, 0, maxHits);
+            this.hits = FDMathUtil.clamp(this.hits - amount, 0, maxHits);
             if (hits == 0) {
                 this.kill();
             }
@@ -1012,7 +1012,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         double len = between.length();
         if (len > 0.025){
 
-            float p = (float) org.joml.Math.clamp(len / 15f, 0, 1);
+            float p = (float) FDMathUtil.clamp(len / 15f, 0, 1);
 
             float speed = (float) FDMathUtil.lerp(0.025, 2, p);
 
@@ -2145,9 +2145,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         Vector3f color = getMalkuthAttackPreparationParticleColor(malkuthAttackType);
 
-        color.x = org.joml.Math.clamp(color.x + random.nextFloat() * 0.2f, 0, 1);
-        color.y = org.joml.Math.clamp(color.y + random.nextFloat() * 0.2f, 0, 1);
-        color.z = org.joml.Math.clamp(color.z + random.nextFloat() * 0.2f, 0, 1);
+        color.x = FDMathUtil.clamp(color.x + random.nextFloat() * 0.2f, 0, 1);
+        color.y = FDMathUtil.clamp(color.y + random.nextFloat() * 0.2f, 0, 1);
+        color.z = FDMathUtil.clamp(color.z + random.nextFloat() * 0.2f, 0, 1);
 
         return color;
     }

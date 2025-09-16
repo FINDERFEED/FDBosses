@@ -53,8 +53,10 @@ public class BossClientPackets {
 
     private static Random random = new Random();
 
-    public static void setPlayerMalkuthWeaknessAmount(int amount){
-        MalkuthWeaknessHandler.setCurrentWeakness(FDClientHelpers.getClientPlayer(), amount);
+    public static void setPlayerMalkuthWeaknessAmount(int amount) {
+        if (FDClientHelpers.getClientPlayer() != null) {
+            MalkuthWeaknessHandler.setCurrentWeakness(FDClientHelpers.getClientPlayer(), amount);
+        }
     }
 
     public static void closeDossierScreen(){
@@ -666,9 +668,9 @@ public class BossClientPackets {
                         (float)center.x,(float)center.y,(float)center.z
                 );
 
-                float r = org.joml.Math.clamp(color.x + random.nextFloat() * 0.2f, 0, 1);
-                float g = org.joml.Math.clamp(color.y + random.nextFloat() * 0.4f, 0, 1);
-                float b = org.joml.Math.clamp(color.z + random.nextFloat() * 0.2f, 0, 1);
+                float r = FDMathUtil.clamp(color.x + random.nextFloat() * 0.2f, 0, 1);
+                float g = FDMathUtil.clamp(color.y + random.nextFloat() * 0.4f, 0, 1);
+                float b = FDMathUtil.clamp(color.z + random.nextFloat() * 0.2f, 0, 1);
 
                 BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
                         .color(r,g,b)

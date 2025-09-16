@@ -188,43 +188,43 @@ public class ArcLightningParticle extends Particle {
                     (float) (p1.x),
                     (float) (p1.y),
                     0
-            ).color(r,g,b,i == 1 ? 0 : a);
+            ).color(r,g,b,i == 1 ? 0 : a).endVertex();
             vertex.vertex(transform,
                     (float) (p1.x + previousCenteredVector.x * previousw),
                     (float) (p1.y + previousCenteredVector.y * previousw),
                     0
-            ).color(r,g,b,0f);
+            ).color(r,g,b,0f).endVertex();
             vertex.vertex(transform,
                     (float) (p2.x + v.x * w),
                     (float) (p2.y + v.y * w),
                     0
-            ).color(r,g,b,0f);
+            ).color(r,g,b,0f).endVertex();
             vertex.vertex(transform,
                     (float) (p2.x),
                     (float) (p2.y),
                     0
-            ).color(r,g,b,a);
+            ).color(r,g,b,a).endVertex();
 
             vertex.vertex(transform,
                     (float) (p1.x),
                     (float) (p1.y),
                     0
-            ).color(r,g,b,i == 1 ? 0 : a);
+            ).color(r,g,b,i == 1 ? 0 : a).endVertex();
             vertex.vertex(transform,
                     (float) (p1.x - previousCenteredVector.x * previousw),
                     (float) (p1.y - previousCenteredVector.y * previousw),
                     0
-            ).color(r,g,b,0f);
+            ).color(r,g,b,0f).endVertex();
             vertex.vertex(transform,
                     (float) (p2.x - v.x * w),
                     (float) (p2.y - v.y * w),
                     0
-            ).color(r,g,b,0f);
+            ).color(r,g,b,0f).endVertex();
             vertex.vertex(transform,
                     (float) (p2.x),
                     (float) (p2.y),
                     0
-            ).color(r,g,b,a);
+            ).color(r,g,b,a).endVertex();
 
             prevPoint = p2;
             previousw = w;
@@ -239,43 +239,43 @@ public class ArcLightningParticle extends Particle {
                 (float) (prevPoint.x),
                 (float) (prevPoint.y),
                 0
-        ).color(r,g,b,a);
+        ).color(r,g,b,a).endVertex();
         vertex.vertex(transform,
                 (float) (prevPoint.x + previousCenteredVector.x * previousw),
                 (float) (prevPoint.y + previousCenteredVector.y * previousw),
                 0
-        ).color(r,g,b,0f);
+        ).color(r,g,b,0f).endVertex();
         vertex.vertex(transform,
                 (float) (lastPos.x),
                 (float) (lastPos.y),
                 0
-        ).color(r,g,b,0f);
+        ).color(r,g,b,0f).endVertex();
         vertex.vertex(transform,
                 (float) (lastPos.x),
                 (float) (lastPos.y),
                 0
-        ).color(r,g,b,a);
+        ).color(r,g,b,a).endVertex();
 
         vertex.vertex(transform,
                 (float) (prevPoint.x),
                 (float) (prevPoint.y),
                 0
-        ).color(r,g,b,a);
+        ).color(r,g,b,a).endVertex();
         vertex.vertex(transform,
                 (float) (prevPoint.x - previousCenteredVector.x * previousw),
                 (float) (prevPoint.y - previousCenteredVector.y * previousw),
                 0
-        ).color(r,g,b,0f);
+        ).color(r,g,b,0f).endVertex();
         vertex.vertex(transform,
                 (float) (lastPos.x),
                 (float) (lastPos.y),
                 0
-        ).color(r,g,b,0f);
+        ).color(r,g,b,0f).endVertex();
         vertex.vertex(transform,
                 (float) (lastPos.x),
                 (float) (lastPos.y),
                 0
-        ).color(r,g,b,a);
+        ).color(r,g,b,a).endVertex();
 
 
     }

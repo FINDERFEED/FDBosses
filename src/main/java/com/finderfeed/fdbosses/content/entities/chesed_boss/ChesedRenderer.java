@@ -191,11 +191,11 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
             }
 
 
-            vertexConsumer.vertex(matrix4f,radius, -crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f + 0.25f,0).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY)
+            vertexConsumer.vertex(matrix4f,radius, -crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f + 0.25f,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT)
                     .normal(poseStack.last().normal(), -1,0,0).endVertex();
 
 
-            vertexConsumer.vertex(matrix4f,radius, crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f + 0.25f,1).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY)
+            vertexConsumer.vertex(matrix4f,radius, crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f + 0.25f,1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT)
                     .normal(poseStack.last().normal(), -1,0,0).endVertex();
 
             poseStack.mulPose(Axis.YP.rotation(angle));
@@ -203,10 +203,10 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
             matrix4f = poseStack.last().pose();
 
 
-            vertexConsumer.vertex(matrix4f,radius, crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f,1).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY)
+            vertexConsumer.vertex(matrix4f,radius, crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f,1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT)
                     .normal(poseStack.last().normal(), -1,0,0).endVertex();
 
-            vertexConsumer.vertex(matrix4f,radius, -crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f,0).uv2(LightTexture.FULL_BRIGHT).overlayCoords(OverlayTexture.NO_OVERLAY)
+            vertexConsumer.vertex(matrix4f,radius, -crackHeightRad, 0).color(1f,1f,1f,1f).uv(texId * 0.25f,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT)
                     .normal(poseStack.last().normal(), -1,0,0).endVertex();
 
             poseStack.popPose();
@@ -244,7 +244,7 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
                 float awayTime = 7f * ticker.getSpeedModifier();
 
 
-                float offsetP2 = Math.clamp((elapsedTime - offset - prepareTime) / awayTime, 0, 1);
+                float offsetP2 = FDMathUtil.clamp((elapsedTime - offset - prepareTime) / awayTime, 0, 1);
 
                 float easedP2 = FDEasings.easeOut(offsetP2);
 
@@ -333,7 +333,7 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
                 float awayTime = 7f * ticker.getSpeedModifier();
 
 
-                float offsetP2 = Math.clamp((elapsedTime - offset - prepareTime) / awayTime, 0, 1);
+                float offsetP2 = FDMathUtil.clamp((elapsedTime - offset - prepareTime) / awayTime, 0, 1);
 
                 float easedP2 = FDEasings.easeOut(offsetP2);
 

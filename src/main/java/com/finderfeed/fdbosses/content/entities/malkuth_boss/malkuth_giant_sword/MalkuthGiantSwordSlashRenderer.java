@@ -106,7 +106,7 @@ public class MalkuthGiantSwordSlashRenderer extends EntityRenderer<MalkuthGiantS
 
             float offsetMax = MalkuthGiantSwordSlash.DISSOLVE_TIME - timeOffset;
 
-            float t = Math.clamp(dissolveTime - timeOffset, 0, offsetMax);
+            float t = FDMathUtil.clamp(dissolveTime - timeOffset, 0, offsetMax);
 
             float upTime = offsetMax / 8f;
             float downTime = offsetMax - upTime;

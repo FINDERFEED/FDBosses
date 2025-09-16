@@ -39,6 +39,16 @@ public class EarthShatterSettings implements AutoSerializable {
     @SerializableField
     public EarthShatterSettings s;
 
+    public EarthShatterSettings(EarthShatterSettings other){
+        this.delay = other.delay;
+        this.upDistance = other.upDistance;
+        this.upTime = other.upTime;
+        this.stayTime = other.stayTime;
+        this.downTime = other.downTime;
+        this.direction = other.direction;
+        this.s = other.s;
+    }
+
     private EarthShatterSettings(int delay,float upDistance,int upTime,int stayTime,int downTime,Vector3f direction){
         this.delay = delay;
         this.upDistance = upDistance;

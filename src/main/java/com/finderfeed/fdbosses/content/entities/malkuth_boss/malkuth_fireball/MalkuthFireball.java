@@ -110,7 +110,7 @@ public class MalkuthFireball extends FDProjectile implements AutoSerializable {
 
                 Vec3 between = target.subtract(pos).normalize();
 
-                float p = (float) Math.clamp(dist / maxDist, 0, 1);
+                float p = (float) FDMathUtil.clamp(dist / maxDist, 0, 1);
 
                 float speedValue = FDMathUtil.lerp(minspeed, peakSpeed, p);
 

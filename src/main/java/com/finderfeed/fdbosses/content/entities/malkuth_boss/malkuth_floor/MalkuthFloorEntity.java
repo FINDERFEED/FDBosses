@@ -67,7 +67,7 @@ public class MalkuthFloorEntity extends Entity {
             if (!level().isClientSide && this.deathTicks <= 0){
                 this.setRemoved(RemovalReason.DISCARDED);
             }
-            this.deathTicks = Math.clamp(deathTicks - 1,0,DEATH_TME);
+            this.deathTicks = FDMathUtil.clamp(deathTicks - 1,0,DEATH_TME);
         }
 
     }

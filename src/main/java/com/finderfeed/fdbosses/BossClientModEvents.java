@@ -319,7 +319,7 @@ public class BossClientModEvents {
 
             Random random = new Random(platform.getId() * 33L);
             int timeToRise = 20 + random.nextInt(10);
-            float p = Math.clamp((platform.tickCount + v) / timeToRise,0, 1);
+            float p = FDMathUtil.clamp((platform.tickCount + v) / timeToRise,0, 1);
 
             float platformFloat = FDEasings.easeIn(p) * (float) Math.sin(time/25 + random.nextFloat() * FDMathUtil.FPI * 2) * 0.05f;
 
@@ -633,7 +633,7 @@ public class BossClientModEvents {
 
                                     if (entity.isActivating()) {
                                         float offsetTime = t - animTime / 2;
-                                        float t2 = Math.clamp(offsetTime / 10, 0, 1);
+                                        float t2 = FDMathUtil.clamp(offsetTime / 10, 0, 1);
 
                                         float p2;
 

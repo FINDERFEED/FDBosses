@@ -2,11 +2,14 @@ package com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity
 
 
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdlib.network.FDPacketHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -19,12 +22,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkHooks;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.function.Consumer;
 
 public class EarthShatterEntity extends Entity {
 
     public static final EntityDataAccessor<BlockState> STATE = SynchedEntityData.defineId(EarthShatterEntity.class, EntityDataSerializers.BLOCK_STATE);
+    public static final EntityDataAccessor<EarthShatterSettings> EARTH_SHATTER_SETTINGS = SynchedEntityData.defineId(EarthShatterEntity.class, BossEntityDataSerializers.EARTH_SHATTER_SETTINGS.get());
 
     public EarthShatterSettings settings;
 
@@ -50,6 +56,7 @@ public class EarthShatterEntity extends Entity {
 
         entity.setPos(pos.getX() + 0.5,pos.getY(),pos.getZ() + 0.5);
         entity.settings = settings;
+        entity.entityData.set(EARTH_SHATTER_SETTINGS, settings);
         entity.setBlockState(state);
 
         level.addFreshEntity(entity);
@@ -60,11 +67,18 @@ public class EarthShatterEntity extends Entity {
     @Override
     public void tick() {
         super.tick();
-        if (this.tickCount > settings.getLifetime()){
-            this.remove(RemovalReason.DISCARDED);
+        if (!level().isClientSide) {
+            if (settings == null) {
+                this.remove(RemovalReason.DISCARDED);
+                return;
+            }
+            if (this.tickCount > settings.getLifetime()) {
+                this.remove(RemovalReason.DISCARDED);
+            }
         }
 
     }
+
 
     public BlockState getBlockState(){
         return this.entityData.get(STATE);
@@ -75,18 +89,22 @@ public class EarthShatterEntity extends Entity {
     }
 
     public Vec3 getShatterDirection(){
-        return this.settings.direction;
+        if (!level().isClientSide) {
+            return this.settings.direction;
+        }else{
+            return this.entityData.get(EARTH_SHATTER_SETTINGS).direction;
+        }
     }
 
     @Override
     protected void defineSynchedData() {
         this.entityData.define(STATE, Blocks.STONE.defaultBlockState());
+        this.entityData.define(EARTH_SHATTER_SETTINGS,new EarthShatterSettings());
     }
 
     @Override
     public void startSeenByPlayer(ServerPlayer p_20119_) {
         super.startSeenByPlayer(p_20119_);
-        FDPacketHandler.INSTANCE.sendTo(new EarthShatterEntitySpawnPacket(this,this.settings),p_20119_.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     @Override
@@ -94,6 +112,7 @@ public class EarthShatterEntity extends Entity {
         this.settings = new EarthShatterSettings();
         this.settings.autoLoad("settings",tag);
         this.setBlockState(NbtUtils.readBlockState(level().holderLookup(Registries.BLOCK),tag));
+        this.entityData.set(EARTH_SHATTER_SETTINGS, settings);
     }
 
     @Override

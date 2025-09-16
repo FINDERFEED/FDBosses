@@ -45,7 +45,7 @@ public class MalkuthBoulderRenderer extends EntityRenderer<MalkuthBoulderEntity>
         super.render(entity, yaw, pticks, matrices, src, light);
         matrices.pushPose();
 
-        float prepareP = Math.clamp((entity.tickCount + pticks) / entity.getPrepareTime(), 0, 1);
+        float prepareP = FDMathUtil.clamp((entity.tickCount + pticks) / entity.getPrepareTime(), 0, 1);
 
 
         FDModel model = entity.getMalkuthAttackType().isFire() ? FIRE_MODEL : ICE_MODEL;

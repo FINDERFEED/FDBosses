@@ -46,8 +46,8 @@ public class RectanglePreparationParticle extends Particle {
 
         Vec3 hdir = options.getHorizontalDirection().multiply(1,0,1).normalize();
 
-        float distanceModifier = FDEasings.easeOut(Math.clamp ((this.age + pticks) / (this.options.getFadeIn()), 0, 1));
-        float attackPreparationModifier = Math.clamp ((this.age + pticks) / (this.options.getAttackChargeTime()), 0, 1);
+        float distanceModifier = FDEasings.easeOut(FDMathUtil.clamp ((this.age + pticks) / (this.options.getFadeIn()), 0, 1));
+        float attackPreparationModifier = FDMathUtil.clamp ((this.age + pticks) / (this.options.getAttackChargeTime()), 0, 1);
 
         float width = this.options.getWidth();
         float length = this.options.getLength();
@@ -68,14 +68,14 @@ public class RectanglePreparationParticle extends Particle {
 
         float fadeOutP = 1;
         if (this.age - this.options.getAttackChargeTime() >= 0){
-            fadeOutP = 1 - Math.clamp((this.age + pticks - this.options.getAttackChargeTime()) / (float) this.options.getFadeOut(),0, 1);
+            fadeOutP = 1 - FDMathUtil.clamp((this.age + pticks - this.options.getAttackChargeTime()) / (float) this.options.getFadeOut(),0, 1);
         }
 
         float colmod = 0.75f;
 
-        float endcolr = Math.clamp(color.r * colmod * 2f, 0, 1);
-        float endcolg = Math.clamp(color.g * colmod * 2f, 0, 1);
-        float endcolb = Math.clamp(color.b * colmod * 2f, 0, 1);
+        float endcolr = FDMathUtil.clamp(color.r * colmod * 2f, 0, 1);
+        float endcolg = FDMathUtil.clamp(color.g * colmod * 2f, 0, 1);
+        float endcolb = FDMathUtil.clamp(color.b * colmod * 2f, 0, 1);
 
         vertex.vertex((float)pos1.x,(float)pos1.y,(float)pos1.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
         vertex.vertex((float)pos2.x,(float)pos2.y,(float)pos2.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
@@ -83,9 +83,9 @@ public class RectanglePreparationParticle extends Particle {
         vertex.vertex((float)pos4.x,(float)pos4.y,(float)pos4.z).color(endcolr,endcolg,endcolb,color.a * fadeOutP);
 //
 
-        float endcolr2 = Math.clamp(color.r * 2f, 0, 1);
-        float endcolg2 = Math.clamp(color.g * 2f, 0, 1);
-        float endcolb2 = Math.clamp(color.b * 2f, 0, 1);
+        float endcolr2 = FDMathUtil.clamp(color.r * 2f, 0, 1);
+        float endcolg2 = FDMathUtil.clamp(color.g * 2f, 0, 1);
+        float endcolb2 = FDMathUtil.clamp(color.b * 2f, 0, 1);
         vertex.vertex((float)pos1p.x,(float)pos1p.y + 0.005f,(float)pos1p.z).color(color.r,color.g,color.b,color.a * fadeOutP);
         vertex.vertex((float)pos2p.x,(float)pos2p.y + 0.005f,(float)pos2p.z).color(color.r,color.g,color.b,color.a * fadeOutP);
         vertex.vertex((float)pos3p.x,(float)pos3p.y + 0.005f,(float)pos3p.z).color(endcolr2,endcolg2,endcolb2,color.a * fadeOutP);

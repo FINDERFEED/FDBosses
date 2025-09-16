@@ -211,7 +211,7 @@ public class FlyingSwordEntity extends FDProjectile {
         Vec3 center = this.position().add(0,this.getBbHeight() / 2,0);
 
         float time = this.tickCount;
-        float p = Math.clamp(time / FlyingSwordEntity.DELAY_UNTIL_LAUNCH,0,1);
+        float p = FDMathUtil.clamp(time / FlyingSwordEntity.DELAY_UNTIL_LAUNCH,0,1);
         float offset = -Mth.sin(p * (FDMathUtil.FPI)) * 2;
 
         int targetId = this.getTargetIdForClient();

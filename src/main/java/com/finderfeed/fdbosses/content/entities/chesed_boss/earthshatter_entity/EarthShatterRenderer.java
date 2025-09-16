@@ -33,7 +33,7 @@ public class EarthShatterRenderer extends EntityRenderer<EarthShatterEntity> {
 
 
 
-        EarthShatterSettings settings = entity.settings;
+        EarthShatterSettings settings = entity.getEntityData().get(EarthShatterEntity.EARTH_SHATTER_SETTINGS);
         if (entity.tickCount < settings.delay){
             return;
         }

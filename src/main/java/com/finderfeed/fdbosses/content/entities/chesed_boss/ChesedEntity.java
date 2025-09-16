@@ -1250,7 +1250,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
             for (float v = 0; v < dist; v += 2f){
 
-                Vector3f b = v1.lerp(v2,Math.clamp(random.nextFloat(),0,1),new Vector3f());
+                Vector3f b = v1.lerp(v2,FDMathUtil.clamp(random.nextFloat(),0,1),new Vector3f());
 
 
                 for (int k = 0; k < 3;k++) {
