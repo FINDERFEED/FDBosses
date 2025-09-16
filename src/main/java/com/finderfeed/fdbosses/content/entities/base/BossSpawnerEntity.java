@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.base;
 
 import com.finderfeed.fdbosses.BossClientPackets;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -16,6 +17,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.PacketDistributor;
 
 public abstract class BossSpawnerEntity extends FDEntity {
 
@@ -42,7 +44,7 @@ public abstract class BossSpawnerEntity extends FDEntity {
     public void spawn(){
         if (this.isActive()){
 
-            PacketDistributor.sendToPlayersTrackingEntity(this, new ForceDossierClosePacket());
+            FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->this),new ForceDossierClosePacket());
 
             var type = this.getBossEntityType();
 

@@ -9,6 +9,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.SetClientMalkuthWeaknessAmountPacket;
+import com.finderfeed.fdbosses.content.items.WeaponCoreItem;
 import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossDamageSources;
@@ -200,7 +201,7 @@ public class BossEvents {
 
                 ItemStack itemStack = Items.BOOK.getDefaultInstance();
 
-                itemStack.set(DataComponents.ITEM_NAME,player.getName());
+                itemStack.setHoverName(player.getName().copy());
 
                 ItemEntity item = new ItemEntity(player.level(),player.getX(),player.getY(),player.getZ(),itemStack);
 
@@ -215,9 +216,10 @@ public class BossEvents {
         ItemStack itemStack = event.getItemStack();
         Player player = event.getEntity();
         Level level = player.level();
-        if (!level.isClientSide && itemStack.has(BossDataComponents.ITEM_CORE)){
 
-            var itemCore = itemStack.get(BossDataComponents.ITEM_CORE).getCoreType();
+        ItemCoreDataComponent.CoreType itemCore = WeaponCoreItem.getItemCore(itemStack);
+
+        if (!level.isClientSide && itemCore != null){
 
             if (itemCore == ItemCoreDataComponent.CoreType.FIRE_AND_ICE){
 
@@ -242,13 +244,15 @@ public class BossEvents {
     public static void onEntityAttack(AttackEntityEvent event){
         Player player = event.getEntity();
         ItemStack itemStack = player.getMainHandItem();
-        if (!player.level().isClientSide && event.getTarget() instanceof LivingEntity livingEntity && itemStack.has(BossDataComponents.ITEM_CORE)){
+
+        ItemCoreDataComponent.CoreType core = WeaponCoreItem.getItemCore(itemStack);
+
+        if (!player.level().isClientSide && event.getTarget() instanceof LivingEntity livingEntity && core != null){
 
             Item item = itemStack.getItem();
             float power = player.getAttackStrengthScale(0.5f);
-            ItemCoreDataComponent core = itemStack.get(BossDataComponents.ITEM_CORE);
 
-            if (power > 0.5f && core.getCoreType() == ItemCoreDataComponent.CoreType.LIGHTNING && BossUtil.itemContainsModifierForAttribute(itemStack, Attributes.ATTACK_DAMAGE)) {
+            if (power > 0.5f && core == ItemCoreDataComponent.CoreType.LIGHTNING && BossUtil.itemContainsModifierForAttribute(itemStack, Attributes.ATTACK_DAMAGE)) {
 
                 float p = Mth.clamp(BossConfigs.BOSS_CONFIG.get().itemConfig.chanceToSummonLightningStrike / 100,0,1);
                 RandomSource randomSource = livingEntity.getRandom();

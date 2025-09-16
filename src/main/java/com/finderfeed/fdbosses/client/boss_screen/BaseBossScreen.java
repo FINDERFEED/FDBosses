@@ -100,7 +100,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
                         Level level = FDClientHelpers.getClientLevel();
                         if (level.getEntity(bossSpawnerId) instanceof BossSpawnerEntity bossSpawner) {
-                            PacketDistributor.sendToServer(new BossSpawnerStartFight(bossSpawnerId));
+                            FDPacketHandler.INSTANCE.sendToServer(new BossSpawnerStartFight(bossSpawnerId));
                         }
 
                     }else{
@@ -477,7 +477,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     public void render(GuiGraphics graphics, int mx, int my, float pticks) {
 
 
-        this.renderBackground(graphics);
+//        this.renderBackground(graphics);
 
 
         PoseStack matrices = graphics.pose();

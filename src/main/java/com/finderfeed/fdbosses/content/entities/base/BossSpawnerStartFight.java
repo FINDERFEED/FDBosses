@@ -6,6 +6,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.function.Supplier;
+
 @RegisterFDPacket("fdbosses:start_boss_fight")
 public class BossSpawnerStartFight extends FDPacket {
 
@@ -31,7 +33,7 @@ public class BossSpawnerStartFight extends FDPacket {
 
     @Override
     public void serverAction(Supplier<NetworkEvent.Context> iPayloadContext) {
-        Player player = iPayloadContext.player();
+        Player player = iPayloadContext.get().getSender();
         if (player.level().getEntity(spawnerEntityId) instanceof BossSpawnerEntity bossSpawnerEntity){
             bossSpawnerEntity.spawn();
         }

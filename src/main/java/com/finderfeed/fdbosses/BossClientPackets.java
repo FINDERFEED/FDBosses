@@ -666,9 +666,9 @@ public class BossClientPackets {
                         (float)center.x,(float)center.y,(float)center.z
                 );
 
-                float r = Math.clamp(color.x + random.nextFloat() * 0.2f, 0, 1);
-                float g = Math.clamp(color.y + random.nextFloat() * 0.4f, 0, 1);
-                float b = Math.clamp(color.z + random.nextFloat() * 0.2f, 0, 1);
+                float r = org.joml.Math.clamp(color.x + random.nextFloat() * 0.2f, 0, 1);
+                float g = org.joml.Math.clamp(color.y + random.nextFloat() * 0.4f, 0, 1);
+                float b = org.joml.Math.clamp(color.z + random.nextFloat() * 0.2f, 0, 1);
 
                 BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
                         .color(r,g,b)
@@ -851,7 +851,7 @@ public class BossClientPackets {
                     .setMaxQuadSize(size * sizeP)
                     .setSpeed(sp.x * speedMod,sp.y * speedMod)
                     .setFriction(frictionP)
-                    .color(
+                    .setColor(
                             0.1f + random.nextFloat() * 0.1f - 0.05f,
                             0.8f + random.nextFloat() * 0.1f - 0.05f,
                             0.8f + random.nextFloat() * 0.1f - 0.05f,

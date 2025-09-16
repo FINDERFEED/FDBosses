@@ -105,7 +105,7 @@ public class MalkuthWeaknessOverlay implements IGuiOverlay {
                         .setMaxQuadSize(3.5f)
                         .setSpeed(0, -0.4)
                         .setFriction(1f)
-                        .color(
+                        .setColor(
                                 color.x, color.y, color.z, 0.8f
                         )
                         .setLifetime(30)
@@ -135,9 +135,6 @@ public class MalkuthWeaknessOverlay implements IGuiOverlay {
         float w = window.getGuiScaledWidth();
         float h = window.getGuiScaledHeight();
 
-        BufferBuilder builder = Tesselator.getInstance().getBuilder();
-        
-        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
 
 
         Vector3f ice = MalkuthEntity.getMalkuthAttackPreparationParticleColor(MalkuthAttackType.ICE);
@@ -159,6 +156,11 @@ public class MalkuthWeaknessOverlay implements IGuiOverlay {
         RenderSystem.enableBlend();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+
+        BufferBuilder builder = Tesselator.getInstance().getBuilder();
+
+        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+
 
 
         for (int i = 0; i < 2;i++){

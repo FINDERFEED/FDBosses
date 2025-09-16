@@ -21,8 +21,7 @@
       "translate": "advancements.qliphoth_awakening.root.description"
     },
     "icon": {
-      "count": 1,
-      "id": "fdbosses:eye_of_chesed"
+      "item": "fdbosses:eye_of_chesed"
     },
     "show_toast": true,
     "title": {

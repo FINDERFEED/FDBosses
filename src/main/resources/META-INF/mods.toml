@@ -24,15 +24,17 @@ config="${mod_id}.mixins.json"
 file="META-INF/accesstransformer.cfg"
 
 [[dependencies.${mod_id}]] #optional
-    modId="neoforge" #mandatory
+    modId="forge" #mandatory
 
     type="required" #mandatory
 
-    versionRange="${neo_version_range}" #mandatory
+    versionRange="${forge_version_range}" #mandatory
 
     ordering="NONE"
 
     side="BOTH"
+
+    mandatory = true
 
 [[dependencies.${mod_id}]]
     modId="minecraft"

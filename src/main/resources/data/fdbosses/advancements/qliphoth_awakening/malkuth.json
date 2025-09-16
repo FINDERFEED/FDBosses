@@ -14,8 +14,7 @@
     },
     "frame": "challenge",
     "icon": {
-      "count": 1,
-      "id": "fdbosses:malkuth_trophy"
+      "item": "fdbosses:malkuth_trophy"
     },
     "title": {
       "translate": "advancements.qliphoth_awakening.malkuth.title"

@@ -7,8 +7,10 @@ import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.systems.particle.FDParticleProcessors;
 import com.finderfeed.fdlib.systems.particle.ParticleProcessorType;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -33,10 +35,10 @@ public class BossModEvents {
 
 
 
-//    @SubscribeEvent
-//    public static void registerSpawnPlacements(RegisterSpawnPlacementsEvent event){
-//        event.register(BossEntities.ICE_MALKUTH_WARRIOR.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-//        event.register(BossEntities.FIRE_MALKUTH_WARRIOR.get(), SpawnPlacementTypes.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules, RegisterSpawnPlacementsEvent.Operation.REPLACE);
-//    }
+    @SubscribeEvent
+    public static void registerSpawnPlacements(SpawnPlacementRegisterEvent event){
+        event.register(BossEntities.ICE_MALKUTH_WARRIOR.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
+        event.register(BossEntities.FIRE_MALKUTH_WARRIOR.get(), SpawnPlacements.Type.ON_GROUND, Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, Monster::checkMonsterSpawnRules, SpawnPlacementRegisterEvent.Operation.REPLACE);
+    }
 
 }

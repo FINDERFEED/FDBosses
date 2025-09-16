@@ -9,6 +9,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.function.Supplier;
+
 @RegisterFDPacket("fdbosses:force_dossier_screen_close_packet")
 public class ForceDossierClosePacket extends FDPacket {
 

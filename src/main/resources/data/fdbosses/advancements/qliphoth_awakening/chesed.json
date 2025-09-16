@@ -14,8 +14,7 @@
     },
     "frame": "challenge",
     "icon": {
-      "count": 1,
-      "id": "fdbosses:chesed_trophy"
+      "item": "fdbosses:chesed_trophy"
     },
     "title": {
       "translate": "advancements.qliphoth_awakening.chesed.title"

@@ -2,20 +2,23 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "#": {
-      "item": "minecraft:sculk"
+    "A": {
+      "item": "minecraft:ice"
+    },
+    "B": {
+      "item": "minecraft:magma_block"
     },
     "X": {
       "item": "minecraft:ender_eye"
     }
   },
   "pattern": [
-    " # ",
-    "#X#",
-    " # "
+    "BBA",
+    "BXA",
+    "BAA"
   ],
   "result": {
     "count": 1,
-    "id": "fdbosses:eye_of_chesed"
+    "item": "fdbosses:eye_of_malkuth"
   }
 }
