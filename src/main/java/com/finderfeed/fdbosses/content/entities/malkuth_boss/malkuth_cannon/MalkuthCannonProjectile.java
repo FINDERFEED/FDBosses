@@ -80,7 +80,7 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
     public void tick() {
         if (!level().isClientSide){
             this.setMalkuthAttackType(this.malkuthAttackType);
-            BossUtil.applyGravity(this, -this.getDefaultGravity());
+            BossUtil.applyGravity(this, this.getDefaultGravity());
 
             if (reversedAge-- <= 0){
                 this.explode(this.position());

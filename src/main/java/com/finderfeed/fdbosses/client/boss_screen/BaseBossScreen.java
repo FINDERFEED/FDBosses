@@ -323,7 +323,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         Vector2f anchor = this.getAnchor(0,1);
 
 
-        BossInfo bossInfo = new BossInfo(ResourceLocation.parse("minecraft:textures/item/book.png"),Component.translatable("fdbosses.word.short_description"),null,this.options.getTLDRComponent());
+        BossInfo bossInfo = new BossInfo(ResourceLocation.tryParse("minecraft:textures/item/book.png"),Component.translatable("fdbosses.word.short_description"),null,this.options.getTLDRComponent());
         FDButton skill = new FDSkillButton(this,anchor.x + 4,anchor.y - 36,32,32, bossInfo)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),

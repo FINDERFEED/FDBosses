@@ -47,7 +47,7 @@ public class FlyingBlockEntity extends Entity {
                 this.getDeltaMovement().multiply(friction,1f,friction)
         );
 
-        BossUtil.applyGravity(this, -this.getDefaultGravity());
+        BossUtil.applyGravity(this, this.getDefaultGravity());
 
         this.move(MoverType.SELF,this.getDeltaMovement());
     }

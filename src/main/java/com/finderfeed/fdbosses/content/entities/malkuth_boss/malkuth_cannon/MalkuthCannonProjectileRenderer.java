@@ -34,7 +34,7 @@ public class MalkuthCannonProjectileRenderer extends EntityRenderer<MalkuthCanno
     @Override
     public void render(MalkuthCannonProjectile projectile, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light) {
 
-        VertexConsumer vertexConsumer = src.getBuffer(RenderType.entityCutoutNoCull(this.getTextureLocation(projectile)));
+
 
         matrices.pushPose();
 
@@ -55,6 +55,7 @@ public class MalkuthCannonProjectileRenderer extends EntityRenderer<MalkuthCanno
             blockRenderDispatcher.renderSingleBlock(Blocks.FIRE.defaultBlockState(), matrices, src, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, ModelData.EMPTY, null);
             matrices.popPose();
         }
+        VertexConsumer vertexConsumer = src.getBuffer(RenderType.entityCutoutNoCull(this.getTextureLocation(projectile)));
         this.model.render(matrices, vertexConsumer, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f ,1f);
 
         matrices.popPose();

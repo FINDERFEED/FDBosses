@@ -51,26 +51,26 @@ public class MalkuthChainRenderer extends EntityRenderer<MalkuthChainEntity> {
         if (!chain.getPassengers().isEmpty()) {
             matrices.mulPose(Axis.YP.rotationDegrees(-135));
         }
-        b.vertex(m, -width,0,0).color(1f,1f,1f,1f).uv(0,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        b.vertex(m, -width,length,0).color(1f,1f,1f,1f).uv(length * 4,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        b.vertex(m, width,length,0).color(1f,1f,1f,1f).uv(length * 4,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        b.vertex(m, width,0,0).color(1f,1f,1f,1f).uv(0,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        b.vertex(m, -width,0,0).color(1f,1f,1f,1f).uv(0,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        b.vertex(m, -width,length,0).color(1f,1f,1f,1f).uv(length * 4,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        b.vertex(m, width,length,0).color(1f,1f,1f,1f).uv(length * 4,1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        b.vertex(m, width,0,0).color(1f,1f,1f,1f).uv(0,1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
 
-        b.vertex(m, width,0,0).color(1f,1f,1f,1f).uv(0,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        b.vertex(m, width,length,0).color(1f,1f,1f,1f).uv(length * 4,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        b.vertex(m, -width,length,0).color(1f,1f,1f,1f).uv(length * 4,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        b.vertex(m, -width,0,0).color(1f,1f,1f,1f).uv(0,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        b.vertex(m, width,0,0).color(1f,1f,1f,1f).uv(0,1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        b.vertex(m, width,length,0).color(1f,1f,1f,1f).uv(length * 4,1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        b.vertex(m, -width,length,0).color(1f,1f,1f,1f).uv(length * 4,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        b.vertex(m, -width,0,0).color(1f,1f,1f,1f).uv(0,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
 
 
-        b.vertex(m, 0,0,-width).color(1f,1f,1f,1f).uv(0,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        b.vertex(m, 0,length,-width).color(1f,1f,1f,1f).uv(length * 4,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        b.vertex(m, 0,length,width).color(1f,1f,1f,1f).uv(length * 4,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        b.vertex(m, 0,0,width).color(1f,1f,1f,1f).uv(0,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        b.vertex(m, 0,0,-width).color(1f,1f,1f,1f).uv(0,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        b.vertex(m, 0,length,-width).color(1f,1f,1f,1f).uv(length * 4,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        b.vertex(m, 0,length,width).color(1f,1f,1f,1f).uv(length * 4,1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        b.vertex(m, 0,0,width).color(1f,1f,1f,1f).uv(0,1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
 
-        b.vertex(m, 0,0,width).color(1f,1f,1f,1f).uv(0,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        b.vertex(m, 0,length,width).color(1f,1f,1f,1f).uv(length * 4,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        b.vertex(m, 0,length,-width).color(1f,1f,1f,1f).uv(length * 4,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        b.vertex(m, 0,0,-width).color(1f,1f,1f,1f).uv(0,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        b.vertex(m, 0,0,width).color(1f,1f,1f,1f).uv(0,1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        b.vertex(m, 0,length,width).color(1f,1f,1f,1f).uv(length * 4,1).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        b.vertex(m, 0,length,-width).color(1f,1f,1f,1f).uv(length * 4,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        b.vertex(m, 0,0,-width).color(1f,1f,1f,1f).uv(0,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
 
         matrices.popPose();
     }

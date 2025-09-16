@@ -1,14 +1,13 @@
 {
   "required": true,
   "package": "com.finderfeed.fdbosses.mixin",
-  "compatibilityLevel": "JAVA_21",
+  "compatibilityLevel": "JAVA_17",
   "refmap": "fdbosses.refmap.json",
   "mixins": [
     "BeardifierMixin",
     "CraftingMenuMixin",
     "EntityMixin",
     "JigsawPlacementMixin",
-    "LivingEntityAccessor",
     "PlayerMixin"
   ],
   "minVersion": "0.8",

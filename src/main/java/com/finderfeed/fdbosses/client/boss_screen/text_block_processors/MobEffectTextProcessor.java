@@ -35,7 +35,7 @@ public class MobEffectTextProcessor extends TextBlockProcessor {
         if (!arguments.containsKey("id")) throw new RuntimeException("Couldn't find 'id' on mob effect text processor");
 
         String id = arguments.get("id");
-        ResourceLocation effectId = ResourceLocation.parse(id);
+        ResourceLocation effectId = ResourceLocation.tryParse(id);
 
         MobEffect effect = ForgeRegistries.MOB_EFFECTS.getValue(effectId);
 

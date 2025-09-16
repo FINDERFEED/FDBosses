@@ -40,16 +40,16 @@ public class ChesedOneShotVerticalRayRenderer extends EntityRenderer<ChesedOneSh
         matrices.scale(p*2,p*2,p*2);
 
         Matrix4f mt = matrices.last().pose();
-        vertexConsumer.vertex(mt, -0.5f,0.05f,0.5f).color(0.2f,0.9f,1f,1f).uv(0,.5f).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).normal(0,1,0).endVertex();
-        vertexConsumer.vertex(mt, 0.5f,0.05f,0.5f).color(0.2f,0.9f,1f,1f).uv(1,.5f).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).normal(0,1,0).endVertex();
-        vertexConsumer.vertex(mt, 0.5f,0.05f,-0.5f).color(0.2f,0.9f,1f,1f).uv(1,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).normal(0,1,0).endVertex();
-        vertexConsumer.vertex(mt, -0.5f,0.05f,-0.5f).color(0.2f,0.9f,1f,1f).uv(0,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).normal(0,1,0).endVertex();
+        vertexConsumer.vertex(mt, -0.5f,0.05f,0.5f).color(0.2f,0.9f,1f,1f).uv(0,.5f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0,1,0).endVertex();
+        vertexConsumer.vertex(mt, 0.5f,0.05f,0.5f).color(0.2f,0.9f,1f,1f).uv(1,.5f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0,1,0).endVertex();
+        vertexConsumer.vertex(mt, 0.5f,0.05f,-0.5f).color(0.2f,0.9f,1f,1f).uv(1,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0,1,0).endVertex();
+        vertexConsumer.vertex(mt, -0.5f,0.05f,-0.5f).color(0.2f,0.9f,1f,1f).uv(0,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0,1,0).endVertex();
 
 
-        vertexConsumer.vertex(mt, -0.5f,0.05f,0.5f).color(0.2f,0.9f,1f,1f).uv(0,1f).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).normal(0,1,0).endVertex();
-        vertexConsumer.vertex(mt, 0.5f,0.05f,0.5f).color(0.2f,0.9f,1f,1f).uv(1,1f).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).normal(0,1,0).endVertex();
-        vertexConsumer.vertex(mt, 0.5f,0.05f,-0.5f).color(0.2f,0.9f,1f,1f).uv(1,0.5f).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).normal(0,1,0).endVertex();
-        vertexConsumer.vertex(mt, -0.5f,0.05f,-0.5f).color(0.2f,0.9f,1f,1f).uv(0,0.5f).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).normal(0,1,0).endVertex();
+        vertexConsumer.vertex(mt, -0.5f,0.05f,0.5f).color(0.2f,0.9f,1f,1f).uv(0,1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0,1,0).endVertex();
+        vertexConsumer.vertex(mt, 0.5f,0.05f,0.5f).color(0.2f,0.9f,1f,1f).uv(1,1f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0,1,0).endVertex();
+        vertexConsumer.vertex(mt, 0.5f,0.05f,-0.5f).color(0.2f,0.9f,1f,1f).uv(1,0.5f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0,1,0).endVertex();
+        vertexConsumer.vertex(mt, -0.5f,0.05f,-0.5f).color(0.2f,0.9f,1f,1f).uv(0,0.5f).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).normal(0,1,0).endVertex();
 
         matrices.popPose();
 
