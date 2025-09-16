@@ -2898,7 +2898,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
                     for (var combatant : this.getCombatants(true)){
                         if (!combatant.isSpectator()){
-                            BossCriteriaTriggers.BOSS_KILLED.get().trigger((ServerPlayer) combatant,this);
+                            BossCriteriaTriggers.BOSS_KILLED.trigger((ServerPlayer) combatant,this);
                         }
                     }
 

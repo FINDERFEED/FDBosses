@@ -86,6 +86,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingUseTotemEvent;
 import net.minecraftforge.event.entity.living.MobEffectEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -559,7 +560,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             if (deathTime == 1){
                 for (var combatant : this.getCombatants(true)){
                     if (!combatant.isSpectator()){
-                        BossCriteriaTriggers.BOSS_KILLED.get().trigger((ServerPlayer) combatant,this);
+                        BossCriteriaTriggers.BOSS_KILLED.trigger((ServerPlayer) combatant,this);
                     }
                 }
             } else if (this.deathTime == animStartTime) {
@@ -2768,6 +2769,27 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
 
+        }
+
+        @SubscribeEvent
+        public static void livingHurtEvent(LivingHurtEvent event){
+            LivingEntity living = event.getEntity();
+            Level level = living.level();
+
+            if (!level.isClientSide && living instanceof Player player && event.getSource() instanceof MalkuthDamageSource damageSource) {
+
+                int malkuthDamageAmount = damageSource.getMalkuthAttackAmount();
+                MalkuthAttackType malkuthAttackType = damageSource.getMalkuthAttackType();
+
+                if (!MalkuthWeaknessHandler.isWeakTo(player, malkuthAttackType)) {
+                    float damage = event.getAmount();
+                    float reduction = 1 - BossConfigs.BOSS_CONFIG.get().malkuthConfig.nonWeakToDamageReduction / 100f;
+                    event.setAmount(damage * reduction);
+                }
+
+                MalkuthWeaknessHandler.damageWeakness(malkuthAttackType, player, malkuthDamageAmount);
+
+            }
         }
 
 //        @SubscribeEvent

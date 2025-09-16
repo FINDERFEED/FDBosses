@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.client.particles.particle_processors.ChesedRayCircleParticleProcessor;
 import com.finderfeed.fdbosses.content.criterion_triggers.BossKilledCriterionTrigger;
+import com.finderfeed.fdbosses.init.BossCriteriaTriggers;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.systems.particle.FDParticleProcessors;
 import com.finderfeed.fdlib.systems.particle.ParticleProcessorType;
@@ -24,7 +25,7 @@ public class BossModEvents {
 
         event.enqueueWork(()->{
 
-            CriteriaTriggers.register(new BossKilledCriterionTrigger());
+            CriteriaTriggers.register(BossCriteriaTriggers.BOSS_KILLED);
 
         });
 

@@ -14,4 +14,6 @@ public class BossCriteriaTriggers {
 //
 //    public static final Supplier<BossKilledCriterionTrigger> BOSS_KILLED = CRITERION_TRIGGERS.register("boss_killed", BossKilledCriterionTrigger::new);
 
+    public static final BossKilledCriterionTrigger BOSS_KILLED = new BossKilledCriterionTrigger();
+
 }

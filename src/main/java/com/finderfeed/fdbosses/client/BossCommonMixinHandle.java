@@ -7,6 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrownEnderpearl;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
@@ -15,7 +16,7 @@ import java.util.List;
 public class BossCommonMixinHandle {
 
 
-    public static void entityCollidersMixin(Entity entity, Level level, List<VoxelShape> shapes, AABB box, CallbackInfoReturnable<List<VoxelShape>> cir, ImmutableList.Builder<VoxelShape> builder){
+    public static void entityCollidersMixin(Entity entity, Level level, List<VoxelShape> shapes, AABB box, CallbackInfoReturnable<Vec3> cir, ImmutableList.Builder<VoxelShape> builder){
         if (entity instanceof Player player || entity instanceof ThrownEnderpearl){
             AABB searchBox = new AABB(-20,-20,-20,20,20,20).move(entity.position());
 

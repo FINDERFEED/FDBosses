@@ -26,12 +26,12 @@ public class PlayerMixin {
         }
     }
 
-    @Inject(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isInvulnerableTo(Lnet/minecraft/world/damagesource/DamageSource;)Z", shift = At.Shift.AFTER))
-    public void actuallyHurt(DamageSource damageSource, float p_36313_, CallbackInfo ci){
-
-        Player player = ((Player)(Object)this);
-        BossMixinHandler.actuallyHurtPlayerMixin(damageSource, player);
-
-    }
+//    @Inject(method = "actuallyHurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isInvulnerableTo(Lnet/minecraft/world/damagesource/DamageSource;)Z", shift = At.Shift.AFTER))
+//    public void actuallyHurt(DamageSource damageSource, float p_36313_, CallbackInfo ci){
+//
+//        Player player = ((Player)(Object)this);
+//        BossMixinHandler.actuallyHurtPlayerMixin(damageSource, player);
+//
+//    }
 
 }

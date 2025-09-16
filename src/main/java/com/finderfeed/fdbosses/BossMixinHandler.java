@@ -1,31 +1,21 @@
 package com.finderfeed.fdbosses;
 
-import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.content.structures.MalkuthArenaStructure;
 import com.finderfeed.fdbosses.init.BossConfigs;
-import com.finderfeed.fdbosses.init.BossDataComponents;
-import com.finderfeed.fdbosses.init.BossItems;
-import com.finderfeed.fdbosses.mixin.LivingEntityAccessor;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.Beardifier;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -35,31 +25,31 @@ import net.minecraft.world.phys.Vec3;
 import java.util.Optional;
 
 public class BossMixinHandler {
-
-    public static void actuallyHurtPlayerMixin(DamageSource source, Player player){
-        LivingEntityAccessor accessor = (LivingEntityAccessor) player;
-        var damageContainers = accessor.getDamageContainers();
-        DamageContainer damageContainer = damageContainers.peek();
-        float newDamage = damageContainer.getNewDamage();
-
-        Level level = player.level();
-
-        if (!level.isClientSide && source instanceof MalkuthDamageSource damageSource) {
-
-            int malkuthDamageAmount = damageSource.getMalkuthAttackAmount();
-            MalkuthAttackType malkuthAttackType = damageSource.getMalkuthAttackType();
-
-            if (!MalkuthWeaknessHandler.isWeakTo(player, malkuthAttackType)) {
-                float damage = newDamage;
-                float reduction = 1 - BossConfigs.BOSS_CONFIG.get().malkuthConfig.nonWeakToDamageReduction / 100f;
-               damageContainer.setNewDamage(damage * reduction);
-            }
-
-            MalkuthWeaknessHandler.damageWeakness(malkuthAttackType, player, malkuthDamageAmount);
-
-        }
-
-    }
+//
+//    public static void actuallyHurtPlayerMixin(DamageSource source, Player player){
+//        LivingEntityAccessor accessor = (LivingEntityAccessor) player;
+//        var damageContainers = accessor.getDamageContainers();
+//        DamageContainer damageContainer = damageContainers.peek();
+//        float newDamage = damageContainer.getNewDamage();
+//
+//        Level level = player.level();
+//
+//        if (!level.isClientSide && source instanceof MalkuthDamageSource damageSource) {
+//
+//            int malkuthDamageAmount = damageSource.getMalkuthAttackAmount();
+//            MalkuthAttackType malkuthAttackType = damageSource.getMalkuthAttackType();
+//
+//            if (!MalkuthWeaknessHandler.isWeakTo(player, malkuthAttackType)) {
+//                float damage = newDamage;
+//                float reduction = 1 - BossConfigs.BOSS_CONFIG.get().malkuthConfig.nonWeakToDamageReduction / 100f;
+//               damageContainer.setNewDamage(damage * reduction);
+//            }
+//
+//            MalkuthWeaknessHandler.damageWeakness(malkuthAttackType, player, malkuthDamageAmount);
+//
+//        }
+//
+//    }
 
     public static boolean addBeardifiersToStructureManually(StructureManager structureManager, ChunkPos chunkPos, ObjectList<Beardifier.Rigid> beardifiers, StructureStart structureStart){
 
@@ -85,7 +75,7 @@ public class BossMixinHandler {
 
 
             if (boxIntersectsChunk(centerBB, chunkPos, 6)) {
-                beardifiers.add(new Beardifier.Rigid(centerBB, TerrainAdjustment.ENCAPSULATE, 0));
+                beardifiers.add(new Beardifier.Rigid(centerBB, TerrainAdjustment.BURY, 0));
             }
 
             int otherBoxRadius = 13;
@@ -120,7 +110,7 @@ public class BossMixinHandler {
                     .moved(pos.getX(), pos.getY(), pos.getZ());
 
             if (boxIntersectsChunk(box, chunkPos, 6)) {
-                beardifiers.add(new Beardifier.Rigid(box, TerrainAdjustment.ENCAPSULATE, 0));
+                beardifiers.add(new Beardifier.Rigid(box, TerrainAdjustment.BURY, 0));
             }
 
         }
