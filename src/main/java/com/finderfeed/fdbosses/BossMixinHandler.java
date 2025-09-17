@@ -4,8 +4,12 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.content.structures.MalkuthArenaStructure;
+import com.finderfeed.fdbosses.content.structures.malkuth.MalkuthStructureBoundingBox;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.llamalad7.mixinextras.sugar.Local;
+import com.llamalad7.mixinextras.sugar.ref.LocalDoubleRef;
+import com.llamalad7.mixinextras.sugar.ref.LocalIntRef;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -16,11 +20,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.levelgen.Beardifier;
+import net.minecraft.world.level.levelgen.DensityFunction;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.TerrainAdjustment;
 import net.minecraft.world.phys.Vec3;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Optional;
 
@@ -51,6 +57,10 @@ public class BossMixinHandler {
 //
 //    }
 
+    public static void computeMixin(DensityFunction.FunctionContext p_208200_, CallbackInfoReturnable<Double> cir, LocalDoubleRef d0){
+
+    }
+
     public static boolean addBeardifiersToStructureManually(StructureManager structureManager, ChunkPos chunkPos, ObjectList<Beardifier.Rigid> beardifiers, StructureStart structureStart){
 
         Structure structure = structureStart.getStructure();
@@ -68,14 +78,14 @@ public class BossMixinHandler {
 
 
 
-            BoundingBox centerBB = new BoundingBox(
+            BoundingBox centerBB = new MalkuthStructureBoundingBox(new BoundingBox(
                     -centerBBRadius,-height,-centerBBRadius,
                     centerBBRadius,-6,centerBBRadius
-            ).moved(startPos.getX(),startPos.getY(),startPos.getZ());
+            ).moved(startPos.getX(),startPos.getY(),startPos.getZ()));
 
 
             if (boxIntersectsChunk(centerBB, chunkPos, 6)) {
-                beardifiers.add(new Beardifier.Rigid(centerBB, TerrainAdjustment.BURY, 0));
+                beardifiers.add(new Beardifier.Rigid(centerBB, TerrainAdjustment.NONE, 0));
             }
 
             int otherBoxRadius = 13;
@@ -106,11 +116,11 @@ public class BossMixinHandler {
                     (int) Math.floor(offset.z)
             );
 
-            BoundingBox box = new BoundingBox(-boxRadius, -height, -boxRadius, boxRadius, -verticalOffset, boxRadius)
-                    .moved(pos.getX(), pos.getY(), pos.getZ());
+            BoundingBox box = new MalkuthStructureBoundingBox(new BoundingBox(-boxRadius, -height, -boxRadius, boxRadius, -verticalOffset, boxRadius)
+                    .moved(pos.getX(), pos.getY(), pos.getZ()));
 
             if (boxIntersectsChunk(box, chunkPos, 6)) {
-                beardifiers.add(new Beardifier.Rigid(box, TerrainAdjustment.BURY, 0));
+                beardifiers.add(new Beardifier.Rigid(box, TerrainAdjustment.NONE, 0));
             }
 
         }

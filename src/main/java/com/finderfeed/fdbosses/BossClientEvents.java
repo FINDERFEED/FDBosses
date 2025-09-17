@@ -198,7 +198,7 @@ public class BossClientEvents {
 
     @SubscribeEvent
     public static void renderLevelStageEvent(RenderLevelStageEvent event){
-        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL){
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_SKY){
             renderHellscapeSkybox(event);
         }else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS){
             renderMalkuthCowardExecution(event, event.getPartialTick());
@@ -433,30 +433,30 @@ public class BossClientEvents {
 
         //back (z is back)
 
-        vertexConsumer.vertex(m, -boxRadius,boxRadius,-boxRadius).uv(0,0.25f).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(m, boxRadius,boxRadius,-boxRadius).uv(0.5f,0.25f).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(m, boxRadius,-boxRadius,-boxRadius).uv(0.5f,0).color(r,g,b,a).endVertex();
         vertexConsumer.vertex(m, -boxRadius,-boxRadius,-boxRadius).uv(0,0).color(r,g,b,a).endVertex();
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,-boxRadius).uv(0.5f,0).color(r,g,b,a).endVertex();
+        vertexConsumer.vertex(m, boxRadius,boxRadius,-boxRadius).uv(0.5f,0.25f).color(r,g,b,a).endVertex();
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,-boxRadius).uv(0,0.25f).color(r,g,b,a).endVertex();
 
 
         //front
-        vertexConsumer.vertex(m, -boxRadius,-boxRadius,boxRadius).uv(0.5f,0.25f).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(m, boxRadius,-boxRadius,boxRadius).uv(0.0f,0.25f).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(m, boxRadius,boxRadius,boxRadius).uv(0.0f,0.5f).color(r,g,b,a).endVertex();
         vertexConsumer.vertex(m, -boxRadius,boxRadius,boxRadius).uv(0.5f,0.5f).color(r,g,b,a).endVertex();
+        vertexConsumer.vertex(m, boxRadius,boxRadius,boxRadius).uv(0.0f,0.5f).color(r,g,b,a).endVertex();
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,boxRadius).uv(0.0f,0.25f).color(r,g,b,a).endVertex();
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,boxRadius).uv(0.5f,0.25f).color(r,g,b,a).endVertex();
 
         //left
-        vertexConsumer.vertex(m, boxRadius,boxRadius,-boxRadius).uv(0.5f,0.5f).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(m, boxRadius,boxRadius,boxRadius).uv(1f,0.5f).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(m, boxRadius,-boxRadius,boxRadius).uv(1f,0.25f).color(r,g,b,a).endVertex();
         vertexConsumer.vertex(m, boxRadius,-boxRadius,-boxRadius).uv(0.5f,0.25f).color(r,g,b,a).endVertex();
+        vertexConsumer.vertex(m, boxRadius,-boxRadius,boxRadius).uv(1f,0.25f).color(r,g,b,a).endVertex();
+        vertexConsumer.vertex(m, boxRadius,boxRadius,boxRadius).uv(1f,0.5f).color(r,g,b,a).endVertex();
+        vertexConsumer.vertex(m, boxRadius,boxRadius,-boxRadius).uv(0.5f,0.5f).color(r,g,b,a).endVertex();
 
 
         //right
-        vertexConsumer.vertex(m, -boxRadius,-boxRadius,-boxRadius).uv(0.5f,0.5f).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(m, -boxRadius,-boxRadius,boxRadius).uv(0f,0.5f).color(r,g,b,a).endVertex();
-        vertexConsumer.vertex(m, -boxRadius,boxRadius,boxRadius).uv(0f,0.75f).color(r,g,b,a).endVertex();
         vertexConsumer.vertex(m, -boxRadius,boxRadius,-boxRadius).uv(0.5f,0.75f).color(r,g,b,a).endVertex();
+        vertexConsumer.vertex(m, -boxRadius,boxRadius,boxRadius).uv(0f,0.75f).color(r,g,b,a).endVertex();
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,boxRadius).uv(0f,0.5f).color(r,g,b,a).endVertex();
+        vertexConsumer.vertex(m, -boxRadius,-boxRadius,-boxRadius).uv(0.5f,0.5f).color(r,g,b,a).endVertex();
 
 
         //down (but for some reason its up)
