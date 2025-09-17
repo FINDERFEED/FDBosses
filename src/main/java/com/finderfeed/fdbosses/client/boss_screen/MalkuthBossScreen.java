@@ -20,6 +20,7 @@ import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.util.WidgetTexture;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticle;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
