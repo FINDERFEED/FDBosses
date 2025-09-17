@@ -175,7 +175,9 @@ public class MalkuthBossScreen extends BaseBossScreen{
 
         matrices.pushPose();
 
-        matrices.translate(0,0,-100);
+        pticks = FDRenderUtil.tryGetPartialTickIgnorePause();
+
+        matrices.translate(0,0,-75);
 
         this.animationSystem.applyAnimations(malkuthModel, pticks);
 

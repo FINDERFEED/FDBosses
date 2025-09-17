@@ -161,7 +161,7 @@ public class MalkuthChainEntity extends LivingEntity implements AutoSerializable
 
     @Override
     public double getPassengersRidingOffset() {
-        return 0.75f;
+        return -0.5f;
     }
 
     @Override

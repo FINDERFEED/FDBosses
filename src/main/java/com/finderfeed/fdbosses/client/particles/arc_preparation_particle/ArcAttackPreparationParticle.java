@@ -76,21 +76,21 @@ public class ArcAttackPreparationParticle extends Particle {
         }
 
         float colmod = 0.75f;
-        vertex.vertex((float) pos.x,(float) pos.y,(float) pos.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.vertex((float) pos2.x,(float) pos2.y,(float) pos2.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.vertex((float) center.x,(float) center.y,(float) center.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
+        vertex.vertex((float) pos.x,(float) pos.y,(float) pos.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP).endVertex();
+        vertex.vertex((float) pos2.x,(float) pos2.y,(float) pos2.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP).endVertex();
+        vertex.vertex((float) center.x,(float) center.y,(float) center.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP).endVertex();
 
-        vertex.vertex((float) pos.x,(float) pos.y,(float) pos.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.vertex((float) pos3.x,(float) pos3.y,(float) pos3.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.vertex((float) center.x,(float) center.y,(float) center.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
+        vertex.vertex((float) pos.x,(float) pos.y,(float) pos.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP).endVertex();
+        vertex.vertex((float) pos3.x,(float) pos3.y,(float) pos3.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP).endVertex();
+        vertex.vertex((float) center.x,(float) center.y,(float) center.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP).endVertex();
 
-        vertex.vertex((float) pos.x,(float) pos.y + 0.005f,(float) pos.z).color(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.vertex((float) pos2p.x,(float) pos.y + 0.005f,(float) pos2p.z).color(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.vertex((float) centerp.x,(float) pos.y + 0.005f,(float) centerp.z).color(color.r,color.g,color.b,color.a * fadeOutP);
+        vertex.vertex((float) pos.x,(float) pos.y + 0.005f,(float) pos.z).color(color.r,color.g,color.b,color.a * fadeOutP).endVertex();
+        vertex.vertex((float) pos2p.x,(float) pos.y + 0.005f,(float) pos2p.z).color(color.r,color.g,color.b,color.a * fadeOutP).endVertex();
+        vertex.vertex((float) centerp.x,(float) pos.y + 0.005f,(float) centerp.z).color(color.r,color.g,color.b,color.a * fadeOutP).endVertex();
 
-        vertex.vertex((float) pos.x,(float) pos.y + 0.005f,(float) pos.z).color(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.vertex((float) pos3p.x,(float) pos.y + 0.005f,(float) pos3p.z).color(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.vertex((float) centerp.x,(float) pos.y + 0.005f,(float) centerp.z).color(color.r,color.g,color.b,color.a * fadeOutP);
+        vertex.vertex((float) pos.x,(float) pos.y + 0.005f,(float) pos.z).color(color.r,color.g,color.b,color.a * fadeOutP).endVertex();
+        vertex.vertex((float) pos3p.x,(float) pos.y + 0.005f,(float) pos3p.z).color(color.r,color.g,color.b,color.a * fadeOutP).endVertex();
+        vertex.vertex((float) centerp.x,(float) pos.y + 0.005f,(float) centerp.z).color(color.r,color.g,color.b,color.a * fadeOutP).endVertex();
 
     }
 

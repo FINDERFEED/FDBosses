@@ -3,6 +3,9 @@ package com.finderfeed.fdbosses.content.entities.malkuth_boss.effects;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+
+import java.util.List;
 
 public class MalkuthKnightEffect extends MobEffect {
 
@@ -10,4 +13,8 @@ public class MalkuthKnightEffect extends MobEffect {
         super(MobEffectCategory.BENEFICIAL, 0x4f4f4f);
     }
 
+    @Override
+    public List<ItemStack> getCurativeItems() {
+        return List.of();
+    }
 }

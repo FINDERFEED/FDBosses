@@ -248,12 +248,12 @@ public class BossClientEvents {
         float easeInP2 = FDEasings.easeOutBack(p2);
 
         BufferBuilder builder = Tesselator.getInstance().getBuilder();
-        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
 
 
         FDRenderUtil.bindTexture(MALKUTH_COWARD_EXECUTION_SQUARE);
 
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
 
         matrices.pushPose();
 
@@ -284,11 +284,11 @@ public class BossClientEvents {
         }
 
         builder = Tesselator.getInstance().getBuilder();
-        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        builder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX);
 
         FDRenderUtil.bindTexture(MALKUTH_FIRE_SWORD);
 
-        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        RenderSystem.setShader(GameRenderer::getPositionColorTexShader);
 
         matrices.pushPose();
 

@@ -178,7 +178,7 @@ public class MalkuthCannonProjectile extends FDProjectile implements AutoSeriali
     @Override
     protected void onHitEntity(EntityHitResult res) {
         super.onHitEntity(res);
-        if (!level().isClientSide && this.tickCount > PROJECITLE_INVULNERABILITY_TIME){
+        if (!level().isClientSide && this.tickCount > PROJECITLE_INVULNERABILITY_TIME && !(res.getEntity() instanceof MalkuthCannonProjectile) ){
             this.explode(res.getLocation());
         }
     }

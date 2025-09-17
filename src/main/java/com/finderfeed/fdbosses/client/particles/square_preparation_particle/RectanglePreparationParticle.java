@@ -77,19 +77,19 @@ public class RectanglePreparationParticle extends Particle {
         float endcolg = FDMathUtil.clamp(color.g * colmod * 2f, 0, 1);
         float endcolb = FDMathUtil.clamp(color.b * colmod * 2f, 0, 1);
 
-        vertex.vertex((float)pos1.x,(float)pos1.y,(float)pos1.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.vertex((float)pos2.x,(float)pos2.y,(float)pos2.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP);
-        vertex.vertex((float)pos3.x,(float)pos3.y,(float)pos3.z).color(endcolr,endcolg,endcolb,color.a * fadeOutP);
-        vertex.vertex((float)pos4.x,(float)pos4.y,(float)pos4.z).color(endcolr,endcolg,endcolb,color.a * fadeOutP);
+        vertex.vertex((float)pos1.x,(float)pos1.y,(float)pos1.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP).endVertex();
+        vertex.vertex((float)pos2.x,(float)pos2.y,(float)pos2.z).color(color.r * colmod,color.g * colmod,color.b * colmod,color.a * fadeOutP).endVertex();
+        vertex.vertex((float)pos3.x,(float)pos3.y,(float)pos3.z).color(endcolr,endcolg,endcolb,color.a * fadeOutP).endVertex();
+        vertex.vertex((float)pos4.x,(float)pos4.y,(float)pos4.z).color(endcolr,endcolg,endcolb,color.a * fadeOutP).endVertex();
 //
 
         float endcolr2 = FDMathUtil.clamp(color.r * 2f, 0, 1);
         float endcolg2 = FDMathUtil.clamp(color.g * 2f, 0, 1);
         float endcolb2 = FDMathUtil.clamp(color.b * 2f, 0, 1);
-        vertex.vertex((float)pos1p.x,(float)pos1p.y + 0.005f,(float)pos1p.z).color(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.vertex((float)pos2p.x,(float)pos2p.y + 0.005f,(float)pos2p.z).color(color.r,color.g,color.b,color.a * fadeOutP);
-        vertex.vertex((float)pos3p.x,(float)pos3p.y + 0.005f,(float)pos3p.z).color(endcolr2,endcolg2,endcolb2,color.a * fadeOutP);
-        vertex.vertex((float)pos4p.x,(float)pos4p.y + 0.005f,(float)pos4p.z).color(endcolr2,endcolg2,endcolb2,color.a * fadeOutP);
+        vertex.vertex((float)pos1p.x,(float)pos1p.y + 0.005f,(float)pos1p.z).color(color.r,color.g,color.b,color.a * fadeOutP).endVertex();
+        vertex.vertex((float)pos2p.x,(float)pos2p.y + 0.005f,(float)pos2p.z).color(color.r,color.g,color.b,color.a * fadeOutP).endVertex();
+        vertex.vertex((float)pos3p.x,(float)pos3p.y + 0.005f,(float)pos3p.z).color(endcolr2,endcolg2,endcolb2,color.a * fadeOutP).endVertex();
+        vertex.vertex((float)pos4p.x,(float)pos4p.y + 0.005f,(float)pos4p.z).color(endcolr2,endcolg2,endcolb2,color.a * fadeOutP).endVertex();
 
     }
 

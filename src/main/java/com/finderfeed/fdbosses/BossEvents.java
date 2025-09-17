@@ -64,16 +64,16 @@ public class BossEvents {
         }
     }
 
-    @SubscribeEvent
-    public static void preventRemovingEffects(MobEffectEvent.Remove event){
-        List<MobEffect> NOT_CURABLE = List.of(
-                BossEffects.MARK_OF_A_COWARD.get(),
-                BossEffects.MARK_OF_A_KNIGHT.get()
-        );
-        if (NOT_CURABLE.contains(event.getEffect())){
-            event.setCanceled(true);
-        }
-    }
+//    @SubscribeEvent
+//    public static void preventRemovingEffects(MobEffectEvent.Remove event){
+//        List<MobEffect> NOT_CURABLE = List.of(
+//                BossEffects.MARK_OF_A_COWARD.get(),
+//                BossEffects.MARK_OF_A_KNIGHT.get()
+//        );
+//        if (NOT_CURABLE.contains(event.getEffect())){
+//            event.setCanceled(true);
+//        }
+//    }
 
     @SubscribeEvent
     public static void playerEnterWorld(PlayerEvent.PlayerLoggedInEvent event){
