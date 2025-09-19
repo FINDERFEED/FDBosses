@@ -142,8 +142,8 @@ dependencies {
 
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
-//    implementation fg.deobf("curse.maven:oculus-581495:4767500")
-//    implementation fg.deobf("curse.maven:rubidium-574856:4767529")
+    implementation fg.deobf("curse.maven:oculus-581495:4767500")
+    implementation fg.deobf("curse.maven:rubidium-574856:4767529")
 //    implementation fg.deobf("curse.maven:entityculling-448233:6780226")
 
 }

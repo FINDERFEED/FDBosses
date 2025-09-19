@@ -484,11 +484,17 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         Vector2f anchorEnd = this.getAnchor(1f,1f);
 
+        matrices.pushPose();
+
+        matrices.pushPose();
+        matrices.translate(0,0,-1000);
         FDRenderUtil.fill(matrices,0,0,anchorEnd.x,anchorEnd.y,0f,0f,0f,0.6f);
+        matrices.popPose();
+
+        this.renderBack(graphics,mx,my,pticks);
 
         this.renderBoss(graphics,mx,my,pticks);
 
-        this.renderBack(graphics,mx,my,pticks);
 
         for (Renderable renderable : this.renderables) {
             if (renderable != this.skillInfoWidget && renderable != didntReadSkillWarningWidget) {
@@ -501,6 +507,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         this.renderDidntReadSkillInfoWidget(graphics,mx,my,pticks);
         this.renderSocialsWidget(graphics,mx,my,pticks);
+        matrices.popPose();
     }
 
     private void renderDidntReadSkillInfoWidget(GuiGraphics graphics, int mx, int my, float pticks){
