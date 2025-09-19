@@ -110,27 +110,27 @@ public class ChesedRenderer implements FDFreeEntityRenderer<ChesedEntity> {
 
         float width = 0.25f;
 
-        vertex.vertex(m,0,0,0f).color(0.3f, 1f, 1f,p);
-        vertex.vertex(m,0,height,0f).color(0.3f, 1f, 1f,p);
-        vertex.vertex(m,-width,height,0f).color(0.3f, 1f, 1f,0);
-        vertex.vertex(m,-width,0,0f).color(0.3f, 1f, 1f,0);
+        vertex.vertex(m,0,0,0f).color(0.3f, 1f, 1f,p).endVertex();
+        vertex.vertex(m,0,height,0f).color(0.3f, 1f, 1f,p).endVertex();
+        vertex.vertex(m,-width,height,0f).color(0.3f, 1f, 1f,0).endVertex();
+        vertex.vertex(m,-width,0,0f).color(0.3f, 1f, 1f,0).endVertex();
 
 
-        vertex.vertex(m,width,0,0f).color(0.3f, 1f, 1f,0);
-        vertex.vertex(m,width,height,0f).color(0.3f, 1f, 1f,0);
-        vertex.vertex(m,0,height,0f).color(0.3f, 1f, 1f,p);
-        vertex.vertex(m,0,0,0f).color(0.3f, 1f, 1f,p);
+        vertex.vertex(m,width,0,0f).color(0.3f, 1f, 1f,0).endVertex();
+        vertex.vertex(m,width,height,0f).color(0.3f, 1f, 1f,0).endVertex();
+        vertex.vertex(m,0,height,0f).color(0.3f, 1f, 1f,p).endVertex();
+        vertex.vertex(m,0,0,0f).color(0.3f, 1f, 1f,p).endVertex();
 
-        vertex.vertex(m,0,0,0.01f).color(1f, 1f, 1f,p);
-        vertex.vertex(m,0,height,0.01f).color(1f, 1f, 1f,p);
-        vertex.vertex(m,-width/4f,height,0.01f).color(1f, 1f, 1f,0);
-        vertex.vertex(m,-width/4f,0,0.01f).color(1f, 1f, 1f,0);
+        vertex.vertex(m,0,0,0.01f).color(1f, 1f, 1f,p).endVertex();
+        vertex.vertex(m,0,height,0.01f).color(1f, 1f, 1f,p).endVertex();
+        vertex.vertex(m,-width/4f,height,0.01f).color(1f, 1f, 1f,0).endVertex();
+        vertex.vertex(m,-width/4f,0,0.01f).color(1f, 1f, 1f,0).endVertex();
 
 
-        vertex.vertex(m,width/4f,0,0.01f).color(1f, 1f, 1f,0);
-        vertex.vertex(m,width/4f,height,0.01f).color(1f, 1f, 1f,0);
-        vertex.vertex(m,0,height,0.01f).color(1f, 1f, 1f,p);
-        vertex.vertex(m,0,0,0.01f).color(1f, 1f, 1f,p);
+        vertex.vertex(m,width/4f,0,0.01f).color(1f, 1f, 1f,0).endVertex();
+        vertex.vertex(m,width/4f,height,0.01f).color(1f, 1f, 1f,0).endVertex();
+        vertex.vertex(m,0,height,0.01f).color(1f, 1f, 1f,p).endVertex();
+        vertex.vertex(m,0,0,0.01f).color(1f, 1f, 1f,p).endVertex();
 
         poseStack.popPose();
     }

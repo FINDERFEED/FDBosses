@@ -20,18 +20,15 @@ public class BossRenderTypes extends RenderType{
     public static final RenderType LIGHTNING_NO_CULL = create(
             "lightning_no_cull",
             DefaultVertexFormat.POSITION_COLOR,
-            VertexFormat.Mode.QUADS,
-            1536,
-            false,
-            true,
+            VertexFormat.Mode.QUADS, 256,
+            false, true,
             RenderType.CompositeState.builder()
                     .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
                     .setWriteMaskState(COLOR_DEPTH_WRITE)
                     .setTransparencyState(LIGHTNING_TRANSPARENCY)
                     .setOutputState(WEATHER_TARGET)
                     .setCullState(RenderStateShard.NO_CULL)
-                    .createCompositeState(false)
-    );
+                    .createCompositeState(false));
 
 
     public static final RenderStateShard.TransparencyStateShard FD_ADDITIVE_TRANSPARENCY = new RenderStateShard.TransparencyStateShard(
