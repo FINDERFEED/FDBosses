@@ -4,10 +4,7 @@ import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
-import com.finderfeed.fdbosses.init.BossAnims;
-import com.finderfeed.fdbosses.init.BossDamageSources;
-import com.finderfeed.fdbosses.init.BossEntities;
-import com.finderfeed.fdbosses.init.BossSounds;
+import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdlib.FDLib;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
@@ -77,6 +74,8 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
 
 
     private void idleParticles(){
+
+        if (BossConfigs.BOSS_CONFIG_CLIENT.get().lessParticles) return;
 
         if (tickCount < 10) return;
         if (tickCount % 3 == 0) {
