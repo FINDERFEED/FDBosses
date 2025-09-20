@@ -40,12 +40,21 @@ public class WeaponCoreItem extends Item {
     }
 
     public static ItemCoreDataComponent.CoreType getItemCore(ItemStack itemStack){
-        CompoundTag tag = getItemTag(itemStack);
+        CompoundTag tag = getItemTagNoCreate(itemStack);
+
+        if (tag == null){
+            return null;
+        }
+
         if (tag.contains(CORE_TAG_NAME)){
             return ItemCoreDataComponent.CoreType.valueOf(tag.getString(CORE_TAG_NAME));
         }else{
             return null;
         }
+    }
+
+    public static CompoundTag getItemTagNoCreate(ItemStack itemStack){
+        return itemStack.getTagElement(FDBosses.MOD_ID);
     }
 
     public static CompoundTag getItemTag(ItemStack itemStack){
