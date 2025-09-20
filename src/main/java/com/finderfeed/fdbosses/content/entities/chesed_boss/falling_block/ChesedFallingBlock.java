@@ -102,8 +102,8 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
                                 .maxAngle(FDMathUtil.FPI * 2)
                                 .maxSpeed(0.3f)
                                 .collectRadius(2)
-                                .maxParticleLifetime(30)
-                                .count(20)
+                                .maxParticleLifetime(15)
+                                .count(5)
                                 .maxVerticalSpeedEdges(0.15f)
                                 .maxVerticalSpeedCenter(0.15f)
                 );

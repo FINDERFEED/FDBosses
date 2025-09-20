@@ -10,6 +10,7 @@ import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOp
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
@@ -1095,6 +1096,12 @@ public class BossClientPackets {
             }
         }
 
+    }
+
+    public static void spawnRadialEarthquakeShatters(int entityId, int radius){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof RadialEarthquakeEntity radialEarthquakeEntity){
+            radialEarthquakeEntity.spawnEarthShattersOnRadius(radius);
+        }
     }
 
     public static void radialEarthquakeParticles(Vec3 tpos,int rad){

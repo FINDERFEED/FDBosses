@@ -223,6 +223,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .registerAttack(RAY_EVASION_ATTACK,this::rayEvasionAttack)
                     .attackListener(this::attackListener)
+//                    .addAttack(0,EARTHQUAKE_ATTACK)
+//                    .addAttack(1,ROCKFALL_ATTACK)
                     .addAttack(0, ray)
                     .addAttack(1,AttackOptions.builder()
                             .addAttack(ELECTRIC_SPHERE_ATTACK)
@@ -1870,7 +1872,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                                 .size(1f)
                                 .build())
                         .lifetime(400)
-                        .particlesPerTick(20)
+                        .particlesPerTick(10)
                         .processor(new CircleSpawnProcessor(new Vec3(0,-1,0),0.05f,0.1f,36))
                         .position(this.position().add(0,height + 2,0))
                         .build());
@@ -1896,7 +1898,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 this.summonDelayedVerticalRayOnFieldNearPlayers(5,this.isBelowHalfHP() ? 3 : 2);
             }
 
-            this.summonStonesAround(4,rad, this.position().add(0,height,0),true,false,FDEasings::easeOut);
+            this.summonStonesAround(2,rad, this.position().add(0,height,0),true,false,FDEasings::easeOut);
 
             int stonesAroundPlayersFrequency = this.isBelowHalfHP() ? 6 : 5;
 
@@ -2484,7 +2486,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 )
                 .upTime(4)
                 .upDistance(0.25f)
-                .downTime(8)
+                .downTime(4)
                 .stayTime(2)
                 .build();
 
@@ -2496,7 +2498,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 )
                 .upTime(4)
                 .upDistance(0.5f)
-                .downTime(8)
+                .downTime(4)
                 .stayTime(2)
                 .build();
 
@@ -2508,7 +2510,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 )
                 .upTime(4)
                 .upDistance(0.5f)
-                .downTime(8)
+                .downTime(4)
                 .stayTime(2)
                 .build();
 

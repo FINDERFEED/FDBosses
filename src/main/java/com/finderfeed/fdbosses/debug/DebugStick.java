@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.debug;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.ChesedMiniRay;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
@@ -62,23 +63,7 @@ public class DebugStick extends Item {
         if (!level.isClientSide){
 
 
-
-//            Vec3 look = player.getLookAngle();
-//            MalkuthPlayerFireIceBall.summon(player, player.getEyePosition().add(look), look.multiply(4,4,4), MalkuthAttackType.FIRE, player.getItemInHand(InteractionHand.MAIN_HAND));
-
-//            Vec3 f = player.getLookAngle().multiply(1,0,1).normalize().multiply(10,10,10);
-//
-//
-//            MalkuthGiantSwordSlash malkuthGiantSwordSlash = MalkuthGiantSwordSlash.summon(level, player.position(), player.getLookAngle(), MalkuthAttackType.ICE, 30);
-//            MalkuthGiantSwordSlash malkuthGiantSwordSlash2 = MalkuthGiantSwordSlash.summon(level, player.position().add(f.yRot(-FDMathUtil.FPI/2)), player.getLookAngle(), MalkuthAttackType.FIRE);
-
-//            MalkuthEarthquake malkuthEarthquake = MalkuthEarthquake.summon(level, MalkuthAttackType.FIRE,player.position(), player.getLookAngle().multiply(1,0,1).normalize().multiply(30,30,30),20,
-//                    FDMathUtil.FPI, 1);
-
-
-            Vec3 pos = player.position().add(5,5,5);
-
-            ChesedMiniRay chesedMiniRay = ChesedMiniRay.summon(level, player, player.getItemInHand(InteractionHand.MAIN_HAND), player);
+            RadialEarthquakeEntity.summon(level, player.getOnPos(), 1, 40,1f, 1);
 
 
 //            if (p1 == null){

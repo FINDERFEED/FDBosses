@@ -79,24 +79,26 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
     private void idleParticles(){
 
         if (tickCount < 10) return;
-        for (int i = 0; i < 1;i++) {
-            float offs = 0.25f;
-            Vec3 p1 = this.position().add( random.nextFloat() * 0.025 - 0.0125,offs, random.nextFloat() * 0.025 - 0.0125);
-            Vec3 p2 = this.position().add(0,this.getBbHeight() - offs,0);
+        if (tickCount % 3 == 0) {
+            for (int i = 0; i < 1; i++) {
+                float offs = 0.25f;
+                Vec3 p1 = this.position().add(random.nextFloat() * 0.025 - 0.0125, offs, random.nextFloat() * 0.025 - 0.0125);
+                Vec3 p2 = this.position().add(0, this.getBbHeight() - offs, 0);
 
-            Vec3 sp = this.getDeltaMovement();
-            level().addParticle(ArcLightningOptions.builder(BossParticles.ARC_LIGHTNING.get())
-                            .end(p2.x, p2.y, p2.z)
-                            .endSpeed(sp)
-                            .lifetime(2)
-                            .color(1 + random.nextInt(40), 183 + random.nextInt(60), 165 + random.nextInt(60))
-                            .lightningSpread(0.25f)
-                            .width(0.1f)
-                            .segments(6)
-                            .circleOffset(0.25f)
-                            .build(),
-                    true, p1.x, p1.y, p1.z, sp.x, sp.y, sp.z
-            );
+                Vec3 sp = this.getDeltaMovement();
+                level().addParticle(ArcLightningOptions.builder(BossParticles.ARC_LIGHTNING.get())
+                                .end(p2.x, p2.y, p2.z)
+                                .endSpeed(sp)
+                                .lifetime(2)
+                                .color(1 + random.nextInt(40), 183 + random.nextInt(60), 165 + random.nextInt(60))
+                                .lightningSpread(0.25f)
+                                .width(0.1f)
+                                .segments(6)
+                                .circleOffset(0.25f)
+                                .build(),
+                        false, p1.x, p1.y, p1.z, sp.x, sp.y, sp.z
+                );
+            }
         }
 
     }

@@ -27,6 +27,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.
 import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlockRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.flying_block_entity.FlyingBlockEntityRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.ChesedKineticFieldRenderer;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayReflectorRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
@@ -682,7 +683,10 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.BLOCK_PROJECTILE.get(), BlockProjectileRenderer::new);
         event.registerEntityRenderer(BossEntities.CHESED_FALLING_BLOCK.get(), ChesedFallingBlockRenderer::new);
         event.registerEntityRenderer(BossEntities.FLYING_BLOCK.get(), FlyingBlockEntityRenderer::new);
-        event.registerEntityRenderer(BossEntities.RADIAL_EARTHQUAKE.get(), NullEntityRenderer::new);
+
+        event.registerEntityRenderer(BossEntities.RADIAL_EARTHQUAKE.get(), RadialEarthquakeRenderer::new);
+
+
         event.registerEntityRenderer(BossEntities.EYE_OF_CHESED.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(BossEntities.EYE_OF_MALKUTH.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(BossEntities.CHESED_VERTICAL_RAY_ATTACK.get(), ChesedVerticalRayAttackRenderer::new);
