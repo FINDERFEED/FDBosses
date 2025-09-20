@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.chesed_boss;
 
+import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.BossParticles;
@@ -29,6 +30,7 @@ import com.finderfeed.fdbosses.content.util.RepeatedSound;
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.packets.ChesedRayReflectPacket;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
+import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.FDHelpers;
@@ -223,8 +225,6 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .registerAttack(ELECTRIC_SPHERE_ATTACK,this::electricSphereAttack) // 1
                     .registerAttack(RAY_EVASION_ATTACK,this::rayEvasionAttack)
                     .attackListener(this::attackListener)
-//                    .addAttack(0,EARTHQUAKE_ATTACK)
-//                    .addAttack(1,ROCKFALL_ATTACK)
                     .addAttack(0, ray)
                     .addAttack(1,AttackOptions.builder()
                             .addAttack(ELECTRIC_SPHERE_ATTACK)
@@ -1866,16 +1866,16 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
                 this.rockfallCastStones(count, height, angle);
 
-                FDLibCalls.addParticleEmitter(level(), height * 1.25f, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
-                                .color(0.25f, 0.25f, 0.25f)
-                                .lifetime(0, 0, 100)
-                                .size(1f)
-                                .build())
-                        .lifetime(400)
-                        .particlesPerTick(10)
-                        .processor(new CircleSpawnProcessor(new Vec3(0,-1,0),0.05f,0.1f,36))
-                        .position(this.position().add(0,height + 2,0))
-                        .build());
+
+                for (var player : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level(), this.position().add(0,-2,0),ARENA_HEIGHT + 2,ARENA_RADIUS + 10)){
+                    FDPacketHandler.INSTANCE.sendTo(new PosLevelEventPacket(
+                            this.position().add(0,height + 2,0),
+                            BossUtil.CHESED_ADD_ROCKFALL_PARTICLE_EMITTER,
+                            this.getId()
+                    ),player.connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+                }
+
+
 
 
                 FDLibCalls.sendParticles((ServerLevel) level(),BallParticleOptions.builder()
@@ -2092,7 +2092,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                         .maxSpeed(0.15f)
                         .collectRadius(2)
                         .maxParticleLifetime(30)
-                        .count(200)
+                        .count(100)
                         .maxVerticalSpeedEdges(0.2f)
                         .maxVerticalSpeedCenter(0.2f)
         );

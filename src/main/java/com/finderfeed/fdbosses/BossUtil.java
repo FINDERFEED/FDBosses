@@ -50,6 +50,7 @@ public class BossUtil {
     public static final int MALKUTH_VOLCANO_ERRUPTION = 11;
     public static final int MALKUTH_SWORD_INSERT_PARTICLES = 12;
     public static final int MALKUTH_PLAYER_FIREBALL_EXPLODE = 13;
+    public static final int CHESED_ADD_ROCKFALL_PARTICLE_EMITTER = 14;
 
     public static CompoundTag getOrCreateTag(CompoundTag main, String name){
         if (!main.contains(name)){
@@ -181,6 +182,10 @@ public class BossUtil {
             double z = pos.z - entity.getZ();
             return x * x + z * z <= radius * radius;
         };
+    }
+
+    public static void chesedRockfallEmitter(ServerLevel level, Vec3 pos, double radius, int chesedEntityId){
+        posEvent(level, pos, CHESED_ADD_ROCKFALL_PARTICLE_EMITTER, chesedEntityId, radius);
     }
 
     public static void malkuthSwordsInsertParticles(ServerLevel serverLevel, Vec3 pos, double radius, int malkuthEntityId){

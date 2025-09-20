@@ -104,6 +104,7 @@ public class BossEntities {
     public static final Supplier<EntityType<RadialEarthquakeEntity>> RADIAL_EARTHQUAKE = ENTITIES.register("radial_earthquake",()->EntityType.Builder.of(
             RadialEarthquakeEntity::new, MobCategory.MISC
     )
+            .clientTrackingRange(60)
             .sized(0.2f,0.2f)
             .build("radial_earthquake"));
 

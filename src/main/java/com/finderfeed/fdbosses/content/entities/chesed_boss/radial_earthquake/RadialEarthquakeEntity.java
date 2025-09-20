@@ -246,4 +246,8 @@ public class RadialEarthquakeEntity extends Entity implements AutoSerializable {
         ).move(this.position());
     }
 
+    @Override
+    public boolean shouldRenderAtSqrDistance(double sqrDistance) {
+        return sqrDistance <= 120 * 120;
+    }
 }

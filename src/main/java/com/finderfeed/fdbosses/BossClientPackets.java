@@ -14,10 +14,14 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.Ra
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
+import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
+import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
+import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterHandler;
+import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.CircleSpawnProcessor;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
 import com.finderfeed.fdlib.util.FDColor;
@@ -195,7 +199,29 @@ public class BossClientPackets {
             case BossUtil.MALKUTH_PLAYER_FIREBALL_EXPLODE -> {
                 malkuthPlayerFireballExplode(pos,data);
             }
+            case BossUtil.CHESED_ADD_ROCKFALL_PARTICLE_EMITTER -> {
+                chesedAddEmitter(pos,data);
+            }
         }
+    }
+
+    public static void chesedAddEmitter(Vec3 pos, int entityId){
+
+        if (BossConfigs.BOSS_CONFIG_CLIENT.get().lessParticles) return;
+
+        var emitterData = ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+                        .color(0.25f, 0.25f, 0.25f)
+                        .lifetime(0, 0, 100)
+                        .size(1f)
+                        .build())
+                .lifetime(400)
+                .particlesPerTick(10)
+                .processor(new CircleSpawnProcessor(new Vec3(0,-1,0),0.05f,0.1f,36))
+                .position(pos)
+                .build();
+
+        ParticleEmitterHandler.addParticleEmitter(emitterData);
+
     }
 
     public static void malkuthSwordInsertParticles(int malkuthEntityId){
@@ -1105,6 +1131,9 @@ public class BossClientPackets {
     }
 
     public static void radialEarthquakeParticles(Vec3 tpos,int rad){
+
+        if (BossConfigs.BOSS_CONFIG_CLIENT.get().lessParticles) return;
+
         Vec3 b = new Vec3(rad,0,0);
         float angle;
         if (rad != 0){
