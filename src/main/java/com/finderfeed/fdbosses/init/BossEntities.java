@@ -19,6 +19,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.flying_block_entity.
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
@@ -298,11 +299,11 @@ public class BossEntities {
 
     //GEBURAH
 
-//    public static final Supplier<EntityType<MalkuthPlayerFireIceBall>> GEBURAH = ENTITIES.register("geburah",()->EntityType.Builder.of(
-//                    MalkuthPlayerFireIceBall::new, MobCategory.MISC
-//            )
-//            .sized(0.25f,0.25f)
-//            .build("geburah"));
+    public static final Supplier<EntityType<GeburahEntity>> GEBURAH = ENTITIES.register("geburah",()->EntityType.Builder.of(
+                    GeburahEntity::new, MobCategory.MISC
+            )
+            .sized(2f,2f)
+            .build("geburah"));
 
 
     @SubscribeEvent
@@ -316,6 +317,9 @@ public class BossEntities {
         event.put(MALKUTH_CHAIN.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
         event.put(MALKUTH.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,20).build());
         event.put(MALKUTH_CANNON.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
+
+
+        event.put(GEBURAH.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
 
         event.put(FIRE_MALKUTH_WARRIOR.get(), Mob.createMobAttributes()
                         .add(Attributes.MAX_HEALTH,60)

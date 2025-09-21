@@ -41,4 +41,9 @@ public class BossModels {
 
     public static final Supplier<FDModelInfo> MALKUTH_WARRIOR = INFOS.register("malkuth_warrior",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_warrior"),1f));
 
+
+    //Geburah
+    public static final Supplier<FDModelInfo> GEBURAH = INFOS.register("geburah",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"),1f));
+
+
 }

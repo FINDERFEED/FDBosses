@@ -16,4 +16,14 @@ public class GeburahEntity extends FDLivingEntity {
         super.tick();
     }
 
+    @Override
+    public boolean shouldRenderAtSqrDistance(double p_19883_) {
+        return true;
+    }
+
+    @Override
+    public boolean shouldRender(double p_20296_, double p_20297_, double p_20298_) {
+        return true;
+    }
+
 }

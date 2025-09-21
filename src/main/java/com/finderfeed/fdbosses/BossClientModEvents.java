@@ -30,6 +30,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayReflectorRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawnerRenderer;
@@ -80,6 +81,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -253,6 +255,14 @@ public class BossClientModEvents {
 
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
+
+        event.registerEntityRenderer(BossEntities.GEBURAH.get(), FDEntityRendererBuilder.<GeburahEntity>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<GeburahEntity>builder()
+                                .model(BossModels.GEBURAH)
+                                .renderType(RenderType.entityCutout(ResourceLocation.tryBuild("minecraft","textures/block/dirt.png")))
+                                .build())
+                        .shouldRender(((geburahEntity, frustum, v, v1, v2) -> true))
+                .build());
 
         EntityRendererProvider<MalkuthWarriorEntity> warriorRenderer = FDEntityRendererBuilder.<MalkuthWarriorEntity>builder()
                 .addLayer(FDEntityRenderLayerOptions.<MalkuthWarriorEntity>builder()
