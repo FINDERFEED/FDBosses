@@ -296,6 +296,14 @@ public class BossEntities {
             .sized(0.6F, 1.8F)
             .build("ice_malkuth_warrior"));
 
+    //GEBURAH
+
+//    public static final Supplier<EntityType<MalkuthPlayerFireIceBall>> GEBURAH = ENTITIES.register("geburah",()->EntityType.Builder.of(
+//                    MalkuthPlayerFireIceBall::new, MobCategory.MISC
+//            )
+//            .sized(0.25f,0.25f)
+//            .build("geburah"));
+
 
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event){
