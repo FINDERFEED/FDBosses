@@ -27,7 +27,7 @@ public class BossMusicAreaCylinder extends FDMusicAreaShape {
         var playerList = level.getServer().getPlayerList();
 
         var players = playerList.getPlayers().stream().filter(player->{
-            return BossTargetFinder.isPointInCylinder(player.position(), position, height, radius);
+            return BossTargetFinder.isPointInCylinder(player.position(), position, height, radius) && player.level().dimension().equals(level.dimension());
         }).toList();
 
         return players;
