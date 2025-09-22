@@ -78,10 +78,10 @@ public class RushParticle extends Particle {
             return;
         }
 
-        vertex.vertex(mat, -w/2, addl, 0).color(color.r,color.g,color.b,color.a);
-        vertex.vertex(mat, w/2, addl, 0).color(color.r,color.g,color.b,color.a);
-        vertex.vertex(mat, w/2, l, 0).color(color.r,color.g,color.b,color.a);
-        vertex.vertex(mat, -w/2, l, 0).color(color.r,color.g,color.b,color.a);
+        vertex.vertex(mat, -w/2, addl, 0).color(color.r,color.g,color.b,color.a).endVertex();
+        vertex.vertex(mat, w/2, addl, 0).color(color.r,color.g,color.b,color.a).endVertex();
+        vertex.vertex(mat, w/2, l, 0).color(color.r,color.g,color.b,color.a).endVertex();
+        vertex.vertex(mat, -w/2, l, 0).color(color.r,color.g,color.b,color.a).endVertex();
 
 
     }
@@ -100,6 +100,7 @@ public class RushParticle extends Particle {
         @Override
         public void end(Tesselator tesselator) {
             tesselator.end();
+            RenderSystem.setShader(GameRenderer::getParticleShader);
         }
 
         @Nullable

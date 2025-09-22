@@ -142,11 +142,11 @@ dependencies {
 
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
-    implementation fg.deobf("curse.maven:oculus-581495:4767500")
-    implementation fg.deobf("curse.maven:rubidium-574856:4767529")
-    implementation fg.deobf("curse.maven:superb-warfare-1218165:6940728")
-    implementation fg.deobf("curse.maven:geckolib-388172:6920925")
-    implementation fg.deobf("curse.maven:curios-309927:6238756")
+//    implementation fg.deobf("curse.maven:oculus-581495:4767500")
+//    implementation fg.deobf("curse.maven:rubidium-574856:4767529")
+//    implementation fg.deobf("curse.maven:superb-warfare-1218165:6940728")
+//    implementation fg.deobf("curse.maven:geckolib-388172:6920925")
+//    implementation fg.deobf("curse.maven:curios-309927:6238756")
 //    implementation fg.deobf("curse.maven:entityculling-448233:6780226")
 
 }
