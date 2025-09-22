@@ -259,7 +259,7 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH.get(), FDEntityRendererBuilder.<GeburahEntity>builder()
                         .addLayer(FDEntityRenderLayerOptions.<GeburahEntity>builder()
                                 .model(BossModels.GEBURAH)
-                                .renderType(RenderType.entityCutout(ResourceLocation.tryBuild("minecraft","textures/block/dirt.png")))
+                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/geburah/geburah.png")))
                                 .build())
                         .shouldRender(((geburahEntity, frustum, v, v1, v2) -> true))
                 .build());
