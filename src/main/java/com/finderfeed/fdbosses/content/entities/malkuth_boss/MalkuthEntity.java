@@ -436,7 +436,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     }
 
     private FDMusicArea constructMusicArea(){
-        return new FDMusicArea(this.level().dimension(), this.spawnPosition.add(0,-2,0), new FDMusicAreaCylinder(ENRAGE_RADIUS, ENRAGE_HEIGHT + 8), this.constructMusicData());
+        return new FDMusicArea(this.level().dimension(), this.spawnPosition.add(0,-2,0), new BossMusicAreaCylinder(ENRAGE_RADIUS, ENRAGE_HEIGHT + 8), this.constructMusicData());
     }
 
     private FDMusicData constructMusicData(){
