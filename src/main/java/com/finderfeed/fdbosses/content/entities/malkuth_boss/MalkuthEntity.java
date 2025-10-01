@@ -6,6 +6,8 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
+import com.finderfeed.fdbosses.content.entities.BossDespawner;
+import com.finderfeed.fdbosses.content.entities.FDDespawnable;
 import com.finderfeed.fdbosses.content.entities.IEffectImmune;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
@@ -21,6 +23,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_floor.Malku
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlash;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_platform.MalkuthPlatform;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairCrystal;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.MalkuthChargeSwordPacket;
 import com.finderfeed.fdbosses.init.*;
@@ -99,7 +102,7 @@ import org.joml.*;
 import java.lang.Math;
 import java.util.*;
 
-public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, AutoSerializable, BossSpawnerContextAssignable, IEffectImmune {
+public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, MalkuthBossBuddy, AutoSerializable, BossSpawnerContextAssignable, IEffectImmune, FDDespawnable {
 
     public static final UUID BOSS_MUSIC_UUID = UUID.fromString("5c6cd8c0-7e3e-44a3-9c2e-2459a61377f3");
 
@@ -176,6 +179,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     private boolean dropLoot = true;
 
     private Vec3 oldTargetPos;
+
+    private BossDespawner<MalkuthEntity> bossDespawner;
 
     public MalkuthEntity(EntityType<? extends FDMob> type, Level level) {
         super(type, level);
@@ -346,6 +351,20 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 .attackListener(this::attackListener)
         ;
 
+        this.bossDespawner = new BossDespawner<>(
+                this,
+                new AABB(-100,-50,-100,100,50,100),
+                50,
+                MalkuthRepairCrystal.class,
+                MalkuthCannonProjectile.class,
+                MalkuthBoulderEntity.class,
+                MalkuthGiantSwordSlash.class,
+                MalkuthCrushAttack.class,
+                MalkuthRepairEntity.class,
+                MalkuthPlatform.class,
+                MalkuthFloorEntity.class
+        );
+
     }
 
     private boolean doNothingNTicks(AttackInstance instance, int tick){
@@ -416,6 +435,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                         }
 
                     }
+
+                    this.bossDespawner.tick();
 
                 } else {
                     if (!malkuthBossInitializer.isFinished()) {
@@ -2703,6 +2724,16 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }else{
             return "ice_sword_place";
         }
+    }
+
+    @Override
+    public boolean onFDDespawn() {
+        BossSpawnerEntity spawner = this.getSpawner();
+        if (spawner != null){
+            spawner.setActive(true);
+            return true;
+        }
+        return false;
     }
 
     @Mod.EventBusSubscriber(modid = FDBosses.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
