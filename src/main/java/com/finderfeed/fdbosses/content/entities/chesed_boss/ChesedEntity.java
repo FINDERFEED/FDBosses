@@ -9,7 +9,9 @@ import com.finderfeed.fdbosses.client.particles.particle_processors.ChesedRayCir
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
+import com.finderfeed.fdbosses.content.entities.BossDespawner;
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
+import com.finderfeed.fdbosses.content.entities.FDDespawnable;
 import com.finderfeed.fdbosses.content.entities.IEffectImmune;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
@@ -24,6 +26,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.ChesedKineticFieldEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_floor.MalkuthFloorEntity;
 import com.finderfeed.fdbosses.content.util.DelayedSound;
 import com.finderfeed.fdbosses.content.util.RepeatedSound;
 import com.finderfeed.fdbosses.init.*;
@@ -105,7 +108,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.*;
 import org.joml.Math;
@@ -118,7 +120,7 @@ import java.util.function.Function;
 import static com.finderfeed.fdbosses.init.BossAnims.CHESED_ATTACK;
 import static com.finderfeed.fdbosses.init.BossAnims.*;
 
-public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerContextAssignable, IEffectImmune {
+public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerContextAssignable, IEffectImmune, FDDespawnable {
 
     public static final String ROCKFALL_TICKER = "ROCKFALL";
 
@@ -189,6 +191,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     private int skipAttackTimes = 0;
 
+    private BossDespawner<ChesedEntity> bossDespawner;
+
     public ChesedEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
         if (serverModel == null) {
@@ -243,6 +247,18 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                     .addAttack(5, RAY_EVASION_ATTACK)
                     .addAttack(6, FINAL_ATTACK)
             ;
+
+            this.bossDespawner = new BossDespawner<>(
+                    this,
+                    new AABB(-ARENA_RADIUS, -5,-ARENA_RADIUS,ARENA_RADIUS,ARENA_HEIGHT,ARENA_RADIUS),
+                    30,
+                    ChesedCrystalEntity.class,
+                    ChesedMonolith.class,
+                    ChesedBlockProjectile.class,
+                    ChesedFallingBlock.class,
+                    ChesedKineticFieldEntity.class,
+                    ChesedElectricSphereEntity.class
+            );
 
         }
     }
@@ -322,6 +338,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             }
 
             if (bossInitializer.isFinished() && !this.isDeadOrDying() && secondPhaseTicker <= 0) {
+
+
                 this.chain.tick();
 
                 this.electrifiedAir();
@@ -350,6 +368,10 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                         this.changeTarget();
                     }
                 }
+
+
+                this.bossDespawner.tick();
+
             }else{
                 this.setRolling(false);
                 this.setDrainingMonoliths(false);
@@ -3229,6 +3251,16 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     @Override
     public boolean isPersistenceRequired() {
         return true;
+    }
+
+    @Override
+    public boolean onFDDespawn() {
+        BossSpawnerEntity spawnerEntity = this.getSpawner();
+        if (spawnerEntity != null) {
+            spawnerEntity.setActive(true);
+            return true;
+        }
+        return false;
     }
 
 }
