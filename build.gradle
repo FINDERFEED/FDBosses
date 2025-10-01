@@ -92,12 +92,16 @@ dependencies {
 //    implementation "curse.maven:placebo-283644:6446766"
 //    implementation "curse.maven:fastworkbench-288885:5670423"
 
+
+    implementation "curse.maven:fdlib-1271749:7017013"
+
     implementation fileTree(dir: 'build/libraries', include: ['*.jar'])
 
     print("Added Libraries: \n")
     fileTree('build/libraries').visit { FileVisitDetails details ->
         print(details.name + '\n')
     }
+
 }
 
 
