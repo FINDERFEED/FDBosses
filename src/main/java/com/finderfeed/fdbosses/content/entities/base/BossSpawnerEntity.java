@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.base;
 
 import com.finderfeed.fdbosses.BossClientPackets;
+import com.finderfeed.fdbosses.packets.OpenBossDossierPacket;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -8,6 +9,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -33,8 +35,8 @@ public abstract class BossSpawnerEntity extends FDEntity {
             return InteractionResult.PASS;
         }
 
-        if (level().isClientSide && hand == InteractionHand.MAIN_HAND && this.isActive()){
-            BossClientPackets.openBossDossierScreen(this, this.getBossEntityType());
+        if (!level().isClientSide && hand == InteractionHand.MAIN_HAND && this.isActive()){
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new OpenBossDossierPacket(this));
         }
 
         return super.interact(player, hand);

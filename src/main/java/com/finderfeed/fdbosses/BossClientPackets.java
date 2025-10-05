@@ -38,6 +38,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -63,10 +64,22 @@ public class BossClientPackets {
         }
     }
 
-    public static void openBossDossierScreen(BossSpawnerEntity bossSpawner, EntityType<?> bossType){
-        BaseBossScreen baseBossScreen = BossScreens.getScreen(bossType,bossSpawner.getId());
-        if (baseBossScreen != null){
-            Minecraft.getInstance().setScreen(baseBossScreen);
+
+//    public static void openBossDossierScreen(BossSpawnerEntity bossSpawner, EntityType<?> bossType){
+//        BaseBossScreen baseBossScreen = BossScreens.getScreen(bossType,bossSpawner.getId());
+//        if (baseBossScreen != null){
+//            Minecraft.getInstance().setScreen(baseBossScreen);
+//        }
+//    }
+
+
+    public static void openBossDossierScreen(int spawnerId, List<Item> drops){
+        Level level = FDClientHelpers.getClientLevel();
+        if (level.getEntity(spawnerId) instanceof BossSpawnerEntity bossSpawner) {
+            BaseBossScreen baseBossScreen = BossScreens.getScreen(bossSpawner.getBossEntityType(), spawnerId, drops);
+            if (baseBossScreen != null) {
+                Minecraft.getInstance().setScreen(baseBossScreen);
+            }
         }
     }
 

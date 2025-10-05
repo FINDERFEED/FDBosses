@@ -9,16 +9,19 @@ import com.finderfeed.fdbosses.init.BossItems;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.item.Item;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class BossScreens {
 
-    private static final HashMap<EntityType<?>, Function<Integer, BaseBossScreen>> BOSS_SCREEN_OPTIONS = new HashMap<>();
+    private static final HashMap<EntityType<?>, BiFunction<Integer, List<Item>, BaseBossScreen>> BOSS_SCREEN_OPTIONS = new HashMap<>();
 
-    public static final Function<Integer, BaseBossScreen> CHESED = register(BossEntities.CHESED.get(),(id)->{
-        return new ChesedBossScreen(id,new BossScreenOptions()
+    public static final BiFunction<Integer, List<Item>, BaseBossScreen> CHESED = register(BossEntities.CHESED.get(),(id, drops)->{
+        return new ChesedBossScreen(id, drops, new BossScreenOptions()
                 .setBossDescription(Component.translatable("fdbosses.bosses.description.chesed"))
                 .setEntityType(BossEntities.CHESED.get())
                 .addSkill(new BossInfo(
@@ -93,23 +96,12 @@ public class BossScreens {
                         Component.translatable("fdbosses.skills.chesed.final_stats"),
                         Component.translatable("fdbosses.skills.chesed.final_description")
                 ))
-                //drops
-                .addDrop(new BossInfo(
-                        BossItems.LIGHTNING_CORE.get().getDefaultInstance(),
-                        Component.translatable("fdbosses.drops.chesed.lightning_core_stats"),
-                        Component.translatable("fdbosses.drops.chesed.lightning_core_description")
-                ))
-                .addDrop(new BossInfo(
-                        BossItems.CHESED_TROPHY.get().getDefaultInstance(),
-                        null,
-                        Component.translatable("fdbosses.drops.chesed.trophy_description")
-                ))
                 .setTLDRComponent(Component.translatable("fdbosses.tldr.chesed"))
         );
     });
 
-    public static final Function<Integer, BaseBossScreen> MALKUTH_BOSS_SCREEN = register(BossEntities.MALKUTH.get(), id -> {
-        return new MalkuthBossScreen(id, new BossScreenOptions()
+    public static final BiFunction<Integer, List<Item>, BaseBossScreen> MALKUTH_BOSS_SCREEN = register(BossEntities.MALKUTH.get(), (id, drops) -> {
+        return new MalkuthBossScreen(id, drops, new BossScreenOptions()
                 .setEntityType(BossEntities.MALKUTH.get())
                 .setBossDescription(Component.translatable("fdbosses.bosses.description.malkuth"))
                 .setTLDRComponent(Component.translatable("fdbosses.tldr.malkuth"))
@@ -191,28 +183,17 @@ public class BossScreens {
                         Component.translatable("fdbosses.skills.malkuth.hellshaper_stats"),
                         Component.translatable("fdbosses.skills.malkuth.hellshaper_description")
                 ))
-
-                .addDrop(new BossInfo(
-                        BossItems.FIRE_AND_ICE_CORE.get().getDefaultInstance(),
-                        Component.translatable("fdbosses.drops.chesed.fire_and_ice_core_stats"),
-                        Component.translatable("fdbosses.drops.chesed.fire_and_ice_core_description")
-                ))
-                .addDrop(new BossInfo(
-                        BossItems.MALKUTH_TROPHY.get().getDefaultInstance(),
-                        null,
-                        Component.translatable("fdbosses.drops.malkuth.trophy_description")
-                ))
         );
     });
 
-    public static BaseBossScreen getScreen(EntityType<?> type, int bossSpawnerId){
+    public static BaseBossScreen getScreen(EntityType<?> type, int bossSpawnerId, List<Item> drops){
         if (BOSS_SCREEN_OPTIONS.containsKey(type)){
-            return BOSS_SCREEN_OPTIONS.get(type).apply(bossSpawnerId);
+            return BOSS_SCREEN_OPTIONS.get(type).apply(bossSpawnerId, drops);
         }
         return null;
     }
 
-    public static Function<Integer, BaseBossScreen> register(EntityType<?> entityType, Function<Integer, BaseBossScreen> factory){
+    public static BiFunction<Integer, List<Item>, BaseBossScreen> register(EntityType<?> entityType, BiFunction<Integer, List<Item>, BaseBossScreen> factory){
         BOSS_SCREEN_OPTIONS.put(entityType,factory);
         return factory;
     }
