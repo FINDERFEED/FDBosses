@@ -97,9 +97,9 @@
   "fdbosses.word.start_fight": "Start Bossfight",
   "fdbosses.word.drops": "Drops",
 
-  "fdbosses.boss_drop.fdbosses.lightning_core.info": "A core that Chesed draws its power from. \n\nCan be applied to any weapon in crafting table. \n\nWhen attacking entities with a weapon that is enhanced with Lightning Core there is a chance to struck the target with Chesed lightning that will do a percentage of weapons damage while inflicting {{(fdbosses:effect)id=fdbosses:shocked}}.",
-  "fdbosses.boss_drop.fdbosses.lightning_core.stats": "Shock:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=effectConfig, value=shockDamageReductionPercent}}% outgoing damage reduction.\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=lightningStrikeShockDuration}} ticks.\n\nLightning: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=lightningStrikeDamagePercent}}% of weapon damage.\n\nSummon chance:  {{(fdbosses:config_float) config=itemConfig, value=chanceToSummonLightningStrike}}%",
-  "fdbosses.boss_drop.fdbosses.chesed_trophy.info": "A trophy of Chesed to showcase your heroic deeds",
+  "fdbosses.boss_drop.fdbosses.chesed.fdbosses.lightning_core.info": "A core that Chesed draws its power from. \n\nCan be applied to any weapon in crafting table. \n\nWhen attacking entities with a weapon that is enhanced with Lightning Core there is a chance to struck the target with Chesed lightning that will do a percentage of weapons damage while inflicting {{(fdbosses:effect)id=fdbosses:shocked}}.",
+  "fdbosses.boss_drop.fdbosses.chesed.fdbosses.lightning_core.stats": "Shock:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=effectConfig, value=shockDamageReductionPercent}}% outgoing damage reduction.\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=lightningStrikeShockDuration}} ticks.\n\nLightning: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=lightningStrikeDamagePercent}}% of weapon damage.\n\nSummon chance:  {{(fdbosses:config_float) config=itemConfig, value=chanceToSummonLightningStrike}}%",
+  "fdbosses.boss_drop.fdbosses.chesed.fdbosses.chesed_trophy.info": "A trophy of Chesed to showcase your heroic deeds",
 
   "fdbosses.skills.chesed.electrified_air": "Electrified Air",
   "fdbosses.skills.chesed.electrified_air_description": "Air above Chesed crackles with power. Entities that interact with it are damaged.",
@@ -167,9 +167,16 @@
   "fdbosses.word.patreon": "Support mod development on Patreon (Shift+Click to see Patrons)",
   "fdbosses.word.boosty": "Support mod development on Boosty (Shift+Click to see Boosters)",
   "fdbosses.word.socials_word": "Socials",
-  "fdbosses.boss_drop.fdbosses.fire_and_ice_core.stats": "Damage:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballToolDamagePercent}}% of tool damage.\n\nItem ability cooldown:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballAbilityCooldown}} ticks",
-  "fdbosses.boss_drop.fdbosses.fire_and_ice_core.info": "The core of Malkuth.\n\nCan be attached to any item that has damage to be able to summon Malkuth fireballs.\n\nUse an item to release a fireball that will deal a percentage of item damage and ignite the targets.\n\nCrouch while using an item to release an iceball that will slow the targets instead.",
-  "fdbosses.boss_drop.fdbosses.malkuth_trophy.info": "A trophy of Malkuth to showcase your heroic deeds",
+
+  "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.fire_and_ice_core.stats": "Damage:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballToolDamagePercent}}% of tool damage.\n\nItem ability cooldown:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballAbilityCooldown}} ticks",
+  "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.fire_and_ice_core.info": "The core of Malkuth.\n\nCan be attached to any item that has damage to be able to summon Malkuth fireballs.\n\nUse an item to release a fireball that will deal a percentage of item damage and ignite the targets.\n\nCrouch while using an item to release an iceball that will slow the targets instead.",
+  "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.malkuth_trophy.info": "A trophy of Malkuth to showcase your heroic deeds",
+
+  "fdbosses.boss_drop.fdbosses.malkuth.minecraft.gold_block.info": "Gold test 1",
+
+  "fdbosses.boss_drop.fdbosses.chesed.minecraft.gold_block.info": "Gold test 2",
+  "fdbosses.boss_drop.fdbosses.chesed.minecraft.gold_block.stats": "Gold test 22",
+
   "fdbosses.tldr.malkuth": "Cannot be attacked directly.\n\nWhen player is weak to §cFire§r it receives decreased §bIce§r damage, and other way around if player is weak to §bIce§r, it receives decreased §cFire§r damage.\n\nCurrent weakness can be seen on the crosshair.\n\nUse cannons on the arena to attack Malkuth, you can only use the cannon of type you are currently weak to.",
   "fdbosses.word.patrons": "Patrons",
   "fdbosses.word.boosters": "Boosters",
