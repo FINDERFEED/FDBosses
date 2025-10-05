@@ -8,6 +8,9 @@ import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.util.FDUtil;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Difficulty;
@@ -20,10 +23,14 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.entries.LootTableReference;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
 import org.joml.Matrix4f;
@@ -270,6 +277,34 @@ public class BossUtil {
         return modifiers.containsKey(attributeHolder);
     }
 
+    public static List<Item> getItemsFromLootTable(MinecraftServer server, ResourceLocation lootTable){
+        var loot = server.getLootData().getLootTable(lootTable);
+        return getItemsFromLootTable(server, loot);
+    }
+
+    public static List<Item> getItemsFromLootTable(MinecraftServer server, LootTable lootTable){
+
+        List<Item> items = new ArrayList<>();
+
+        for (var pool : lootTable.pools){
+
+            for (var entry : pool.entries){
+
+                if (entry instanceof LootItem lootItem){
+                    items.add(lootItem.item);
+                }else if (entry instanceof LootTableReference nestedLootTable){
+
+                    items.addAll(getItemsFromLootTable(server, nestedLootTable.name));
+
+                }
+
+            }
+
+
+        }
+
+        return items;
+    }
 
     public static class StructureTags {
 

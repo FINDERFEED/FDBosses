@@ -31,10 +31,12 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.Item;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.List;
 import java.util.Random;
 
 public class MalkuthBossScreen extends BaseBossScreen{
@@ -49,8 +51,8 @@ public class MalkuthBossScreen extends BaseBossScreen{
     private float bossY;
 
 
-    public MalkuthBossScreen(int bossSpawnerId, BossScreenOptions options) {
-        super(bossSpawnerId, options);
+    public MalkuthBossScreen(int bossSpawnerId, List<Item> possibleDrops, BossScreenOptions options) {
+        super(bossSpawnerId, possibleDrops, options);
         if (malkuthModel == null) {
             malkuthModel = new FDModel(BossModels.MALKUTH_SCREEN.get());
         }

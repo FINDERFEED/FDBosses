@@ -30,6 +30,9 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.Item;
+
+import java.util.List;
 
 //@Mod.EventBusSubscriber(modid = FDBosses.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ChesedBossScreen extends BaseBossScreen {
@@ -64,8 +67,8 @@ public class ChesedBossScreen extends BaseBossScreen {
 
     private TimedText hurtText;
 
-    public ChesedBossScreen(int bossSpawnerId, BossScreenOptions options) {
-        super(bossSpawnerId, options);
+    public ChesedBossScreen(int bossSpawnerId, List<Item> possibleDrops, BossScreenOptions options) {
+        super(bossSpawnerId, possibleDrops, options);
     }
 
     @Override
