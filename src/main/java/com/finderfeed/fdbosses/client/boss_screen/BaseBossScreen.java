@@ -22,10 +22,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector2f;
@@ -60,9 +63,11 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     private int moveThings = 0;
 
     private int bossSpawnerId;
+    private List<Item> possibleDrops;
 
-    public BaseBossScreen(int bossSpawnerId, BossScreenOptions options) {
+    public BaseBossScreen(int bossSpawnerId, List<Item> possibleDrops, BossScreenOptions options) {
         super();
+        this.possibleDrops = possibleDrops;
         this.options = options;
         this.bossSpawnerId = bossSpawnerId;
     }
@@ -271,7 +276,11 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                 .setText(Component.translatable("fdbosses.word.drops").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         73,1f,true,0,1)
                 .setOnClickAction(((fdWidget, v, v1, i) -> {
-                    this.resetAbilities(this.options.getDrops(), false);
+
+
+                    this.resetAbilities(this.createPossibleDropsBossInfos(), false);
+
+
                     return true;
                 }));
 
@@ -279,6 +288,46 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         bossAbilitesWidget.addChild("openDrops",fdButtonDrops);
 
     }
+
+    private List<BossInfo> createPossibleDropsBossInfos(){
+        List<BossInfo> bossInfos = new ArrayList<>();
+        for (Item item : this.possibleDrops){
+
+            ItemStack itemStack = item.getDefaultInstance();
+
+            var key = BuiltInRegistries.ITEM.getKey(item);
+            String itemId = key.toString().replace(":",".");
+
+            String infoString = "fdbosses.boss_drop." + itemId + ".info";
+            String statsString = "fdbosses.boss_drop." + itemId + ".stats";
+
+            Component info;
+            Component stats = null;
+
+            if (this.hasTranslatableFor(infoString)){
+                info = Component.translatable(infoString);
+            }else{
+                info = itemStack.getHoverName();
+            }
+
+            if (this.hasTranslatableFor(statsString)){
+                stats = Component.translatable(statsString);
+            }
+
+            BossInfo bossInfo = new BossInfo(itemStack, stats, info);
+
+            bossInfos.add(bossInfo);
+        }
+
+        return bossInfos;
+    }
+
+    private boolean hasTranslatableFor(String id){
+        Component component = Component.translatable(id);
+        var translated = component.getString();
+        return !translated.equals(id);
+    }
+
 
     protected void resetAbilities(List<BossInfo> bossInfos, boolean malkuthShuffle){
         bossAbilitesWidget.bossAbilitiesButtonContainer.setCurrentScroll(0);

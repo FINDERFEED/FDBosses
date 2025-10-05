@@ -9,7 +9,6 @@ import java.util.List;
 public class BossScreenOptions {
 
     private List<BossInfo> skills = new ArrayList<>();
-    private List<BossInfo> drops = new ArrayList<>();
     private Component TLDRComponent = null;
 
     private Component bossDescription = Component.empty();
@@ -34,10 +33,6 @@ public class BossScreenOptions {
         return this;
     }
 
-    public BossScreenOptions addDrop(BossInfo bossDrop){
-        this.drops.add(bossDrop);
-        return this;
-    }
 
     public BossScreenOptions setTLDRComponent(Component component){
         this.TLDRComponent = component;
@@ -46,10 +41,6 @@ public class BossScreenOptions {
 
     public List<BossInfo> getSkills() {
         return skills;
-    }
-
-    public List<BossInfo> getDrops(){
-        return drops;
     }
 
     public Component getBossDescription() {

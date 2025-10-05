@@ -9,7 +9,9 @@ import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdlib.util.FDUtil;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Difficulty;
@@ -22,11 +24,15 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.levelgen.structure.Structure;
+import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.AttributeUtil;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -259,6 +265,42 @@ public class BossUtil {
         return false;
     }
 
+    public static List<Item> getItemsFromLootTable(MinecraftServer server, ResourceKey<LootTable> lootTable){
+        var loot = server.reloadableRegistries().getLootTable(lootTable);
+        return getItemsFromLootTable(server, loot);
+    }
+
+    public static List<Item> getItemsFromLootTable(MinecraftServer server, LootTable lootTable){
+
+        List<Item> items = new ArrayList<>();
+
+        for (var pool : lootTable.pools){
+
+            for (var entry : pool.entries){
+
+                if (entry instanceof LootItem lootItem){
+                    items.add(lootItem.item.value());
+                }else if (entry instanceof NestedLootTable nestedLootTable){
+
+                    var contents = nestedLootTable.contents;
+                    var left = contents.left();
+                    var right = contents.right();
+                    if (right.isPresent()){
+                        var loot = right.get();
+                        items.addAll(getItemsFromLootTable(server, loot));
+                    }else if (left.isPresent()){
+                        var loot = left.get();
+                        items.addAll(getItemsFromLootTable(server, loot));
+                    }
+                }
+
+            }
+
+
+        }
+
+        return items;
+    }
 
     public static class StructureTags {
 
