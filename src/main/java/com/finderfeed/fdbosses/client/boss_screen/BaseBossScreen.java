@@ -27,6 +27,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -291,6 +292,12 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
     private List<BossInfo> createPossibleDropsBossInfos(){
         List<BossInfo> bossInfos = new ArrayList<>();
+
+        EntityType<?> entityType = this.options.getEntityType();
+
+        var typeKey = BuiltInRegistries.ENTITY_TYPE.getKey(entityType);
+        var keyString = typeKey.toString().replace(":",".");
+
         for (Item item : this.possibleDrops){
 
             ItemStack itemStack = item.getDefaultInstance();
@@ -298,8 +305,8 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
             var key = BuiltInRegistries.ITEM.getKey(item);
             String itemId = key.toString().replace(":",".");
 
-            String infoString = "fdbosses.boss_drop." + itemId + ".info";
-            String statsString = "fdbosses.boss_drop." + itemId + ".stats";
+            String infoString = "fdbosses.boss_drop." + keyString + "." + itemId + ".info";
+            String statsString = "fdbosses.boss_drop." + keyString + "." + itemId + ".stats";
 
             Component info;
             Component stats = null;
