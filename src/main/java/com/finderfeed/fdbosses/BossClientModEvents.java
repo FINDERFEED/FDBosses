@@ -259,6 +259,8 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH.get(), FDEntityRendererBuilder.<GeburahEntity>builder()
                         .addLayer(FDEntityRenderLayerOptions.<GeburahEntity>builder()
                                 .model(BossModels.GEBURAH)
+                                .light(LightTexture.FULL_BRIGHT)
+                                .ignoreHurtOverlay(true)
                                 .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/geburah/geburah.png")))
                                 .build())
                         .shouldRender(((geburahEntity, frustum, v, v1, v2) -> true))
