@@ -31,6 +31,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayReflectorRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawnerRenderer;
@@ -255,6 +256,10 @@ public class BossClientModEvents {
 
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
+
+        event.registerEntityRenderer(BossEntities.GEBURAH_CHAIN_TRAP.get(), FDEntityRendererBuilder.<GeburahChainTrapEntity>builder()
+
+                .build());
 
         event.registerEntityRenderer(BossEntities.GEBURAH.get(), FDEntityRendererBuilder.<GeburahEntity>builder()
                         .addLayer(FDEntityRenderLayerOptions.<GeburahEntity>builder()

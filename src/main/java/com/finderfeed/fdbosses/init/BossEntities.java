@@ -20,6 +20,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.Ra
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
@@ -304,6 +305,12 @@ public class BossEntities {
             )
             .sized(2f,2f)
             .build("geburah"));
+
+    public static final Supplier<EntityType<GeburahChainTrapEntity>> GEBURAH_CHAIN_TRAP = ENTITIES.register("geburah_chain_trap",()->EntityType.Builder.of(
+                    GeburahChainTrapEntity::new, MobCategory.MISC
+            )
+            .sized(0.5f,0.5f)
+            .build("geburah_chain_trap"));
 
 
     @SubscribeEvent
