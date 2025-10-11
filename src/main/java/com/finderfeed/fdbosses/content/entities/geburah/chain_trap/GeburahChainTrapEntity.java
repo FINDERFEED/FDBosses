@@ -4,6 +4,8 @@ import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import com.finderfeed.fdlib.util.FDTargetFinder;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticle;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -20,19 +22,19 @@ import net.minecraft.world.phys.Vec3;
 
 import java.util.UUID;
 
-public class GeburahChainTrapEntity extends FDEntity implements AutoSerializable {
+public class GeburahChainTrapEntity extends Entity implements AutoSerializable {
 
-    public static final int CATCH_TIME = 10;
-    public static final int PULL_TIME = 10;
+    public static int CATCH_TIME = 10;
+    public static int PULL_TIME = 4;
 
     public static final EntityDataAccessor<Integer> ENTITY_ABOUT_TO_TRAP = SynchedEntityData.defineId(GeburahChainTrapEntity.class, EntityDataSerializers.INT);
 
     @SerializableField
     private UUID entityAboutToTrap;
 
-    private int catchingTime = -1;
+    protected int catchingTime = -1;
 
-    private int pullingTime = -1;
+    protected int pullingTime = -1;
 
     private Vec3 lastKnownTargetPos;
 
@@ -53,7 +55,7 @@ public class GeburahChainTrapEntity extends FDEntity implements AutoSerializable
 
                 if (entityAboutToTrap != null) {
 
-                    if (entityAboutToTrap.isDeadOrDying()) {
+                    if (entityAboutToTrap.isDeadOrDying() || (entityAboutToTrap.getVehicle() instanceof GeburahChainTrapEntity e && e != this) ) {
                         this.setRemoved(RemovalReason.DISCARDED);
                         return;
                     }
@@ -63,12 +65,12 @@ public class GeburahChainTrapEntity extends FDEntity implements AutoSerializable
                     }else if (catchingTime == 0){
                         entityAboutToTrap.startRiding(this, true);
                     }
-                    catchingTime = Mth.clamp(catchingTime - 1, 0, CATCH_TIME);
+
                     this.getEntityData().set(ENTITY_ABOUT_TO_TRAP, entityAboutToTrap.getId());
                 } else {
-                    for (var player : FDTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position().add(0,-0.1,0),10,10)){
-                        if (!(player instanceof Player player1) || player1.isCrouching()){
-                            this.trapEntity(player);
+                    for (var entity : FDTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position().add(0,-0.1,0),5,1.5f)){
+                        if (!(entity.getVehicle() instanceof GeburahChainTrapEntity)){
+                            this.trapEntity(entity);
                             break;
                         }
                     }
@@ -82,6 +84,23 @@ public class GeburahChainTrapEntity extends FDEntity implements AutoSerializable
             }
         }else{
 
+            if (level().getGameTime() % 2 == 0) {
+                BallParticleOptions ballParticle = BallParticleOptions.builder()
+                        .color(0.3f, 0.8f + random.nextFloat() * 0.2f, 1f)
+                        .size(0.15f)
+                        .brightness(3)
+                        .scalingOptions(0, 0, 20)
+                        .build();
+
+                Vec3 rndOffset = new Vec3(random.nextFloat() * 0.2f + 0.3, 0, 0).yRot(random.nextFloat() * FDMathUtil.FPI * 2);
+
+                level().addParticle(ballParticle, this.getX() + rndOffset.x, this.getY(), this.getZ() + rndOffset.z, 0, 0.05f, 0);
+
+            }
+        }
+
+        if (catchingTime != -1){
+            catchingTime = Mth.clamp(catchingTime - 1, 0, CATCH_TIME);
         }
 
         if (pullingTime != -1){
@@ -99,7 +118,7 @@ public class GeburahChainTrapEntity extends FDEntity implements AutoSerializable
     }
 
     public void trapEntity(LivingEntity entity){
-        if (entity.distanceTo(this) > 10) return;
+        if (entity.distanceTo(this) > 20) return;
         this.entityAboutToTrap = entity.getUUID();
         this.getEntityData().set(ENTITY_ABOUT_TO_TRAP, entity.getId());
     }
@@ -163,14 +182,22 @@ public class GeburahChainTrapEntity extends FDEntity implements AutoSerializable
 
     @Override
     protected void addAdditionalSaveData(CompoundTag tag) {
-        super.addAdditionalSaveData(tag);
         this.autoSave(tag);
     }
 
     @Override
     protected void readAdditionalSaveData(CompoundTag tag) {
-        super.readAdditionalSaveData(tag);
         this.autoLoad(tag);
+    }
+
+    @Override
+    public boolean shouldRender(double p_20296_, double p_20297_, double p_20298_) {
+        return true;
+    }
+
+    @Override
+    public boolean shouldRenderAtSqrDistance(double p_19883_) {
+        return true;
     }
 
 }
