@@ -129,6 +129,85 @@
 						{"origin": [-86.9, 16, -36], "size": [16, 16, 72], "pivot": [0, 24, 0], "rotation": [0, 90, 0], "uv": [208, 32]},
 						{"origin": [-86.9, 16, -36], "size": [16, 16, 72], "pivot": [0, 24, 0], "rotation": [0, 45, 0], "uv": [208, 32]}
 					]
+				},
+				{
+					"name": "cannon_1",
+					"parent": "rotating_weapons",
+					"pivot": [0, 26, 0],
+					"cubes": [
+						{"origin": [-80.9, 13, -11], "size": [16, 22, 22], "pivot": [6, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 209]},
+						{"origin": [-60.9, 18, -6], "size": [12, 12, 12], "pivot": [22, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 254]}
+					]
+				},
+				{
+					"name": "cannon_2",
+					"parent": "rotating_weapons",
+					"pivot": [0, 26, 0],
+					"rotation": [0, -45, 0],
+					"cubes": [
+						{"origin": [-80.9, 13, -11], "size": [16, 22, 22], "pivot": [6, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 209]},
+						{"origin": [-60.9, 18, -6], "size": [12, 12, 12], "pivot": [22, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 254]}
+					]
+				},
+				{
+					"name": "cannon_3",
+					"parent": "rotating_weapons",
+					"pivot": [0, 26, 0],
+					"rotation": [0, -90, 0],
+					"cubes": [
+						{"origin": [-80.9, 13, -11], "size": [16, 22, 22], "pivot": [6, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 209]},
+						{"origin": [-60.9, 18, -6], "size": [12, 12, 12], "pivot": [22, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 254]}
+					]
+				},
+				{
+					"name": "cannon_4",
+					"parent": "rotating_weapons",
+					"pivot": [0, 26, 0],
+					"rotation": [0, 45, 0],
+					"cubes": [
+						{"origin": [-80.9, 13, -11], "size": [16, 22, 22], "pivot": [6, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 209]},
+						{"origin": [-60.9, 18, -6], "size": [12, 12, 12], "pivot": [22, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 254]}
+					]
+				},
+				{
+					"name": "cannon_5",
+					"parent": "rotating_weapons",
+					"pivot": [0, 26, 0],
+					"rotation": [0, 90, 0],
+					"cubes": [
+						{"origin": [-80.9, 13, -11], "size": [16, 22, 22], "pivot": [6, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 209]},
+						{"origin": [-60.9, 18, -6], "size": [12, 12, 12], "pivot": [22, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 254]}
+					]
+				},
+				{
+					"name": "cannon_6",
+					"parent": "rotating_weapons",
+					"pivot": [0, 26, 0],
+					"rotation": [0, -135, 0],
+					"cubes": [
+						{"origin": [-80.9, 13, -11], "size": [16, 22, 22], "pivot": [6, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 209]},
+						{"origin": [-60.9, 18, -6], "size": [12, 12, 12], "pivot": [22, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 254]}
+					]
+				},
+				{
+					"name": "cannon_7",
+					"parent": "rotating_weapons",
+					"pivot": [0, 26, 0],
+					"rotation": [0, 180, 0],
+					"cubes": [
+						{"origin": [-80.9, 13, -11], "size": [16, 22, 22], "pivot": [6, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 209]},
+						{"origin": [-60.9, 18, -6], "size": [12, 12, 12], "pivot": [22, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 254]}
+					]
+				},
+				{
+					"name": "cannon_8",
+					"parent": "rotating_weapons",
+					"pivot": [0, 26, 0],
+					"rotation": [0, 135, 0],
+					"cubes": [
+						{"origin": [-80.9, 13, -11], "size": [16, 22, 22], "pivot": [6, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 209]},
+						{"origin": [-60.9, 18, -6], "size": [12, 12, 12], "pivot": [22, 24, 0], "rotation": [-180, 0, 180], "uv": [0, 254]}
+					]
 				}
 			]
 		}
