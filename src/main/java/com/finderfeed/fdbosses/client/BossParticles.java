@@ -14,6 +14,7 @@ import com.finderfeed.fdbosses.FDBosses;
 
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
+import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ParticleType;
 
@@ -144,6 +145,20 @@ public class BossParticles {
     public static final Supplier<ParticleType<GravityParticleOptions>> ICE_CHUNK = PARTICLES.register("ice_chunk",()->new GravityOptionsParticleType(true));
 
 
+
+
+
+    public static final Supplier<ParticleType<GeburahRayOptions>> GEBURAH_RAY_ATTACK = PARTICLES.register("geburah_ray",()->new ParticleType<GeburahRayOptions>(true) {
+        @Override
+        public MapCodec<GeburahRayOptions> codec() {
+            return GeburahRayOptions.mapCodec();
+        }
+
+        @Override
+        public StreamCodec<? super RegistryFriendlyByteBuf, GeburahRayOptions> streamCodec() {
+            return GeburahRayOptions.STREAM_CODEC;
+        }
+    });
 
 
 }

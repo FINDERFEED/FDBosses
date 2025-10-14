@@ -64,6 +64,7 @@ public class ChesedMiniRayRenderer extends EntityRenderer<ChesedMiniRay> {
         VertexConsumer consumer = src.getBuffer(RenderType.text(CHESED_RAY_PREPARE));
 
         QuadRenderer.start(consumer)
+                .renderBack()
                 .light(LightTexture.FULL_BRIGHT)
                 .color(1f,1f,1f,alpha)
                 .pose(matrices)
@@ -73,6 +74,7 @@ public class ChesedMiniRayRenderer extends EntityRenderer<ChesedMiniRay> {
                 .render();
 
         QuadRenderer.start(consumer)
+                .renderBack()
                 .light(LightTexture.FULL_BRIGHT)
                 .color(1f,1f,1f,alpha)
                 .pose(matrices)
@@ -83,6 +85,7 @@ public class ChesedMiniRayRenderer extends EntityRenderer<ChesedMiniRay> {
                 .render();
 
         QuadRenderer.start(consumer)
+                .renderBack()
                 .light(LightTexture.FULL_BRIGHT)
                 .color(1f,1f,1f,alpha)
                 .pose(matrices)

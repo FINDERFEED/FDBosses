@@ -33,6 +33,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRen
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapRenderer;
+import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayParticle;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawnerRenderer;
@@ -253,6 +254,7 @@ public class BossClientModEvents {
         event.registerSpecial(BossParticles.ARC_ATTACK_PREPARATION_PARTICLE.get(), new ArcAttackPreparationParticle.Factory());
         event.registerSpecial(BossParticles.RECTANGLE_PREPARATION_PARTICLE.get(), new RectanglePreparationParticle.Factory());
         event.registerSpecial(BossParticles.STRIPE_PARTICLE.get(), new StripeParticle.Factory());
+        event.registerSpecial(BossParticles.GEBURAH_RAY_ATTACK.get(), new GeburahRayParticle.Factory());
     }
 
     @SubscribeEvent

@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.debug;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.ChesedMiniRay;
+import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
@@ -59,6 +60,21 @@ public class DebugStick extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 
+        if (level.isClientSide){
+
+            Vec3 start = player.getEyePosition().add(5,-0.2f,0);
+            Vec3 end = start.add(player.getLookAngle().multiply(30,30,30));
+
+            var options = GeburahRayOptions.builder()
+                    .end(end)
+                    .color(0.3f,0.8f,1f)
+                    .time(0,2,7)
+                    .width(1f)
+                    .build();
+
+            level.addParticle(options, start.x, start.y,start.z,0,0,0);
+        }
+
         if (!level.isClientSide){
 
 
@@ -76,9 +92,10 @@ public class DebugStick extends Item {
 //                    FDMathUtil.FPI, 1);
 
 
-            Vec3 pos = player.position().add(5,5,5);
+//            Vec3 pos = player.position().add(5,5,5);
+//
+//            ChesedMiniRay chesedMiniRay = ChesedMiniRay.summon(level, player, player.getItemInHand(InteractionHand.MAIN_HAND), player);
 
-            ChesedMiniRay chesedMiniRay = ChesedMiniRay.summon(level, player, player.getItemInHand(InteractionHand.MAIN_HAND), player);
 
 
 //            if (p1 == null){
@@ -125,6 +142,8 @@ public class DebugStick extends Item {
 //                        (float)lookAngle.z
 //                ));
 //            }
+
+
 
             if (true) return InteractionResultHolder.consume(player.getItemInHand(hand));
 
