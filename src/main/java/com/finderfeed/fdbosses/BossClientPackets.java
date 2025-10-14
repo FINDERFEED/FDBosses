@@ -10,11 +10,14 @@ import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOp
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdlib.FDClientPacketExecutables;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
@@ -64,6 +67,15 @@ public class BossClientPackets {
         }
     }
 
+    public static void handleGeburahWeaponRotationSync(int entityId, float currentRotation){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
+            GeburahRotatingWeaponsHandler rotationWeapons = geburah.getRotatingWeaponsHandler();
+            float rot = rotationWeapons.getCurrentRotation();
+            if (Math.abs(rot - currentRotation) > 0.1f) {
+                rotationWeapons.setRotation(currentRotation);
+            }
+        }
+    }
 
 //    public static void openBossDossierScreen(BossSpawnerEntity bossSpawner, EntityType<?> bossType){
 //        BaseBossScreen baseBossScreen = BossScreens.getScreen(bossType,bossSpawner.getId());

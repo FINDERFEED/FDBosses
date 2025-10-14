@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
+import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import net.minecraft.world.entity.EntityType;
@@ -8,8 +9,11 @@ import net.minecraft.world.level.Level;
 
 public class GeburahEntity extends FDLivingEntity {
 
+    protected GeburahRotatingWeaponsHandler rotatingWeaponsHandler;
+
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
+        this.rotatingWeaponsHandler = new GeburahRotatingWeaponsHandler(this);
     }
 
     @Override
@@ -18,6 +22,15 @@ public class GeburahEntity extends FDLivingEntity {
 
         if (level().isClientSide){
             this.particles();
+        }
+
+        this.rotatingWeaponsHandler.tick();
+
+        if (this.rotatingWeaponsHandler.finishedRotation()){
+            this.rotatingWeaponsHandler.rotateWeaponsBy(
+                    level().random.nextFloat() * 100f - 50f,
+                    20
+            );
         }
 
     }
@@ -35,6 +48,10 @@ public class GeburahEntity extends FDLivingEntity {
             level().addParticle(ballParticle, true, this.getX(), this.getY() + 21.5f, this.getZ(), 0, 0, 0);
 
         }
+    }
+
+    public GeburahRotatingWeaponsHandler getRotatingWeaponsHandler() {
+        return rotatingWeaponsHandler;
     }
 
     @Override
