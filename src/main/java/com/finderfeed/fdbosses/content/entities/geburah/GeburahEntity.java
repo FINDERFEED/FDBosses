@@ -24,13 +24,15 @@ public class GeburahEntity extends FDLivingEntity {
             this.particles();
         }
 
+        if (level().isClientSide){
         this.rotatingWeaponsHandler.tick();
 
         if (this.rotatingWeaponsHandler.finishedRotation()){
             this.rotatingWeaponsHandler.rotateWeaponsBy(
-                    level().random.nextFloat() * 100f - 50f,
+                    level().random.nextFloat() * 200f - 100f,
                     20
             );
+        }
         }
 
     }
