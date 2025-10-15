@@ -70,7 +70,7 @@ public class DebugStick extends Item {
 
             var options = GeburahRayOptions.builder()
                     .end(end)
-                    .color(0.3f,0.8f,1f)
+                    .color(1f,0.8f,0.2f)
                     .time(0,2,7)
                     .width(1f)
                     .build();

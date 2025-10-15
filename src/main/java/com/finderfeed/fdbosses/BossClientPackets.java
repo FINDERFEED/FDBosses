@@ -222,10 +222,12 @@ public class BossClientPackets {
 
     public static void geburahRayParticles(Vec3 pos, int data){
 
+
+        //1f,0.8f,0.2f
         Level level = FDClientHelpers.getClientLevel();
 
         BallParticleOptions flash = BallParticleOptions.builder()
-                .color(0.4f,1f,1f)
+                .color(1f,0.8f,0.2f)
                 .scalingOptions(1,0,2)
                 .brightness(4)
                 .size(15f)
@@ -263,9 +265,9 @@ public class BossClientPackets {
 
             int directionsCount = Math.round(FDMathUtil.lerp(1,12,ip));
 
-            float r = FDMathUtil.lerp(0.3f,1f,FDEasings.easeIn(ip));
-            float gr = FDMathUtil.lerp(0.8f,1f,ip);
-            float b = FDMathUtil.lerp(0.9f,1f,ip);
+            float r = FDMathUtil.lerp(1f,1f,ip);
+            float gr = FDMathUtil.lerp(0.5f,1f,ip);
+            float b = FDMathUtil.lerp(0.0f,1f,ip * ip);
 
             for (int g = 0; g < repetitionCount; g++) {
                 for (var dir : new HorizontalCircleRandomDirections(level.random, directionsCount, 1f)) {
@@ -297,6 +299,81 @@ public class BossClientPackets {
             }
 
             cumulativeSize += travelDistWindow;
+
+        }
+
+
+        int smokesCount = 10;
+        float smokesFriction = 0.8f;
+
+        int smokesTravelTime = 20;
+
+        for (int i = 0; i < smokesCount; i++){
+
+            float p = i / (float) (smokesCount - 1);
+
+            int count = Math.round(FDMathUtil.lerp(12,24,p));
+
+            float distance = 0.8f * i;
+
+            for (var dir : new HorizontalCircleRandomDirections(level.random, count, 1f)){
+
+                float particleSpeed = (distance * (1 - smokesFriction) / (1 - (float) Math.pow(smokesFriction, smokesTravelTime)));
+
+                Vec3 pspeed = dir.multiply(particleSpeed,0,particleSpeed);
+
+                float col = 0.2f + random.nextFloat() * 0.2f;
+
+                BigSmokeParticleOptions options = BigSmokeParticleOptions.builder()
+                        .color(col,col,col)
+                        .friction(smokesFriction)
+                        .size(4f)
+                        .minSpeed(0.025f)
+                        .lifetime(0,0,30)
+                        .build();
+
+                level.addParticle(options, true, pos.x,pos.y,pos.z,pspeed.x,pspeed.y,pspeed.z);
+
+
+            }
+
+        }
+
+        for (var dir : new HorizontalCircleRandomDirections(level.random, 12, 0)){
+
+            float randomOffset = FDMathUtil.FPI / 8 + FDMathUtil.FPI / 8 * level.random.nextFloat();
+            randomOffset *= level.random.nextBoolean() ? 1 : -1;
+
+            float offset1 = 2;
+            float offset2 = 3;
+
+            Vec3 p1 = Vec3.ZERO;
+            Vec3 p2 = BossUtil.matTransformDirectionVec3(mat, dir.yRot(randomOffset).add(dir.x * offset1,5,dir.z * offset1)
+                    .add(
+                            random.nextFloat() * 0.5 - 0.25f,
+                            random.nextFloat() * 2 - 1,
+                            random.nextFloat() * 0.5 - 0.25f
+                    ));
+            Vec3 p3 = BossUtil.matTransformDirectionVec3(mat, dir.yRot(-randomOffset).add(dir.x * offset2,10,dir.z * offset2)
+                    .add(
+                    random.nextFloat() * 0.5 - 0.25f,
+                    random.nextFloat() * 2 - 1,
+                    random.nextFloat() * 0.5 - 0.25f
+                    ));
+
+            StripeParticleOptions options = StripeParticleOptions.builder()
+                    .startColor(new FDColor(1f,0.1f,0.1f,1f))
+                    .endColor(new FDColor(1f,0.6f,0.2f,1f))
+                    .lifetime(10 + random.nextInt(5))
+                    .lod(25)
+                    .scale(0.1f)
+                    .stripePercentLength(0.5f)
+                    .endOutPercent(0.1f)
+                    .startInPercent(0.1f)
+                    .offsets(p1,p2,p3)
+                    .build();
+
+            level.addParticle(options, true, pos.x, pos.y,pos.z,0,0,0);
 
         }
 

@@ -2,24 +2,30 @@ package com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray;
 
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningParticle;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
+import com.finderfeed.fdlib.systems.particle.FDParticleRenderType;
 import com.finderfeed.fdlib.util.math.ComplexEasingFunction;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
+import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
@@ -121,15 +127,17 @@ public class GeburahRayParticle extends Particle {
 
 
         float w = options.rayWidth * p;
-        vertex.addVertex(mat,0,0,0).setColor(options.color.r,options.color.g,options.color.b,alpha);
-        vertex.addVertex(mat,w,0,0).setColor(options.color.r,options.color.g,options.color.b,0f);
-        vertex.addVertex(mat,w,(float)len,0).setColor(options.color.r,options.color.g,options.color.b,0f);
-        vertex.addVertex(mat,0,(float)len,0).setColor(options.color.r,options.color.g,options.color.b,alpha);
+        for (int zh = 0; zh < 2; zh++) {
+            vertex.addVertex(mat, 0, 0, 0).setColor(options.color.r, options.color.g, options.color.b, alpha);
+            vertex.addVertex(mat, w, 0, 0).setColor(options.color.r, options.color.g, options.color.b, 0f);
+            vertex.addVertex(mat, w, (float) len, 0).setColor(options.color.r, options.color.g, options.color.b, 0f);
+            vertex.addVertex(mat, 0, (float) len, 0).setColor(options.color.r, options.color.g, options.color.b, alpha);
 
-        vertex.addVertex(mat,0,0,0).setColor(options.color.r,options.color.g,options.color.b,alpha);
-        vertex.addVertex(mat,-w,0,0).setColor(options.color.r,options.color.g,options.color.b,0f);
-        vertex.addVertex(mat,-w,(float)len,0).setColor(options.color.r,options.color.g,options.color.b,0f);
-        vertex.addVertex(mat,0,(float)len,0).setColor(options.color.r,options.color.g,options.color.b,alpha);
+            vertex.addVertex(mat, 0, 0, 0).setColor(options.color.r, options.color.g, options.color.b, alpha);
+            vertex.addVertex(mat, -w, 0, 0).setColor(options.color.r, options.color.g, options.color.b, 0f);
+            vertex.addVertex(mat, -w, (float) len, 0).setColor(options.color.r, options.color.g, options.color.b, 0f);
+            vertex.addVertex(mat, 0, (float) len, 0).setColor(options.color.r, options.color.g, options.color.b, alpha);
+        }
 
         mat.translate(0,0,0.01f);
         vertex.addVertex(mat,0,0,0f).setColor(1f,1f,1f,alpha);
@@ -180,8 +188,29 @@ public class GeburahRayParticle extends Particle {
 
     @Override
     public ParticleRenderType getRenderType() {
-        return ArcLightningParticle.RENDER_TYPE;
+        return ADDITIVE_TRANSLUCENT;
     }
+
+
+    public static final ParticleRenderType ADDITIVE_TRANSLUCENT = new FDParticleRenderType() {
+        public @Nullable BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
+            RenderSystem.depthMask(true);
+            RenderSystem.enableBlend();
+            RenderSystem.disableCull();
+            RenderSystem.setShader(GameRenderer::getRendertypeLightningShader);
+            RenderSystem.blendFunc(GL11.GL_SRC_ALPHA,GL11.GL_ONE);
+
+            return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        }
+
+        public void end() {
+
+        }
+
+        public String toString() {
+            return "solarcraft:additive";
+        }
+    };
 
 
     public static class Factory implements ParticleProvider<GeburahRayOptions> {

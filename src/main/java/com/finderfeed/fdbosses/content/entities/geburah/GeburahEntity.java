@@ -6,6 +6,7 @@ import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOpti
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public class GeburahEntity extends FDLivingEntity {
 
@@ -37,6 +38,10 @@ public class GeburahEntity extends FDLivingEntity {
 
     }
 
+    public Vec3 getCorePosition(){
+        return this.position().add(0,21.5f,0);
+    }
+
     private void particles(){
 
         if (level().getGameTime() % 3 == 0) {
@@ -47,7 +52,9 @@ public class GeburahEntity extends FDLivingEntity {
                     .size(2f)
                     .build();
 
-            level().addParticle(ballParticle, true, this.getX(), this.getY() + 21.5f, this.getZ(), 0, 0, 0);
+            Vec3 corePos = this.getCorePosition();
+
+            level().addParticle(ballParticle, true, corePos.x, corePos.y, corePos.z, 0, 0, 0);
 
         }
     }
