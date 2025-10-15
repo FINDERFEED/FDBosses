@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.config.BossConfig;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossConfigs;
@@ -69,6 +70,7 @@ public class BossUtil {
     public static final int MALKUTH_SWORD_INSERT_PARTICLES = 12;
     public static final int MALKUTH_PLAYER_FIREBALL_EXPLODE = 13;
     public static final int GEBURAH_RAY_PARTICLES = 14;
+    public static final int GEBURAH_RAY_CHARGE_PARTICLES = 15;
 
     public static Vec3 matTransformDirectionVec3(Matrix4f mat, Vec3 v){
         Vector3f v1 = mat.transformDirection(
@@ -263,6 +265,10 @@ public class BossUtil {
             double z = pos.z - entity.getZ();
             return x * x + z * z <= radius * radius;
         };
+    }
+
+    public static void geburahRayChargeParticles(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){
+        posEvent(serverLevel, pos, GEBURAH_RAY_CHARGE_PARTICLES, geburah.getId(), radius);
     }
 
     public static void geburahRayParticles(ServerLevel serverLevel, Vec3 pos, double radius, Vec3 direction){

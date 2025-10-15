@@ -1,8 +1,11 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
 import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdlib.FDLibCalls;
+import com.finderfeed.fdlib.util.FDColor;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.ClipContext;
@@ -16,7 +19,9 @@ import java.util.List;
 
 public class GeburahRayController {
 
-    public int currentShotCharge = -1;
+    private int maxShotChargeTime = -1;
+
+    private int currentShotCharge = -1;
 
     private List<Vec3> targets = new ArrayList<>();
 
@@ -32,6 +37,26 @@ public class GeburahRayController {
         Level level = geburah.level();
 
         if (currentShotCharge > 0){
+
+
+            if (currentShotCharge >= 10) {
+
+                if (currentShotCharge % 2 == 0) {
+                    Vec3 pos = geburah.getCorePosition();
+
+                    StripeParticleOptions stripeParticleOptions = StripeParticleOptions.createHorizontalCircling(
+                            new FDColor(1f, 0.3f, 0.2f, 1f),new FDColor(1f, 0.6f, 0.2f, 1f),
+                            new Vec3(0, 1, 0), (currentShotCharge / 2) * (FDMathUtil.FPI / 2), 0.3f, 10, 100, 0, 10, 0.5f,
+                            0.5f, true, true
+                    );
+
+                    FDLibCalls.sendParticles((ServerLevel) level, stripeParticleOptions, pos, 200);
+                }
+
+                BossUtil.geburahRayChargeParticles((ServerLevel) level, geburah.getCorePosition(), 100, geburah);
+            }
+
+
             currentShotCharge = Mth.clamp(currentShotCharge - 1,0,Integer.MAX_VALUE);
         }else if (currentShotCharge == 0){
 
@@ -53,7 +78,7 @@ public class GeburahRayController {
                         .end(location)
                         .color(1f,0.8f,0.2f)
                         .time(0,2,7)
-                        .width(1f)
+                        .width(0.5f)
                         .build();
 
                 FDLibCalls.sendParticles((ServerLevel) level, options, start, 200);
@@ -69,7 +94,11 @@ public class GeburahRayController {
     }
 
     public void shoot(int shootTime, List<Vec3> targets){
-        this.currentShotCharge = shootTime;
+        if (this.currentShotCharge == -1) {
+            this.maxShotChargeTime = shootTime;
+            this.currentShotCharge = shootTime;
+        }
+        this.targets.clear();
         this.targets.addAll(targets);
     }
 

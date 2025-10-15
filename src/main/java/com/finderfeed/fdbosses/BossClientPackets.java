@@ -217,6 +217,54 @@ public class BossClientPackets {
             case BossUtil.GEBURAH_RAY_PARTICLES -> {
                 geburahRayParticles(pos, data);
             }
+            case BossUtil.GEBURAH_RAY_CHARGE_PARTICLES -> {
+                geburahRayChargeParticles(pos, data);
+            }
+        }
+    }
+
+    public static void geburahRayChargeParticles(Vec3 pos, int data){
+
+        if (FDClientHelpers.getClientLevel().getEntity(data) instanceof GeburahEntity geburah) {
+
+            pos = geburah.getCorePosition();
+            int count = 3;
+
+            float randomYRot = random.nextFloat() * FDMathUtil.FPI * 2;
+            float randomXRot = random.nextFloat() * FDMathUtil.FPI * 2;
+
+            float r = 1f;
+            float gr = 0.49f;
+            float b = 0.2f;
+
+            Level level = FDClientHelpers.getClientLevel();
+
+            for (int x = -count; x <= count; x++) {
+                for (int y = -count; y <= count; y++) {
+                    for (int z = -count; z <= count; z++) {
+
+                        if (random.nextFloat() > 0.05f) continue;
+
+                        Vec3 v = new Vec3(x, y, z).normalize()
+                            .yRot(randomYRot).xRot(randomXRot);
+
+                        BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                                .brightness(2)
+                                .size(0.5f)
+                                .color(r, gr, b, 1f)
+                                .friction(1.4f)
+                                .scalingOptions(10, 0, 0)
+                                .build();
+
+                        Vec3 ppos = pos.add(v.scale(2));
+
+                        float speed = 0.05f;
+
+                        level.addParticle(ballParticleOptions, true, ppos.x, ppos.y, ppos.z, -v.x * speed, -v.y * speed, -v.z * speed);
+
+                    }
+                }
+            }
         }
     }
 

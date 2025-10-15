@@ -12,9 +12,12 @@ public class GeburahEntity extends FDLivingEntity {
 
     protected GeburahRotatingWeaponsHandler rotatingWeaponsHandler;
 
+    private GeburahRayController rayController;
+
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
         this.rotatingWeaponsHandler = new GeburahRotatingWeaponsHandler(this);
+        this.rayController = new GeburahRayController(this);
     }
 
     @Override
@@ -25,21 +28,27 @@ public class GeburahEntity extends FDLivingEntity {
             this.particles();
         }
 
-        if (level().isClientSide){
-        this.rotatingWeaponsHandler.tick();
+        if (level().isClientSide) {
+            this.rotatingWeaponsHandler.tick();
 
-        if (this.rotatingWeaponsHandler.finishedRotation()){
-            this.rotatingWeaponsHandler.rotateWeaponsBy(
-                    level().random.nextFloat() * 200f - 100f,
-                    20
-            );
-        }
+            if (this.rotatingWeaponsHandler.finishedRotation()) {
+                this.rotatingWeaponsHandler.rotateWeaponsBy(
+                        level().random.nextFloat() * 200f - 100f,
+                        20
+                );
+            }
+        }else{
+            this.getRayController().tick();
         }
 
     }
 
     public Vec3 getCorePosition(){
         return this.position().add(0,21.5f,0);
+    }
+
+    public GeburahRayController getRayController() {
+        return rayController;
     }
 
     private void particles(){
