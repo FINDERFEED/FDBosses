@@ -15,12 +15,11 @@ import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.Geburah
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
+import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDClientHelpers;
-import com.finderfeed.fdlib.FDClientPacketExecutables;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
-import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDUtil;
@@ -38,7 +37,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -51,7 +49,6 @@ import java.lang.Math;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-import java.util.Vector;
 
 public class BossClientPackets {
 
@@ -217,7 +214,92 @@ public class BossClientPackets {
             case BossUtil.MALKUTH_PLAYER_FIREBALL_EXPLODE -> {
                 malkuthPlayerFireballExplode(pos,data);
             }
+            case BossUtil.GEBURAH_RAY_PARTICLES -> {
+                geburahRayParticles(pos, data);
+            }
         }
+    }
+
+    public static void geburahRayParticles(Vec3 pos, int data){
+
+        Level level = FDClientHelpers.getClientLevel();
+
+        BallParticleOptions flash = BallParticleOptions.builder()
+                .color(0.4f,1f,1f)
+                .scalingOptions(1,0,2)
+                .brightness(4)
+                .size(15f)
+                .build();
+
+        level.addParticle(flash,true,pos.x,pos.y,pos.z,0,0,0);
+
+
+        Vec3 direction = FDUtil.decodeDirection(data);
+
+        Matrix4f mat = new Matrix4f();
+        FDRenderUtil.applyMovementMatrixRotations(mat, direction);
+
+
+        float maxParticleSize = 2f;
+        float minParticleSize = 0.1f;
+        float particleFriction = 0.7f;
+        int maxParticleRows = 10;
+
+        int particleTravelTime = 100;
+
+        float cumulativeSize = 0;
+
+        float travelDistWindow = 1f;
+
+        float randomXZSpread = 0.25f;
+
+        for (int i = 0; i < maxParticleRows;i++) {
+
+            float ip = i / (maxParticleRows - 1f);
+
+            float size = FDMathUtil.lerp(minParticleSize, maxParticleSize, 1 - ip);
+
+            int repetitionCount = Math.round(FDMathUtil.lerp(1,5,ip));
+
+            int directionsCount = Math.round(FDMathUtil.lerp(1,12,ip));
+
+            float r = FDMathUtil.lerp(0.3f,1f,FDEasings.easeIn(ip));
+            float gr = FDMathUtil.lerp(0.8f,1f,ip);
+            float b = FDMathUtil.lerp(0.9f,1f,ip);
+
+            for (int g = 0; g < repetitionCount; g++) {
+                for (var dir : new HorizontalCircleRandomDirections(level.random, directionsCount, 1f)) {
+
+                    float travelDistance = cumulativeSize + travelDistWindow * random.nextFloat();
+
+                    float particleSpeed = (travelDistance * (1 - particleFriction) / (1 - (float) Math.pow(particleFriction, particleTravelTime)));
+
+                    Vec3 speed = BossUtil.matTransformDirectionVec3(mat, new Vec3(
+                            dir.x + random.nextFloat() * randomXZSpread * 2 - randomXZSpread,
+                            3 - random.nextFloat() * 0.5f,
+                            dir.z + random.nextFloat() * randomXZSpread * 2 - randomXZSpread
+                    ).normalize().multiply(particleSpeed, particleSpeed, particleSpeed));
+
+                    Vec3 spawnOffset = BossUtil.matTransformDirectionVec3(mat, dir.multiply(0.5f, 0.5f, 0.5f));
+
+                    BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                            .brightness(2)
+                            .size(size)
+                            .color(r,gr,b, 1f)
+                            .friction(particleFriction)
+                            .scalingOptions(0, 0, 20 + random.nextInt(10))
+                            .build();
+
+                    level.addParticle(ballParticleOptions, true, pos.x + spawnOffset.x, pos.y + spawnOffset.y, pos.z + spawnOffset.z, speed.x, speed.y, speed.z);
+
+
+                }
+            }
+
+            cumulativeSize += travelDistWindow;
+
+        }
+
     }
 
     public static void malkuthSwordInsertParticles(int malkuthEntityId){

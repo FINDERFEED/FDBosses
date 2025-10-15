@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.debug;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.ChesedMiniRay;
@@ -23,6 +24,7 @@ import com.finderfeed.fdlib.systems.render_types.FDRenderType;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
@@ -39,6 +41,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.joml.SimplexNoise;
@@ -62,8 +65,8 @@ public class DebugStick extends Item {
 
         if (level.isClientSide){
 
-            Vec3 start = player.getEyePosition().add(5,-0.2f,0);
-            Vec3 end = start.add(player.getLookAngle().multiply(30,30,30));
+            Vec3 start = player.getEyePosition().add(0,-0.2f,0);
+            Vec3 end = start.add(player.getLookAngle().multiply(100,100,100));
 
             var options = GeburahRayOptions.builder()
                     .end(end)
@@ -73,9 +76,23 @@ public class DebugStick extends Item {
                     .build();
 
             level.addParticle(options, start.x, start.y,start.z,0,0,0);
+
+
         }
 
         if (!level.isClientSide){
+            Vec3 start = player.getEyePosition().add(0,-0.2f,0);
+            Vec3 end = start.add(player.getLookAngle().multiply(100,100,100));
+            ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+
+            BlockHitResult result = level.clip(clipContext);
+
+            if (result.getType() != HitResult.Type.MISS){
+
+                BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), end.subtract(start).normalize());
+                BossUtil.geburahRayParticles((ServerLevel) level, result.getLocation(), 200, start.subtract(end).normalize());
+
+            }
 
 
 

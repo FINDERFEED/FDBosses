@@ -1,12 +1,19 @@
 package com.finderfeed.fdbosses;
 
+import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.config.BossConfig;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
+import com.finderfeed.fdlib.FDLibCalls;
+import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
+import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.BoundToEntityProcessor;
 import com.finderfeed.fdlib.util.FDUtil;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -29,6 +36,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
@@ -60,6 +68,7 @@ public class BossUtil {
     public static final int MALKUTH_VOLCANO_ERRUPTION = 11;
     public static final int MALKUTH_SWORD_INSERT_PARTICLES = 12;
     public static final int MALKUTH_PLAYER_FIREBALL_EXPLODE = 13;
+    public static final int GEBURAH_RAY_PARTICLES = 14;
 
     public static Vec3 matTransformDirectionVec3(Matrix4f mat, Vec3 v){
         Vector3f v1 = mat.transformDirection(
@@ -71,6 +80,84 @@ public class BossUtil {
 
         return new Vec3(v1.x,v1.y,v1.z);
     }
+
+    public static void createOnEarthBlockExplosionEffect(Level level, Vec3 position, Vec3 attackDirection){
+
+        attackDirection = attackDirection.normalize();
+
+        Vec3 explosionVec = new Vec3(attackDirection.x,attackDirection.y,attackDirection.z);
+
+        var states = collectStates(level, position, 1);
+
+        if (states.isEmpty()) return;
+
+        for (int i = 0; i < 30; i++){
+
+            Vec3 direction = new Vec3(0.05f + level.random.nextFloat() * 0.6f,0,0).yRot(FDMathUtil.FPI * 2 * level.random.nextFloat());
+
+            float randomYSpeed = 0.25f + level.random.nextFloat() * 0.6f;
+
+            Vec3 speed = new Vec3(direction.x,randomYSpeed,direction.z);
+
+            float explosionVecContribution = 0.7f;
+
+            speed = speed.add(
+                    explosionVec.x * explosionVecContribution,
+                    0,
+                    explosionVec.z * explosionVecContribution
+            );
+
+            float rndOffs = level.random.nextFloat();
+            Vec3 spawnOffset = position.add(direction.normalize().multiply(rndOffs,rndOffs,rndOffs));
+
+            ChesedFallingBlock fallingBlock = ChesedFallingBlock.summon(level, states.get(level.random.nextInt(states.size())), spawnOffset, speed, 0, 0.05f);
+
+
+            float rnd = level.random.nextFloat() * 0.05f;
+            FDLibCalls.addParticleEmitter(level, 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+                            .color(0.35f - rnd, 0.35f - rnd, 0.35f - rnd)
+                            .lifetime(0, 0, 25)
+                            .size(1.5f)
+                            .build())
+                    .lifetime(200)
+                    .processor(new BoundToEntityProcessor(fallingBlock.getId(), Vec3.ZERO))
+                    .position(spawnOffset)
+                    .build());
+
+        }
+
+    }
+
+    private static List<BlockState> collectStates(Level level, Vec3 pos, int radius){
+
+        BlockPos blockPos = new BlockPos(
+                (int) Math.floor(pos.x),
+                (int) Math.floor(pos.y),
+                (int) Math.floor(pos.z)
+        );
+
+        List<BlockState> blockStates = new ArrayList<>();
+
+
+        for (int x = -radius; x <= radius; x++){
+            for (int y = -radius; y <= radius; y++){
+                for (int z = -radius; z <= radius; z++){
+
+                    BlockPos offset = blockPos.offset(x,y,z);
+
+                    BlockState blockState = level.getBlockState(offset);
+
+                    if (!blockState.isAir() && blockState.isCollisionShapeFullBlock(level, offset)){
+                        blockStates.add(blockState);
+                    }
+
+                }
+            }
+        }
+
+        return blockStates;
+    }
+
 
     /**
      * Air Friction? What?
@@ -176,6 +263,10 @@ public class BossUtil {
             double z = pos.z - entity.getZ();
             return x * x + z * z <= radius * radius;
         };
+    }
+
+    public static void geburahRayParticles(ServerLevel serverLevel, Vec3 pos, double radius, Vec3 direction){
+        posEvent(serverLevel, pos, GEBURAH_RAY_PARTICLES, FDUtil.encodeDirection(direction), radius);
     }
 
     public static void malkuthSwordsInsertParticles(ServerLevel serverLevel, Vec3 pos, double radius, int malkuthEntityId){
