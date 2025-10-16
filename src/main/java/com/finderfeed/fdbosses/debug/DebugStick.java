@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.ChesedMiniRay;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahStompingController;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
@@ -42,10 +43,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.joml.SimplexNoise;
 
@@ -84,20 +82,20 @@ public class DebugStick extends Item {
         }
 
         if (!level.isClientSide){
-//            Vec3 start = player.getEyePosition().add(0,-0.2f,0);
-//            Vec3 end = start.add(player.getLookAngle().multiply(100,100,100));
-//            ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+            Vec3 start = player.getEyePosition().add(0,-0.2f,0);
+            Vec3 end = start.add(player.getLookAngle().multiply(100,100,100));
+            ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+
+            BlockHitResult result = level.clip(clipContext);
+
+            if (result.getType() != HitResult.Type.MISS){
 //
-//            BlockHitResult result = level.clip(clipContext);
-//
-//            if (result.getType() != HitResult.Type.MISS){
-////
-////                BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), end.subtract(start).normalize());
-////                BossUtil.geburahRayParticles((ServerLevel) level, result.getLocation(), 200, start.subtract(end).normalize());
-//
-//                float radius = 50;
-//
-//                for (var geburah : FDTargetFinder.getEntitiesInSphere(GeburahEntity.class, level, player.position(), 200)){
+//                BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), end.subtract(start).normalize());
+//                BossUtil.geburahRayParticles((ServerLevel) level, result.getLocation(), 200, start.subtract(end).normalize());
+
+                float radius = 50;
+
+                for (var geburah : FDTargetFinder.getEntitiesInSphere(GeburahEntity.class, level, player.position(), 200)){
 //                    var rayController = geburah.getRayController();
 //                    rayController.shoot(20,List.of(
 //                            result.getLocation(),
@@ -122,12 +120,14 @@ public class DebugStick extends Item {
 //                                    level.random.nextFloat() * radius * 2 - radius
 //                            )
 //                    ));
-//                }
-//
-//            }
+                    GeburahStompingController stompingController = geburah.getStompingController();
+                    stompingController.stompFullCircle(20, true, 1f, 1f);
+                }
+
+            }
 
 
-            GeburahEarthquake.summon(level, player.getOnPos(), 2,30,1f,1,player.getLookAngle(),FDMathUtil.FPI / 2);
+//            GeburahEarthquake.summon(level, player.getOnPos(), 2,30,1f,1,player.getLookAngle(),FDMathUtil.FPI / 2);
 
 
 

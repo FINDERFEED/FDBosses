@@ -1,23 +1,32 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
+import com.finderfeed.fdlib.nbt.AutoSerializable;
+import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-public class GeburahEntity extends FDLivingEntity {
+public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
+
+    public static final String GEBURAH_STOMPING_LAYER = "stomping";
 
     protected GeburahRotatingWeaponsHandler rotatingWeaponsHandler;
 
     private GeburahRayController rayController;
 
+    @SerializableField
+    private GeburahStompingController stompingController;
+
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
         this.rotatingWeaponsHandler = new GeburahRotatingWeaponsHandler(this);
         this.rayController = new GeburahRayController(this);
+        this.stompingController = new GeburahStompingController(this, 30);
     }
 
     @Override
@@ -29,17 +38,13 @@ public class GeburahEntity extends FDLivingEntity {
         }
 
         if (level().isClientSide) {
-            this.rotatingWeaponsHandler.tick();
 
-            if (this.rotatingWeaponsHandler.finishedRotation()) {
-                this.rotatingWeaponsHandler.rotateWeaponsBy(
-                        level().random.nextFloat() * 200f - 100f,
-                        20
-                );
-            }
         }else{
             this.getRayController().tick();
+            this.getStompingController().tick();
         }
+
+        this.rotatingWeaponsHandler.tick();
 
     }
 
@@ -49,6 +54,10 @@ public class GeburahEntity extends FDLivingEntity {
 
     public GeburahRayController getRayController() {
         return rayController;
+    }
+
+    public GeburahStompingController getStompingController() {
+        return stompingController;
     }
 
     private void particles(){
@@ -70,6 +79,18 @@ public class GeburahEntity extends FDLivingEntity {
 
     public GeburahRotatingWeaponsHandler getRotatingWeaponsHandler() {
         return rotatingWeaponsHandler;
+    }
+
+    @Override
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        this.autoSave(tag);
+    }
+
+    @Override
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        this.autoLoad(tag);
     }
 
     @Override

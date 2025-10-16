@@ -225,4 +225,11 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
     });
 
+    //GEBURAH
+
+    public static DeferredHolder<Animation,Animation> GEBURAH_STOMP = ANIMATIONS.register("geburah_stomp", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"));
+    });
+
+
 }
