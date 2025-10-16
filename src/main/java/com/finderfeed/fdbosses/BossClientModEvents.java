@@ -31,6 +31,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayReflectorRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquakeRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsBoneController;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapRenderer;
@@ -270,7 +271,7 @@ public class BossClientModEvents {
                                 .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/geburah/geburah.png")))
                                 .addBoneController("rotating_weapons", new GeburahRotatingWeaponsBoneController())
                                 .build())
-
+                        .freeRender(new GeburahRenderer())
                         .shouldRender(((geburahEntity, frustum, v, v1, v2) -> true))
                 .build());
 
