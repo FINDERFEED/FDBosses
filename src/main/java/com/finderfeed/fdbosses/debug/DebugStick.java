@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.ChesedMiniRay;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
@@ -83,47 +84,50 @@ public class DebugStick extends Item {
         }
 
         if (!level.isClientSide){
-            Vec3 start = player.getEyePosition().add(0,-0.2f,0);
-            Vec3 end = start.add(player.getLookAngle().multiply(100,100,100));
-            ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
-
-            BlockHitResult result = level.clip(clipContext);
-
-            if (result.getType() != HitResult.Type.MISS){
+//            Vec3 start = player.getEyePosition().add(0,-0.2f,0);
+//            Vec3 end = start.add(player.getLookAngle().multiply(100,100,100));
+//            ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
 //
-//                BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), end.subtract(start).normalize());
-//                BossUtil.geburahRayParticles((ServerLevel) level, result.getLocation(), 200, start.subtract(end).normalize());
+//            BlockHitResult result = level.clip(clipContext);
+//
+//            if (result.getType() != HitResult.Type.MISS){
+////
+////                BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), end.subtract(start).normalize());
+////                BossUtil.geburahRayParticles((ServerLevel) level, result.getLocation(), 200, start.subtract(end).normalize());
+//
+//                float radius = 50;
+//
+//                for (var geburah : FDTargetFinder.getEntitiesInSphere(GeburahEntity.class, level, player.position(), 200)){
+//                    var rayController = geburah.getRayController();
+//                    rayController.shoot(20,List.of(
+//                            result.getLocation(),
+//                            result.getLocation().add(
+//                                    level.random.nextFloat() * radius * 2 - radius,
+//                                    0,
+//                                    level.random.nextFloat() * radius * 2 - radius
+//                            ),
+//                            result.getLocation().add(
+//                                    level.random.nextFloat() * radius * 2 - radius,
+//                                    0,
+//                                    level.random.nextFloat() * radius * 2 - radius
+//                            ),
+//                            result.getLocation().add(
+//                                    level.random.nextFloat() * radius * 2 - radius,
+//                                    0,
+//                                    level.random.nextFloat() * radius * 2 - radius
+//                            ),
+//                            result.getLocation().add(
+//                                    level.random.nextFloat() * radius * 2 - radius,
+//                                    0,
+//                                    level.random.nextFloat() * radius * 2 - radius
+//                            )
+//                    ));
+//                }
+//
+//            }
 
-                float radius = 50;
 
-                for (var geburah : FDTargetFinder.getEntitiesInSphere(GeburahEntity.class, level, player.position(), 200)){
-                    var rayController = geburah.getRayController();
-                    rayController.shoot(20,List.of(
-                            result.getLocation(),
-                            result.getLocation().add(
-                                    level.random.nextFloat() * radius * 2 - radius,
-                                    0,
-                                    level.random.nextFloat() * radius * 2 - radius
-                            ),
-                            result.getLocation().add(
-                                    level.random.nextFloat() * radius * 2 - radius,
-                                    0,
-                                    level.random.nextFloat() * radius * 2 - radius
-                            ),
-                            result.getLocation().add(
-                                    level.random.nextFloat() * radius * 2 - radius,
-                                    0,
-                                    level.random.nextFloat() * radius * 2 - radius
-                            ),
-                            result.getLocation().add(
-                                    level.random.nextFloat() * radius * 2 - radius,
-                                    0,
-                                    level.random.nextFloat() * radius * 2 - radius
-                            )
-                    ));
-                }
-
-            }
+            GeburahEarthquake.summon(level, player.getOnPos(), 2,30,1f,1,player.getLookAngle(),FDMathUtil.FPI / 2);
 
 
 

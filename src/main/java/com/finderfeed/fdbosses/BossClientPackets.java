@@ -11,6 +11,7 @@ import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
@@ -73,13 +74,6 @@ public class BossClientPackets {
             }
         }
     }
-
-//    public static void openBossDossierScreen(BossSpawnerEntity bossSpawner, EntityType<?> bossType){
-//        BaseBossScreen baseBossScreen = BossScreens.getScreen(bossType,bossSpawner.getId());
-//        if (baseBossScreen != null){
-//            Minecraft.getInstance().setScreen(baseBossScreen);
-//        }
-//    }
 
 
     public static void openBossDossierScreen(int spawnerId, List<Item> drops){
@@ -172,6 +166,68 @@ public class BossClientPackets {
 
         }
     }
+
+    public static void geburahEarthquakeSpawnEarthshatters(int entityId,Vec3 direction, int radius, float angle){
+
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEarthquake geburahEarthquake){
+            geburahEarthquake.spawnEarthShattersOnRadius(radius,direction,angle);
+            geburahEarthquakeParticles(geburahEarthquake.position(),radius, direction, angle);
+        }
+
+    }
+
+
+    public static void geburahEarthquakeParticles(Vec3 tpos,int rad, Vec3 direction, float arcAngle){
+        Vec3 b = new Vec3(rad,0,0);
+        float angle;
+        if (rad != 0){
+            angle = 1f / rad;
+        }else{
+            angle = FDMathUtil.FPI * 2;
+        }
+        Level level = Minecraft.getInstance().level;
+
+        BlockPos prevPos = null;
+        for (float i = 0; i < FDMathUtil.FPI * 2;i += angle){
+
+            Vec3 vec = b.yRot(i);
+
+            if (FDMathUtil.angleBetweenVectors(vec, direction) > arcAngle) continue;
+
+            Vec3 pos = tpos.add(vec);
+
+            BlockPos ppos = FDMathUtil.vec3ToBlockPos(pos);
+            if (!ppos.equals(prevPos)){
+                Vec3 c = ppos.getCenter();
+                Vec3 dir = tpos.subtract(c).multiply(1,0,1).normalize();
+
+                BlockState state = level.getBlockState(ppos);
+                if (state.isAir()) continue;
+
+
+                Vec3 sppos = new Vec3(
+                        c.x + random.nextFloat() * 2 - 1 - dir.x,
+                        c.y + 0.1 + random.nextFloat() * 0.19,
+                        c.z + random.nextFloat() * 2 - 1 - dir.z
+                );
+
+                Vec3 speed = dir.yRot(FDMathUtil.FPI / 4 * (random.nextFloat() * 2 - 1)).multiply(0.075,0.,0.075).add(0,0.25f + random.nextFloat() * 0.2f,0);
+
+                FDBlockParticleOptions options = FDBlockParticleOptions.builder()
+                        .lifetime(10 + random.nextInt(5))
+                        .state(state)
+                        .quadSizeMultiplier(1 + random.nextFloat() * 0.2f)
+                        .build();
+
+                level.addParticle(options,sppos.x,sppos.y,sppos.z,speed.x,speed.y,speed.z);
+
+//                }
+            }
+            prevPos = ppos;
+        }
+    }
+
+
 
     public static void posEvent(Vec3 pos,int event,int data){
         switch (event) {
