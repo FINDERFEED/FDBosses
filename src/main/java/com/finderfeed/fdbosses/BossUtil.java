@@ -71,6 +71,7 @@ public class BossUtil {
     public static final int MALKUTH_PLAYER_FIREBALL_EXPLODE = 13;
     public static final int GEBURAH_RAY_PARTICLES = 14;
     public static final int GEBURAH_RAY_CHARGE_PARTICLES = 15;
+    public static final int GEBURAH_WEAPONS_START_LASER = 16;
 
     public static Vec3 matTransformDirectionVec3(Matrix4f mat, Vec3 v){
         Vector3f v1 = mat.transformDirection(
@@ -265,6 +266,10 @@ public class BossUtil {
             double z = pos.z - entity.getZ();
             return x * x + z * z <= radius * radius;
         };
+    }
+
+    public static void geburahWeaponsStartLaser(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){
+        posEvent(serverLevel, pos, GEBURAH_WEAPONS_START_LASER, geburah.getId(), radius);
     }
 
     public static void geburahRayChargeParticles(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){

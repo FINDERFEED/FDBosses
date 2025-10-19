@@ -96,9 +96,9 @@ public class DebugStick extends Item {
                 float radius = 50;
 
                 for (var geburah : FDTargetFinder.getEntitiesInSphere(GeburahEntity.class, level, player.position(), 200)){
-//                    var rayController = geburah.getRayController();
-//                    rayController.shoot(20,List.of(
-//                            result.getLocation(),
+                    var rayController = geburah.getRayController();
+                    rayController.shoot(20,List.of(
+                            result.getLocation()
 //                            result.getLocation().add(
 //                                    level.random.nextFloat() * radius * 2 - radius,
 //                                    0,
@@ -119,9 +119,9 @@ public class DebugStick extends Item {
 //                                    0,
 //                                    level.random.nextFloat() * radius * 2 - radius
 //                            )
-//                    ));
-                    GeburahStompingController stompingController = geburah.getStompingController();
-                    stompingController.stompFullCircle(20, true, 1f, 1f);
+                    ));
+//                    GeburahStompingController stompingController = geburah.getStompingController();
+//                    stompingController.stompFullCircle(20, true, 1f, 1f);
                 }
 
             }

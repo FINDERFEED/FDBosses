@@ -1,6 +1,8 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
 import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttackController;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdlib.data_structures.Pair;
@@ -14,6 +16,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -37,6 +40,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
     private GeburahRayController rayController;
 
+    private GeburahWeaponAttackController attackController;
+
     @SerializableField
     private GeburahStompingController stompingController;
 
@@ -45,6 +50,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         this.rotatingWeaponsHandler = new GeburahRotatingWeaponsHandler(this);
         this.rayController = new GeburahRayController(this);
         this.stompingController = new GeburahStompingController(this, 30);
+        this.attackController = new GeburahWeaponAttackController(this);
     }
 
 
@@ -58,13 +64,19 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         }else{
             this.getRayController().tick();
             this.getStompingController().tick();
+            this.getAttackController().tick();
+
+            if (tickCount % 100 == 0){
+                this.getRotatingWeaponsHandler().startConstantRotation(1 + random.nextFloat() * 10);
+            }
+
         }
 
         if (this.getRotatingWeaponsHandler().finishedRotation()){
 //            this.getRotatingWeaponsHandler().rotateWeaponsBy(10,30);
         }
 
-        this.rotatingWeaponsHandler.tick();
+        this.getRotatingWeaponsHandler().tick();
 
     }
 
@@ -97,7 +109,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         return pairs;
     }
 
-    public void activateLasersVisual(boolean state){
+    public void setLaserVisualsState(boolean state){
         this.getEntityData().set(LASERS_ACTIVE, state);
     }
 
@@ -115,6 +127,10 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
     public GeburahStompingController getStompingController() {
         return stompingController;
+    }
+
+    public GeburahWeaponAttackController getAttackController() {
+        return attackController;
     }
 
     private void particles(){
@@ -193,10 +209,22 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         return rotatingWeaponsHandler;
     }
 
+
+    @Override
+    public void startSeenByPlayer(ServerPlayer player) {
+        super.startSeenByPlayer(player);
+        this.getRotatingWeaponsHandler().onStartSeeingGeburah(player);
+    }
+
+    @Override
+    public void stopSeenByPlayer(ServerPlayer p_20174_) {
+        super.stopSeenByPlayer(p_20174_);
+    }
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
-        builder.define(LASERS_ACTIVE, true);
+        builder.define(LASERS_ACTIVE, false);
     }
 
     @Override

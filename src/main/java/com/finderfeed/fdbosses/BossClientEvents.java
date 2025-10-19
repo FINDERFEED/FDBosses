@@ -13,6 +13,8 @@ import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
+import com.google.gson.JsonSyntaxException;
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -22,11 +24,14 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.client.sounds.MusicManager;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceProvider;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
@@ -47,6 +52,8 @@ import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
+
+import java.io.IOException;
 
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID,bus = EventBusSubscriber.Bus.GAME,value = Dist.CLIENT)
@@ -465,7 +472,6 @@ public class BossClientEvents {
         vertexConsumer.addVertex(m, -boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(1f,.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
         vertexConsumer.addVertex(m, boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.5f,.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
         vertexConsumer.addVertex(m, boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(.5f,.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
-
 
     }
 

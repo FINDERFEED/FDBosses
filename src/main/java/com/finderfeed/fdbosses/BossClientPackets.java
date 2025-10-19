@@ -13,6 +13,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
+import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahWeaponRotation;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
@@ -62,6 +63,20 @@ public class BossClientPackets {
     public static void closeDossierScreen(){
         if (Minecraft.getInstance().screen instanceof BaseBossScreen baseBossScreen){
             Minecraft.getInstance().setScreen(null);
+        }
+    }
+
+    public static void stopWeaponRotation(int entityId){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
+            geburah.getRotatingWeaponsHandler().stopRotation();
+        }
+    }
+
+    public static void startGeburahWeaponRotation(int entityId, GeburahWeaponRotation geburahWeaponRotation){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
+            var handler = geburah.getRotatingWeaponsHandler();
+            geburahWeaponRotation.setRotatingWeaponsHandler(handler);
+            handler.rotateWeapons(geburahWeaponRotation);
         }
     }
 
@@ -276,7 +291,77 @@ public class BossClientPackets {
             case BossUtil.GEBURAH_RAY_CHARGE_PARTICLES -> {
                 geburahRayChargeParticles(pos, data);
             }
+            case BossUtil.GEBURAH_WEAPONS_START_LASER -> {
+                geburahWeaponsStartLaser(pos, data);
+            }
         }
+    }
+
+    public static void geburahWeaponsStartLaser(Vec3 pos, int data){
+
+        Level level = FDClientHelpers.getClientLevel();
+
+        if (level.getEntity(data) instanceof GeburahEntity geburah){
+
+            float particleFriction = 0.8f;
+
+            float r = 0.3f;
+            float g = 0.7f;
+            float b = 1f;
+
+            float rowWidth = 0.5f;
+
+            for (var cannon : geburah.getCannonsPositionAndDirection()){
+
+                Vec3 cannonPos = cannon.first;
+                Vec3 cannonDirection = cannon.second;
+
+                Matrix4f mat = new Matrix4f();
+
+                FDRenderUtil.applyMovementMatrixRotations(mat, cannonDirection);
+
+                int rowCount = 5;
+
+                float offs = 0;
+
+                for (int i = 0; i < rowCount; i++) {
+
+                    for (var dir : new HorizontalCircleRandomDirections(geburah.getRandom(), 12, 1f)) {
+
+                        float pspeed = calculateParticleSpeed(offs + random.nextFloat() * rowWidth, particleFriction, 10);
+                        Vec3 desiredSpeed = new Vec3(
+                                dir.x + random.nextFloat() * 0.8 - 0.4,
+                                3,
+                                dir.z + random.nextFloat() * 0.8 - 0.4
+                        ).normalize().scale(pspeed);
+
+                        Vec3 sppos = BossUtil.matTransformDirectionVec3(mat, dir.scale(0.25));
+
+                        desiredSpeed = BossUtil.matTransformDirectionVec3(mat, desiredSpeed);
+
+                        BallParticleOptions options = BallParticleOptions.builder()
+                                .friction(particleFriction)
+                                .size(0.5f)
+                                .brightness(2)
+                                .scalingOptions(0,0,10)
+                                .color(r,g,b)
+                                .build();
+
+
+                        level.addParticle(options, true, cannonPos.x + sppos.x,cannonPos.y + sppos.y,cannonPos.z + sppos.z, desiredSpeed.x,desiredSpeed.y, desiredSpeed.z);
+
+                    }
+
+                    offs += rowWidth;
+                }
+
+            }
+
+        }
+    }
+
+    private static float calculateParticleSpeed(float travelDistance, float particleFriction, int particleTravelTime){
+        return (travelDistance * (1 - particleFriction) / (1 - (float) Math.pow(particleFriction, particleTravelTime)));
     }
 
     public static void geburahRayChargeParticles(Vec3 pos, int data){

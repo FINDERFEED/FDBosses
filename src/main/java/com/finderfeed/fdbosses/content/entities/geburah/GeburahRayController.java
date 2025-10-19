@@ -4,6 +4,8 @@ import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdlib.FDLibCalls;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
+import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.server.level.ServerLevel;
@@ -84,6 +86,12 @@ public class GeburahRayController {
                 FDLibCalls.sendParticles((ServerLevel) level, options, start, 200);
                 BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), between);
                 BossUtil.geburahRayParticles((ServerLevel) level, result.getLocation(), 200, between.reverse());
+
+                PositionedScreenShakePacket.send((ServerLevel) level, FDShakeData.builder()
+                                .amplitude(1f)
+                                .outTime(5)
+                                .frequency(20)
+                        .build(), result.getLocation(), 60);
 
             }
 
