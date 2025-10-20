@@ -156,5 +156,8 @@
         "stream": true
       }
     ]
+  },
+  "geburah_sin": {
+    "sounds": [ "fdbosses:geburah_sin" ]
   }
 }

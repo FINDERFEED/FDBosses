@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahStompingController;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.GeburahTriggerSinEffectPacket;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
@@ -16,19 +17,26 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
 import com.finderfeed.fdbosses.init.BossModels;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.init.FDRenderTypes;
+import com.finderfeed.fdlib.network.lib_packets.PlaySoundInEarsPacket;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.ModelSystem;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.BaseModelAttachmentData;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.instances.fdmodel.FDModelAttachmentData;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.attachments.instances.item_stack.ItemStackAttachmentData;
+import com.finderfeed.fdlib.systems.broken_screen_effect.ShatteredScreenEffectHandler;
+import com.finderfeed.fdlib.systems.broken_screen_effect.ShatteredScreenSettings;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.render_types.FDRenderType;
+import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
@@ -45,6 +53,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.phys.*;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.SimplexNoise;
 
 import java.util.*;
@@ -79,52 +88,61 @@ public class DebugStick extends Item {
 //            level.addParticle(options, start.x, start.y,start.z,0,0,0);
 //
 
+
+
         }
 
         if (!level.isClientSide){
-            Vec3 start = player.getEyePosition().add(0,-0.2f,0);
-            Vec3 end = start.add(player.getLookAngle().multiply(100,100,100));
-            ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
 
-            BlockHitResult result = level.clip(clipContext);
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
 
-            if (result.getType() != HitResult.Type.MISS){
+
+
+
+
+//            Vec3 start = player.getEyePosition().add(0,-0.2f,0);
+//            Vec3 end = start.add(player.getLookAngle().multiply(100,100,100));
+//            ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
 //
-//                BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), end.subtract(start).normalize());
-//                BossUtil.geburahRayParticles((ServerLevel) level, result.getLocation(), 200, start.subtract(end).normalize());
-
-                float radius = 50;
-
-                for (var geburah : FDTargetFinder.getEntitiesInSphere(GeburahEntity.class, level, player.position(), 200)){
-                    var rayController = geburah.getRayController();
-                    rayController.shoot(20,List.of(
-                            result.getLocation()
-//                            result.getLocation().add(
-//                                    level.random.nextFloat() * radius * 2 - radius,
-//                                    0,
-//                                    level.random.nextFloat() * radius * 2 - radius
-//                            ),
-//                            result.getLocation().add(
-//                                    level.random.nextFloat() * radius * 2 - radius,
-//                                    0,
-//                                    level.random.nextFloat() * radius * 2 - radius
-//                            ),
-//                            result.getLocation().add(
-//                                    level.random.nextFloat() * radius * 2 - radius,
-//                                    0,
-//                                    level.random.nextFloat() * radius * 2 - radius
-//                            ),
-//                            result.getLocation().add(
-//                                    level.random.nextFloat() * radius * 2 - radius,
-//                                    0,
-//                                    level.random.nextFloat() * radius * 2 - radius
-//                            )
-                    ));
-//                    GeburahStompingController stompingController = geburah.getStompingController();
-//                    stompingController.stompFullCircle(20, true, 1f, 1f);
-                }
-
-            }
+//            BlockHitResult result = level.clip(clipContext);
+//
+//            if (result.getType() != HitResult.Type.MISS){
+////
+////                BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), end.subtract(start).normalize());
+////                BossUtil.geburahRayParticles((ServerLevel) level, result.getLocation(), 200, start.subtract(end).normalize());
+//
+//                float radius = 50;
+//
+//                for (var geburah : FDTargetFinder.getEntitiesInSphere(GeburahEntity.class, level, player.position(), 200)){
+//                    var rayController = geburah.getRayController();
+//                    rayController.shoot(20,List.of(
+//                            result.getLocation()
+////                            result.getLocation().add(
+////                                    level.random.nextFloat() * radius * 2 - radius,
+////                                    0,
+////                                    level.random.nextFloat() * radius * 2 - radius
+////                            ),
+////                            result.getLocation().add(
+////                                    level.random.nextFloat() * radius * 2 - radius,
+////                                    0,
+////                                    level.random.nextFloat() * radius * 2 - radius
+////                            ),
+////                            result.getLocation().add(
+////                                    level.random.nextFloat() * radius * 2 - radius,
+////                                    0,
+////                                    level.random.nextFloat() * radius * 2 - radius
+////                            ),
+////                            result.getLocation().add(
+////                                    level.random.nextFloat() * radius * 2 - radius,
+////                                    0,
+////                                    level.random.nextFloat() * radius * 2 - radius
+////                            )
+//                    ));
+////                    GeburahStompingController stompingController = geburah.getStompingController();
+////                    stompingController.stompFullCircle(20, true, 1f, 1f);
+//                }
+//
+//            }
 
 
 //            GeburahEarthquake.summon(level, player.getOnPos(), 2,30,1f,1,player.getLookAngle(),FDMathUtil.FPI / 2);

@@ -14,15 +14,27 @@ import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahWeaponRotation;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.ScreenFlashEffect;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.ScreenFlashEffectData;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
+import com.finderfeed.fdlib.ClientMixinHandler;
 import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdlib.FDLib;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.systems.broken_screen_effect.ShatteredScreenEffectHandler;
+import com.finderfeed.fdlib.systems.broken_screen_effect.ShatteredScreenSettings;
 import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
+import com.finderfeed.fdlib.systems.screen.screen_effect.ScreenEffectOverlay;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
+import com.finderfeed.fdlib.systems.shake.DefaultShake;
+import com.finderfeed.fdlib.systems.shake.FDScreenShake;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.client.particles.FDBlockParticleOptions;
@@ -35,6 +47,8 @@ import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
@@ -64,6 +78,27 @@ public class BossClientPackets {
         if (Minecraft.getInstance().screen instanceof BaseBossScreen baseBossScreen){
             Minecraft.getInstance().setScreen(null);
         }
+    }
+
+    public static void triggerSinEffect(){
+
+        SoundManager soundManager = Minecraft.getInstance().getSoundManager();
+        soundManager.play(SimpleSoundInstance.forUI(BossSounds.GEBURAH_SIN.get(),1f,1f));
+        ClientMixinHandler.addShake(new DefaultShake(FDShakeData.builder()
+                .amplitude(0.5f)
+                .outTime(10)
+                .inTime(0)
+                .stayTime(0)
+                .build()));
+        ShatteredScreenEffectHandler.setCurrentEffect(new ShatteredScreenSettings(
+                ShatteredScreenSettings.DATA_1_GLASSY,
+                1,0,40,0.1f
+        ));
+
+        ScreenEffectOverlay.addScreenEffect(new ScreenFlashEffect(
+                new ScreenFlashEffectData(new FDColor(1f,1f,1f,0.2f),0.5f),1,0,40
+        ));
+
     }
 
     public static void stopWeaponRotation(int entityId){
