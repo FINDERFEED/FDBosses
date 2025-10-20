@@ -75,6 +75,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -155,6 +156,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     private HeadControllerContainer<MalkuthEntity> headControllerContainer;
 
     private AttackChain attackChain;
+
+    @SerializableField
+    public int pullAndPunchCooldown = 0;
 
     @SerializableField
     protected Vec3 spawnPosition;
@@ -391,6 +395,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         if (level().isClientSide){
             this.headControllerContainer.clientTick();
         }else{
+
+            this.pullAndPunchCooldown = Mth.clamp(pullAndPunchCooldown - 1,0,Integer.MAX_VALUE);
 
             this.preventEnteringLavaField();
 
@@ -1700,6 +1706,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
     private boolean checkCanPunch(){
+
+        if (pullAndPunchCooldown > 0){
+            return false;
+        }
+
         AABB box = new AABB(-ENRAGE_RADIUS,5,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(this.position());
 
         List<Player> players = level().getEntitiesOfClass(Player.class, box);
@@ -1707,8 +1718,16 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         return !players.isEmpty();
     }
 
-    private boolean pullAndPunch(AttackInstance inst){
+    private List<Player> pullAndPunchTargets = new ArrayList<>();
 
+    private List<Player> getPullAndPunchTargets(){
+        AABB box = new AABB(-ENRAGE_RADIUS,4,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(this.position());
+        return new ArrayList<>(level().getEntitiesOfClass(Player.class, box, player -> {
+            return !player.isCreative() && !player.isSpectator();
+        }));
+    }
+
+    private boolean pullAndPunch(AttackInstance inst){
 
         int stage = inst.stage;
         int tick = inst.tick;
@@ -1723,6 +1742,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_PULL_AND_PUNCH)
                             .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
                     .build());
+
+            this.pullAndPunchTargets = this.getPullAndPunchTargets();
+
             inst.nextStage();
         }else if (stage == 1){
 
@@ -1739,9 +1761,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     return true;
                 }
 
-                AABB box = new AABB(-ENRAGE_RADIUS,-2,-ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS,ENRAGE_RADIUS).move(this.position());
+                if (pullAndPunchTargets.isEmpty()){
+                    this.pullAndPunchTargets = this.getPullAndPunchTargets();
+                }
 
-                for (Player target : level().getEntitiesOfClass(Player.class, box)) {
+
+                for (Player target : pullAndPunchTargets) {
                     Vec3 pullToPos = this.position().add(0, 2.5, 0).add(this.getForward().multiply(1, 0, 1).normalize().multiply(2, 2, 2));
                     MalkuthChainEntity malkuthChainEntity = MalkuthChainEntity.summon(level(), this, MalkuthAttackType.ICE, pullToPos, target, 10, 10);
                 }
@@ -1817,6 +1842,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 this.attachIceSword();
                 this.headControllerContainer.setControllersMode(HeadControllerContainer.Mode.LOOK);
             } else if (tick >= 40){
+                pullAndPunchCooldown = BossConfigs.BOSS_CONFIG.get().malkuthConfig.chainpunchCooldown;
                 return true;
             }
         }
