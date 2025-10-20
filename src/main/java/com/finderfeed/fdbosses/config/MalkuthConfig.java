@@ -46,4 +46,7 @@ public class MalkuthConfig {
     @ConfigValue
     public float malkuthFloorDamage = 20;
 
+    @ConfigValue
+    public int chainpunchCooldown = 150;
+
 }
