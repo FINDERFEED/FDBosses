@@ -70,6 +70,7 @@ public class ChesedMiniRayRenderer extends EntityRenderer<ChesedMiniRay> {
                 .size(size1)
                 .direction(dir)
                 .rotationDegrees(rotation)
+                .renderBack()
                 .render();
 
         QuadRenderer.start(consumer)
@@ -80,6 +81,7 @@ public class ChesedMiniRayRenderer extends EntityRenderer<ChesedMiniRay> {
                 .direction(dir)
                 .offsetOnDirection(-0.75f)
                 .rotationDegrees(-rotation)
+                .renderBack()
                 .render();
 
         QuadRenderer.start(consumer)
@@ -90,6 +92,7 @@ public class ChesedMiniRayRenderer extends EntityRenderer<ChesedMiniRay> {
                 .direction(dir)
                 .offsetOnDirection(0.75f)
                 .rotationDegrees(-rotation)
+                .renderBack()
                 .render();
 
 
