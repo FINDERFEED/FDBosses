@@ -38,6 +38,7 @@ public class FDBosses {
         BossDataAttachments.ATTACHMENTS.register(bus);
         BossScreenEffects.SCREEN_EFFECTS.register(bus);
         BossDataComponents.DATA_COMPONENTS.register(bus);
+        BossAttachmentTypes.ATTACHMENT_TYPES.register(bus);
         BossCriteriaTriggers.CRITERION_TRIGGERS.register(bus);
         BossRecipeSerializers.RECIPE_SERIALIZERS.register(bus);
         BossEntityDataSerializers.ENTITY_DATA_SERIALIZERS.register(bus);
