@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.geburah;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttackController;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahAttackFireDefaultProjectiles;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
@@ -33,6 +34,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     public static FDModel CLIENT_MODEL;
 
     public static EntityDataAccessor<Boolean> LASERS_ACTIVE = SynchedEntityData.defineId(GeburahEntity.class, EntityDataSerializers.BOOLEAN);
+
+    public static final String GEBURAH_CANNONS_LAYER = "cannons";
 
     public static final String GEBURAH_STOMPING_LAYER = "stomping";
 
@@ -66,8 +69,14 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
             this.getStompingController().tick();
             this.getAttackController().tick();
 
-            if (tickCount % 100 == 0){
-                this.getRotatingWeaponsHandler().startConstantRotation(1 + random.nextFloat() * 10);
+            int test = 15;
+
+            int tick = tickCount % (test + 11);
+
+            if (tick == test - 6){
+                this.attackController.setCurrentAttack(new GeburahAttackFireDefaultProjectiles(this, 30, 100), false);
+            }else if (tick == 0){
+                this.getRotatingWeaponsHandler().rotateWeaponsBy(BossUtil.randomPlusMinus() * (20 + random.nextFloat() * 80), test);
             }
 
         }

@@ -12,6 +12,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class JudgementBallProjectile extends FDEntity implements AutoSerializable {
 
@@ -20,6 +21,8 @@ public class JudgementBallProjectile extends FDEntity implements AutoSerializabl
 
     @SerializableField
     public float damage = 2;
+
+    private double distanceTraveled = 0;
 
     public FDTrailDataGenerator<JudgementBallProjectile> trail;
 
@@ -50,10 +53,28 @@ public class JudgementBallProjectile extends FDEntity implements AutoSerializabl
         if (!level().isClientSide){
             this.tickMovementPath();
             this.detectTargetsAndExplode();
+            this.setPos(this.position().add(this.getDeltaMovement()));
         }else{
+            this.setPos(this.position().add(this.getDeltaMovement()));
+            this.particles();
             this.trail.tick(this);
         }
-        this.setPos(this.position().add(this.getDeltaMovement()));
+    }
+
+    private void particles(){
+
+        if (distanceTraveled > 0.5){
+            distanceTraveled = 0;
+            Vec3 ppos = this.position().subtract(this.getDeltaMovement().scale(1));
+            level().addParticle(new JudgementBallExplosionParticleOptions(this.getDeltaMovement(),-10,0.9f),ppos.x,ppos.y + this.getBbHeight()/2, ppos.z,0,0,0);
+        }else{
+            distanceTraveled += new Vec3(
+                    this.getX() - xo,
+                    this.getY() - yo,
+                    this.getZ() - zo
+            ).length();
+        }
+
     }
 
     @Override

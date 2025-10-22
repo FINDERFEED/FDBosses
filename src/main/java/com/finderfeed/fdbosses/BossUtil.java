@@ -53,6 +53,7 @@ import java.util.function.Predicate;
 
 public class BossUtil {
 
+    public static final Random random = new Random();
 
     public static final TargetingConditions ALL = TargetingConditions.forNonCombat().selector(p->true).ignoreLineOfSight().ignoreInvisibilityTesting();
 
@@ -82,6 +83,10 @@ public class BossUtil {
         );
 
         return new Vec3(v1.x,v1.y,v1.z);
+    }
+
+    public static int randomPlusMinus(){
+        return random.nextBoolean() ? -1 : 1;
     }
 
     public static void createOnEarthBlockExplosionEffect(Level level, Vec3 position, Vec3 attackDirection){

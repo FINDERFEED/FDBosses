@@ -298,6 +298,9 @@ public class BossClientModEvents {
                             );
                             poseStack.popPose();
                         }))
+                        .shouldRender(((judgementBallProjectile, frustum, v, v1, v2) -> {
+                            return frustum.isVisible(judgementBallProjectile.getBoundingBox().inflate(10));
+                        }))
                 .build());
 
         event.registerEntityRenderer(BossEntities.GEBURAH_EARTHQUAKE.get(), GeburahEarthquakeRenderer::new);

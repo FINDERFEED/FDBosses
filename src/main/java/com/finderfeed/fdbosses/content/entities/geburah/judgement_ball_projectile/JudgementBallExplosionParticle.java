@@ -42,7 +42,7 @@ public class JudgementBallExplosionParticle extends Particle {
         this.xd = xd;
         this.yd = yd;
         this.zd = zd;
-        this.lifetime = options.lifetime;
+        this.lifetime = Math.abs(options.lifetime);
         this.options = options;
 
     }
@@ -62,13 +62,17 @@ public class JudgementBallExplosionParticle extends Particle {
         poseStack.translate(realPos.x,realPos.y,realPos.z);
         FDRenderUtil.applyMovementMatrixRotations(poseStack, options.movement);
 
+        boolean inverted = options.lifetime < 0;
+
         float time = (this.age + pticks) / lifetime;
 
-        float scale = FDEasings.easeOut(time) * options.size;
+        float scale = (inverted ? 1 - time : FDEasings.easeOut(time)) * options.size;
 
-        float rotation = this.age + pticks;
+        if (!inverted) {
+            float rotation = this.age + pticks;
 
-        poseStack.mulPose(Axis.ZP.rotationDegrees(rotation * 20));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(rotation * 20));
+        }
 
         poseStack.scale(scale,scale,scale);
 

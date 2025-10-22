@@ -49,7 +49,7 @@ public class GeburahWeaponsRotateTo extends GeburahWeaponRotation {
 
         currentRotationTime = Mth.clamp(currentRotationTime + 1,0,rotationTime);
 
-        float p = FDEasings.easeOut(currentRotationTime / (float) rotationTime);
+        float p = FDEasings.easeInOut(currentRotationTime / (float) rotationTime);
 
         float rotation = FDMathUtil.lerp(rotationSnapshot, rotationTarget, p);
 

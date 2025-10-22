@@ -74,11 +74,12 @@ public class DebugStick extends Item {
 
             Vec3 init = player.getEyePosition().add(player.getLookAngle());
 
-            JudgementBallProjectile judgementBallProjectile = JudgementBallProjectile.summon(
-                    level, new ProjectileMovementPath(70,false)
-                            .addPos(init)
-                            .addPos(init.add(player.getLookAngle().scale(20)))
-            );
+//            JudgementBallProjectile judgementBallProjectile = JudgementBallProjectile.summon(
+//                    level, new ProjectileMovementPath(70,false)
+//                            .addPos(init)
+//                            .addPos(init.add(player.getLookAngle().scale(20)))
+//            );
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
 
         }
 
