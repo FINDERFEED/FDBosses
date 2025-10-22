@@ -16,6 +16,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.Geburah
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahWeaponRotation;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.ScreenFlashEffect;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.ScreenFlashEffectData;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSins;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
@@ -80,6 +81,10 @@ public class BossClientPackets {
         }
     }
 
+    public static void syncPlayerSinsPacket(PlayerSins playerSins){
+        PlayerSins.setPlayerSins(FDClientHelpers.getClientPlayer(), playerSins);
+    }
+
     public static void triggerSinEffect(){
 
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
@@ -92,11 +97,11 @@ public class BossClientPackets {
                 .build()));
         ShatteredScreenEffectHandler.setCurrentEffect(new ShatteredScreenSettings(
                 ShatteredScreenSettings.DATA_1_GLASSY,
-                1,0,40,0.1f
+                0,0,40,0.1f
         ));
 
         ScreenEffectOverlay.addScreenEffect(new ScreenFlashEffect(
-                new ScreenFlashEffectData(new FDColor(1f,1f,1f,0.2f),0.5f),1,0,40
+                new ScreenFlashEffectData(new FDColor(1f,1f,1f,0.2f),0.25f),1,0,40
         ));
 
     }

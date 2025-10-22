@@ -33,5 +33,21 @@ public class ActivePlayerSinInstance {
         this.activeSinTime = activeSinTime;
         this.sin = sin;
     }
-    
+
+    public int getActiveSinTime() {
+        return activeSinTime;
+    }
+
+    public PlayerSin getSin() {
+        return sin;
+    }
+
+    public void setActiveSinTime(int activeSinTime) {
+        this.activeSinTime = activeSinTime;
+    }
+
+    public void setSin(PlayerSin sin) {
+        this.sin = sin;
+    }
+
 }

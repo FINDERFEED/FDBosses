@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.init;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSins;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -38,5 +39,15 @@ public class BossDataAttachments {
                 return a;
             })
             .build());
+
+    public static final Supplier<AttachmentType<PlayerSins>> PLAYER_SINS = ATTACHMENTS.register("player_sins", ()->{
+        return AttachmentType.builder(v->new PlayerSins())
+                .serialize(PlayerSins.CODEC)
+                .copyHandler(((attachment, holder, provider) -> {
+                    return new PlayerSins(attachment);
+                }))
+                .build();
+    });
+
 
 }

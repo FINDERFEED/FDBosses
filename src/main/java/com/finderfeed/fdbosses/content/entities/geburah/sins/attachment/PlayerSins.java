@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.geburah.sins.attachment;
 
+import com.finderfeed.fdbosses.init.BossDataAttachments;
 import com.finderfeed.fdbosses.init.BossRegistries;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -7,6 +8,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,17 +32,53 @@ public class PlayerSins {
 
     public PlayerSins(){}
 
-    private PlayerSins(List<ActivePlayerSinInstance> activeSins, int sinnedTimes){
+    protected PlayerSins(List<ActivePlayerSinInstance> activeSins, int sinnedTimes){
         this(activeSins);
         this.sinnedTimes = sinnedTimes;
     }
 
     public PlayerSins(PlayerSins other){
         this.activeSins = new ArrayList<>(other.activeSins);
+        this.sinnedTimes = other.sinnedTimes;
     }
 
     public PlayerSins(List<ActivePlayerSinInstance> activeSins){
         this.activeSins = new ArrayList<>(activeSins);
+    }
+
+    public static PlayerSins getPlayerSins(Player player){
+        return player.getData(BossDataAttachments.PLAYER_SINS);
+    }
+
+    public static void setPlayerSins(Player player, PlayerSins playerSins){
+        player.setData(BossDataAttachments.PLAYER_SINS, playerSins);
+    }
+
+    public static void tickPlayerSins(Player player){
+        PlayerSins playerSins = getPlayerSins(player);
+        for (var activeSin : playerSins.activeSins){
+            activeSin.setActiveSinTime(activeSin.getActiveSinTime() + 1);
+        }
+        player.setData(BossDataAttachments.PLAYER_SINS, playerSins);
+    }
+
+    public boolean hasSinActive(PlayerSin playerSin){
+        return activeSins.stream().anyMatch(inst -> inst.getSin() == playerSin);
+    }
+
+    public void setActiveSins(List<PlayerSin> sins){
+        this.activeSins.clear();
+        this.activeSins = new ArrayList<>(
+                sins.stream().map(ActivePlayerSinInstance::new).toList()
+        );
+    }
+
+    public int getSinnedTimes() {
+        return sinnedTimes;
+    }
+
+    public void setSinnedTimes(int sinnedTimes) {
+        this.sinnedTimes = sinnedTimes;
     }
 
 }
