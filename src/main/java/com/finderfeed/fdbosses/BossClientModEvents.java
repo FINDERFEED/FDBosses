@@ -33,6 +33,8 @@ import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRen
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquakeRenderer;
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallExplosionParticle;
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsBoneController;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayParticle;
@@ -71,6 +73,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.ren
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockEntityTransformation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockRenderLayerOptions;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.text_block.text_block_parser.TextBlockProcessors;
+import com.finderfeed.fdlib.systems.trails.FDTrailRenderer;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.client.NullEntityRenderer;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -101,7 +104,7 @@ import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import org.joml.Random;
 import org.joml.Vector3f;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD,value = Dist.CLIENT,modid = FDBosses.MOD_ID)
+@EventBusSubscriber(value = Dist.CLIENT,modid = FDBosses.MOD_ID)
 public class BossClientModEvents {
 
 
@@ -254,10 +257,48 @@ public class BossClientModEvents {
         event.registerSpecial(BossParticles.RECTANGLE_PREPARATION_PARTICLE.get(), new RectanglePreparationParticle.Factory());
         event.registerSpecial(BossParticles.STRIPE_PARTICLE.get(), new StripeParticle.Factory());
         event.registerSpecial(BossParticles.GEBURAH_RAY_ATTACK.get(), new GeburahRayParticle.Factory());
+        event.registerSpecial(BossParticles.JUDGEMENT_BALL_EXPLOSION.get(), new JudgementBallExplosionParticle.Factory());
     }
 
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
+
+        event.registerEntityRenderer(BossEntities.GEBURAH_JUDGEMENT_BALL.get(), FDEntityRendererBuilder.<JudgementBallProjectile>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<JudgementBallProjectile>builder()
+                                .renderType(RenderType.text(FDBosses.location("textures/entities/geburah/judgement_ball.png")))
+                                .model(BossModels.JUDGEMENT_BALL)
+                                .light(LightTexture.FULL_BRIGHT)
+                                .transformation(((judgementBallProjectile, poseStack, v) -> {
+                                    poseStack.translate(0,judgementBallProjectile.getBbHeight()/2,0);
+                                    FDRenderUtil.applyMovementMatrixRotations(poseStack, judgementBallProjectile.getDeltaMovement());
+                                }))
+                                .build())
+
+                        .addLayer(FDEntityRenderLayerOptions.<JudgementBallProjectile>builder()
+                                .renderType(((judgementBallProjectile, v) -> {
+                                    float tick = (judgementBallProjectile.tickCount + v) % 8;
+                                    return RenderType.text(FDBosses.location("textures/entities/geburah/judgement_ball_" + (int)Math.floor(tick / 2) + ".png"));
+                                }))
+                                .model(BossModels.JUDGEMENT_BALL_LAYER)
+                                .transformation(((judgementBallProjectile, poseStack, v) -> {
+                                    poseStack.translate(0,judgementBallProjectile.getBbHeight()/2,0);
+                                    FDRenderUtil.applyMovementMatrixRotations(poseStack, judgementBallProjectile.getDeltaMovement());
+                                }))
+                                .light(LightTexture.FULL_BRIGHT)
+                                .build())
+
+                        .freeRender(((judgementBallProjectile, v, v1, poseStack, multiBufferSource, i) -> {
+                            poseStack.pushPose();
+                            poseStack.translate(0,judgementBallProjectile.getBbHeight()/2,0);
+                            FDTrailRenderer.renderTrail(judgementBallProjectile, judgementBallProjectile.trail,
+                                    multiBufferSource.getBuffer(RenderType.lightning()),
+                                    poseStack,0.15f,4,10,v1,
+                                    new FDColor(0.5f,0.7f,0.9f,0f),
+                                    new FDColor(0.5f,0.7f,0.9f,0.7f)
+                            );
+                            poseStack.popPose();
+                        }))
+                .build());
 
         event.registerEntityRenderer(BossEntities.GEBURAH_EARTHQUAKE.get(), GeburahEarthquakeRenderer::new);
 

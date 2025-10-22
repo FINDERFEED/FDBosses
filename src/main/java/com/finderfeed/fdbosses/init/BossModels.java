@@ -44,6 +44,8 @@ public class BossModels {
 
     //Geburah
     public static final Supplier<FDModelInfo> GEBURAH = INFOS.register("geburah",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"),1f));
+    public static final Supplier<FDModelInfo> JUDGEMENT_BALL = INFOS.register("judgement_ball",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_ball"),1f));
+    public static final Supplier<FDModelInfo> JUDGEMENT_BALL_LAYER = INFOS.register("judgement_ball_layer",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_ball"),1.05f));
 
 
 }

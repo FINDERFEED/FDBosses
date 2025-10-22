@@ -22,6 +22,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEnt
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
@@ -55,7 +56,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.Supplier;
 
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID,bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = FDBosses.MOD_ID)
 public class BossEntities {
 
 
@@ -318,6 +319,12 @@ public class BossEntities {
             )
             .sized(0.2f,0.2f)
             .build("geburah_earthquake"));
+
+    public static final Supplier<EntityType<JudgementBallProjectile>> GEBURAH_JUDGEMENT_BALL = ENTITIES.register("geburah_judgement_ball",()->EntityType.Builder.of(
+                    JudgementBallProjectile::new, MobCategory.MISC
+            )
+            .sized(0.5f,0.5f)
+            .build("geburah_judgement_ball"));
 
 
     @SubscribeEvent

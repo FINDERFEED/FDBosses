@@ -14,6 +14,7 @@ import com.finderfeed.fdbosses.FDBosses;
 
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallExplosionParticleOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ParticleType;
@@ -157,6 +158,19 @@ public class BossParticles {
         @Override
         public StreamCodec<? super RegistryFriendlyByteBuf, GeburahRayOptions> streamCodec() {
             return GeburahRayOptions.STREAM_CODEC;
+        }
+    });
+
+
+    public static final Supplier<ParticleType<JudgementBallExplosionParticleOptions>> JUDGEMENT_BALL_EXPLOSION = PARTICLES.register("judgement_ball_explosion",()->new ParticleType<JudgementBallExplosionParticleOptions>(true) {
+        @Override
+        public MapCodec<JudgementBallExplosionParticleOptions> codec() {
+            return JudgementBallExplosionParticleOptions.MAP_CODEC;
+        }
+
+        @Override
+        public StreamCodec<? super RegistryFriendlyByteBuf, JudgementBallExplosionParticleOptions> streamCodec() {
+            return JudgementBallExplosionParticleOptions.STREAM_CODEC;
         }
     });
 
