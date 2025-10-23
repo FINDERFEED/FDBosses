@@ -73,15 +73,18 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            Vec3 init = player.getEyePosition();
-            Vec3 end = init.add(player.getLookAngle().scale(100));
+//            Vec3 init = player.getEyePosition();
+//            Vec3 end = init.add(player.getLookAngle().scale(100));
+//
+//            ClipContext clipContext = new ClipContext(init,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+//
+//            var b = level.clip(clipContext);
+//            Vec3 location = b.getLocation();
+//
+//            JusticeHammerAttack.summon(level, location, player.getLookAngle());
 
-            ClipContext clipContext = new ClipContext(init,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
 
-            var b = level.clip(clipContext);
-            Vec3 location = b.getLocation();
-
-            JusticeHammerAttack.summon(level, location, player.getLookAngle());
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
 
         }
 

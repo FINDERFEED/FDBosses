@@ -5,14 +5,20 @@ import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahW
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahAttackFireDefaultProjectiles;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.PlayerSinsHandler;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.ActivePlayerSinInstance;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSins;
 import com.finderfeed.fdbosses.content.util.CylinderPlayerPositionsCollector;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
+import com.finderfeed.fdbosses.content.util.WorldBox;
+import com.finderfeed.fdbosses.init.GeburahSins;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -23,6 +29,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 
@@ -73,7 +80,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         if (level().isClientSide) {
             this.particles();
         }else{
-
+            this.tickClockwiseSin();
             this.getRayController().tick();
             this.getStompingController().tick();
             this.getAttackController().tick();
@@ -90,11 +97,49 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
         }
 
-        if (this.getRotatingWeaponsHandler().finishedRotation()){
-//            this.getRotatingWeaponsHandler().rotateWeaponsBy(10,30);
-        }
-
         this.getRotatingWeaponsHandler().tick();
+
+    }
+
+    public void tickClockwiseSin(){
+
+        for (var player : this.playerPositionsCollector.getPlayers()){
+
+            PlayerSins playerSins = PlayerSins.getPlayerSins(player);
+
+            if (!playerSins.hasSinActive(GeburahSins.MOVE_CLOCKWISE_SIN.get())){
+                playerSins.setActiveSins(List.of(
+                        new ActivePlayerSinInstance(GeburahSins.MOVE_CLOCKWISE_SIN.get(),
+                                new WorldBox(this.level().dimension(),new AABB(-30,-1,-30,30,30,30).move(this.position())),0)
+                ));
+                System.out.println("zhopa");
+            }
+
+            if (playerSins.hasSinActive(GeburahSins.MOVE_CLOCKWISE_SIN.get()) && !playerSins.isGainingSinsOnCooldown()){
+
+                var pair = this.playerPositionsCollector.getOldAndCurrentPlayerPosition(player);
+                Vec3 oldPos = pair.first.multiply(1,0,1);
+                Vec3 newPos = pair.second.multiply(1,0,1);
+
+                Vec3 between = newPos.subtract(oldPos);
+
+                if (between.length() < 0.1) continue;
+
+
+                Vec3 betweenThisAndThat = newPos.subtract(this.position().multiply(1,0,1));
+
+
+                Vec3 rotated = betweenThisAndThat.yRot(FDMathUtil.FPI / 2);
+
+                double dot = between.normalize().dot(rotated.normalize());
+
+                if (dot < 0){
+                    PlayerSinsHandler.sin((ServerPlayer) player, 40);
+                }
+
+            }
+
+        }
 
     }
 

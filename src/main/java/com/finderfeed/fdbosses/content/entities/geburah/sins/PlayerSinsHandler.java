@@ -6,13 +6,12 @@ import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.ActivePl
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSins;
 import com.finderfeed.fdbosses.content.util.WorldBox;
 import com.finderfeed.fdbosses.init.BossDataAttachments;
-import com.finderfeed.fdbosses.init.BossGeburahSins;
+import com.finderfeed.fdbosses.init.GeburahSins;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
@@ -20,7 +19,6 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Iterator;
-import java.util.List;
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID)
 public class PlayerSinsHandler {
@@ -75,7 +73,7 @@ public class PlayerSinsHandler {
         LivingEntity entity = event.getEntity();
         if (entity instanceof ServerPlayer player){
             PlayerSins playerSins = PlayerSins.getPlayerSins(player);
-            if (playerSins.hasSinActive(BossGeburahSins.JUMPING_SIN.get())) {
+            if (playerSins.hasSinActive(GeburahSins.JUMPING_SIN.get())) {
                 sin(player, 100);
             }
         }

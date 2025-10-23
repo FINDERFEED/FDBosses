@@ -54,6 +54,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -95,8 +96,11 @@ public class BossClientPackets {
                 .inTime(0)
                 .stayTime(0)
                 .build()));
+
+        ResourceLocation data = ShatteredScreenSettings.DATA_1_GLASSY;
+
         ShatteredScreenEffectHandler.setCurrentEffect(new ShatteredScreenSettings(
-                ShatteredScreenSettings.DATA_1_GLASSY,
+                data,
                 0,0,40,0.1f
         ));
 

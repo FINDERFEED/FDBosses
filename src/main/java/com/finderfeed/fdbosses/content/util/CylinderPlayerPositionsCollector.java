@@ -6,6 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,6 +40,10 @@ public class CylinderPlayerPositionsCollector {
 
         this.removeUnusedPlayers(players);
 
+    }
+
+    public Collection<Player> getPlayers(){
+        return this.positionData.keySet();
     }
 
     public Pair<Vec3, Vec3> getOldAndCurrentPlayerPosition(Player player){
