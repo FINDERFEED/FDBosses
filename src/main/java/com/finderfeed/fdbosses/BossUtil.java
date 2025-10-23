@@ -32,6 +32,7 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.targeting.TargetingConditions;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
@@ -83,6 +84,10 @@ public class BossUtil {
         );
 
         return new Vec3(v1.x,v1.y,v1.z);
+    }
+
+    public static boolean isPlayerInSurvival(Player player){
+        return !player.isCreative() && !player.isSpectator();
     }
 
     public static int randomPlusMinus(){

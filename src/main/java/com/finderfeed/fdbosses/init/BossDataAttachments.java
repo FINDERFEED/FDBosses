@@ -43,6 +43,7 @@ public class BossDataAttachments {
     public static final Supplier<AttachmentType<PlayerSins>> PLAYER_SINS = ATTACHMENTS.register("player_sins", ()->{
         return AttachmentType.builder(v->new PlayerSins())
                 .serialize(PlayerSins.CODEC)
+                .sync(PlayerSins.STREAM_CODEC)
                 .copyHandler(((attachment, holder, provider) -> {
                     return new PlayerSins(attachment);
                 }))
