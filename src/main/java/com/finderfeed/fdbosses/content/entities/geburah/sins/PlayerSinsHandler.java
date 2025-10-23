@@ -19,6 +19,7 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.Iterator;
+import java.util.List;
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID)
 public class PlayerSinsHandler {
@@ -58,13 +59,27 @@ public class PlayerSinsHandler {
 
     }
 
+    public static void setActiveSins(ServerPlayer player, List<ActivePlayerSinInstance> instances){
+        PlayerSins playerSins = PlayerSins.getPlayerSins(player);
+        playerSins.setActiveSins(instances);
+        PlayerSins.setPlayerSins(player,playerSins);
+    }
+
     public static void sin(ServerPlayer player, int cooldown){
         PlayerSins playerSins = PlayerSins.getPlayerSins(player);
         if (!playerSins.isGainingSinsOnCooldown() && BossUtil.isPlayerInSurvival(player)) {
             PacketDistributor.sendToPlayer(player, new GeburahTriggerSinEffectPacket());
-            playerSins.setSinnedTimes(playerSins.getSinnedTimes() + 1);
-            playerSins.setSinGainCooldown(cooldown);
-            player.setData(BossDataAttachments.PLAYER_SINS, playerSins);
+
+            int sinnedTimes = playerSins.getSinnedTimes();
+
+            if (sinnedTimes + 1 >= PlayerSins.MAX_SIN_TIMES){
+                player.kill();
+            }else {
+                playerSins.setSinnedTimes(sinnedTimes + 1);
+                playerSins.setSinGainCooldown(cooldown);
+
+                PlayerSins.setPlayerSins(player, playerSins);
+            }
         }
     }
 

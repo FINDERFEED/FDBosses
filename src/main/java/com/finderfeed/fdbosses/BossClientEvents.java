@@ -1,38 +1,29 @@
 package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.HandleButtonPressSinPacket;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSins;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdbosses.content.util.GainLoseValue;
-import com.finderfeed.fdbosses.init.BossDataComponents;
-import com.finderfeed.fdbosses.init.BossEffects;
-import com.finderfeed.fdbosses.init.BossItems;
-import com.finderfeed.fdbosses.init.BossModels;
+import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
-import com.google.gson.JsonSyntaxException;
-import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.PostChain;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.client.sounds.MusicManager;
-import net.minecraft.client.sounds.SoundEngine;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ResourceProvider;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
@@ -44,19 +35,18 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.client.event.*;
 
-import net.neoforged.neoforge.client.event.RenderFrameEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix4f;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import java.io.IOException;
+import java.util.List;
 
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID,bus = EventBusSubscriber.Bus.GAME,value = Dist.CLIENT)
+@EventBusSubscriber(modid = FDBosses.MOD_ID, value = Dist.CLIENT)
 public class BossClientEvents {
 
     public static Double cachedGamma = null;
@@ -70,6 +60,84 @@ public class BossClientEvents {
     public static int chesedDarkenEffectTickMax = 10;
 
     private static GainLoseValue hellscapeSkyValue = new GainLoseValue(0,100);
+
+    private static final List<Integer> ALLOWED_TO_USE_BUTTONS = List.of(
+            GLFW.GLFW_KEY_ESCAPE
+    );
+
+    @SubscribeEvent
+    public static void handleButtonPressSin(InputEvent.Key event){
+        Level level = Minecraft.getInstance().level;
+        Player player = Minecraft.getInstance().player;
+
+        if (Minecraft.getInstance().isPaused()) return;
+
+        if (player != null && level != null && event.getAction() == GLFW.GLFW_PRESS && !ALLOWED_TO_USE_BUTTONS.contains(event.getKey()) && !player.isDeadOrDying()){
+            PacketDistributor.sendToServer(new HandleButtonPressSinPacket());
+        }
+
+    }
+
+    @SubscribeEvent
+    public static void handleButtonPressSinMouse(InputEvent.MouseButton.Post event){
+        Level level = Minecraft.getInstance().level;
+        Player player = Minecraft.getInstance().player;
+
+        if (Minecraft.getInstance().isPaused()) return;
+
+        if (player != null && level != null && event.getAction() == GLFW.GLFW_PRESS && !player.isDeadOrDying()){
+            PacketDistributor.sendToServer(new HandleButtonPressSinPacket());
+        }
+
+    }
+
+    public static boolean hasPlayerJumpedUnderSinEffect = false;
+
+
+    @SubscribeEvent
+    public static void postClientTick(ClientTickEvent.Post event){
+        var player = Minecraft.getInstance().player;
+
+        if (player == null || !BossUtil.isPlayerInSurvival(player)) {
+            hasPlayerJumpedUnderSinEffect = false;
+            return;
+        }
+
+        PlayerSins playerSins = PlayerSins.getPlayerSins(player);
+
+        if (playerSins.hasSinActive(GeburahSins.PRESSED_TOO_MANY_BUTTONS_SIN.get())) {
+
+            var key = Minecraft.getInstance().options.keyJump;
+
+            if (key.isDown()) {
+                if (player.input.jumping) {
+                    hasPlayerJumpedUnderSinEffect = true;
+                    player.setJumping(false);
+                }
+            }else{
+                hasPlayerJumpedUnderSinEffect = false;
+            }
+
+        }else{
+            hasPlayerJumpedUnderSinEffect = false;
+        }
+
+
+    }
+
+    @SubscribeEvent
+    public static void renderGuiEventTest(RenderGuiEvent.Post event){
+        if (Minecraft.getInstance().player != null) {
+            var graphics = event.getGuiGraphics();
+
+            var playerSins = PlayerSins.getPlayerSins(Minecraft.getInstance().player);
+
+            int sinnedTimes =  playerSins.getSinnedTimes();
+
+            FDRenderUtil.renderScaledText(graphics, Component.literal("Sinned times: " + sinnedTimes + " / " + PlayerSins.MAX_SIN_TIMES),20, 20,1.5f,false,0xffffff);
+        }
+    }
+
 
 
     @SubscribeEvent

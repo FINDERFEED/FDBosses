@@ -1,12 +1,14 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
 import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttackController;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahAttackFireDefaultProjectiles;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.PlayerSinsHandler;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.ActivePlayerSinInstance;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSin;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSins;
 import com.finderfeed.fdbosses.content.util.CylinderPlayerPositionsCollector;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
@@ -31,6 +33,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -106,14 +111,6 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         for (var player : this.playerPositionsCollector.getPlayers()){
 
             PlayerSins playerSins = PlayerSins.getPlayerSins(player);
-
-            if (!playerSins.hasSinActive(GeburahSins.MOVE_CLOCKWISE_SIN.get())){
-                playerSins.setActiveSins(List.of(
-                        new ActivePlayerSinInstance(GeburahSins.MOVE_CLOCKWISE_SIN.get(),
-                                new WorldBox(this.level().dimension(),new AABB(-30,-1,-30,30,30,30).move(this.position())),0)
-                ));
-                System.out.println("zhopa");
-            }
 
             if (playerSins.hasSinActive(GeburahSins.MOVE_CLOCKWISE_SIN.get()) && !playerSins.isGainingSinsOnCooldown()){
 
@@ -310,6 +307,28 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     @Override
     public boolean shouldRender(double p_20296_, double p_20297_, double p_20298_) {
         return true;
+    }
+
+    @EventBusSubscriber(modid = FDBosses.MOD_ID)
+    public static class Events {
+
+        @SubscribeEvent
+        public static void testPlayer(PlayerTickEvent.Pre event){
+            var player = event.getEntity();
+
+            if (!player.level().isClientSide){
+
+                PlayerSins playerSins = PlayerSins.getPlayerSins(player);
+                if (!playerSins.hasSinActive(GeburahSins.PRESSED_TOO_MANY_BUTTONS_SIN.get())){
+                    PlayerSinsHandler.setActiveSins((ServerPlayer) player, List.of(
+                            new ActivePlayerSinInstance(GeburahSins.PRESSED_TOO_MANY_BUTTONS_SIN.get(), new WorldBox(player.level().dimension(), AABB.INFINITE),0)
+                    ));
+                }
+
+            }
+
+        }
+
     }
 
 }

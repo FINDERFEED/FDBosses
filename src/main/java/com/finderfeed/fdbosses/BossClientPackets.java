@@ -89,7 +89,7 @@ public class BossClientPackets {
     public static void triggerSinEffect(){
 
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
-        soundManager.play(SimpleSoundInstance.forUI(BossSounds.GEBURAH_SIN.get(),1f,1f));
+        soundManager.play(SimpleSoundInstance.forUI(BossSounds.GEBURAH_SIN.get(),0.95f + random.nextFloat() * 0.1f,1f));
         ClientMixinHandler.addShake(new DefaultShake(FDShakeData.builder()
                 .amplitude(0.5f)
                 .outTime(10)

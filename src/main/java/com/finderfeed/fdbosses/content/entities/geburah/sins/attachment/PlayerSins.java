@@ -17,6 +17,8 @@ import java.util.List;
 
 public class PlayerSins {
 
+    public static final int MAX_SIN_TIMES = 5;
+
     public static final Codec<PlayerSins> CODEC = RecordCodecBuilder.create(p->p.group(
             Codec.list(ActivePlayerSinInstance.CODEC).fieldOf("active_sins").forGetter(v->v.activeSins),
             Codec.INT.fieldOf("sinned_times").forGetter(v->v.sinnedTimes),
