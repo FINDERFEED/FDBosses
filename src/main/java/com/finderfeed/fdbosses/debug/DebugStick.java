@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahStompingController;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
+import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.GeburahTriggerSinEffectPacket;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
@@ -72,14 +73,15 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            Vec3 init = player.getEyePosition().add(player.getLookAngle());
+            Vec3 init = player.getEyePosition();
+            Vec3 end = init.add(player.getLookAngle().scale(100));
 
-//            JudgementBallProjectile judgementBallProjectile = JudgementBallProjectile.summon(
-//                    level, new ProjectileMovementPath(70,false)
-//                            .addPos(init)
-//                            .addPos(init.add(player.getLookAngle().scale(20)))
-//            );
-            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
+            ClipContext clipContext = new ClipContext(init,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+
+            var b = level.clip(clipContext);
+            Vec3 location = b.getLocation();
+
+            JusticeHammerAttack.summon(level, location, player.getLookAngle());
 
         }
 

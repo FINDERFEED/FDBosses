@@ -35,6 +35,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquakeRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallExplosionParticle;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
+import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsBoneController;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayParticle;
@@ -262,6 +263,24 @@ public class BossClientModEvents {
 
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
+
+        event.registerEntityRenderer(BossEntities.JUSTICE_HAMMER.get(), FDEntityRendererBuilder.<JusticeHammerAttack>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<JusticeHammerAttack>builder()
+                                .renderType(RenderType.lightning())
+                                .model(BossModels.JUSTICE_HAMMER)
+                                .transformation(((justiceHammerAttack, poseStack, v) -> {
+                                    poseStack.mulPose(Axis.YP.rotationDegrees(90));
+                                }))
+                                .color(((justiceHammerAttack, v) -> {
+                                    float alpha = JusticeHammerAttack.EASING.apply(justiceHammerAttack.tickCount + v);
+                                    return new FDColor(0.3f,0.7f,1f,alpha);
+                                }))
+                                .light(LightTexture.FULL_BRIGHT)
+                                .build())
+                        .shouldRender(((justiceHammerAttack, frustum, v, v1, v2) -> {
+                            return frustum.isVisible(justiceHammerAttack.getBoundingBox().inflate(30));
+                        }))
+                .build());
 
         event.registerEntityRenderer(BossEntities.GEBURAH_JUDGEMENT_BALL.get(), FDEntityRendererBuilder.<JudgementBallProjectile>builder()
                         .addLayer(FDEntityRenderLayerOptions.<JudgementBallProjectile>builder()

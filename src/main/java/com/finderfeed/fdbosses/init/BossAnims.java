@@ -235,5 +235,9 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"));
     });
 
+    public static DeferredHolder<Animation,Animation> JUSTICE_HAMMER_SMACK = ANIMATIONS.register("justice_hammer_smack", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"justice_hammer"));
+    });
+
 
 }

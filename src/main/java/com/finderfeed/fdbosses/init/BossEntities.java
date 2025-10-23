@@ -23,6 +23,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
+import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
@@ -325,6 +326,12 @@ public class BossEntities {
             )
             .sized(0.5f,0.5f)
             .build("geburah_judgement_ball"));
+
+    public static final Supplier<EntityType<JusticeHammerAttack>> JUSTICE_HAMMER = ENTITIES.register("justice_hammer",()->EntityType.Builder.of(
+                    JusticeHammerAttack::new, MobCategory.MISC
+            )
+            .sized(0.2f,0.2f)
+            .build("justice_hammer"));
 
 
     @SubscribeEvent
