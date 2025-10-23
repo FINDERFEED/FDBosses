@@ -36,6 +36,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.Gebur
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallExplosionParticle;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
+import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsBoneController;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayParticle;
@@ -277,6 +278,7 @@ public class BossClientModEvents {
                                 }))
                                 .light(LightTexture.FULL_BRIGHT)
                                 .build())
+                        .freeRender(new JusticeHammerAttackRenderer())
                         .shouldRender(((justiceHammerAttack, frustum, v, v1, v2) -> {
                             return frustum.isVisible(justiceHammerAttack.getBoundingBox().inflate(30));
                         }))

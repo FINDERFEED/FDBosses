@@ -24,14 +24,14 @@ public class BossTargetFinder {
         Vec3 p1 = start.add(sideOffset);
         Vec3 p2 = start.add(sideOffset.reverse());
 
-        Vec3 p3 = start.add(lengthOffset);
-        Vec3 p4 = start.add(lengthOffset);
+        Vec3 p3 = p1.add(lengthOffset);
+        Vec3 p4 = p2.add(lengthOffset);
 
         Vec3 p5 = start.add(sideOffset).add(0, height, 0);
         Vec3 p6 = start.add(sideOffset.reverse()).add(0, height, 0);
 
-        Vec3 p7 = start.add(lengthOffset).add(0, height, 0);
-        Vec3 p8 = start.add(lengthOffset).add(0, height, 0);
+        Vec3 p7 = p1.add(lengthOffset).add(0, height, 0);
+        Vec3 p8 = p2.add(lengthOffset).add(0, height, 0);
 
         double minX = Math.min(p1.x, Math.min(p2.x, Math.min(p3.x, Math.min(p4.x, Math.min(p5.x, Math.min(p6.x, Math.min(p7.x,p8.x)))))));
         double minY = Math.min(p1.y, Math.min(p2.y, Math.min(p3.y, Math.min(p4.y, Math.min(p5.y, Math.min(p6.y, Math.min(p7.y,p8.y)))))));

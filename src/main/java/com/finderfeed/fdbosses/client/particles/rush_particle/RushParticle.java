@@ -21,6 +21,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
+import org.lwjgl.opengl.GL11;
 
 public class RushParticle extends Particle {
 
@@ -106,9 +107,9 @@ public class RushParticle extends Particle {
         @Override
         public BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
             RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
             RenderSystem.depthMask(true);
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
+            RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
             BufferBuilder builder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             return builder;
         }
