@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahW
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahAttackFireDefaultProjectiles;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
+import com.finderfeed.fdbosses.content.util.CylinderPlayerPositionsCollector;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
@@ -20,6 +21,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
@@ -48,8 +50,11 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     @SerializableField
     private GeburahStompingController stompingController;
 
+    private CylinderPlayerPositionsCollector playerPositionsCollector;
+
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
+        this.playerPositionsCollector = new CylinderPlayerPositionsCollector(level, 30, 30);
         this.rotatingWeaponsHandler = new GeburahRotatingWeaponsHandler(this);
         this.rayController = new GeburahRayController(this);
         this.stompingController = new GeburahStompingController(this, 30);
@@ -60,11 +65,15 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
     @Override
     public void tick() {
+
+        playerPositionsCollector.tick(this.position().add(0,-0.1,0));
+
         super.tick();
 
         if (level().isClientSide) {
             this.particles();
         }else{
+
             this.getRayController().tick();
             this.getStompingController().tick();
             this.getAttackController().tick();

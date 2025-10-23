@@ -31,16 +31,7 @@ public class PlayerSinsHandler {
         Level level = player.level();
 
         if (!level.isClientSide) {
-
-            PlayerSins playerSins = PlayerSins.getPlayerSins(player);
-            if (!playerSins.hasSinActive(BossGeburahSins.JUMPING_SIN.get())) {
-                playerSins.setActiveSins(List.of(
-                        new ActivePlayerSinInstance(BossGeburahSins.JUMPING_SIN.get(), new WorldBox(level.dimension(), AABB.INFINITE), 0)
-                ));
-            }
-
             tickPlayerSins(player);
-
         }
     }
 
