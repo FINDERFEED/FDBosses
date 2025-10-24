@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.Ches
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahStompingController;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahExplosiveCrystal;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
@@ -84,7 +85,8 @@ public class DebugStick extends Item {
 //            JusticeHammerAttack.summon(level, location, player.getLookAngle());
 
 
-            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
+//            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
+            GeburahExplosiveCrystal.summon(player.position().add(10,10,10),player);
 
         }
 

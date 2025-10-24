@@ -22,6 +22,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEnt
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahExplosiveCrystal;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
@@ -332,6 +333,13 @@ public class BossEntities {
             )
             .sized(0.2f,0.2f)
             .build("justice_hammer"));
+
+    public static final Supplier<EntityType<GeburahExplosiveCrystal>> GEBURAH_EXPLOSIVE_CRYSTAL = ENTITIES.register("geburah_sin_crystal",()->EntityType.Builder.of(
+                    GeburahExplosiveCrystal::new, MobCategory.MISC
+            )
+            .updateInterval(1)
+            .sized(0.2f,0.2f)
+            .build("geburah_sin_crystal"));
 
 
     @SubscribeEvent

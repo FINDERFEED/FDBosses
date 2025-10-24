@@ -33,6 +33,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRen
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquakeRenderer;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahExplosiveCrystal;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallExplosionParticle;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
@@ -267,6 +268,39 @@ public class BossClientModEvents {
 
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
+
+
+        event.registerEntityRenderer(BossEntities.GEBURAH_EXPLOSIVE_CRYSTAL.get(), FDEntityRendererBuilder.<GeburahExplosiveCrystal>builder()
+                .addLayer(FDEntityRenderLayerOptions.<GeburahExplosiveCrystal>builder()
+                        .renderType(RenderType.lightning())
+                        .model(BossModels.JUDGEMENT_BALL)
+                        .light(LightTexture.FULL_BRIGHT)
+                        .color(((geburahExplosiveCrystal, v) -> {
+                            return new FDColor(0.3f,0.7f,1f,1f);
+                        }))
+                        .transformation(((judgementBallProjectile, poseStack, v) -> {
+                            poseStack.translate(0,judgementBallProjectile.getBbHeight()/2,0);
+                            FDRenderUtil.applyMovementMatrixRotations(poseStack, judgementBallProjectile.getDeltaMovement());
+                            poseStack.scale(0.5f,0.5f,0.5f);
+                        }))
+                        .build())
+
+                .freeRender(((judgementBallProjectile, v, v1, poseStack, multiBufferSource, i) -> {
+                    poseStack.pushPose();
+                    poseStack.translate(0,judgementBallProjectile.getBbHeight()/2,0);
+                    FDTrailRenderer.renderTrail(judgementBallProjectile, judgementBallProjectile.trail,
+                            multiBufferSource.getBuffer(RenderType.lightning()),
+                            poseStack,0.1f,4,10,v1,
+                            new FDColor(0.5f,0.7f,0.9f,0f),
+                            new FDColor(0.5f,0.7f,0.9f,0.7f)
+                    );
+                    poseStack.popPose();
+                }))
+                .shouldRender(((explosiveCrystal, frustum, v, v1, v2) -> {
+                    return frustum.isVisible(explosiveCrystal.getBoundingBox().inflate(10));
+                }))
+                .build());
+
 
         event.registerEntityRenderer(BossEntities.JUSTICE_HAMMER.get(), FDEntityRendererBuilder.<JusticeHammerAttack>builder()
                         .addLayer(FDEntityRenderLayerOptions.<JusticeHammerAttack>builder()
