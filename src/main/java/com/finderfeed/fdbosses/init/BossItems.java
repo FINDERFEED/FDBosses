@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.init;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
+import com.finderfeed.fdbosses.content.entities.geburah.ExplosiveCrystalItem;
 import com.finderfeed.fdbosses.content.items.LocatorEye;
 import com.finderfeed.fdbosses.content.items.WeaponCoreItem;
 import com.finderfeed.fdbosses.debug.DebugStick;
@@ -49,12 +50,16 @@ public class BossItems {
     public static final Supplier<Item> MALKUTH_TROPHY = ITEMS.register("malkuth_trophy",
             ()->new BlockItem(BossBlocks.MALKUTH_TROPHY.get(), new Item.Properties().stacksTo(1)));
 
-    @EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+    public static final Supplier<Item> GEBURAH_EXPLOSIVE_CRYSTAL = ITEMS.register("geburah_explosive_crystal",
+            ()->new ExplosiveCrystalItem(new Item.Properties()));
+
+    @EventBusSubscriber(modid = FDBosses.MOD_ID)
     public static class AddToCreativeTabs{
 
         @SubscribeEvent
         public static void addToCreativeTabs(BuildCreativeModeTabContentsEvent event){
             if (event.getTab().equals(BossCreativeTabs.MAIN.get())){
+                event.accept(GEBURAH_EXPLOSIVE_CRYSTAL.get());
                 event.accept(LIGHTNING_CORE.get());
                 event.accept(FIRE_AND_ICE_CORE.get());
                 event.accept(EYE_OF_CHESED.get());

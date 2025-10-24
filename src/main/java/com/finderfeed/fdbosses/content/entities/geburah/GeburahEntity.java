@@ -309,26 +309,10 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         return true;
     }
 
-    @EventBusSubscriber(modid = FDBosses.MOD_ID)
-    public static class Events {
-
-        @SubscribeEvent
-        public static void testPlayer(PlayerTickEvent.Pre event){
-            var player = event.getEntity();
-
-            if (!player.level().isClientSide){
-
-                PlayerSins playerSins = PlayerSins.getPlayerSins(player);
-                if (!playerSins.hasSinActive(GeburahSins.PRESSED_TOO_MANY_BUTTONS_SIN.get())){
-                    PlayerSinsHandler.setActiveSins((ServerPlayer) player, List.of(
-                            new ActivePlayerSinInstance(GeburahSins.PRESSED_TOO_MANY_BUTTONS_SIN.get(), new WorldBox(player.level().dimension(), AABB.INFINITE),0)
-                    ));
-                }
-
-            }
-
-        }
-
-    }
+//    @EventBusSubscriber(modid = FDBosses.MOD_ID)
+//    public static class Events {
+//
+//
+//    }
 
 }

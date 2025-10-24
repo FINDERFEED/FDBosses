@@ -87,6 +87,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
@@ -178,8 +179,10 @@ public class BossClientModEvents {
             TextBlockProcessors.register(FDBosses.location("config_float"),new BossConfigFloatValueProcessor());
 
 
-
-
+            ItemProperties.register(BossItems.GEBURAH_EXPLOSIVE_CRYSTAL.get(), FDBosses.location("exploding"), (stack, level, entity, id)->{
+                int k = (stack.getDamageValue() / 10) % 2;
+                return k;
+            });
 
 
 
