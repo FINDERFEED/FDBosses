@@ -77,7 +77,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
-        this.playerPositionsCollector = new CylinderPlayerPositionsCollector(level, ARENA_RADIUS, ARENA_HEIGHT);
+        this.playerPositionsCollector = new CylinderPlayerPositionsCollector(level, ARENA_RADIUS, ARENA_HEIGHT, BossUtil::isPlayerInSurvival);
         this.rotatingWeaponsHandler = new GeburahWeaponRotationController(this);
         this.rayController = new GeburahRayController(this);
         this.stompingController = new GeburahStompingController(this, ARENA_RADIUS);

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Predicate;
 
 public class CylinderPlayerPositionsCollector {
 
@@ -18,16 +19,18 @@ public class CylinderPlayerPositionsCollector {
     private Level level;
     private float radius;
     private float height;
+    private Predicate<Player> predicate;
 
-    public CylinderPlayerPositionsCollector(Level level, float radius, float height){
+    public CylinderPlayerPositionsCollector(Level level, float radius, float height, Predicate<Player> predicate){
         this.level = level;
         this.radius = radius;
         this.height = height;
+        this.predicate = predicate;
     }
 
     public void tick(Vec3 pos){
 
-        var players = BossTargetFinder.getEntitiesInCylinder(Player.class, level, pos, height, radius);
+        var players = BossTargetFinder.getEntitiesInCylinder(Player.class, level, pos, height, radius, predicate);
 
         for (var player : players){
             if (positionData.containsKey(player)){
