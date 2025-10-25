@@ -1,6 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations;
 
-import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
+import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahWeaponRotationController;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.network.FriendlyByteBuf;
@@ -29,7 +29,7 @@ public class GeburahWeaponsRotateTo extends GeburahWeaponRotation {
 
     private int currentRotationTime = 0;
 
-    public GeburahWeaponsRotateTo(GeburahRotatingWeaponsHandler rotationHandler, float rotationTarget, int rotationTime) {
+    public GeburahWeaponsRotateTo(GeburahWeaponRotationController rotationHandler, float rotationTarget, int rotationTime) {
         if (rotationHandler != null) {
             this.rotationSnapshot = rotationHandler.currentRotation;
         }

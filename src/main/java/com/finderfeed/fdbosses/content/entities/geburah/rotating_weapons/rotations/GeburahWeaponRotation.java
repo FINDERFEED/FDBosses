@@ -1,6 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations;
 
-import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
+import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahWeaponRotationController;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 
@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 public abstract class GeburahWeaponRotation {
 
-    protected GeburahRotatingWeaponsHandler rotatingWeaponsHandler;
+    protected GeburahWeaponRotationController rotatingWeaponsHandler;
 
     public GeburahWeaponRotation(){
 
@@ -36,7 +36,7 @@ public abstract class GeburahWeaponRotation {
 
     }
 
-    public void setRotatingWeaponsHandler(GeburahRotatingWeaponsHandler rotatingWeaponsHandler) {
+    public void setRotatingWeaponsHandler(GeburahWeaponRotationController rotatingWeaponsHandler) {
         this.rotatingWeaponsHandler = rotatingWeaponsHandler;
     }
 }

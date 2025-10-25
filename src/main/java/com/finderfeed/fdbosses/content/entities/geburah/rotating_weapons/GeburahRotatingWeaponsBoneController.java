@@ -12,7 +12,7 @@ public class GeburahRotatingWeaponsBoneController implements BoneTransformationC
     @Override
     public void transformBone(GeburahEntity geburahEntity, FDModel fdModel, FDModelPart fdModelPart, PoseStack poseStack, MultiBufferSource multiBufferSource, String s, int i, int i1, float v) {
 
-        var rotationHandler = geburahEntity.getRotatingWeaponsHandler();
+        var rotationHandler = geburahEntity.getWeaponRotationController();
 
         float currentRotation = rotationHandler.getLerpedRotation(v);
 

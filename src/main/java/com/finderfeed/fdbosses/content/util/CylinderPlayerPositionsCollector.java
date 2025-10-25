@@ -6,6 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -53,6 +54,14 @@ public class CylinderPlayerPositionsCollector {
         }else{
             return new Pair<>(data.oldPos, data.currentPos);
         }
+    }
+
+    public List<Vec3> getCurrentPlayerPositions(){
+        return new ArrayList<>(this.positionData.values().stream().map(positionData -> positionData.currentPos).toList());
+    }
+
+    public List<Vec3> getOldPlayerPositions(){
+        return new ArrayList<>(this.positionData.values().stream().map(positionData -> positionData.oldPos).toList());
     }
 
     private void removeUnusedPlayers(List<Player> currentPlayersInsideCylinder){

@@ -1,11 +1,8 @@
 package com.finderfeed.fdbosses.content.entities.geburah.sins.attachment;
 
 import com.finderfeed.fdbosses.init.BossDataAttachments;
-import com.finderfeed.fdbosses.init.BossRegistries;
-import com.finderfeed.fdlib.data_structures.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -13,6 +10,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class PlayerSins {
@@ -67,6 +65,17 @@ public class PlayerSins {
 
     public boolean hasSinActive(PlayerSin playerSin){
         return activeSins.stream().anyMatch(inst -> inst.getSin() == playerSin);
+    }
+
+    public boolean hasExactlyThisSins(Collection<PlayerSin> playerSins){
+        int count = 0;
+        for (var sin : this.getActiveSins()){
+            var s = sin.getSin();
+            if (playerSins.contains(s)){
+                count++;
+            }
+        }
+        return count == this.getActiveSins().size();
     }
 
     public void setActiveSins(List<ActivePlayerSinInstance> instances){

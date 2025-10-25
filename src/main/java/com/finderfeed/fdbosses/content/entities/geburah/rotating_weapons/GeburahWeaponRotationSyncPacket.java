@@ -14,7 +14,7 @@ public class GeburahWeaponRotationSyncPacket extends FDPacket {
     private float currentRotation;
 
     public GeburahWeaponRotationSyncPacket(GeburahEntity geburah){
-        GeburahRotatingWeaponsHandler rotatingWeaponsHandler = geburah.getRotatingWeaponsHandler();
+        GeburahWeaponRotationController rotatingWeaponsHandler = geburah.getWeaponRotationController();
         float currentRotation = rotatingWeaponsHandler.getCurrentRotation();
         this.currentRotation = currentRotation;
         this.entityId = geburah.getId();

@@ -12,7 +12,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
-import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
+import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahWeaponRotationController;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahWeaponRotation;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.ScreenFlashEffect;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.ScreenFlashEffectData;
@@ -25,8 +25,6 @@ import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.ClientMixinHandler;
 import com.finderfeed.fdlib.FDClientHelpers;
-import com.finderfeed.fdlib.FDLib;
-import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.broken_screen_effect.ShatteredScreenEffectHandler;
 import com.finderfeed.fdlib.systems.broken_screen_effect.ShatteredScreenSettings;
@@ -34,7 +32,6 @@ import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
 import com.finderfeed.fdlib.systems.screen.screen_effect.ScreenEffectOverlay;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
 import com.finderfeed.fdlib.systems.shake.DefaultShake;
-import com.finderfeed.fdlib.systems.shake.FDScreenShake;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDUtil;
@@ -112,13 +109,13 @@ public class BossClientPackets {
 
     public static void stopWeaponRotation(int entityId){
         if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
-            geburah.getRotatingWeaponsHandler().stopRotation();
+            geburah.getWeaponRotationController().stopRotation();
         }
     }
 
     public static void startGeburahWeaponRotation(int entityId, GeburahWeaponRotation geburahWeaponRotation){
         if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
-            var handler = geburah.getRotatingWeaponsHandler();
+            var handler = geburah.getWeaponRotationController();
             geburahWeaponRotation.setRotatingWeaponsHandler(handler);
             handler.rotateWeapons(geburahWeaponRotation);
         }
@@ -126,7 +123,7 @@ public class BossClientPackets {
 
     public static void handleGeburahWeaponRotationSync(int entityId, float currentRotation){
         if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
-            GeburahRotatingWeaponsHandler rotationWeapons = geburah.getRotatingWeaponsHandler();
+            GeburahWeaponRotationController rotationWeapons = geburah.getWeaponRotationController();
             float rot = rotationWeapons.getCurrentRotation();
             if (Math.abs(rot - currentRotation) > 0.1f) {
                 rotationWeapons.setRotation(currentRotation);

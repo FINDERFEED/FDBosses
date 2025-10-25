@@ -9,7 +9,7 @@ import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.PacketDistributor;
 
-public class GeburahRotatingWeaponsHandler {
+public class GeburahWeaponRotationController {
 
     private GeburahEntity geburah;
 
@@ -18,7 +18,7 @@ public class GeburahRotatingWeaponsHandler {
 
     protected GeburahWeaponRotation weaponRotation;
 
-    public GeburahRotatingWeaponsHandler(GeburahEntity geburah){
+    public GeburahWeaponRotationController(GeburahEntity geburah){
         this.geburah = geburah;
     }
 

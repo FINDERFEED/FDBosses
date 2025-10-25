@@ -1,6 +1,5 @@
 package com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations;
 
-import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;

@@ -12,23 +12,28 @@ public class GeburahAttackFireDefaultProjectiles extends GeburahWeaponAttack {
 
     private int projectileFlyTime;
     private float radius;
+    private float speed;
 
-    public GeburahAttackFireDefaultProjectiles(GeburahEntity geburah, float radius, int projectileFlyTime) {
+    public GeburahAttackFireDefaultProjectiles(GeburahEntity geburah, float radius, int projectileFlyTime, float speed) {
         super(geburah);
         this.radius = radius;
         this.projectileFlyTime = projectileFlyTime;
+        this.speed = speed;
     }
 
     @Override
     public void onAttackStart() {
         geburah.getAnimationSystem().startAnimation(GeburahEntity.GEBURAH_CANNONS_LAYER, AnimationTicker.builder(BossAnims.GEBURAH_FIRE_CANNONS)
-
+                        .setSpeed(speed)
                 .build());
     }
 
     @Override
     public void tickAttack() {
-        if (this.getCurrentTick() == 20 / 3){
+
+        int attackTick = Math.round(BossAnims.GEBURAH_FIRE_CANNONS.get().getAnimTime() / speed * 0.6f);
+
+        if (this.getCurrentTick() == attackTick){
             for (var cannon : this.geburah.getCannonsPositionAndDirection()){
 
                 Vec3 position = cannon.first.add(0,-0.25f,0);
@@ -44,7 +49,7 @@ public class GeburahAttackFireDefaultProjectiles extends GeburahWeaponAttack {
 
     @Override
     public boolean hasEnded() {
-        return this.getCurrentTick() > BossAnims.GEBURAH_FIRE_CANNONS.get().getAnimTime();
+        return this.getCurrentTick() > BossAnims.GEBURAH_FIRE_CANNONS.get().getAnimTime() / speed;
     }
 
     @Override

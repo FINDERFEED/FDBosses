@@ -4,8 +4,7 @@ import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttackController;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahAttackFireDefaultProjectiles;
-import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
-import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsHandler;
+import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahWeaponRotationController;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.PlayerSinsHandler;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.ActivePlayerSinInstance;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSin;
@@ -13,12 +12,16 @@ import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSi
 import com.finderfeed.fdbosses.content.util.CylinderPlayerPositionsCollector;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.content.util.WorldBox;
+import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.GeburahSins;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
+import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
+import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
@@ -29,14 +32,12 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -44,7 +45,14 @@ import java.util.List;
 
 public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
-    public static final float MAX_LASERS_RADIUS = 50;
+    public static final String SIMPLE_NO_SIN_RUN_AROUND = "simple_no_sin_run_around";
+    public static final String EMPTY_SINS_AND_DELAY = "empty_sins_and_delay";
+
+    public static final int ARENA_HEIGHT = 30;
+
+    public static final int ARENA_RADIUS = 30;
+
+    public static final float MAX_LASERS_RADIUS = ARENA_RADIUS;
 
     public static FDModel CLIENT_MODEL;
 
@@ -54,7 +62,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
     public static final String GEBURAH_STOMPING_LAYER = "stomping";
 
-    protected GeburahRotatingWeaponsHandler rotatingWeaponsHandler;
+    protected GeburahWeaponRotationController rotatingWeaponsHandler;
 
     private GeburahRayController rayController;
 
@@ -63,15 +71,29 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     @SerializableField
     private GeburahStompingController stompingController;
 
+    private AttackChain mainAttackChain;
+
     private CylinderPlayerPositionsCollector playerPositionsCollector;
 
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
-        this.playerPositionsCollector = new CylinderPlayerPositionsCollector(level, 30, 30);
-        this.rotatingWeaponsHandler = new GeburahRotatingWeaponsHandler(this);
+        this.playerPositionsCollector = new CylinderPlayerPositionsCollector(level, ARENA_RADIUS, ARENA_HEIGHT);
+        this.rotatingWeaponsHandler = new GeburahWeaponRotationController(this);
         this.rayController = new GeburahRayController(this);
-        this.stompingController = new GeburahStompingController(this, 30);
+        this.stompingController = new GeburahStompingController(this, ARENA_RADIUS);
         this.attackController = new GeburahWeaponAttackController(this);
+
+        AttackOptions<?> simpleRunAroundNoSins = AttackOptions.chainOptionsBuilder()
+                .addAttack(SIMPLE_NO_SIN_RUN_AROUND)
+                .addAttack(EMPTY_SINS_AND_DELAY)
+                .build();
+
+        this.mainAttackChain = new AttackChain(level.random)
+                .registerAttack(EMPTY_SINS_AND_DELAY, this::emptySinsAndDelay)
+                .registerAttack(SIMPLE_NO_SIN_RUN_AROUND, this::simpleNoSinRunAroundAttack)
+
+                .addAttack(0, simpleRunAroundNoSins)
+        ;
     }
 
 
@@ -86,26 +108,83 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         if (level().isClientSide) {
             this.particles();
         }else{
+            this.mainAttackChain.tick();
+
             this.tickClockwiseSin();
             this.getRayController().tick();
             this.getStompingController().tick();
-            this.getAttackController().tick();
-
-            int test = 15;
-
-            int tick = tickCount % (test + 11);
-
-            if (tick == test - 6){
-                this.attackController.setCurrentAttack(new GeburahAttackFireDefaultProjectiles(this, 30, 100), false);
-            }else if (tick == 0){
-                this.getRotatingWeaponsHandler().rotateWeaponsBy(BossUtil.randomPlusMinus() * (20 + random.nextFloat() * 80), test);
-            }
-
+            this.getWeaponAttackController().tick();
         }
 
-        this.getRotatingWeaponsHandler().tick();
+        this.getWeaponRotationController().tick();
 
     }
+
+
+
+    //-------------------------------------------------------------------ATTACKS--------------------------------------------------------------------------
+
+    public boolean emptySinsAndDelay(AttackInstance attackInstance){
+        return attackInstance.tick > 100;
+    }
+
+    public boolean simpleNoSinRunAroundAttack(AttackInstance attackInstance){
+
+
+        this.attackWithRay(attackInstance.tick, 20, 10, 60);
+
+        this.simpleCannonAttacks(attackInstance.tick, 5,20);
+
+        return false;
+    }
+
+    private boolean rotationBool = false;
+
+    private void simpleCannonAttacks(int currentTick, int timeBetweenShots, int frequency){
+
+        var attackController = this.getWeaponAttackController();
+        var weaponRotationController = this.getWeaponRotationController();
+
+        int startShootTime = frequency + timeBetweenShots;
+
+        int localtick = currentTick % startShootTime;
+
+        if (localtick == 0){
+
+            float rotation = (random.nextFloat() * 100 + 40) * (rotationBool ? -1 : 1);
+
+            rotationBool = !rotationBool;
+
+            weaponRotationController.rotateWeaponsBy(rotation, frequency);
+        }else if (localtick == frequency - BossAnims.GEBURAH_FIRE_CANNONS.get().getAnimTime() + 5){
+            attackController.setCurrentAttack(new GeburahAttackFireDefaultProjectiles(this, ARENA_RADIUS, 100,1f),false);
+        }
+
+    }
+
+    private void attackWithRay(int currentTick, int rayChargeDuration, int attackRedirectTick, int frequency){
+
+        if (rayChargeDuration >= frequency){
+            throw new RuntimeException("Cannot have ray charge duration higher than frequency");
+        }
+
+        var rayController = this.getRayController();
+
+        if (currentTick % frequency == 0){
+            var list = this.playerPositionsCollector.getCurrentPlayerPositions();
+            rayController.shoot(rayChargeDuration, list);
+        }
+
+        if (rayController.getCurrentShotCharge() == attackRedirectTick){
+            var list = this.playerPositionsCollector.getCurrentPlayerPositions();
+            rayController.shoot(rayChargeDuration, list.stream().map(v->v.add(0,0.5,0)).toList());
+        }
+
+    }
+
+
+    //------------------------------------------------------------------ATTACKS-END-----------------------------------------------------------------------
+
 
     public void tickClockwiseSin(){
 
@@ -150,7 +229,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         float offsetFromCenter = 6.5f;
         float verticalOffset = 1.5f;
 
-        float currentRotation = this.getRotatingWeaponsHandler().getLerpedRotation(pticks);
+        float currentRotation = this.getWeaponRotationController().getLerpedRotation(pticks);
 
         int cannonCount = 8;
         float angle = 360f / cannonCount;
@@ -190,7 +269,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         return stompingController;
     }
 
-    public GeburahWeaponAttackController getAttackController() {
+    public GeburahWeaponAttackController getWeaponAttackController() {
         return attackController;
     }
 
@@ -266,7 +345,39 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         }
     }
 
-    public GeburahRotatingWeaponsHandler getRotatingWeaponsHandler() {
+    public void trySetAllPlayersSins(List<PlayerSin> sins, int sinCooldown){
+
+        AABB sinBox = this.constructSinBox();
+
+        for (var player : this.playerPositionsCollector.getPlayers()){
+
+            PlayerSins playerSins = PlayerSins.getPlayerSins(player);
+
+            if (!playerSins.hasExactlyThisSins(sins)){
+
+                List<ActivePlayerSinInstance> instances = sins.stream().map(sin -> {
+                    return new ActivePlayerSinInstance(sin, new WorldBox(level().dimension(), sinBox),0);
+                }).toList();
+
+                playerSins.setSinGainCooldown(sinCooldown);
+
+                playerSins.setActiveSins(instances);
+
+            }
+
+        }
+
+    }
+
+    private AABB constructSinBox(){
+        return new AABB(
+                -ARENA_RADIUS,-2,-ARENA_RADIUS,
+                ARENA_RADIUS, ARENA_HEIGHT, ARENA_RADIUS
+        ).move(this.position());
+    }
+
+
+    public GeburahWeaponRotationController getWeaponRotationController() {
         return rotatingWeaponsHandler;
     }
 
@@ -274,7 +385,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     @Override
     public void startSeenByPlayer(ServerPlayer player) {
         super.startSeenByPlayer(player);
-        this.getRotatingWeaponsHandler().onStartSeeingGeburah(player);
+        this.getWeaponRotationController().onStartSeeingGeburah(player);
     }
 
     @Override
@@ -292,12 +403,17 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         this.autoSave(tag);
+
+        CompoundTag mainAttackChain = new CompoundTag();
+        this.mainAttackChain.save(mainAttackChain);
+        tag.put("mainAttackChain",mainAttackChain);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
         this.autoLoad(tag);
+        this.mainAttackChain.load(tag.getCompound("mainAttackChain"));
     }
 
     @Override

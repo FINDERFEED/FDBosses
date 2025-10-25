@@ -110,4 +110,7 @@ public class GeburahRayController {
         this.targets.addAll(targets);
     }
 
+    public int getCurrentShotCharge() {
+        return currentShotCharge;
+    }
 }
