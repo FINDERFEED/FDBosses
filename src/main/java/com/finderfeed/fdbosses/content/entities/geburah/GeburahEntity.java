@@ -13,6 +13,7 @@ import com.finderfeed.fdbosses.content.util.CylinderPlayerPositionsCollector;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.content.util.WorldBox;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.init.GeburahSins;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
@@ -54,7 +55,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
     public static final float MAX_LASERS_RADIUS = ARENA_RADIUS;
 
-    public static FDModel CLIENT_MODEL;
+    private static FDModel CLIENT_MODEL;
 
     public static EntityDataAccessor<Boolean> LASERS_ACTIVE = SynchedEntityData.defineId(GeburahEntity.class, EntityDataSerializers.BOOLEAN);
 
@@ -96,6 +97,13 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         ;
     }
 
+
+    public static FDModel getClientModel(){
+        if (CLIENT_MODEL == null){
+            CLIENT_MODEL = new FDModel(BossModels.GEBURAH.get());
+        }
+        return CLIENT_MODEL;
+    }
 
 
     @Override

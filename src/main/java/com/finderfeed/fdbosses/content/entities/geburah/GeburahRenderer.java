@@ -1,8 +1,10 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
+import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDFreeEntityRenderer;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -25,6 +27,35 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
             this.renderLasers(geburah,v,v1,poseStack,multiBufferSource,i);
         }
 
+        this.renderSins(geburah, v, v1, poseStack, multiBufferSource, i);
+
+    }
+
+    private void renderSins(GeburahEntity geburah, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light){
+
+        matrices.pushPose();
+
+        Matrix4f tv_1 = geburah.getModelPartTransformation("tv_1_1",GeburahEntity.getClientModel());
+        matrices.mulPose(tv_1);
+
+        QuadRenderer.start(src.getBuffer(RenderType.text(FDBosses.location("textures/entities/geburah/screen_sin/base_screen.png"))))
+                .pose(matrices)
+                .sizeY(0.562f)
+                .sizeX(1.185f)
+                .offsetOnDirection(0.01f)
+                .color(1f,1f,1f,0.85f)
+                .direction(new Vec3(-1,0,0))
+                .render();
+
+        QuadRenderer.start(src.getBuffer(RenderType.text(FDBosses.location("textures/entities/geburah/screen_sin/sin_crystal_of_sin.png"))))
+                .pose(matrices)
+                .size(0.56f)
+                .offsetOnDirection(0.011f)
+                .color(1f,1f,1f,1f)
+                .direction(new Vec3(-1,0,0))
+                .render();
+
+        matrices.popPose();
     }
 
     private void renderLasers(GeburahEntity geburah, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light){
