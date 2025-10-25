@@ -134,7 +134,7 @@ public class BossClientEvents {
 
             int sinnedTimes =  playerSins.getSinnedTimes();
 
-            FDRenderUtil.renderScaledText(graphics, Component.literal("Sinned times: " + sinnedTimes + " / " + PlayerSins.MAX_SIN_TIMES),20, 20,1.5f,false,0xffffff);
+//            FDRenderUtil.renderScaledText(graphics, Component.literal("Sinned times: " + sinnedTimes + " / " + PlayerSins.MAX_SIN_TIMES),20, 20,1.5f,false,0xffffff);
         }
     }
 

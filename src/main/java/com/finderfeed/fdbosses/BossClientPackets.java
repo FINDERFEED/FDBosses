@@ -101,11 +101,11 @@ public class BossClientPackets {
 
         ShatteredScreenEffectHandler.setCurrentEffect(new ShatteredScreenSettings(
                 data,
-                0,0,40,0.1f
+                0,0,40,0.1f,true
         ));
 
         ScreenEffectOverlay.addScreenEffect(new ScreenFlashEffect(
-                new ScreenFlashEffectData(new FDColor(1f,1f,1f,0.2f),0.25f),1,0,40
+                new ScreenFlashEffectData(new FDColor(1f,1f,1f,0.5f),0.5f),1,0,40
         ));
 
     }

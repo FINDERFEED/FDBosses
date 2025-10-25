@@ -22,6 +22,7 @@ import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDHelpers;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDRenderTypes;
 import com.finderfeed.fdlib.network.lib_packets.PlaySoundInEarsPacket;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_system.ModelSystem;
@@ -31,6 +32,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_sy
 import com.finderfeed.fdlib.systems.broken_screen_effect.ShatteredScreenEffectHandler;
 import com.finderfeed.fdlib.systems.broken_screen_effect.ShatteredScreenSettings;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
+import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
 import com.finderfeed.fdlib.systems.render_types.FDRenderType;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
@@ -85,8 +87,13 @@ public class DebugStick extends Item {
 //            JusticeHammerAttack.summon(level, location, player.getLookAngle());
 
 
-//            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
-            GeburahExplosiveCrystal.summon(player.position().add(10,10,10),player);
+//            FDLibCalls.sendImpactFrames((ServerLevel) level,player.position(), 120,
+//                    new ImpactFrame().setDuration(10),
+//                    new ImpactFrame(true).setDuration(10)
+//            );
+
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
+//            GeburahExplosiveCrystal.summon(player.position().add(10,10,10),player);
 
         }
 

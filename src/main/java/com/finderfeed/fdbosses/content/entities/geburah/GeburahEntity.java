@@ -35,6 +35,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import org.joml.Matrix4f;
 
@@ -314,5 +315,29 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 //
 //
 //    }
+
+    @EventBusSubscriber(modid = FDBosses.MOD_ID)
+    public static class Events {
+
+        @SubscribeEvent
+        public static void killEvent(LivingDeathEvent event){
+
+            var entity = event.getEntity();
+            var source = event.getSource();
+            Level level = entity.level();
+
+            if (source.getEntity() instanceof ServerPlayer serverPlayer){
+                PlayerSins playerSins = PlayerSins.getPlayerSins(serverPlayer);
+
+                if (playerSins.hasSinActive(GeburahSins.KILL_ENTITY_SIN.get())){
+                    PlayerSinsHandler.sin(serverPlayer, 100);
+                }
+
+
+            }
+
+        }
+
+    }
 
 }
