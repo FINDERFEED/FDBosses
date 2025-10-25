@@ -1,6 +1,9 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSin;
+import com.finderfeed.fdbosses.init.BossRegistries;
+import com.finderfeed.fdbosses.init.GeburahSins;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDFreeEntityRenderer;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
@@ -18,6 +21,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
+import java.util.List;
+
 public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
     @Override
@@ -27,15 +32,36 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
             this.renderLasers(geburah,v,v1,poseStack,multiBufferSource,i);
         }
 
-        this.renderSins(geburah, v, v1, poseStack, multiBufferSource, i);
+        this.renderSins(geburah,v,v1,poseStack,multiBufferSource,i);
 
     }
 
     private void renderSins(GeburahEntity geburah, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light){
 
+        List<PlayerSin> playerSins = geburah.getEntityData().get(GeburahEntity.ACTIVE_SINS);
+
+        if (playerSins.isEmpty()){
+            this.renderSinAtScreen(null, 1, geburah, pticks, matrices, src);
+            this.renderSinAtScreen(null, 2, geburah, pticks, matrices, src);
+            this.renderSinAtScreen(null, 3, geburah, pticks, matrices, src);
+            this.renderSinAtScreen(null, 4, geburah, pticks, matrices, src);
+        }else{
+
+            for (int i = 0; i < 4; i++){
+                int id = i % playerSins.size();
+                PlayerSin sin = playerSins.get(id);
+                int screenId = i + 1;
+                this.renderSinAtScreen(sin,screenId,geburah,pticks,matrices,src);
+            }
+
+        }
+
+    }
+
+    private void renderSinAtScreen(PlayerSin sin, int screenId, GeburahEntity geburah, float pticks, PoseStack matrices, MultiBufferSource src){
         matrices.pushPose();
 
-        Matrix4f tv_1 = geburah.getModelPartTransformation("tv_1_1",GeburahEntity.getClientModel());
+        Matrix4f tv_1 = geburah.getModelPartTransformation("tv_1_"+screenId,GeburahEntity.getClientModel());
         matrices.mulPose(tv_1);
 
         QuadRenderer.start(src.getBuffer(RenderType.text(FDBosses.location("textures/entities/geburah/screen_sin/base_screen.png"))))
@@ -47,15 +73,20 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
                 .direction(new Vec3(-1,0,0))
                 .render();
 
-        QuadRenderer.start(src.getBuffer(RenderType.text(FDBosses.location("textures/entities/geburah/screen_sin/sin_crystal_of_sin.png"))))
-                .pose(matrices)
-                .size(0.56f)
-                .offsetOnDirection(0.011f)
-                .color(1f,1f,1f,1f)
-                .direction(new Vec3(-1,0,0))
-                .render();
+        if (sin != null) {
+            var key = BossRegistries.PLAYER_SINS.getKey(sin);
+            var idStart = key.getPath();
+            QuadRenderer.start(src.getBuffer(RenderType.text(FDBosses.location("textures/entities/geburah/screen_sin/sin_" + idStart + ".png"))))
+                    .pose(matrices)
+                    .size(0.56f)
+                    .offsetOnDirection(0.011f)
+                    .color(1f, 1f, 1f, 1f)
+                    .direction(new Vec3(-1, 0, 0))
+                    .render();
+        }
 
         matrices.popPose();
+
     }
 
     private void renderLasers(GeburahEntity geburah, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light){

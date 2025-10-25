@@ -13,6 +13,7 @@ import com.finderfeed.fdbosses.content.util.CylinderPlayerPositionsCollector;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.content.util.WorldBox;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.init.GeburahSins;
 import com.finderfeed.fdlib.data_structures.Pair;
@@ -31,6 +32,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -42,6 +44,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
@@ -49,32 +52,31 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     public static final String SIMPLE_NO_SIN_RUN_AROUND = "simple_no_sin_run_around";
     public static final String EMPTY_SINS_AND_DELAY = "empty_sins_and_delay";
 
+    public static final String GEBURAH_STOMPING_LAYER = "stomping";
+    public static final String GEBURAH_CANNONS_LAYER = "cannons";
+
     public static final int ARENA_HEIGHT = 30;
-
     public static final int ARENA_RADIUS = 30;
-
     public static final float MAX_LASERS_RADIUS = ARENA_RADIUS;
 
     private static FDModel CLIENT_MODEL;
 
+    public static EntityDataAccessor<List<PlayerSin>> ACTIVE_SINS = SynchedEntityData.defineId(GeburahEntity.class, BossEntityDataSerializers.SINS.get());
     public static EntityDataAccessor<Boolean> LASERS_ACTIVE = SynchedEntityData.defineId(GeburahEntity.class, EntityDataSerializers.BOOLEAN);
-
-    public static final String GEBURAH_CANNONS_LAYER = "cannons";
-
-    public static final String GEBURAH_STOMPING_LAYER = "stomping";
-
-    protected GeburahWeaponRotationController rotatingWeaponsHandler;
-
-    private GeburahRayController rayController;
-
-    private GeburahWeaponAttackController attackController;
 
     @SerializableField
     private GeburahStompingController stompingController;
+    protected GeburahWeaponRotationController rotatingWeaponsHandler;
+    private GeburahRayController rayController;
+    private GeburahWeaponAttackController attackController;
 
     private AttackChain mainAttackChain;
 
     private CylinderPlayerPositionsCollector playerPositionsCollector;
+
+    public static final int MAX_SIN_APPEAR_TICK = 20;
+    public int sinsAppearTick = 0;
+    public int sinsAppearTickO = 0;
 
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
@@ -115,6 +117,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
         if (level().isClientSide) {
             this.particles();
+            this.tickSinsAppearTick();
         }else{
             this.mainAttackChain.tick();
 
@@ -122,6 +125,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
             this.getRayController().tick();
             this.getStompingController().tick();
             this.getWeaponAttackController().tick();
+
+            this.propagateSins(100, GeburahSins.JUMPING_SIN.get(), GeburahSins.CRYSTAL_OF_SIN.get());
+
         }
 
         this.getWeaponRotationController().tick();
@@ -131,7 +137,6 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
 
     //-------------------------------------------------------------------ATTACKS--------------------------------------------------------------------------
-
     public boolean emptySinsAndDelay(AttackInstance attackInstance){
         return attackInstance.tick > 100;
     }
@@ -191,8 +196,19 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     }
 
 
+
+
     //------------------------------------------------------------------ATTACKS-END-----------------------------------------------------------------------
 
+    private void tickSinsAppearTick(){
+        var list = this.getEntityData().get(ACTIVE_SINS);
+        sinsAppearTickO = sinsAppearTick;
+        if (list.isEmpty()){
+            sinsAppearTick = Mth.clamp(sinsAppearTick - 1,0, MAX_SIN_APPEAR_TICK);
+        }else{
+            sinsAppearTick = Mth.clamp(sinsAppearTick + 1,0, MAX_SIN_APPEAR_TICK);
+        }
+    }
 
     public void tickClockwiseSin(){
 
@@ -279,6 +295,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
     public GeburahWeaponAttackController getWeaponAttackController() {
         return attackController;
+    }
+
+    public void propagateSins(int cooldown, PlayerSin... sins){
+        var list = new ArrayList<>(Arrays.stream(sins).toList());
+        this.getEntityData().set(ACTIVE_SINS, list);
+        this.trySetAllPlayersSins(list, cooldown);
     }
 
     private void particles(){
@@ -405,6 +427,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(LASERS_ACTIVE, false);
+        builder.define(ACTIVE_SINS, new ArrayList<>());
     }
 
     @Override
