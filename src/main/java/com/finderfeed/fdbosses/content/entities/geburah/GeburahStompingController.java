@@ -113,7 +113,7 @@ public class GeburahStompingController implements AutoSerializable {
                     new Vec3(direction.x,0,direction.y),stompRadius,angle,stompTime, fadeIn, fadeOut, 1f,0.1f,0.1f,0.25f
             );
 
-            FDLibCalls.sendParticles((ServerLevel) geburah.level(), options, geburah.position().add(0,0.01f,0), 120);
+            FDLibCalls.sendParticles((ServerLevel) geburah.level(), options, geburah.position().add(0,0.02f,0), 120);
 
         }
 

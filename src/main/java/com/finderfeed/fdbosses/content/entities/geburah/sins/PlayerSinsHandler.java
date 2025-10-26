@@ -89,7 +89,7 @@ public class PlayerSinsHandler {
         if (entity instanceof ServerPlayer player){
             PlayerSins playerSins = PlayerSins.getPlayerSins(player);
             if (playerSins.hasSinActive(GeburahSins.JUMPING_SIN.get())) {
-                sin(player, 100);
+                sin(player, 40);
             }
         }
     }

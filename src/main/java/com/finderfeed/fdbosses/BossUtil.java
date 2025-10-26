@@ -94,7 +94,7 @@ public class BossUtil {
         return random.nextBoolean() ? -1 : 1;
     }
 
-    public static void createOnEarthBlockExplosionEffect(Level level, Vec3 position, Vec3 attackDirection, BlockState fallback){
+    public static void createOnEarthBlockExplosionEffect(Level level, Vec3 position, Vec3 attackDirection, int intensity, BlockState fallback){
 
         attackDirection = attackDirection.normalize();
 
@@ -107,7 +107,7 @@ public class BossUtil {
 
         if (states.isEmpty()) return;
 
-        for (int i = 0; i < 30; i++){
+        for (int i = 0; i < intensity; i++){
 
             Vec3 direction = new Vec3(0.05f + level.random.nextFloat() * 0.6f,0,0).yRot(FDMathUtil.FPI * 2 * level.random.nextFloat());
 

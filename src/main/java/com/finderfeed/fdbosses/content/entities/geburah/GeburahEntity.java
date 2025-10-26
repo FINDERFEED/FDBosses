@@ -42,6 +42,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -122,6 +123,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
                 .registerAttack(SIMPLE_NO_SIN_RUN_AROUND, this::simpleNoSinRunAroundAttack)
                 .registerAttack(RUN_CLOCKWISE_HAMMERS_RAY_PROJECTILES, this::runClockwiseProjectilesHammersRay)
                 .registerAttack(LIMITED_BUTTONS_LASERS_AND_EARTHQUAKES, this::limitedButtonsRotatingLasers)
+                .registerAttack(NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES, this::noJumpEarthquakesProjectilesRays)
                 .addAttack(0, noJumpRaysEarthquakesProjectiles)
         ;
 
@@ -173,10 +175,66 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
         this.propagateSins(30, GeburahSins.JUMPING_SIN.get());
 
+        this.simpleCannonAttacks(inst.tick, 10, 15);
+
+        this.randomStompsAndRays(inst.tick, 60, random.nextInt(6) + 4);
 
 
         return false;
     }
+
+    public void randomStompsAndRays(int currentTick, int frequency, int count){
+
+        if (currentTick % frequency == 0) {
+
+            float rayShotRadius = 5;
+
+            var stompingController = this.getStompingController();
+
+            List<Vec3> playerPositions = this.playerPositionsCollector.getCurrentPlayerPositions();
+
+            if (playerPositions.isEmpty()) return;
+
+            Vec3 pos = playerPositions.getFirst();
+
+            List<GeburahStompingController.StompInstance> stompInstances = new ArrayList<>();
+
+            float angle = FDMathUtil.FPI / count;
+
+
+            List<Vec3> rayPositions = new ArrayList<>();
+            float startRadius = 10;
+
+            for (int i = 0; i < count; i++) {
+
+                Vec3 direction = pos.subtract(this.position()).multiply(1, 0, 1).normalize();
+
+                Vec3 stompDirection = direction.yRot(i * angle * 2);
+
+                stompInstances.add(new GeburahStompingController.StompInstance(new Vec2((float) stompDirection.x, (float) stompDirection.z), angle/2));
+
+                float randomRadius = startRadius + random.nextFloat() * (ARENA_RADIUS - startRadius - rayShotRadius);
+
+                float arcLength = FDMathUtil.FPI * 2 * randomRadius * (angle / FDMathUtil.FPI / 2);
+
+                float angleRandomCoefficient = arcLength / (rayShotRadius * 2) / 2;
+                float additionAngle = Math.max(0, angle / 2 * (angleRandomCoefficient - 1));
+
+
+                Vec3 rayDirection = direction.yRot(i * angle * 2 + angle + additionAngle * BossUtil.randomPlusMinus());
+                Vec3 rayPos = this.position().add(rayDirection.scale(randomRadius));
+
+                rayPositions.add(rayPos);
+
+            }
+
+            this.getRayController().shoot(frequency - 20, rayShotRadius, true, rayPositions);
+
+            stompingController.stomp(frequency - 30, true, 1f, 1f, stompInstances);
+        }
+
+    }
+
 
     public boolean emptySinsAndDelay(AttackInstance attackInstance){
         this.propagateSins(20);

@@ -108,7 +108,7 @@ public class GeburahRayController {
         FDLibCalls.sendParticles((ServerLevel) level, options, start, 200);
 
         if (result.getType() != HitResult.Type.MISS) {
-            BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), between, Blocks.STONE.defaultBlockState());
+            BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), between, 10, Blocks.STONE.defaultBlockState());
         }
 
         BossUtil.geburahRayParticles((ServerLevel) level, result.getLocation(), 200, between.reverse());
@@ -135,10 +135,10 @@ public class GeburahRayController {
 
         if (preparationParticles){
             for (var pos : targets){
-                for (var dir : new HorizontalCircleRandomDirections(geburah.getRandom(), 6, 0)) {
+                for (var dir : new HorizontalCircleRandomDirections(geburah.getRandom(), 4, 0)) {
                     ArcAttackPreparationParticleOptions options =
-                            new ArcAttackPreparationParticleOptions(dir,damageRadius,FDMathUtil.FPI * 2 / 6, shootTime, Math.round(shootTime * 0.25f), 10,1f,0.8f,0.2f,0.3f);
-                    FDLibCalls.sendParticles((ServerLevel) geburah.level(), options, pos.add(0,0.03f,0), 120);
+                            new ArcAttackPreparationParticleOptions(dir,damageRadius,FDMathUtil.FPI / 4, shootTime, Math.round(shootTime * 0.25f), 10,1f,0.8f,0.2f,0.3f);
+                    FDLibCalls.sendParticles((ServerLevel) geburah.level(), options, pos.add(0,0.1f,0), 120);
                 }
             }
         }
