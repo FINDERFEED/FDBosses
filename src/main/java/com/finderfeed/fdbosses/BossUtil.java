@@ -94,13 +94,16 @@ public class BossUtil {
         return random.nextBoolean() ? -1 : 1;
     }
 
-    public static void createOnEarthBlockExplosionEffect(Level level, Vec3 position, Vec3 attackDirection){
+    public static void createOnEarthBlockExplosionEffect(Level level, Vec3 position, Vec3 attackDirection, BlockState fallback){
 
         attackDirection = attackDirection.normalize();
 
         Vec3 explosionVec = new Vec3(attackDirection.x,attackDirection.y,attackDirection.z);
 
         var states = collectStates(level, position, 1);
+        if (states.isEmpty() && fallback != null){
+            states.add(fallback);
+        }
 
         if (states.isEmpty()) return;
 

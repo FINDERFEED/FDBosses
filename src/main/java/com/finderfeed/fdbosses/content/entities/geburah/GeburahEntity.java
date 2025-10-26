@@ -21,7 +21,6 @@ import com.finderfeed.fdbosses.init.GeburahSins;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
@@ -58,6 +57,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     public static final String SIMPLE_NO_SIN_RUN_AROUND = "simple_no_sin_run_around";
     public static final String RUN_CLOCKWISE_HAMMERS_RAY_PROJECTILES = "run_clockwise_hammers_ray_projectiles";
     public static final String LIMITED_BUTTONS_LASERS_AND_EARTHQUAKES = "limited_buttons_lasers_and_earthquakes";
+    public static final String NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES = "no_jump_rays_earthquakes_projectiles";
     public static final String EMPTY_SINS_AND_DELAY = "empty_sins_and_delay";
 
     public static final String GEBURAH_STOMPING_LAYER = "stomping";
@@ -95,8 +95,15 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         this.stompingController = new GeburahStompingController(this, ARENA_RADIUS);
         this.attackController = new GeburahWeaponAttackController(this);
 
+
         AttackOptions<?> simpleRunAroundNoSins = AttackOptions.chainOptionsBuilder()
                 .addAttack(SIMPLE_NO_SIN_RUN_AROUND)
+                .addAttack(EMPTY_SINS_AND_DELAY)
+                .build();
+
+
+        AttackOptions<?> noJumpRaysEarthquakesProjectiles = AttackOptions.chainOptionsBuilder()
+                .addAttack(NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES)
                 .addAttack(EMPTY_SINS_AND_DELAY)
                 .build();
 
@@ -115,8 +122,11 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
                 .registerAttack(SIMPLE_NO_SIN_RUN_AROUND, this::simpleNoSinRunAroundAttack)
                 .registerAttack(RUN_CLOCKWISE_HAMMERS_RAY_PROJECTILES, this::runClockwiseProjectilesHammersRay)
                 .registerAttack(LIMITED_BUTTONS_LASERS_AND_EARTHQUAKES, this::limitedButtonsRotatingLasers)
-                .addAttack(0, limitedButtonsLasersAndEarthquakes)
+                .addAttack(0, noJumpRaysEarthquakesProjectiles)
         ;
+
+
+
     }
 
 
@@ -159,6 +169,15 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
 
 
+    public boolean noJumpEarthquakesProjectilesRays(AttackInstance inst){
+
+        this.propagateSins(30, GeburahSins.JUMPING_SIN.get());
+
+
+
+        return false;
+    }
+
     public boolean emptySinsAndDelay(AttackInstance attackInstance){
         this.propagateSins(20);
         return attackInstance.tick > 100;
@@ -166,13 +185,16 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
     public boolean limitedButtonsRotatingLasers(AttackInstance attackInstance){
 
-        int attackDuration = Integer.MAX_VALUE;
+        this.propagateSins(60, GeburahSins.PRESSED_TOO_MANY_BUTTONS_SIN.get());
+
+        int attackDuration = 400;
+
 
         if (attackInstance.tick < attackDuration){
 
             this.constantRotatingLaser(0.5f);
 
-            if (attackInstance.tick % 100 == 0){
+            if ((attackInstance.tick + 50) % 100 == 0){
                 this.getStompingController().stompFullCircle(20,true,1f,1f);
             }
 
@@ -214,7 +236,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         int attackDuration = 400;
 
         if (attackInstance.tick <= attackDuration) {
-            this.attackWithRay(attackInstance.tick, 20, 10, 60);
+            this.attackPlayersWithRay(attackInstance.tick, 20, 10, 60);
             this.simpleCannonAttacks(attackInstance.tick, 5, 15);
             this.smackWithHammersAround(attackInstance.tick + 1, 40);
         }
@@ -226,7 +248,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
         this.propagateSins(20);
 
-        this.attackWithRay(attackInstance.tick, 20, 10, 60);
+        this.attackPlayersWithRay(attackInstance.tick, 20, 10, 60);
 
         this.simpleCannonAttacks(attackInstance.tick, 5,20);
 
@@ -257,7 +279,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
     }
 
-    private void attackWithRay(int currentTick, int rayChargeDuration, int attackRedirectTick, int frequency){
+    private void attackPlayersWithRay(int currentTick, int rayChargeDuration, int attackRedirectTick, int frequency){
 
         if (rayChargeDuration >= frequency){
             throw new RuntimeException("Cannot have ray charge duration higher than frequency");
@@ -267,12 +289,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
         if (currentTick % frequency == 0){
             var list = this.playerPositionsCollector.getCurrentPlayerPositions();
-            rayController.shoot(rayChargeDuration, list);
+            rayController.shoot(rayChargeDuration, 1, false, list);
         }
 
         if (rayController.getCurrentShotCharge() == attackRedirectTick){
             var list = this.playerPositionsCollector.getCurrentPlayerPositions();
-            rayController.shoot(rayChargeDuration, list.stream().map(v->v.add(0,0.5,0)).toList());
+            rayController.shoot(rayChargeDuration, 1, false, list.stream().map(v->v.add(0,0.5,0)).toList());
         }
 
     }
@@ -602,12 +624,6 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     public boolean shouldRender(double p_20296_, double p_20297_, double p_20298_) {
         return true;
     }
-
-//    @EventBusSubscriber(modid = FDBosses.MOD_ID)
-//    public static class Events {
-//
-//
-//    }
 
     @EventBusSubscriber(modid = FDBosses.MOD_ID)
     public static class Events {

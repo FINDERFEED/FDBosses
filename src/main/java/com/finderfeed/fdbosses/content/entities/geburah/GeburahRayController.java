@@ -1,8 +1,11 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
 import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
+import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
+import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
@@ -14,7 +17,9 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 
@@ -23,11 +28,9 @@ import java.util.List;
 
 public class GeburahRayController {
 
-    private int maxShotChargeTime = -1;
-
-    private int currentShotCharge = -1;
-
     private List<Vec3> targets = new ArrayList<>();
+    private int currentShotCharge = -1;
+    private float damageRadius = 1;
 
     private GeburahEntity geburah;
 
@@ -64,41 +67,8 @@ public class GeburahRayController {
             currentShotCharge = Mth.clamp(currentShotCharge - 1,0,Integer.MAX_VALUE);
         }else if (currentShotCharge == 0){
 
-            Vec3 start = geburah.getCorePosition();
-
             for (var target : this.targets){
-
-                for (var living : FDTargetFinder.getEntitiesInSphere(LivingEntity.class, level, target, 2)){
-                    living.hurt(level.damageSources().generic(),1);
-                }
-
-                Vec3 between = target.subtract(start).normalize();
-
-                Vec3 end = target.add(between.multiply(10,10,10));
-
-                ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
-
-                BlockHitResult result = level.clip(clipContext);
-
-                Vec3 location = result.getLocation();
-
-                var options = GeburahRayOptions.builder()
-                        .end(location)
-                        .color(1f,0.8f,0.2f)
-                        .time(0,2,7)
-                        .width(0.5f)
-                        .build();
-
-                FDLibCalls.sendParticles((ServerLevel) level, options, start, 200);
-                BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), between);
-                BossUtil.geburahRayParticles((ServerLevel) level, result.getLocation(), 200, between.reverse());
-
-                PositionedScreenShakePacket.send((ServerLevel) level, FDShakeData.builder()
-                                .amplitude(1f)
-                                .outTime(5)
-                                .frequency(20)
-                        .build(), result.getLocation(), 60);
-
+               this.fireRayAtPos(target,1, damageRadius);
             }
 
             this.currentShotCharge = -1;
@@ -107,18 +77,72 @@ public class GeburahRayController {
 
     }
 
-    public void shoot(int shootTime, List<Vec3> targets){
+    public void fireRayAtPos(Vec3 target, float damage, float damageRadius){
+        Vec3 start = geburah.getCorePosition();
 
+        Level level = geburah.level();
+
+        Vec3 between = target.subtract(start).normalize();
+
+        Vec3 end = target.add(between.multiply(10,10,10));
+
+        ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+        BlockHitResult result = level.clip(clipContext);
+        Vec3 location = result.getLocation();
+
+        List<LivingEntity> targets = new ArrayList<>();
+        targets.addAll(FDTargetFinder.getEntitiesInSphere(LivingEntity.class, level, target, damageRadius));
+        targets.addAll(FDHelpers.traceEntities(level, start, location, 0.1f,(r)->r instanceof LivingEntity).stream().map(v->(LivingEntity)v).toList());
+
+        for (var living : targets){
+            living.hurt(level.damageSources().generic(),1);
+        }
+
+        var options = GeburahRayOptions.builder()
+                .end(location)
+                .color(1f,0.8f,0.2f)
+                .time(0,2,7)
+                .width(0.5f)
+                .build();
+
+        FDLibCalls.sendParticles((ServerLevel) level, options, start, 200);
+
+        if (result.getType() != HitResult.Type.MISS) {
+            BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), between, Blocks.STONE.defaultBlockState());
+        }
+
+        BossUtil.geburahRayParticles((ServerLevel) level, result.getLocation(), 200, between.reverse());
+
+        PositionedScreenShakePacket.send((ServerLevel) level, FDShakeData.builder()
+                .amplitude(1f)
+                .outTime(5)
+                .frequency(20)
+                .build(), result.getLocation(), 60);
+    }
+
+    public void shoot(int shootTime, float damageRadius, boolean preparationParticles, List<Vec3> targets){
         if (targets.isEmpty()){
             return;
         }
 
         if (this.currentShotCharge == -1) {
-            this.maxShotChargeTime = shootTime;
             this.currentShotCharge = shootTime;
         }
+
+        this.damageRadius = damageRadius;
         this.targets.clear();
         this.targets.addAll(targets);
+
+        if (preparationParticles){
+            for (var pos : targets){
+                for (var dir : new HorizontalCircleRandomDirections(geburah.getRandom(), 6, 0)) {
+                    ArcAttackPreparationParticleOptions options =
+                            new ArcAttackPreparationParticleOptions(dir,damageRadius,FDMathUtil.FPI * 2 / 6, shootTime, Math.round(shootTime * 0.25f), 10,1f,0.8f,0.2f,0.3f);
+                    FDLibCalls.sendParticles((ServerLevel) geburah.level(), options, pos.add(0,0.03f,0), 120);
+                }
+            }
+        }
+
     }
 
     public int getCurrentShotCharge() {

@@ -39,7 +39,7 @@ public class HandleButtonPressSinPacket extends FDPacket {
 
         var sins = PlayerSins.getPlayerSins(player);
 
-        if (BossUtil.isPlayerInSurvival(player) && sins.hasSinActive(GeburahSins.PRESSED_TOO_MANY_BUTTONS_SIN.get())){
+        if (BossUtil.isPlayerInSurvival(player) && sins.hasSinActive(GeburahSins.PRESSED_TOO_MANY_BUTTONS_SIN.get()) && !sins.isGainingSinsOnCooldown()){
 
             var sin = sins.getSin(GeburahSins.PRESSED_TOO_MANY_BUTTONS_SIN.get());
 

@@ -29,7 +29,6 @@ public class GeburahLasersAttack extends GeburahWeaponAttack {
     public void tickAttack() {
         this.geburah.setLaserVisualsState(true);
 
-        var rotationController = geburah.getWeaponRotationController();
         List<Pair<Vec3, Vec3>> rotationOld = this.geburah.getCannonsPositionAndDirection(0);
         List<Pair<Vec3, Vec3>> rotationNew = this.geburah.getCannonsPositionAndDirection(1);
 
@@ -45,9 +44,13 @@ public class GeburahLasersAttack extends GeburahWeaponAttack {
 
             float angle = (float) FDMathUtil.angleBetweenVectors(oldDirection,newDirection);
 
+            if (Float.isNaN(angle) || angle == 0){
+                angle = 0.05f;
+            }
+
             var targets = BossTargetFinder.getEntitiesInArc(LivingEntity.class, geburah.level(), geburah.position().add(0,-0.1,0),
                     new Vec2((float)centeredDirection.x,(float)centeredDirection.z),
-                    angle * 2,3,GeburahEntity.ARENA_RADIUS,livingEntity -> {
+                    angle * 2,2,GeburahEntity.ARENA_RADIUS,livingEntity -> {
                         return !(livingEntity instanceof GeburahEntity);
             });
 
