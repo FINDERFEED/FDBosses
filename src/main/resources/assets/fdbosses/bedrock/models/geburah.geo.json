@@ -61,23 +61,23 @@
 				{
 					"name": "scales_plates",
 					"parent": "scales",
+					"pivot": [0, 294, 0]
+				},
+				{
+					"name": "scale_south",
+					"parent": "scales_plates",
 					"pivot": [0, 294, -0.25],
 					"cubes": [
-						{"origin": [-6, 290, -4], "size": [12, 8, 8], "uv": [-16, -6]},
-						{"origin": [-5, 287, -120], "size": [10, 14, 240], "uv": [295, 377]},
-						{"origin": [0, 279, -44], "size": [0, 8, 44], "uv": [0, 892]},
-						{"origin": [0, 279, -1], "size": [0, 8, 44], "pivot": [0, 283, 21], "rotation": [0, 180, 0], "uv": [0, 892]},
-						{"origin": [0, 301, -105], "size": [0, 10, 75], "pivot": [0, 306, -67.5], "rotation": [0, 180, 0], "uv": [0, 851]},
+						{"origin": [-5, 287, -120], "size": [10, 14, 119], "pivot": [0, 294, 0], "rotation": [0, 180, 0], "uv": [416, 498]},
+						{"origin": [0, 279, 0], "size": [0, 8, 44], "pivot": [0, 283, 22], "rotation": [0, 180, 0], "uv": [0, 892]},
 						{"origin": [0, 301, 30], "size": [0, 10, 75], "uv": [0, 851]},
-						{"origin": [0, 277, -110], "size": [0, 10, 10], "uv": [0, 935]},
-						{"origin": [0, 277, -110], "size": [0, 10, 10], "pivot": [0, 282, -105], "rotation": [0, 90, 0], "uv": [0, 935]},
 						{"origin": [0, 277, 100], "size": [0, 10, 10], "uv": [0, 935]},
 						{"origin": [0, 277, 100], "size": [0, 10, 10], "pivot": [0, 282, 105], "rotation": [0, 90, 0], "uv": [0, 935]}
 					]
 				},
 				{
 					"name": "scales_plate_south",
-					"parent": "scales_plates",
+					"parent": "scale_south",
 					"pivot": [0, 287, 105],
 					"cubes": [
 						{"origin": [-2, 159, 105], "size": [4, 128, 0], "pivot": [0, 287, 105], "rotation": [167.72007, -1.32603, 167.72008], "uv": [0, 547]},
@@ -96,8 +96,21 @@
 					]
 				},
 				{
-					"name": "scales_plate_north",
+					"name": "scale_north",
 					"parent": "scales_plates",
+					"pivot": [0, 294, -0.25],
+					"cubes": [
+						{"origin": [-6, 290, -4], "size": [12, 8, 8], "uv": [-16, -6]},
+						{"origin": [-5, 287, -120], "size": [10, 14, 119], "uv": [416, 498]},
+						{"origin": [0, 279, -44], "size": [0, 8, 44], "uv": [0, 892]},
+						{"origin": [0, 301, -105], "size": [0, 10, 75], "pivot": [0, 306, -67.5], "rotation": [0, 180, 0], "uv": [0, 851]},
+						{"origin": [0, 277, -110], "size": [0, 10, 10], "uv": [0, 935]},
+						{"origin": [0, 277, -110], "size": [0, 10, 10], "pivot": [0, 282, -105], "rotation": [0, 90, 0], "uv": [0, 935]}
+					]
+				},
+				{
+					"name": "scales_plate_north",
+					"parent": "scale_north",
 					"pivot": [0, 287, -105],
 					"cubes": [
 						{"origin": [-2, 159, -105], "size": [4, 128, 0], "pivot": [0, 287, -105], "rotation": [-167.72007, 1.32603, 167.72008], "uv": [0, 547]},

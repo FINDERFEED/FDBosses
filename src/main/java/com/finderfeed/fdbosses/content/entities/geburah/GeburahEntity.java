@@ -19,6 +19,7 @@ import com.finderfeed.fdbosses.init.GeburahSins;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
@@ -54,6 +55,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
     public static final String GEBURAH_STOMPING_LAYER = "stomping";
     public static final String GEBURAH_CANNONS_LAYER = "cannons";
+    public static final String GEBURAH_TILT_LAYER = "tilt";
 
     public static final int ARENA_HEIGHT = 30;
     public static final int ARENA_RADIUS = 30;
@@ -127,6 +129,16 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
             this.getWeaponAttackController().tick();
 
             this.propagateSins(100, GeburahSins.JUMPING_SIN.get(), GeburahSins.CRYSTAL_OF_SIN.get());
+
+            int tick = tickCount % 400;
+
+            if (tick < 200){
+                this.getAnimationSystem().startAnimation(GEBURAH_TILT_LAYER, AnimationTicker.builder(BossAnims.GEBURAH_TILT_LEFT)
+                        .build());
+            }else{
+                this.getAnimationSystem().startAnimation(GEBURAH_TILT_LAYER, AnimationTicker.builder(BossAnims.GEBURAH_TILT_RIGHT)
+                        .build());
+            }
 
         }
 

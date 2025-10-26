@@ -63,6 +63,7 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
         Matrix4f tv_1 = geburah.getModelPartTransformation("tv_1_"+screenId,GeburahEntity.getClientModel());
         matrices.mulPose(tv_1);
+        
 
         QuadRenderer.start(src.getBuffer(RenderType.text(FDBosses.location("textures/entities/geburah/screen_sin/base_screen.png"))))
                 .pose(matrices)

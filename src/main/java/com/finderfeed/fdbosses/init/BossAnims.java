@@ -239,5 +239,13 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"justice_hammer"));
     });
 
+    public static DeferredHolder<Animation,Animation> GEBURAH_TILT_LEFT = ANIMATIONS.register("geburah_tilt_left", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"));
+    });
+
+    public static DeferredHolder<Animation,Animation> GEBURAH_TILT_RIGHT = ANIMATIONS.register("geburah_tilt_right", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"));
+    });
+
 
 }
