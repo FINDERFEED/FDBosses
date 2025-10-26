@@ -29,10 +29,10 @@ public class JusticeHammerAttackRenderer implements FDFreeEntityRenderer<Justice
         float ySize = 0.7f * p;
 
         poseStack.pushPose();
-        poseStack.translate(0,ySize + 0.01,0);
+        poseStack.translate(0,ySize + 0.02,0);
 
 
-        float alpha = p;
+        float alpha = p * 0.75f;
 
         QuadRenderer.start(vertex)
                 .pose(poseStack)
@@ -93,7 +93,7 @@ public class JusticeHammerAttackRenderer implements FDFreeEntityRenderer<Justice
         QuadRenderer.start(vertex)
                 .pose(poseStack)
                 .rotationDegrees(-justiceHammerAttack.getYRot())
-                .offsetOnDirection(0.01f)
+                .offsetOnDirection(0.02f)
                 .sizeX(width/2)
                 .sizeY(length/2)
                 .color(r,g,b,alpha)

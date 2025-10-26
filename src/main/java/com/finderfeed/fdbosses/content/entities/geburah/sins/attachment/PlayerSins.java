@@ -75,7 +75,7 @@ public class PlayerSins {
                 count++;
             }
         }
-        return count == this.getActiveSins().size();
+        return count == playerSins.size() && playerSins.size() == this.getActiveSins().size();
     }
 
     public void setActiveSins(List<ActivePlayerSinInstance> instances){

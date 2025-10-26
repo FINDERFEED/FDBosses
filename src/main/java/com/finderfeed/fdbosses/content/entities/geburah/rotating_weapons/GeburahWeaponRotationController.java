@@ -47,7 +47,13 @@ public class GeburahWeaponRotationController {
         ));
     }
 
-    public void startConstantRotation(float rotationSpeed){
+    public void startConstantRotation(float rotationSpeed) {
+        if (this.weaponRotation instanceof GeburahConstantWeaponRotation constantWeaponRotation) {
+            float currentRotSpeed = constantWeaponRotation.getRotationSpeed();
+            if (currentRotSpeed == rotationSpeed){
+                return;
+            }
+        }
         this.rotateWeapons(new GeburahConstantWeaponRotation(rotationSpeed));
     }
 

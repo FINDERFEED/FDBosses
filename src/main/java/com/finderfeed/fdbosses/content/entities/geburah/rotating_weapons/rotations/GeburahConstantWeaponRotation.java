@@ -40,4 +40,8 @@ public class GeburahConstantWeaponRotation extends GeburahWeaponRotation {
         return Type.CONSTANT_ROTATION;
     }
 
+    public float getRotationSpeed() {
+        return rotationSpeed;
+    }
+
 }

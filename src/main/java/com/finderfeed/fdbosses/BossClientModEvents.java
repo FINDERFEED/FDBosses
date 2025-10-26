@@ -311,7 +311,7 @@ public class BossClientModEvents {
                                 }))
                                 .color(((justiceHammerAttack, v) -> {
                                     float alpha = JusticeHammerAttack.EASING.apply(justiceHammerAttack.tickCount + v);
-                                    return new FDColor(0.3f,0.7f,1f,alpha);
+                                    return new FDColor(0.3f,0.7f,1f,alpha * 0.75f);
                                 }))
                                 .light(LightTexture.FULL_BRIGHT)
                                 .build())
@@ -366,15 +366,18 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CHAIN_TRAP.get(), GeburahChainTrapRenderer::new);
 
         event.registerEntityRenderer(BossEntities.GEBURAH.get(), FDEntityRendererBuilder.<GeburahEntity>builder()
-                        .addLayer(FDEntityRenderLayerOptions.<GeburahEntity>builder()
-                                .model(BossModels.GEBURAH)
-                                .light(LightTexture.FULL_BRIGHT)
-                                .ignoreHurtOverlay(true)
-                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/geburah/geburah.png")))
-                                .addBoneController("rotating_weapons", new GeburahRotatingWeaponsBoneController())
-                                .build())
-                        .freeRender(new GeburahRenderer())
-                        .shouldRender(((geburahEntity, frustum, v, v1, v2) -> true))
+                .addLayer(FDEntityRenderLayerOptions.<GeburahEntity>builder()
+                        .model(BossModels.GEBURAH)
+                        .light(LightTexture.FULL_BRIGHT)
+                        .ignoreHurtOverlay(true)
+                        .renderType(((geburah, v) -> {
+                            return RenderType.entityCutout(FDBosses.location("textures/entities/geburah/geburah.png"));
+                        }))
+                        .addBoneController("rotating_weapons", new GeburahRotatingWeaponsBoneController())
+                        .build())
+
+                .freeRender(new GeburahRenderer())
+                .shouldRender(((geburahEntity, frustum, v, v1, v2) -> true))
                 .build());
 
         EntityRendererProvider<MalkuthWarriorEntity> warriorRenderer = FDEntityRendererBuilder.<MalkuthWarriorEntity>builder()

@@ -7,9 +7,11 @@ import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDColor;
+import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
@@ -66,6 +68,10 @@ public class GeburahRayController {
 
             for (var target : this.targets){
 
+                for (var living : FDTargetFinder.getEntitiesInSphere(LivingEntity.class, level, target, 2)){
+                    living.hurt(level.damageSources().generic(),1);
+                }
+
                 Vec3 between = target.subtract(start).normalize();
 
                 Vec3 end = target.add(between.multiply(10,10,10));
@@ -102,6 +108,11 @@ public class GeburahRayController {
     }
 
     public void shoot(int shootTime, List<Vec3> targets){
+
+        if (targets.isEmpty()){
+            return;
+        }
+
         if (this.currentShotCharge == -1) {
             this.maxShotChargeTime = shootTime;
             this.currentShotCharge = shootTime;

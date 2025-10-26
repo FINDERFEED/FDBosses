@@ -67,7 +67,7 @@ public class PlayerSinsHandler {
 
     public static void sin(ServerPlayer player, int cooldown){
         PlayerSins playerSins = PlayerSins.getPlayerSins(player);
-        if (!playerSins.isGainingSinsOnCooldown() && BossUtil.isPlayerInSurvival(player)) {
+        if (!playerSins.isGainingSinsOnCooldown() && BossUtil.isPlayerInSurvival(player) && player.isAlive()) {
             PacketDistributor.sendToPlayer(player, new GeburahTriggerSinEffectPacket());
 
             int sinnedTimes = playerSins.getSinnedTimes();

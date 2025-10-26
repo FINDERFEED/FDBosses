@@ -43,5 +43,8 @@ public class GeburahWeaponAttackController {
         return currentAttack != null;
     }
 
+    public GeburahWeaponAttack getCurrentAttack() {
+        return currentAttack;
+    }
 
 }

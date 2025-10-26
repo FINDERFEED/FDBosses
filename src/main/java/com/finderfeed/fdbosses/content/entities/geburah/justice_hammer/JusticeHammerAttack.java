@@ -28,14 +28,16 @@ import net.minecraft.world.phys.Vec3;
 
 public class JusticeHammerAttack extends FDEntity {
 
-    public static final int ATTACK_WIDTH = 12;
-    public static final int ATTACK_LENGTH = 17;
+    public static int ATTACK_WIDTH = 7;
+    public static int ATTACK_LENGTH = 13;
 
     public static ComplexEasingFunction EASING;
     protected static ComplexEasingFunction EASING2;
 
     public static JusticeHammerAttack summon(Level level, Vec3 pos, Vec3 direction){
         JusticeHammerAttack justiceHammerAttack = new JusticeHammerAttack(BossEntities.JUSTICE_HAMMER.get(), level);
+
+        ATTACK_LENGTH = 15;
 
         justiceHammerAttack.setPos(pos);
         justiceHammerAttack.lookAt(EntityAnchorArgument.Anchor.FEET, pos.add(direction.multiply(1,0,1).normalize().scale(200)));
@@ -51,10 +53,10 @@ public class JusticeHammerAttack extends FDEntity {
             int animTime = BossAnims.JUSTICE_HAMMER_SMACK.get().getAnimTime();
 
             int fadeOut = 10;
-            int fadeIn = 20;
+            int fadeIn = 30;
 
             EASING = ComplexEasingFunction.builder()
-                    .addArea(fadeIn, FDEasings::easeOut)
+                    .addArea(fadeIn, FDEasings::easeIn)
                     .addArea(animTime - fadeIn, FDEasings::one)
                     .addArea(fadeOut, FDEasings::reversedLinear)
                     .build();
@@ -83,7 +85,7 @@ public class JusticeHammerAttack extends FDEntity {
 
 
 
-            if (this.tickCount == attackTime){
+            if (this.tickCount == attackTime - 3){
                 this.smack(ATTACK_LENGTH, ATTACK_WIDTH);
             }else if (this.tickCount == animTime + 10){
                 this.setRemoved(RemovalReason.DISCARDED);
@@ -114,6 +116,7 @@ public class JusticeHammerAttack extends FDEntity {
                             .size(0.15f)
                             .scalingOptions(0,0,5 + random.nextInt(5))
                             .friction(0.6f)
+                            .brightness(2)
                             .color(r,g,b)
                             .build();
 
@@ -156,9 +159,9 @@ public class JusticeHammerAttack extends FDEntity {
                         .outTime(7)
                         .stayTime(0)
                         .inTime(0)
-                        .amplitude(1f)
+                        .amplitude(0.5f)
                         .frequency(10f)
-                .build(),this.position(),30);
+                .build(),this.position(),60);
 
 
     }

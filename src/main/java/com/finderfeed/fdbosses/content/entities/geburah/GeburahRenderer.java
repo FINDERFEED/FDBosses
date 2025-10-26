@@ -13,6 +13,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.level.ClipContext;
@@ -65,10 +66,11 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
         matrices.mulPose(tv_1);
         
 
-        QuadRenderer.start(src.getBuffer(RenderType.text(FDBosses.location("textures/entities/geburah/screen_sin/base_screen.png"))))
+        QuadRenderer.start(src.getBuffer(RenderType.entityCutout(FDBosses.location("textures/entities/geburah/screen_sin/base_screen.png"))))
                 .pose(matrices)
                 .sizeY(0.562f)
                 .sizeX(1.185f)
+                .light(LightTexture.FULL_BRIGHT)
                 .offsetOnDirection(0.01f)
                 .color(1f,1f,1f,0.85f)
                 .direction(new Vec3(-1,0,0))
@@ -77,9 +79,10 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
         if (sin != null) {
             var key = BossRegistries.PLAYER_SINS.getKey(sin);
             var idStart = key.getPath();
-            QuadRenderer.start(src.getBuffer(RenderType.text(FDBosses.location("textures/entities/geburah/screen_sin/sin_" + idStart + ".png"))))
+            QuadRenderer.start(src.getBuffer(RenderType.entityCutout(FDBosses.location("textures/entities/geburah/screen_sin/sin_" + idStart + ".png"))))
                     .pose(matrices)
                     .size(0.56f)
+                    .light(LightTexture.FULL_BRIGHT)
                     .offsetOnDirection(0.011f)
                     .color(1f, 1f, 1f, 1f)
                     .direction(new Vec3(-1, 0, 0))
