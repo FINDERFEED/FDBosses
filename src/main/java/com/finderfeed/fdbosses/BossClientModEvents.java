@@ -38,6 +38,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectil
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttackRenderer;
+import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayStrikeDecalParticle;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsBoneController;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayParticle;
@@ -264,6 +265,7 @@ public class BossClientModEvents {
         event.registerSpecial(BossParticles.STRIPE_PARTICLE.get(), new StripeParticle.Factory());
         event.registerSpecial(BossParticles.GEBURAH_RAY_ATTACK.get(), new GeburahRayParticle.Factory());
         event.registerSpecial(BossParticles.JUDGEMENT_BALL_EXPLOSION.get(), new JudgementBallExplosionParticle.Factory());
+        event.registerSpecial(BossParticles.GEBURAH_RAY_DECAL.get(), new GeburahRayStrikeDecalParticle.Factory());
     }
 
     @SubscribeEvent

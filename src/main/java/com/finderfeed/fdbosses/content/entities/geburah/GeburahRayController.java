@@ -1,6 +1,8 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
 import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdbosses.client.particles.DecalParticleOptions;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
@@ -11,7 +13,9 @@ import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDTargetFinder;
+import com.finderfeed.fdlib.util.client.particles.options.AlphaOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -95,7 +99,7 @@ public class GeburahRayController {
         targets.addAll(FDHelpers.traceEntities(level, start, location, 0.1f,(r)->r instanceof LivingEntity).stream().map(v->(LivingEntity)v).toList());
 
         for (var living : targets){
-            living.hurt(level.damageSources().generic(),1);
+            living.hurt(level.damageSources().generic(),damage);
         }
 
         var options = GeburahRayOptions.builder()
@@ -109,6 +113,22 @@ public class GeburahRayController {
 
         if (result.getType() != HitResult.Type.MISS) {
             BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), between, 10, Blocks.STONE.defaultBlockState());
+
+            Direction direction = result.getDirection();
+
+            var decal = new DecalParticleOptions(BossParticles.GEBURAH_RAY_DECAL.get(),new Vec3(direction.getStepX(),direction.getStepY(),direction.getStepZ()),
+                    AlphaOptions.builder()
+                            .stay(20)
+                            .out(10)
+                            .build(),
+                    3);
+
+            FDLibCalls.sendParticles((ServerLevel) geburah.level(), decal, target.add(
+                    direction.getStepX() * GeburahEntity.RAY_DECAL_OFFSET,
+                    direction.getStepY() * GeburahEntity.RAY_DECAL_OFFSET,
+                    direction.getStepZ() * GeburahEntity.RAY_DECAL_OFFSET),
+                    120);
+
         }
 
         BossUtil.geburahRayParticles((ServerLevel) level, result.getLocation(), 200, between.reverse());
@@ -118,6 +138,10 @@ public class GeburahRayController {
                 .outTime(5)
                 .frequency(20)
                 .build(), result.getLocation(), 60);
+
+
+
+
     }
 
     public void shoot(int shootTime, float damageRadius, boolean preparationParticles, List<Vec3> targets){
@@ -138,7 +162,7 @@ public class GeburahRayController {
                 for (var dir : new HorizontalCircleRandomDirections(geburah.getRandom(), 4, 0)) {
                     ArcAttackPreparationParticleOptions options =
                             new ArcAttackPreparationParticleOptions(dir,damageRadius,FDMathUtil.FPI / 4, shootTime, Math.round(shootTime * 0.25f), 10,1f,0.8f,0.2f,0.3f);
-                    FDLibCalls.sendParticles((ServerLevel) geburah.level(), options, pos.add(0,0.1f,0), 120);
+                    FDLibCalls.sendParticles((ServerLevel) geburah.level(), options, pos.add(0,GeburahEntity.RAY_PREPARATION_PARTICLES_OFFSET,0), 120);
                 }
             }
         }

@@ -1,5 +1,7 @@
 package com.finderfeed.fdbosses.client;
 
+import com.finderfeed.fdbosses.client.particles.DecalParticleOptions;
+import com.finderfeed.fdbosses.client.particles.DecalParticleType;
 import com.finderfeed.fdbosses.client.particles.GravityOptionsParticleType;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
@@ -147,8 +149,6 @@ public class BossParticles {
 
 
 
-
-
     public static final Supplier<ParticleType<GeburahRayOptions>> GEBURAH_RAY_ATTACK = PARTICLES.register("geburah_ray",()->new ParticleType<GeburahRayOptions>(true) {
         @Override
         public MapCodec<GeburahRayOptions> codec() {
@@ -174,5 +174,6 @@ public class BossParticles {
         }
     });
 
+    public static final Supplier<ParticleType<DecalParticleOptions>> GEBURAH_RAY_DECAL = PARTICLES.register("geburah_ray_decal", () ->new DecalParticleType(true));
 
 }

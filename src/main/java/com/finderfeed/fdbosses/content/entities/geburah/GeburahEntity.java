@@ -55,6 +55,10 @@ import java.util.List;
 
 public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
+    public static final float RAY_PREPARATION_PARTICLES_OFFSET = 0.02f;
+    public static final float STOMP_PREPARATION_PARTICLES_OFFSET = 0.01f;
+    public static final float RAY_DECAL_OFFSET = 0.015f;
+
     public static final String SIMPLE_NO_SIN_RUN_AROUND = "simple_no_sin_run_around";
     public static final String RUN_CLOCKWISE_HAMMERS_RAY_PROJECTILES = "run_clockwise_hammers_ray_projectiles";
     public static final String LIMITED_BUTTONS_LASERS_AND_EARTHQUAKES = "limited_buttons_lasers_and_earthquakes";
@@ -177,7 +181,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
         this.simpleCannonAttacks(inst.tick, 10, 15);
 
-        this.randomStompsAndRays(inst.tick, 60, random.nextInt(6) + 4);
+        this.randomStompsAndRays(inst.tick, 70, random.nextInt(2) + 4);
 
 
         return false;
@@ -187,7 +191,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
         if (currentTick % frequency == 0) {
 
-            float rayShotRadius = 5;
+            float rayShotRadius = 4;
 
             var stompingController = this.getStompingController();
 
@@ -195,7 +199,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
             if (playerPositions.isEmpty()) return;
 
-            Vec3 pos = playerPositions.getFirst();
+            Vec3 pos = playerPositions.get(random.nextInt(playerPositions.size()));
 
             List<GeburahStompingController.StompInstance> stompInstances = new ArrayList<>();
 
@@ -205,9 +209,16 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
             List<Vec3> rayPositions = new ArrayList<>();
             float startRadius = 10;
 
+            int id = random.nextBoolean() ? 0 : count - 1;
+
+            Vec3 direction = pos.subtract(this.position()).multiply(1, 0, 1);
+
+            double distToPlayer = direction.length();
+
+            direction = direction.normalize();
+
             for (int i = 0; i < count; i++) {
 
-                Vec3 direction = pos.subtract(this.position()).multiply(1, 0, 1).normalize();
 
                 Vec3 stompDirection = direction.yRot(i * angle * 2);
 
@@ -215,10 +226,15 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
                 float randomRadius = startRadius + random.nextFloat() * (ARENA_RADIUS - startRadius - rayShotRadius);
 
+                if (i == id){
+                    randomRadius = Math.max(startRadius, (float) distToPlayer);
+                }
+
                 float arcLength = FDMathUtil.FPI * 2 * randomRadius * (angle / FDMathUtil.FPI / 2);
 
                 float angleRandomCoefficient = arcLength / (rayShotRadius * 2) / 2;
                 float additionAngle = Math.max(0, angle / 2 * (angleRandomCoefficient - 1));
+
 
 
                 Vec3 rayDirection = direction.yRot(i * angle * 2 + angle + additionAngle * BossUtil.randomPlusMinus());
@@ -332,7 +348,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
             weaponRotationController.rotateWeaponsBy(rotation, frequency);
         }else if (localtick == frequency - BossAnims.GEBURAH_FIRE_CANNONS.get().getAnimTime() + 5){
-            attackController.setCurrentAttack(new GeburahAttackFireDefaultProjectiles(this, ARENA_RADIUS, 100,1f),false);
+            attackController.setCurrentAttack(new GeburahAttackFireDefaultProjectiles(this, ARENA_RADIUS, 80,1f),false);
         }
 
     }
