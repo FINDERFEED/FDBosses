@@ -77,13 +77,16 @@ public class DebugStick extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 
-        if (level.isClientSide){
+        if (!level.isClientSide){
 
 //            for (var dir : new HorizontalCircleRandomDirections(level.random,12,1f)) {
 //                level.addParticle(new ColoredJumpingParticleOptions(new FDColor(1f, 0, 0f, 1f), 5, 0.5f, 1f, -1),
 //                        player.getX(), player.getY() + 3, player.getZ(), dir.x * 0.5, player.getRandom().nextFloat() * 1f, dir.z * 0.5);
 //
 //            }
+
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
+
         }
 
         return super.use(level, player, hand);

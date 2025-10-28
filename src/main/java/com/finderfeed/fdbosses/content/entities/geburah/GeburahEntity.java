@@ -57,6 +57,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
     public static final float RAY_PREPARATION_PARTICLES_OFFSET = 0.05f;
     public static final float STOMP_PREPARATION_PARTICLES_OFFSET = 0.01f;
+    public static final float LASERS_PREPARATION_OFFSET = 0.03f;
     public static final float RAY_DECAL_OFFSET = 0.03f;
 
     public static final String SIMPLE_NO_SIN_RUN_AROUND = "simple_no_sin_run_around";
@@ -91,6 +92,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     public static final int MAX_SIN_APPEAR_TICK = 20;
     public int sinsAppearTick = 0;
     public int sinsAppearTickO = 0;
+
+    public GeburahLaserAttackPreparator laserAttackPreparator;
 
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
@@ -131,6 +134,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
                 .addAttack(0, noJumpRaysEarthquakesProjectiles)
         ;
 
+        this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
 
 
     }
@@ -154,15 +158,13 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         if (level().isClientSide) {
             this.particles();
             this.tickSinsAppearTick();
+            this.laserAttackPreparator.tick();
         }else{
             this.mainAttackChain.tick();
-
             this.tickClockwiseSin();
             this.getRayController().tick();
             this.getStompingController().tick();
             this.getWeaponAttackController().tick();
-
-
         }
 
         this.getWeaponRotationController().tick();
@@ -183,6 +185,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
         this.randomStompsAndRays(inst.tick, 70, random.nextInt(2) + 4);
 
+        if (inst.tick % 100 == 0){
+            this.laserAttackPreparator.launchPreparation(60);
+        }
 
         return false;
     }

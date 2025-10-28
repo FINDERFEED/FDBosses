@@ -3,9 +3,10 @@ package com.finderfeed.fdbosses.content.entities.geburah;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSin;
 import com.finderfeed.fdbosses.init.BossRegistries;
-import com.finderfeed.fdbosses.init.GeburahSins;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDFreeEntityRenderer;
+import com.finderfeed.fdlib.util.math.ComplexEasingFunction;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -34,6 +35,79 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
         }
 
         this.renderSins(geburah,v,v1,poseStack,multiBufferSource,i);
+
+        this.renderRayPreparations(geburah, v, v1, poseStack, multiBufferSource, i);
+
+    }
+
+    private void renderRayPreparations(GeburahEntity geburah, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light){
+
+
+        var attackPreparator = geburah.laserAttackPreparator;
+
+        if (attackPreparator.time != -1) {
+
+            var cannons = geburah.getCannonsPositionAndDirection(pticks);
+
+            float time = attackPreparator.time - attackPreparator.currentTime + pticks;
+
+
+            float centerOffset = 4.75f;
+            float length = GeburahEntity.ARENA_RADIUS - centerOffset;
+            int fadeIn = 10;
+            float stayTime = attackPreparator.time - fadeIn - GeburahLaserAttackPreparator.FADE_OUT;
+            int fadeOut = GeburahLaserAttackPreparator.FADE_OUT;
+
+            ComplexEasingFunction lengthEasingFunction = ComplexEasingFunction.builder()
+                    .addArea(fadeIn, FDEasings::easeOut)
+                    .addArea(stayTime + fadeOut, FDEasings::one)
+                    .build();
+
+            ComplexEasingFunction upperLengthEasingFunction = ComplexEasingFunction.builder()
+                    .addArea(fadeIn + stayTime, FDEasings::linear)
+                    .addArea(fadeOut, FDEasings::one)
+                    .build();
+
+
+            ComplexEasingFunction alphaEasingFunction = ComplexEasingFunction.builder()
+                    .addArea(fadeIn, FDEasings::easeOut)
+                    .addArea(stayTime, FDEasings::one)
+                    .addArea(fadeOut, FDEasings::reversedEaseOut)
+                    .build();
+
+            VertexConsumer vertex = src.getBuffer(RenderType.lightning());
+
+            float l = length * lengthEasingFunction.apply(time);
+            float l2 = length * upperLengthEasingFunction.apply(time);
+            float alpha = alphaEasingFunction.apply(time);
+
+            float wsize = 0.5f;
+
+            for (var pair : cannons) {
+                matrices.pushPose();
+                Vec3 direction = pair.second;
+
+                matrices.translate(direction.x * centerOffset, GeburahEntity.LASERS_PREPARATION_OFFSET, direction.z * centerOffset);
+                FDRenderUtil.applyMovementMatrixRotations(matrices, direction);
+
+                Matrix4f mat = matrices.last().pose();
+
+                vertex.addVertex(mat, -wsize, l2, 0).setColor(0.3f, 0.5f, 1f, 0.25f * alpha);
+                vertex.addVertex(mat, -wsize, l, 0).setColor(0.3f, 0.5f, 1f, 0.25f * alpha);
+                vertex.addVertex(mat, wsize, l, 0).setColor(0.3f, 0.5f, 1f, 0.25f * alpha);
+                vertex.addVertex(mat, wsize, l2, 0).setColor(0.3f, 0.5f, 1f, 0.25f * alpha);
+
+
+                vertex.addVertex(mat, -wsize, 0, 0).setColor(0.3f, 1f, 1f, 0.5f * alpha);
+                vertex.addVertex(mat, -wsize, l2, 0).setColor(0.3f, 1f, 1f, 0.5f * alpha);
+                vertex.addVertex(mat, wsize, l2, 0).setColor(0.3f, 1f, 1f, 0.5f * alpha);
+                vertex.addVertex(mat, wsize, 0, 0).setColor(0.5f, 1f, 1f, 0.5f * alpha);
+
+                matrices.popPose();
+            }
+
+        }
+
 
     }
 

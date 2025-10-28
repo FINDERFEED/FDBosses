@@ -84,6 +84,12 @@ public class BossClientPackets {
         PlayerSins.setPlayerSins(FDClientHelpers.getClientPlayer(), playerSins);
     }
 
+    public static void launchGeburahLaserPrepare(int geburah, int timeUntilAttack){
+        if (FDClientHelpers.getClientLevel().getEntity(geburah) instanceof GeburahEntity geburah1){
+            geburah1.laserAttackPreparator.launchPreparation(timeUntilAttack);
+        }
+    }
+
     public static void triggerSinEffect(){
 
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
@@ -99,11 +105,11 @@ public class BossClientPackets {
 
         ShatteredScreenEffectHandler.setCurrentEffect(new ShatteredScreenSettings(
                 data,
-                0,0,40,0.1f,true
+                0,0,40,0.1f,0.05f,true
         ));
 
         ScreenEffectOverlay.addScreenEffect(new ScreenFlashEffect(
-                new ScreenFlashEffectData(new FDColor(1f,1f,1f,0.5f),0.5f),1,0,40
+                new ScreenFlashEffectData(new FDColor(1f,1f,1f,0.5f),0.3f),1,0,20
         ));
 
     }
