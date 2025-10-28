@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.debug;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticleOptions;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.ChesedMiniRay;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
@@ -19,6 +20,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_earthquake.
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_giant_sword.MalkuthGiantSwordSlash;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
+import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDHelpers;
@@ -36,6 +38,7 @@ import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
 import com.finderfeed.fdlib.systems.render_types.FDRenderType;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
+import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -74,27 +77,13 @@ public class DebugStick extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 
-        if (!level.isClientSide){
+        if (level.isClientSide){
 
-//            Vec3 init = player.getEyePosition();
-//            Vec3 end = init.add(player.getLookAngle().scale(100));
-//
-//            ClipContext clipContext = new ClipContext(init,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
-//
-//            var b = level.clip(clipContext);
-//            Vec3 location = b.getLocation();
-//
-//            JusticeHammerAttack.summon(level, location, player.getLookAngle());
+            for (var dir : new HorizontalCircleRandomDirections(level.random,12,1f)) {
+                level.addParticle(new ColoredJumpingParticleOptions(new FDColor(1f, 0, 0f, 1f), 5, 0.5f, 1f, -1),
+                        player.getX(), player.getY() + 3, player.getZ(), dir.x * 0.5, player.getRandom().nextFloat() * 1f, dir.z * 0.5);
 
-
-//            FDLibCalls.sendImpactFrames((ServerLevel) level,player.position(), 120,
-//                    new ImpactFrame().setDuration(10),
-//                    new ImpactFrame(true).setDuration(10)
-//            );
-
-            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
-//            GeburahExplosiveCrystal.summon(player.position().add(10,10,10),player);
-
+            }
         }
 
         return super.use(level, player, hand);

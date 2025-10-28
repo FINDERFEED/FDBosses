@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOption
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticle;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
+import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticleOptions;
 import com.finderfeed.fdbosses.client.particles.malkuth_slash.MalkuthHorizontalSlashOptions;
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
@@ -175,5 +176,17 @@ public class BossParticles {
     });
 
     public static final Supplier<ParticleType<DecalParticleOptions>> GEBURAH_RAY_DECAL = PARTICLES.register("geburah_ray_decal", () ->new DecalParticleType(true));
+
+    public static final Supplier<ParticleType<ColoredJumpingParticleOptions>> COLORED_JUMPING_PARTICLE = PARTICLES.register("colored_jumping_particles", () -> new ParticleType<ColoredJumpingParticleOptions>(true) {
+        @Override
+        public MapCodec<ColoredJumpingParticleOptions> codec() {
+            return ColoredJumpingParticleOptions.MAP_CODEC;
+        }
+
+        @Override
+        public StreamCodec<? super RegistryFriendlyByteBuf, ColoredJumpingParticleOptions> streamCodec() {
+            return ColoredJumpingParticleOptions.STREAM_CODEC;
+        }
+    });
 
 }

@@ -10,6 +10,7 @@ import com.finderfeed.fdbosses.client.particles.IceChunkParticle;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningParticle;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticle;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedAttackRayParticle;
+import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticle;
 import com.finderfeed.fdbosses.client.particles.malkuth_slash.MalkuthHorizontalSlashParticle;
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticle;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticle;
@@ -266,6 +267,7 @@ public class BossClientModEvents {
         event.registerSpecial(BossParticles.GEBURAH_RAY_ATTACK.get(), new GeburahRayParticle.Factory());
         event.registerSpecial(BossParticles.JUDGEMENT_BALL_EXPLOSION.get(), new JudgementBallExplosionParticle.Factory());
         event.registerSpecial(BossParticles.GEBURAH_RAY_DECAL.get(), new GeburahRayStrikeDecalParticle.Factory());
+        event.registerSpecial(BossParticles.COLORED_JUMPING_PARTICLE.get(), new ColoredJumpingParticle.Factory());
     }
 
     @SubscribeEvent
