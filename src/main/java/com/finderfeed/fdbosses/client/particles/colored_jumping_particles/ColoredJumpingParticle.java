@@ -49,6 +49,8 @@ public class ColoredJumpingParticle extends Particle {
 
     public boolean disappearWhenSpeedIsLow = false;
 
+    private int currentJumpAmount = 0;
+
     public ColoredJumpingParticle(ColoredJumpingParticleOptions options, ClientLevel level, double x, double y, double z, double xd, double yd, double zd) {
         super(level, x, y, z, xd, yd, zd);
         this.options = options;
@@ -58,10 +60,10 @@ public class ColoredJumpingParticle extends Particle {
         this.xd = xd;
         this.yd = yd;
         this.zd = zd;
-        this.rCol = options.color.r;
-        this.gCol = options.color.g;
-        this.bCol = options.color.b;
-        this.alpha = options.color.a;
+        this.rCol = options.colorStart.r;
+        this.gCol = options.colorStart.g;
+        this.bCol = options.colorStart.b;
+        this.alpha = options.colorStart.a;
 
         this.gravity = options.gravity;
 
@@ -87,7 +89,7 @@ public class ColoredJumpingParticle extends Particle {
     @Override
     public void tick() {
 
-        if (disappearWhenSpeedIsLow && new Vec3(xd,yd,zd).length() < 0.025f){
+        if (disappearWhenSpeedIsLow && this.onGround && this.currentJumpAmount >= options.maxJumpAmount && trail.getPoints().size() <= 1){
             this.remove();
             return;
         }
@@ -149,7 +151,7 @@ public class ColoredJumpingParticle extends Particle {
         Vec3 oldShift = new Vec3(xd,yd,zd);
         Vec3 newShift = Entity.collideBoundingBox(null, oldShift, this.getBoundingBox(), this.level, List.of());
 
-        if (!oldShift.equals(newShift)){
+        if (!oldShift.equals(newShift) && currentJumpAmount < options.maxJumpAmount){
 
             Vec3 thisPos = this.getPos();
 
@@ -180,7 +182,7 @@ public class ColoredJumpingParticle extends Particle {
             this.yd = shift.y * yMod;
             this.zd = shift.z * zMod;
 
-
+            currentJumpAmount++;
 
             return new Vec3(
                     shift.x  * xMod,
@@ -216,9 +218,9 @@ public class ColoredJumpingParticle extends Particle {
 
         mat.rotate(camera.rotation());
 
-        float radius = 0.01f;
+        float radius = options.size;
 
-        FDColor color = options.color;
+        FDColor color = options.colorStart;
 
         vertex.addVertex(mat, radius,radius,0).setColor(color.r,color.g,color.b,color.a);
         vertex.addVertex(mat, -radius,radius,0).setColor(color.r,color.g,color.b,color.a);
@@ -294,9 +296,9 @@ public class ColoredJumpingParticle extends Particle {
 
                 matrices.translate(pos.x,pos.y,pos.z);
 
-                FDTrailRenderer.renderTrail(particle, particle.trail, builder, matrices, 0.01f,4,30, event.getPartialTick().getGameTimeDeltaPartialTick(false),
-                        particle.options.color,
-                        particle.options.color
+                FDTrailRenderer.renderTrail(particle, particle.trail, builder, matrices, particle.options.size,4,30, event.getPartialTick().getGameTimeDeltaPartialTick(false),
+                        particle.options.colorEnd,
+                        particle.options.colorStart
                 );
 
                 matrices.popPose();

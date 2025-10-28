@@ -110,7 +110,7 @@ public class GeburahStompingController implements AutoSerializable {
             int fadeOut = 10;
 
             ArcAttackPreparationParticleOptions options = new ArcAttackPreparationParticleOptions(
-                    new Vec3(direction.x,0,direction.y),stompRadius,angle,stompTime, fadeIn, fadeOut, 1f,0.1f,0.1f,0.25f
+                    new Vec3(direction.x,0,direction.y),stompRadius,angle,stompTime, fadeIn, fadeOut, 1f,0.1f,0.1f,0.2f
             );
 
             FDLibCalls.sendParticles((ServerLevel) geburah.level(), options, geburah.position().add(0,GeburahEntity.STOMP_PREPARATION_PARTICLES_OFFSET,0), 120);

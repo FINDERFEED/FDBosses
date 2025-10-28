@@ -118,10 +118,12 @@ public class GeburahRayController {
 
             var decal = new DecalParticleOptions(BossParticles.GEBURAH_RAY_DECAL.get(),new Vec3(direction.getStepX(),direction.getStepY(),direction.getStepZ()),
                     AlphaOptions.builder()
-                            .stay(20)
+                            .stay(30)
                             .out(10)
                             .build(),
-                    3);
+                    4f);
+
+
 
             FDLibCalls.sendParticles((ServerLevel) geburah.level(), decal, target.add(
                     direction.getStepX() * GeburahEntity.RAY_DECAL_OFFSET,
@@ -161,7 +163,7 @@ public class GeburahRayController {
             for (var pos : targets){
                 for (var dir : new HorizontalCircleRandomDirections(geburah.getRandom(), 4, 0)) {
                     ArcAttackPreparationParticleOptions options =
-                            new ArcAttackPreparationParticleOptions(dir,damageRadius,FDMathUtil.FPI / 4, shootTime, Math.round(shootTime * 0.25f), 10,1f,0.8f,0.2f,0.3f);
+                            new ArcAttackPreparationParticleOptions(dir,damageRadius,FDMathUtil.FPI / 4, shootTime, Math.round(shootTime * 0.25f), 10,1f,0.8f,0.2f,0.2f);
                     FDLibCalls.sendParticles((ServerLevel) geburah.level(), options, pos.add(0,GeburahEntity.RAY_PREPARATION_PARTICLES_OFFSET,0), 120);
                 }
             }

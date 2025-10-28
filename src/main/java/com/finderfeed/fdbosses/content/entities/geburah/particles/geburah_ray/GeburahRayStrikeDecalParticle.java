@@ -25,7 +25,7 @@ public class GeburahRayStrikeDecalParticle extends DecalParticle {
 
     public GeburahRayStrikeDecalParticle(DecalParticleOptions decalParticleOptions, ClientLevel level, double x, double y, double z, double xd, double yd, double zd) {
         super(decalParticleOptions, level, x, y, z, xd, yd, zd);
-        this.roll = level.random.nextFloat() * 360;
+        this.roll = level.random.nextInt(4) * 90;
         this.oRoll = roll;
     }
 

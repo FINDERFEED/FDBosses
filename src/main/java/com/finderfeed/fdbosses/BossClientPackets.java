@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.boss_screen.BaseBossScreen;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreens;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
+import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
@@ -467,6 +468,7 @@ public class BossClientPackets {
 
 
         Vec3 direction = FDUtil.decodeDirection(data);
+        Vec3 horizontalReversedDirection = direction.multiply(-1,0,-1).normalize();
 
         Matrix4f mat = new Matrix4f();
         FDRenderUtil.applyMovementMatrixRotations(mat, direction);
@@ -480,19 +482,21 @@ public class BossClientPackets {
         int particleTravelTime = 100;
 
         float cumulativeSize = 0;
+        float cumulativeSize2 = 0;
 
         float travelDistWindow = 1f;
-
+        float travelDistWindow2 = 1f;
         float randomXZSpread = 0.25f;
 
+        float angleSlamEarth = FDMathUtil.FPI / 4;
+
+        //MAIN
         for (int i = 0; i < maxParticleRows;i++) {
 
             float ip = i / (maxParticleRows - 1f);
 
             float size = FDMathUtil.lerp(minParticleSize, maxParticleSize, 1 - ip);
-
             int repetitionCount = Math.round(FDMathUtil.lerp(1,5,ip));
-
             int directionsCount = Math.round(FDMathUtil.lerp(1,12,ip));
 
             float r = FDMathUtil.lerp(1f,1f,ip);
@@ -502,9 +506,11 @@ public class BossClientPackets {
             for (int g = 0; g < repetitionCount; g++) {
                 for (var dir : new HorizontalCircleRandomDirections(level.random, directionsCount, 1f)) {
 
+                    //---------------------------RAY-----------------------------
+
                     float travelDistance = cumulativeSize + travelDistWindow * random.nextFloat();
 
-                    float particleSpeed = (travelDistance * (1 - particleFriction) / (1 - (float) Math.pow(particleFriction, particleTravelTime)));
+                    float particleSpeed = calculateParticleSpeed(travelDistance, particleFriction, particleTravelTime);
 
                     Vec3 speed = BossUtil.matTransformDirectionVec3(mat, new Vec3(
                             dir.x + random.nextFloat() * randomXZSpread * 2 - randomXZSpread,
@@ -517,7 +523,7 @@ public class BossClientPackets {
                     BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
                             .brightness(2)
                             .size(size)
-                            .color(r,gr,b, 1f)
+                            .color(r, gr, b, 1f)
                             .friction(particleFriction)
                             .scalingOptions(0, 0, 20 + random.nextInt(10))
                             .build();
@@ -525,25 +531,54 @@ public class BossClientPackets {
                     level.addParticle(ballParticleOptions, true, pos.x + spawnOffset.x, pos.y + spawnOffset.y, pos.z + spawnOffset.z, speed.x, speed.y, speed.z);
 
 
+                    //--------------------------------------EARTH SLAM---------------------------------------------
+
+                    double angleBetween = FDMathUtil.angleBetweenVectors(horizontalReversedDirection, dir);
+
+                    if (angleBetween > angleSlamEarth) continue;
+
+                    BallParticleOptions ballParticleOptions2 = BallParticleOptions.builder()
+                            .brightness(2)
+                            .size(size * 2)
+                            .color(r,gr,b, 1f)
+                            .friction(particleFriction)
+                            .scalingOptions(0, 0, 20 + random.nextInt(10))
+                            .build();
+
+                    float travelDistance2 = cumulativeSize2 + travelDistWindow2 * random.nextFloat();
+
+                    float particleSpeed2 = calculateParticleSpeed(travelDistance2,particleFriction,particleTravelTime);
+
+
+                    Vec3 speed2 = new Vec3(
+                            dir.x + random.nextFloat() * randomXZSpread * 2 - randomXZSpread,
+                            0.1f + random.nextFloat() * 0.5f,
+                            dir.z + random.nextFloat() * randomXZSpread * 2 - randomXZSpread
+                    ).normalize().scale(particleSpeed2);
+
+                    Vec3 spawnPos2 = pos.add(new Vec3(1,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat()));
+
+
+                    level.addParticle(ballParticleOptions2, true, spawnPos2.x,spawnPos2.y,spawnPos2.z, speed2.x, speed2.y, speed2.z);
+
                 }
             }
 
             cumulativeSize += travelDistWindow;
+            cumulativeSize2 += travelDistWindow2;
 
         }
 
 
+        //SMOKE
         int smokesCount = 10;
         float smokesFriction = 0.8f;
-
         int smokesTravelTime = 20;
 
         for (int i = 0; i < smokesCount; i++){
 
             float p = i / (float) (smokesCount - 1);
-
             int count = Math.round(FDMathUtil.lerp(12,24,p));
-
             float distance = 0.8f * i;
 
             for (var dir : new HorizontalCircleRandomDirections(level.random, count, 1f)){
@@ -569,6 +604,7 @@ public class BossClientPackets {
 
         }
 
+        //STRIPES
         for (var dir : new HorizontalCircleRandomDirections(level.random, 12, 0)){
 
             float randomOffset = FDMathUtil.FPI / 8 + FDMathUtil.FPI / 8 * level.random.nextFloat();
@@ -592,8 +628,8 @@ public class BossClientPackets {
                     ));
 
             StripeParticleOptions options = StripeParticleOptions.builder()
-                    .startColor(new FDColor(1f,0.1f,0.1f,1f))
-                    .endColor(new FDColor(1f,0.6f,0.2f,1f))
+                    .startColor(new FDColor(1f,0.4f,0.1f,1f))
+                    .endColor(new FDColor(1f,0.8f,0.8f,1f))
                     .lifetime(10 + random.nextInt(5))
                     .lod(25)
                     .scale(0.1f)
@@ -606,6 +642,35 @@ public class BossClientPackets {
             level.addParticle(options, true, pos.x, pos.y,pos.z,0,0,0);
 
         }
+
+        //JUMPING PARTICLES
+        for (var dir : new HorizontalCircleRandomDirections(level.random, 13, 1f)){
+
+            ColoredJumpingParticleOptions options = new ColoredJumpingParticleOptions.Builder()
+                    .colorStart(new FDColor(1f, 1f, 1f, 1f))
+                    .colorEnd(new FDColor(1f, 0.8f, 0.3f, 1f))
+                    .maxPointsInTrail(5)
+                    .reflectionStrength(0.33f)
+                    .gravity(1.5f)
+                    .lifetime(-1)
+                    .maxJumpAmount(1)
+                    .size(0.03f)
+                    .build();
+
+            float horizontalSpeed = random.nextFloat() * 0.5f + 0.2f;
+
+            float verticalSpeed = random.nextFloat() * 0.3f + 0.3f;
+
+            dir = dir.subtract(direction.scale(0.75));
+
+            level.addParticle(options,pos.x,pos.y,pos.z,dir.x * horizontalSpeed, verticalSpeed,dir.z * horizontalSpeed);
+        }
+
+        //MAIN 2
+
+
+
+
 
     }
 

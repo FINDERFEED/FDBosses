@@ -208,7 +208,7 @@ public class GeburahRayParticle extends Particle {
         }
 
         public String toString() {
-            return "solarcraft:additive";
+            return "fdbosses:geburah_ray";
         }
     };
 

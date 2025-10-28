@@ -55,9 +55,9 @@ import java.util.List;
 
 public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
-    public static final float RAY_PREPARATION_PARTICLES_OFFSET = 0.02f;
+    public static final float RAY_PREPARATION_PARTICLES_OFFSET = 0.05f;
     public static final float STOMP_PREPARATION_PARTICLES_OFFSET = 0.01f;
-    public static final float RAY_DECAL_OFFSET = 0.015f;
+    public static final float RAY_DECAL_OFFSET = 0.03f;
 
     public static final String SIMPLE_NO_SIN_RUN_AROUND = "simple_no_sin_run_around";
     public static final String RUN_CLOCKWISE_HAMMERS_RAY_PROJECTILES = "run_clockwise_hammers_ray_projectiles";
@@ -187,11 +187,13 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         return false;
     }
 
+    private int stompingSwitcher = 0;
+
     public void randomStompsAndRays(int currentTick, int frequency, int count){
 
         if (currentTick % frequency == 0) {
 
-            float rayShotRadius = 4;
+            float rayShotRadius = 5;
 
             var stompingController = this.getStompingController();
 
@@ -199,11 +201,22 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
             if (playerPositions.isEmpty()) return;
 
-            Vec3 pos = playerPositions.get(random.nextInt(playerPositions.size()));
 
             List<GeburahStompingController.StompInstance> stompInstances = new ArrayList<>();
 
             float angle = FDMathUtil.FPI / count;
+            Vec3 pos = playerPositions.get(random.nextInt(playerPositions.size()));
+
+            Vec3 direction = pos.subtract(this.position()).multiply(1, 0, 1);
+
+            if (stompingSwitcher % 2 == 0){
+                direction = direction.yRot(angle);
+            }
+
+            double distToPlayer = direction.length();
+            direction = direction.normalize();
+
+            stompingSwitcher++;
 
 
             List<Vec3> rayPositions = new ArrayList<>();
@@ -211,11 +224,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
             int id = random.nextBoolean() ? 0 : count - 1;
 
-            Vec3 direction = pos.subtract(this.position()).multiply(1, 0, 1);
 
-            double distToPlayer = direction.length();
-
-            direction = direction.normalize();
 
             for (int i = 0; i < count; i++) {
 
