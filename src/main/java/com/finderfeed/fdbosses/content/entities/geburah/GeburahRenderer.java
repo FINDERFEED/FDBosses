@@ -30,9 +30,8 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
     @Override
     public void render(GeburahEntity geburah, float v, float v1, PoseStack poseStack, MultiBufferSource multiBufferSource, int i) {
 
-        if (geburah.isLaserVisualActive()){
-            this.renderLasers(geburah,v,v1,poseStack,multiBufferSource,i);
-        }
+        this.renderLasers(geburah,v,v1,poseStack,multiBufferSource,i);
+
 
         this.renderSins(geburah,v,v1,poseStack,multiBufferSource,i);
 
@@ -169,6 +168,12 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
     private void renderLasers(GeburahEntity geburah, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light){
 
+        float alpha = geburah.getLaserVisualAlpha(pticks);
+
+
+        if (alpha == 0){
+            return;
+        }
 
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
 
@@ -232,9 +237,6 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
             float p = (float) (Math.sin(time) + 1) / 2f;
 
             p = p * 0.4f + 0.6f;
-
-            float alpha = 1f;
-
 
             float w = 0.3f * p;
 

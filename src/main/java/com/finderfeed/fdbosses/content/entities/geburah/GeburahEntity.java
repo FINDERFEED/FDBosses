@@ -67,6 +67,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     public static final String RUN_CLOCKWISE_HAMMERS_RAY_PROJECTILES = "run_clockwise_hammers_ray_projectiles";
     public static final String LIMITED_BUTTONS_LASERS_AND_EARTHQUAKES = "limited_buttons_lasers_and_earthquakes";
     public static final String NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES = "no_jump_rays_earthquakes_projectiles";
+    public static final String SIN_CRYSTALS_LASERS_AND_CANNONS = "sin_crystals_lasers_and_cannons";
     public static final String EMPTY_SINS_AND_DELAY = "empty_sins_and_delay";
 
     public static final String GEBURAH_STOMPING_LAYER = "stomping";
@@ -76,6 +77,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     public static final int ARENA_HEIGHT = 30;
     public static final int ARENA_RADIUS = 40;
     public static final float MAX_LASERS_RADIUS = ARENA_RADIUS;
+
+
 
     private static FDModel CLIENT_MODEL;
 
@@ -95,6 +98,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     public static final int MAX_SIN_APPEAR_TICK = 20;
     public int sinsAppearTick = 0;
     public int sinsAppearTickO = 0;
+    public static final int MAX_LASER_VISUAL_DISAPPEAR_TIME = 5;
+    public int laserVisualDisappearTicker = 0;
 
     public GeburahLaserAttackPreparator laserAttackPreparator;
 
@@ -128,13 +133,19 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
                 .addAttack(EMPTY_SINS_AND_DELAY)
                 .build();
 
+        AttackOptions<?> sinCrystalsLasersAndCannons = AttackOptions.chainOptionsBuilder()
+                .addAttack(SIN_CRYSTALS_LASERS_AND_CANNONS)
+                .addAttack(EMPTY_SINS_AND_DELAY)
+                .build();
+
         this.mainAttackChain = new AttackChain(level.random)
                 .registerAttack(EMPTY_SINS_AND_DELAY, this::emptySinsAndDelay)
                 .registerAttack(SIMPLE_NO_SIN_RUN_AROUND, this::simpleNoSinRunAroundAttack)
                 .registerAttack(RUN_CLOCKWISE_HAMMERS_RAY_PROJECTILES, this::runClockwiseProjectilesHammersRay)
                 .registerAttack(LIMITED_BUTTONS_LASERS_AND_EARTHQUAKES, this::limitedButtonsRotatingLasers)
                 .registerAttack(NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES, this::noJumpEarthquakesProjectilesRays)
-                .addAttack(0, noJumpRaysEarthquakesProjectiles)
+                .registerAttack(SIN_CRYSTALS_LASERS_AND_CANNONS, this::sinCrystalsLasersAndCannons)
+                .addAttack(0, sinCrystalsLasersAndCannons)
         ;
 
         this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
@@ -162,6 +173,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
             this.particles();
             this.tickSinsAppearTick();
             this.laserAttackPreparator.tick();
+            this.tickLaserVisualDisappearance();
         }else{
             this.mainAttackChain.tick();
             this.tickClockwiseSin();
@@ -172,6 +184,31 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
         this.getWeaponRotationController().tick();
 
+    }
+
+    public void tickLaserVisualDisappearance(){
+        if (this.isLaserVisualActive()){
+            this.laserVisualDisappearTicker = MAX_LASER_VISUAL_DISAPPEAR_TIME;
+        }else{
+            this.laserVisualDisappearTicker = Mth.clamp(laserVisualDisappearTicker - 1,0,MAX_LASER_VISUAL_DISAPPEAR_TIME);
+        }
+    }
+
+    public float getLaserVisualAlpha(float pticks){
+        if (this.isLaserVisualActive()){
+            if (laserVisualDisappearTicker == MAX_LASER_VISUAL_DISAPPEAR_TIME){
+                return 1;
+            }
+        }
+        return Mth.clamp(laserVisualDisappearTicker - pticks,0,MAX_LASER_VISUAL_DISAPPEAR_TIME) / MAX_LASER_VISUAL_DISAPPEAR_TIME;
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> accessor) {
+        super.onSyncedDataUpdated(accessor);
+        if (accessor == LASERS_ACTIVE && this.getEntityData().get(LASERS_ACTIVE)){
+            laserVisualDisappearTicker = MAX_LASER_VISUAL_DISAPPEAR_TIME;
+        }
     }
 
     public CylinderPlayerPositionsCollector getPlayerPositionsCollector() {
@@ -192,25 +229,64 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
 //-------------------------------------------------------------------ATTACKS--------------------------------------------------------------------------
 
+    public boolean emptySinsAndDelay(AttackInstance attackInstance){
+        this.propagateSins(20);
+        return attackInstance.tick > 60;
+    }
+
+    private boolean sideSwitch = true;
+
+    public boolean sinCrystalsLasersAndCannons(AttackInstance inst){
+
+        int stage = inst.stage;
+        int localStagesAmount = 6;
+        int localStage = stage % localStagesAmount;
+
+        int tick = inst.tick;
+
+        int stagesAmount = 10 * localStagesAmount;
+
+        if (stage < stagesAmount){
+            if (localStage < 3){
+
+
+                this.simpleCannonAttacks(inst.tick, 20, 10,175,20 * localStage * ( 0.5f + random.nextFloat()));
+
+                if (tick > 11){
+                    cannonRotationSwap = !cannonRotationSwap;
+                    inst.nextStage();
+                }
+
+            }else{
+
+                GeburahWeaponAttackController controller = this.getWeaponAttackController();
+                if (localStage == 3) {
+                    controller.setCurrentAttack(new GeburahRoundAndRoundLaserAttack(this, sideSwitch = !sideSwitch), true);
+                    inst.nextStage();
+                } else if (localStage == 4){
+                    if (controller.getCurrentAttack() == null){
+                        inst.nextStage();
+                    }
+                }else{
+                    if (tick > 2) inst.nextStage();
+                }
+
+            }
+        }
+
+        return stage >= stagesAmount && tick > 40;
+    }
 
 
     public boolean noJumpEarthquakesProjectilesRays(AttackInstance inst){
 
         this.propagateSins(30, GeburahSins.JUMPING_SIN.get());
 
-//        this.simpleCannonAttacks(inst.tick, 10, 15);
+        this.simpleCannonAttacks(inst.tick, 10, 15);
 
-//        this.randomStompsAndRays(inst.tick, 70, random.nextInt(2) + 4);
+        this.randomStompsAndRays(inst.tick, 70, random.nextInt(2) + 4);
 
-        if (inst.tick % 200 == 0){
-
-            GeburahWeaponAttackController controller = this.getWeaponAttackController();
-
-            controller.setCurrentAttack(new GeburahRoundAndRoundLaserAttack(this, false),true);
-
-        }
-
-        return false;
+        return inst.tick > 400;
     }
 
     private int stompingSwitcher = 0;
@@ -287,11 +363,6 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     }
 
 
-    public boolean emptySinsAndDelay(AttackInstance attackInstance){
-        this.propagateSins(20);
-        return attackInstance.tick > 100;
-    }
-
     public boolean limitedButtonsRotatingLasers(AttackInstance attackInstance){
 
         this.propagateSins(60, GeburahSins.PRESSED_TOO_MANY_BUTTONS_SIN.get());
@@ -364,9 +435,13 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
         return attackInstance.tick > 400;
     }
 
-    private boolean rotationSwap = false;
+    private boolean cannonRotationSwap = false;
 
     private void simpleCannonAttacks(int currentTick, int timeBetweenShots, int frequency){
+        this.simpleCannonAttacks(currentTick,timeBetweenShots,frequency,80, -1);
+    }
+
+    private void simpleCannonAttacks(int currentTick, int timeBetweenShots, int frequency, int projectileFlyTime, float fixedAngle){
 
         var attackController = this.getWeaponAttackController();
         var weaponRotationController = this.getWeaponRotationController();
@@ -377,13 +452,17 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
         if (localtick == 0){
 
-            float rotation = (random.nextFloat() * 100 + 40) * (rotationSwap ? -1 : 1);
-
-            rotationSwap = !rotationSwap;
+            float rotation;
+            if (fixedAngle == -1) {
+                rotation = (random.nextFloat() * 100 + 40) * (cannonRotationSwap ? -1 : 1);
+                cannonRotationSwap = !cannonRotationSwap;
+            }else{
+                rotation = fixedAngle  * (cannonRotationSwap ? -1 : 1);
+            }
 
             weaponRotationController.rotateWeaponsBy(rotation, frequency);
         }else if (localtick == frequency - BossAnims.GEBURAH_FIRE_CANNONS.get().getAnimTime() + 5){
-            attackController.setCurrentAttack(new GeburahAttackFireDefaultProjectiles(this, ARENA_RADIUS, 80,1f),false);
+            attackController.setCurrentAttack(new GeburahAttackFireDefaultProjectiles(this, ARENA_RADIUS, projectileFlyTime,1f),false);
         }
 
     }

@@ -1,13 +1,18 @@
 package com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttack;
+import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahLerpingRotation;
+import com.finderfeed.fdlib.FDHelpers;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 
@@ -45,10 +50,48 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
             this.rotateUntilStopAngleIsReached(maxSpeed, 50);
             this.rotateToTargetPos(maxSpeed);
         }else{
-            System.out.println("Jiorno Jiovanna");
             fireShotTime = Mth.clamp(fireShotTime - 1,0,Integer.MAX_VALUE);
+            this.fireLasers(false);
+            if (fireShotTime <= 0){
+                this.geburah.setLaserVisualsState(false);
+            }
         }
 
+    }
+
+    private void fireLasers(boolean laserStart){
+        if (laserStart) {
+            BossUtil.geburahWeaponsStartLaser((ServerLevel) geburah.level(), this.geburah.position(), 120, geburah);
+
+        }
+        this.geburah.setLaserVisualsState(true);
+        for (var cannonData : this.geburah.getCannonsPositionAndDirection()){
+
+            Vec3 position = cannonData.first;
+            Vec3 direction = cannonData.second;
+            Vec3 end = position.add(direction.scale(GeburahEntity.ARENA_RADIUS - 5));
+
+
+            if (laserStart){
+                GeburahRayOptions options = GeburahRayOptions.builder()
+                    .width(0.5f)
+                    .color(0.3f,0.8f,1f,1f)
+                    .end(end)
+                    .stay(2)
+                    .out(3)
+                    .build();
+                FDLibCalls.sendParticles((ServerLevel) geburah.level(), options, position, 120);
+            }
+
+
+            var entities = FDHelpers.traceEntities(geburah.level(), position, end, 0.5f,(e)->e instanceof LivingEntity);
+            for (var entity : entities){
+                if (entity instanceof LivingEntity livingEntity){
+                    livingEntity.hurt(geburah.level().damageSources().generic(),1);
+                }
+            }
+
+        }
     }
 
     private void rotateToTargetPos(float maxSpeed){
@@ -64,7 +107,8 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
                 rotationSnapshot = -1;
             }else{
                 if (controller.finishedRotation()){
-                    fireShotTime = 30;
+                    this.fireLasers(true);
+                    fireShotTime = 5;
                 }
             }
 
@@ -170,9 +214,9 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
         float currentRotation = rotationController.getCurrentRotation();
 
         if (forward){
-            return currentRotation - rotationSnapshot > 180;
+            return currentRotation - rotationSnapshot > 90;
         }else{
-            return currentRotation - rotationSnapshot > -180;
+            return currentRotation - rotationSnapshot < -90;
         }
 
     }
