@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttackController;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahAttackFireDefaultProjectiles;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahRoundAndRoundLaserAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahWeaponRotationController;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.PlayerSinsHandler;
@@ -40,6 +41,7 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
@@ -55,6 +57,7 @@ import java.util.List;
 
 public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
+    public static final int CANNONS_AMOUNT = 8;
     public static final float RAY_PREPARATION_PARTICLES_OFFSET = 0.05f;
     public static final float STOMP_PREPARATION_PARTICLES_OFFSET = 0.01f;
     public static final float LASERS_PREPARATION_OFFSET = 0.03f;
@@ -171,9 +174,23 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
     }
 
+    public CylinderPlayerPositionsCollector getPlayerPositionsCollector() {
+        return playerPositionsCollector;
+    }
 
+    public Player pickRandomCombatant(){
+        var positionsCollector = this.getPlayerPositionsCollector();
 
-    //-------------------------------------------------------------------ATTACKS--------------------------------------------------------------------------
+        List<Player> players = new ArrayList<>(positionsCollector.getPlayers());
+
+        if (players.isEmpty()){
+            return null;
+        }
+
+        return players.get(random.nextInt(players.size()));
+    }
+
+//-------------------------------------------------------------------ATTACKS--------------------------------------------------------------------------
 
 
 
@@ -181,12 +198,16 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
         this.propagateSins(30, GeburahSins.JUMPING_SIN.get());
 
-        this.simpleCannonAttacks(inst.tick, 10, 15);
+//        this.simpleCannonAttacks(inst.tick, 10, 15);
 
-        this.randomStompsAndRays(inst.tick, 70, random.nextInt(2) + 4);
+//        this.randomStompsAndRays(inst.tick, 70, random.nextInt(2) + 4);
 
-        if (inst.tick % 100 == 0){
-            this.laserAttackPreparator.launchPreparation(60);
+        if (inst.tick % 200 == 0){
+
+            GeburahWeaponAttackController controller = this.getWeaponAttackController();
+
+            controller.setCurrentAttack(new GeburahRoundAndRoundLaserAttack(this, true),true);
+
         }
 
         return false;
@@ -479,12 +500,11 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
         float currentRotation = this.getWeaponRotationController().getLerpedRotation(pticks);
 
-        int cannonCount = 8;
-        float angle = 360f / cannonCount;
+        float angle = 360f / CANNONS_AMOUNT;
 
         List<Pair<Vec3, Vec3>> pairs = new ArrayList<>();
 
-        for (int i = 0; i < cannonCount; i++) {
+        for (int i = 0; i < CANNONS_AMOUNT; i++) {
 
             Vec3 dir = new Vec3(1, 0, 0).yRot((float) Math.toRadians(currentRotation + angle * i));
 

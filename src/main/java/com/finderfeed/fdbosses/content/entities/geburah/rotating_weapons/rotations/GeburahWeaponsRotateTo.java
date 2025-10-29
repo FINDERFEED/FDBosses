@@ -15,8 +15,9 @@ public class GeburahWeaponsRotateTo extends GeburahWeaponRotation {
             ByteBufCodecs.FLOAT, v->v.rotationTarget,
             ByteBufCodecs.INT, v->v.rotationTime,
             ByteBufCodecs.INT, v->v.currentRotationTime,
-            ((aFloat, aFloat2, integer, integer2) -> {
-                GeburahWeaponsRotateTo rotateTo = new GeburahWeaponsRotateTo(null, aFloat2, integer);
+            ByteBufCodecs.BOOL, v->v.easeInOut,
+            ((aFloat, aFloat2, integer, integer2, easeInOut) -> {
+                GeburahWeaponsRotateTo rotateTo = new GeburahWeaponsRotateTo(null, aFloat2, integer, easeInOut);
                 rotateTo.currentRotationTime = integer2;
                 rotateTo.rotationSnapshot = aFloat;
                 return rotateTo;
@@ -26,15 +27,21 @@ public class GeburahWeaponsRotateTo extends GeburahWeaponRotation {
     private float rotationSnapshot;
     private float rotationTarget;
     private int rotationTime;
+    private boolean easeInOut;
 
     private int currentRotationTime = 0;
 
-    public GeburahWeaponsRotateTo(GeburahWeaponRotationController rotationHandler, float rotationTarget, int rotationTime) {
+    public GeburahWeaponsRotateTo(GeburahWeaponRotationController rotationHandler, float rotationTarget, int rotationTime, boolean easeInOut) {
         if (rotationHandler != null) {
             this.rotationSnapshot = rotationHandler.currentRotation;
         }
         this.rotationTarget = rotationTarget;
         this.rotationTime = rotationTime;
+        this.easeInOut = easeInOut;
+    }
+
+    public GeburahWeaponsRotateTo(GeburahWeaponRotationController rotationHandler, float rotationTarget, int rotationTime) {
+        this(rotationHandler,rotationTarget,rotationTime,true);
     }
 
     public GeburahWeaponsRotateTo(GeburahWeaponsRotateTo other){
@@ -42,6 +49,7 @@ public class GeburahWeaponsRotateTo extends GeburahWeaponRotation {
         this.rotationTarget = other.rotationTarget;
         this.currentRotationTime = other.currentRotationTime;
         this.rotationTime = other.rotationTime;
+        this.easeInOut = other.easeInOut;
     }
 
     @Override
@@ -49,7 +57,12 @@ public class GeburahWeaponsRotateTo extends GeburahWeaponRotation {
 
         currentRotationTime = Mth.clamp(currentRotationTime + 1,0,rotationTime);
 
-        float p = FDEasings.easeInOut(currentRotationTime / (float) rotationTime);
+        float p = currentRotationTime / (float) rotationTime;
+        if (easeInOut){
+            p = FDEasings.easeInOut(p);
+        }else{
+            p = FDEasings.easeOut(p);
+        }
 
         float rotation = FDMathUtil.lerp(rotationSnapshot, rotationTarget, p);
 

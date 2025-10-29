@@ -36,15 +36,22 @@ public class GeburahWeaponRotationController {
     public void rotateWeapons(GeburahWeaponRotation geburahWeaponRotation){
         geburahWeaponRotation.setRotatingWeaponsHandler(this);
         if (!geburah.level().isClientSide){
+            if (this.weaponRotation != null){
+                this.trySendRotationSyncPacket();
+            }
             PacketDistributor.sendToPlayersTrackingEntity(geburah, new StartGeburahWeaponRotationPacket(this.geburah, geburahWeaponRotation));
         }
         this.weaponRotation = geburahWeaponRotation;
     }
 
-    public void rotateWeaponsBy(float rotationDelta, int rotationTime){
+    public void rotateWeaponsBy(float rotationDelta, int rotationTime, boolean easeInOut){
         this.rotateWeapons(new GeburahWeaponsRotateTo(this,
-                this.currentRotation + rotationDelta, rotationTime
+                this.currentRotation + rotationDelta, rotationTime,easeInOut
         ));
+    }
+
+    public void rotateWeaponsBy(float rotationDelta, int rotationTime){
+        this.rotateWeaponsBy(rotationDelta,rotationTime,false);
     }
 
     public void startConstantRotation(float rotationSpeed) {
