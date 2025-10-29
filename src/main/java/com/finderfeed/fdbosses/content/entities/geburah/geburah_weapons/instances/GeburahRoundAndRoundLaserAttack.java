@@ -2,11 +2,10 @@ package com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instanc
 
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttack;
+import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahLerpingRotation;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
-import com.finderfeed.fdlib.util.rendering.FDEasings;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -18,14 +17,13 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
 
     private boolean circleComplete = false;
 
-    private float rotationSnapshot;
-    private int cannonId;
+    private int cannonId = -1;
     private Player targetPlayer;
 
     private int fireShotTime = -1;
-    private int endingRotation = -1;
 
-    private Vec3 cachedTargetPos;
+    private Vec3 targetPos;
+    private float rotationSnapshot;
 
     public GeburahRoundAndRoundLaserAttack(GeburahEntity geburah, boolean forward) {
         super(geburah);
@@ -36,64 +34,109 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
     public void onAttackStart() {
         this.rotationSnapshot = this.geburah.getWeaponRotationController().getCurrentRotation();
         this.targetPlayer = geburah.pickRandomCombatant();
-        this.cannonId = this.getNearestCannonToPlayer(targetPlayer);
         this.geburah.laserAttackPreparator.launchPreparation(20);
     }
 
     @Override
     public void tickAttack() {
 
-
-
         if (fireShotTime == -1){
-
-            float speed = 10f;
-
-            if (this.hasFinishedCircle()){
-                circleComplete = true;
-
-
-                Vec3 targetPos = this.getPlayerTargetPos();
-                if (cachedTargetPos != null){
-                    targetPos = cachedTargetPos;
-                }
-
-                var cannonData = this.geburah.getCannonsPositionAndDirection().get(cannonId);
-
-                var cannonPos = cannonData.first;
-                var cannonDirection = cannonData.second;
-
-
-                ((ServerLevel)geburah.level()).sendParticles(BallParticleOptions.builder().stay(1).build(),cannonPos.x + cannonDirection.x,cannonPos.y,cannonPos.z + cannonDirection.z,1,0,0,0,0);
-
-                Vec3 geb = this.geburah.position().multiply(1,0,1);
-                Vec3 between = targetPos.subtract(geb);
-
-                Vec3 rotatedCannonDirection = cannonDirection.yRot(FDMathUtil.FPI / 2);
-
-                double angle = Math.toDegrees(FDMathUtil.angleBetweenVectors(cannonDirection,between));
-                var dot = rotatedCannonDirection.dot(between.normalize());
-                if (dot < 0){
-                    angle = 360 - angle;
-                }
-
-                float stopAngle = 80;
-                if (angle <= stopAngle){
-                    speed = (float) FDMathUtil.lerp(0,speed,FDEasings.linear((float) (angle / stopAngle)));
-                }
-
-
-            }
-
-            this.geburah.getWeaponRotationController().startConstantRotation(speed);
-
+            float maxSpeed = 15f;
+            this.rotateUntilStopAngleIsReached(maxSpeed, 50);
+            this.rotateToTargetPos(maxSpeed);
         }else{
+            System.out.println("Jiorno Jiovanna");
             fireShotTime = Mth.clamp(fireShotTime - 1,0,Integer.MAX_VALUE);
         }
 
     }
 
-    private Vec3 getPlayerTargetPos(){
+    private void rotateToTargetPos(float maxSpeed){
+
+        if (targetPos != null){
+
+            var controller = this.geburah.getWeaponRotationController();
+            if (rotationSnapshot != -1) {
+                if (!forward){
+                    rotationSnapshot = -rotationSnapshot;
+                }
+                controller.rotateWeapons(new GeburahLerpingRotation(controller, maxSpeed, rotationSnapshot));
+                rotationSnapshot = -1;
+            }else{
+                if (controller.finishedRotation()){
+                    fireShotTime = 30;
+                }
+            }
+
+        }
+
+    }
+
+
+
+    private void rotateUntilStopAngleIsReached(float maxSpeed, float startDecelerationAngle){
+
+        if (targetPos == null) {
+            if (this.hasFinishedCircle()) {
+
+                if (cannonId == -1){
+                    this.cannonId = this.getFarthestCannonToPlayer(targetPlayer);
+                }
+
+                circleComplete = true;
+
+                Vec3 targetPos = this.getPlayerTargetPos(20);
+
+                double angle = this.getCurrentAngleToTargetPos(targetPos);
+
+                if (angle <= startDecelerationAngle) {
+                    rotationSnapshot = (float) angle;
+                    this.targetPos = targetPos;
+                }
+
+            }
+
+            if (!forward){
+                maxSpeed = -maxSpeed;
+            }
+
+            this.geburah.getWeaponRotationController().startConstantRotation(maxSpeed);
+        }
+    }
+
+    private double getCurrentAngleToTargetPos(Vec3 targetPos){
+        var cannonData = this.geburah.getCannonsPositionAndDirection().get(cannonId);
+
+
+        var pos = cannonData.first;
+        var cannonDirection = cannonData.second;
+
+        ((ServerLevel)geburah.level()).sendParticles(BallParticleOptions.builder().stay(3).build(),
+                pos.x + cannonDirection.x,
+                pos.y,
+                pos.z + cannonDirection.z,
+                1,0,0,0,0
+        );
+
+
+        Vec3 geb = this.geburah.position().multiply(1, 0, 1);
+        Vec3 between = targetPos.subtract(geb);
+
+        Vec3 rotatedCannonDirection = cannonDirection.yRot(FDMathUtil.FPI / 2);
+
+        double angle = Math.toDegrees(FDMathUtil.angleBetweenVectors(cannonDirection, between));
+        var dot = rotatedCannonDirection.dot(between.normalize());
+
+
+        if (forward && dot < 0 || dot > 0 && !forward) {
+            angle = 360 - angle;
+        }
+
+        return angle;
+    }
+
+
+    private Vec3 getPlayerTargetPos(float angleModifier){
         Pair<Vec3, Vec3> playerData = this.geburah.getPlayerPositionsCollector().getOldAndCurrentPlayerPosition(targetPlayer);
         var old = playerData.first.subtract(this.geburah.position()).multiply(1,0,1);
         var current = playerData.second.subtract(this.geburah.position()).multiply(1,0,1);
@@ -109,30 +152,13 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
         double dot = old.normalize().dot(rotated.normalize());
 
         if (dot > 0){
-            return this.geburah.position().add(current.yRot(-(float)angle * 20)).multiply(1,0,1);
+            return this.geburah.position().add(current.yRot(-(float)angle * angleModifier)).multiply(1,0,1);
         }else{
-            return this.geburah.position().add(current.yRot((float)angle * 20)).multiply(1,0,1);
+            return this.geburah.position().add(current.yRot((float)angle * angleModifier)).multiply(1,0,1);
         }
     }
 
 
-
-
-
-    @Override
-    public boolean hasEnded() {
-        return fireShotTime == 0;
-    }
-
-    @Override
-    public void onAttackEnd() {
-
-    }
-
-    @Override
-    public boolean canBeChanged() {
-        return false;
-    }
 
     private boolean hasFinishedCircle(){
         if (circleComplete){
@@ -151,13 +177,13 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
 
     }
 
-    private int getNearestCannonToPlayer(Player player){
+    private int getFarthestCannonToPlayer(Player player){
 
         var cannonData = this.geburah.getCannonsPositionAndDirection();
 
-        double minAngle = 180;
+        double maxAngle = 0;
 
-        int minId = 0;
+        int maxId = 0;
 
         for (int i = 0; i < GeburahEntity.CANNONS_AMOUNT; i++){
 
@@ -166,14 +192,29 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
 
             double angle = FDMathUtil.angleBetweenVectors(cannonDirection.normalize(),between.normalize());
 
-            if (angle < minAngle){
-                minAngle = angle;
-                minId = i;
+            if (angle > maxAngle){
+                maxAngle = angle;
+                maxId = i;
             }
 
         }
 
-        return minId;
+        return maxId;
+    }
+
+    @Override
+    public boolean hasEnded() {
+        return fireShotTime == 0;
+    }
+
+    @Override
+    public void onAttackEnd() {
+
+    }
+
+    @Override
+    public boolean canBeChanged() {
+        return false;
     }
 
 

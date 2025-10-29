@@ -206,7 +206,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
             GeburahWeaponAttackController controller = this.getWeaponAttackController();
 
-            controller.setCurrentAttack(new GeburahRoundAndRoundLaserAttack(this, true),true);
+            controller.setCurrentAttack(new GeburahRoundAndRoundLaserAttack(this, false),true);
 
         }
 

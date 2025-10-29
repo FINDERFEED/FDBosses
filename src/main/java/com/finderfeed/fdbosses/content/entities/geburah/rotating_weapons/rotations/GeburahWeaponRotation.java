@@ -23,6 +23,7 @@ public abstract class GeburahWeaponRotation {
     //This is dirty, but i don't want to make a useless registry
     public static enum Type {
         ROTATE_TO(GeburahWeaponsRotateTo.STREAM_CODEC, v -> new GeburahWeaponsRotateTo((GeburahWeaponsRotateTo) v)),
+        LERPING_ROTATE_BY(GeburahLerpingRotation.STREAM_CODEC, v -> new GeburahLerpingRotation((GeburahLerpingRotation) v)),
         CONSTANT_ROTATION(GeburahConstantWeaponRotation.STREAM_CODEC, v -> new GeburahConstantWeaponRotation((GeburahConstantWeaponRotation) v))
         ;
 
