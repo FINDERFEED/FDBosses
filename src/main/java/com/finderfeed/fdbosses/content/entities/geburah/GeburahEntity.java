@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.geburah;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahSinCrystalCastCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttackController;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahAttackFireDefaultProjectiles;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
@@ -180,6 +181,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
             this.getRayController().tick();
             this.getStompingController().tick();
             this.getWeaponAttackController().tick();
+            this.throwSinCrystals();
         }
 
         this.getWeaponRotationController().tick();
@@ -229,14 +231,49 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
 //-------------------------------------------------------------------ATTACKS--------------------------------------------------------------------------
 
+
     public boolean emptySinsAndDelay(AttackInstance attackInstance){
         this.propagateSins(20);
         return attackInstance.tick > 60;
     }
 
+
+    @SerializableField
+    private float sinCrystalsThrowTick = 0;
+
+    public void throwSinCrystals(){
+
+        var activeSins = this.getEntityData().get(ACTIVE_SINS);
+
+        if (activeSins.contains(GeburahSins.CRYSTAL_OF_SIN.get())) {
+            if (sinCrystalsThrowTick % 200 == 0) {
+
+                var players = new ArrayList<>(this.playerPositionsCollector.getPlayers());
+
+                if (!players.isEmpty()) {
+                    for (int i = 0; i < 4; i++) {
+
+                        Vec3 direction = new Vec3(1, 0, 0).yRot(FDMathUtil.FPI / 4 + FDMathUtil.FPI / 2 * i);
+                        Vec3 pos = this.position().add(0, 4, 0).add(direction.scale(5));
+                        Player player = players.get(random.nextInt(players.size()));
+                        GeburahSinCrystalCastCircle.summon(level(), pos, direction.add(0, 1, 0), player);
+
+                    }
+                }
+
+            }
+            sinCrystalsThrowTick++;
+        }else{
+            sinCrystalsThrowTick = 0;
+        }
+
+    }
+
     private boolean sideSwitch = true;
 
     public boolean sinCrystalsLasersAndCannons(AttackInstance inst){
+
+        this.propagateSins(0, GeburahSins.CRYSTAL_OF_SIN.get());
 
         int stage = inst.stage;
         int localStagesAmount = 6;
@@ -281,9 +318,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
     public boolean noJumpEarthquakesProjectilesRays(AttackInstance inst){
 
         this.propagateSins(30, GeburahSins.JUMPING_SIN.get());
-
         this.simpleCannonAttacks(inst.tick, 10, 15);
-
         this.randomStompsAndRays(inst.tick, 70, random.nextInt(2) + 4);
 
         return inst.tick > 400;

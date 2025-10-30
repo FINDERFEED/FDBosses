@@ -33,8 +33,9 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayRef
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircleRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquakeRenderer;
-import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahExplosiveCrystal;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahSinCrystal;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallExplosionParticle;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
@@ -273,9 +274,10 @@ public class BossClientModEvents {
     @SubscribeEvent
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
 
+        event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_SIN_CRYSTAL.get(), GeburahCastingCircleRenderer::new);
 
-        event.registerEntityRenderer(BossEntities.GEBURAH_EXPLOSIVE_CRYSTAL.get(), FDEntityRendererBuilder.<GeburahExplosiveCrystal>builder()
-                .addLayer(FDEntityRenderLayerOptions.<GeburahExplosiveCrystal>builder()
+        event.registerEntityRenderer(BossEntities.GEBURAH_SIN_CRYSTAL.get(), FDEntityRendererBuilder.<GeburahSinCrystal>builder()
+                .addLayer(FDEntityRenderLayerOptions.<GeburahSinCrystal>builder()
                         .renderType(RenderType.lightning())
                         .model(BossModels.JUDGEMENT_BALL)
                         .light(LightTexture.FULL_BRIGHT)

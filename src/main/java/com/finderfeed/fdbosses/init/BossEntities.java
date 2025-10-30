@@ -20,9 +20,10 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.Ra
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahSinCrystalCastCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
-import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahExplosiveCrystal;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahSinCrystal;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
@@ -334,12 +335,18 @@ public class BossEntities {
             .sized(0.2f,0.2f)
             .build("justice_hammer"));
 
-    public static final Supplier<EntityType<GeburahExplosiveCrystal>> GEBURAH_EXPLOSIVE_CRYSTAL = ENTITIES.register("geburah_sin_crystal",()->EntityType.Builder.of(
-                    GeburahExplosiveCrystal::new, MobCategory.MISC
+    public static final Supplier<EntityType<GeburahSinCrystal>> GEBURAH_SIN_CRYSTAL = ENTITIES.register("geburah_sin_crystal",()->EntityType.Builder.of(
+                    GeburahSinCrystal::new, MobCategory.MISC
             )
             .updateInterval(1)
             .sized(0.2f,0.2f)
             .build("geburah_sin_crystal"));
+
+    public static final Supplier<EntityType<GeburahSinCrystalCastCircle>> GEBURAH_CASTING_CIRCLE_SIN_CRYSTAL = ENTITIES.register("geburah_casting_circle_sin_crystal",()->EntityType.Builder.of(
+                    GeburahSinCrystalCastCircle::new, MobCategory.MISC
+            )
+            .sized(0.2f,0.2f)
+            .build("geburah_casting_circle_sin_crystal"));
 
 
     @SubscribeEvent

@@ -45,6 +45,10 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
     @Override
     public void tickAttack() {
 
+        if (targetPlayer == null || this.targetPlayer.isDeadOrDying()){
+            this.targetPlayer = geburah.pickRandomCombatant();
+        }
+
         if (fireShotTime == -1){
             float maxSpeed = 15f;
             this.rotateUntilStopAngleIsReached(maxSpeed, 50);
@@ -248,7 +252,7 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
 
     @Override
     public boolean hasEnded() {
-        return fireShotTime == 0;
+        return fireShotTime == 0 || targetPlayer == null || targetPlayer.isDeadOrDying();
     }
 
     @Override

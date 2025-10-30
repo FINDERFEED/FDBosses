@@ -6,7 +6,6 @@ import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import com.finderfeed.fdlib.systems.trails.FDTrailDataGenerator;
-import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -24,29 +23,19 @@ import org.joml.Vector3d;
 import java.util.List;
 import java.util.UUID;
 
-public class GeburahExplosiveCrystal extends FDEntity implements AutoSerializable {
+public class GeburahSinCrystal extends FDEntity implements AutoSerializable {
 
     @SerializableField
     private UUID playerToFlyTo;
 
-    public FDTrailDataGenerator<GeburahExplosiveCrystal> trail;
+    public FDTrailDataGenerator<GeburahSinCrystal> trail;
 
-    public static GeburahExplosiveCrystal summon(Vec3 pos, Player player){
-        GeburahExplosiveCrystal crystal = new GeburahExplosiveCrystal(BossEntities.GEBURAH_EXPLOSIVE_CRYSTAL.get(), player.level());
+    public static GeburahSinCrystal summon(Vec3 pos, Player player, Vec3 initialDirection){
+        GeburahSinCrystal crystal = new GeburahSinCrystal(BossEntities.GEBURAH_SIN_CRYSTAL.get(), player.level());
 
         crystal.playerToFlyTo = player.getUUID();
 
-        Vec3 targetPos = crystal.getTargetPos(player);
-
-        Vec3 between = pos.subtract(targetPos).normalize();
-
-        Vec3 initialSpeed = between.add(
-                player.getRandom().nextFloat() * 0.1 - 0.05,
-                player.getRandom().nextFloat() * 0.1 - 0.05,
-                player.getRandom().nextFloat() * 0.1 - 0.05
-        ).normalize();
-
-        crystal.setDeltaMovement(initialSpeed.scale(0.25f));
+        crystal.setDeltaMovement(initialDirection.normalize());
 
         crystal.setPos(pos);
 
@@ -54,10 +43,10 @@ public class GeburahExplosiveCrystal extends FDEntity implements AutoSerializabl
         return crystal;
     }
 
-    public GeburahExplosiveCrystal(EntityType<?> type, Level level) {
+    public GeburahSinCrystal(EntityType<?> type, Level level) {
         super(type, level);
         if (level.isClientSide){
-            trail = new FDTrailDataGenerator<>(GeburahExplosiveCrystal::getPosition, 10, 0.01f);
+            trail = new FDTrailDataGenerator<>(GeburahSinCrystal::getPosition, 10, 0.01f);
         }
     }
 
@@ -82,7 +71,7 @@ public class GeburahExplosiveCrystal extends FDEntity implements AutoSerializabl
 
         Vec3 targetPos = this.getTargetPos(player);
 
-        if (this.position().distanceTo(targetPos) < 0.5){
+        if (this.position().distanceTo(targetPos) < 1){
             this.putCrystalInPlayersInventory(player);
             this.remove(RemovalReason.DISCARDED);
         }
@@ -135,7 +124,7 @@ public class GeburahExplosiveCrystal extends FDEntity implements AutoSerializabl
 
         int tries = 100;
 
-        while (cr.is(BossItems.GEBURAH_EXPLOSIVE_CRYSTAL.get()) || tries > 0){
+        while ((cr.is(BossItems.GEBURAH_EXPLOSIVE_CRYSTAL.get()) || Inventory.isHotbarSlot(randomSlot)) && tries > 0){
             randomSlot = random.nextInt(items.size());
             cr = items.get(randomSlot);
             tries--;
