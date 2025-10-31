@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_cryst
 
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossItems;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
@@ -10,6 +11,8 @@ import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -46,7 +49,7 @@ public class GeburahSinCrystal extends FDEntity implements AutoSerializable {
     public GeburahSinCrystal(EntityType<?> type, Level level) {
         super(type, level);
         if (level.isClientSide){
-            trail = new FDTrailDataGenerator<>(GeburahSinCrystal::getPosition, 10, 0.01f);
+            trail = new FDTrailDataGenerator<>(GeburahSinCrystal::getPosition, 5, 0.01f);
         }
     }
 
@@ -151,6 +154,8 @@ public class GeburahSinCrystal extends FDEntity implements AutoSerializable {
         }
 
         inventory.setChanged();
+
+        level().playSound(null,player.getX(),player.getY() + player.getEyeHeight(), player.getZ(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS,1f,2f);
 
     }
 

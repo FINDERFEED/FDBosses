@@ -278,15 +278,30 @@ public class BossClientModEvents {
 
         event.registerEntityRenderer(BossEntities.GEBURAH_SIN_CRYSTAL.get(), FDEntityRendererBuilder.<GeburahSinCrystal>builder()
                 .addLayer(FDEntityRenderLayerOptions.<GeburahSinCrystal>builder()
-                        .renderType(RenderType.lightning())
+                        .renderType(RenderType.text(FDBosses.location("textures/entities/geburah/crystal_of_sin_entity.png")))
                         .model(BossModels.JUDGEMENT_BALL)
                         .light(LightTexture.FULL_BRIGHT)
-                        .color(((geburahExplosiveCrystal, v) -> {
-                            return new FDColor(0.3f,0.7f,1f,1f);
-                        }))
                         .transformation(((judgementBallProjectile, poseStack, v) -> {
                             poseStack.translate(0,judgementBallProjectile.getBbHeight()/2,0);
-                            FDRenderUtil.applyMovementMatrixRotations(poseStack, judgementBallProjectile.getDeltaMovement());
+
+                            float time = (judgementBallProjectile.tickCount + v) * 4f + judgementBallProjectile.getId();
+                            poseStack.mulPose(Axis.YP.rotationDegrees(time));
+                            poseStack.mulPose(Axis.ZP.rotationDegrees(time));
+
+                            poseStack.scale(0.5f,0.5f,0.5f);
+                        }))
+                        .build())
+                .addLayer(FDEntityRenderLayerOptions.<GeburahSinCrystal>builder()
+                        .renderType(RenderType.text(FDBosses.location("textures/entities/geburah/crystal_of_sin_entity_layer.png")))
+                        .model(BossModels.JUDGEMENT_BALL_LAYER)
+                        .light(LightTexture.FULL_BRIGHT)
+                        .transformation(((judgementBallProjectile, poseStack, v) -> {
+                            poseStack.translate(0,judgementBallProjectile.getBbHeight()/2,0);
+
+                            float time = (judgementBallProjectile.tickCount + v) * 4f + judgementBallProjectile.getId();
+                            poseStack.mulPose(Axis.YP.rotationDegrees(time));
+                            poseStack.mulPose(Axis.ZP.rotationDegrees(time));
+
                             poseStack.scale(0.5f,0.5f,0.5f);
                         }))
                         .build())

@@ -37,9 +37,11 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
 
     @Override
     public void onAttackStart() {
-        this.rotationSnapshot = this.geburah.getWeaponRotationController().getCurrentRotation();
         this.targetPlayer = geburah.pickRandomCombatant();
-        this.geburah.laserAttackPreparator.launchPreparation(20);
+        this.rotationSnapshot = this.geburah.getWeaponRotationController().getCurrentRotation();
+        if (this.targetPlayer != null) {
+            this.geburah.laserAttackPreparator.launchPreparation(20);
+        }
     }
 
     @Override
@@ -257,7 +259,7 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
 
     @Override
     public void onAttackEnd() {
-
+        this.geburah.getWeaponRotationController().stopRotation();
     }
 
     @Override

@@ -287,10 +287,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
             if (localStage < 3){
 
 
-                this.simpleCannonAttacks(inst.tick, 20, 10,175,20 * localStage * ( 0.5f + random.nextFloat()));
+                this.simpleCannonAttacks(inst.tick, 20, 10,175);
 
                 if (tick > 11){
-                    cannonRotationSwap = !cannonRotationSwap;
                     inst.nextStage();
                 }
 
@@ -298,8 +297,10 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
                 GeburahWeaponAttackController controller = this.getWeaponAttackController();
                 if (localStage == 3) {
-                    controller.setCurrentAttack(new GeburahRoundAndRoundLaserAttack(this, sideSwitch = !sideSwitch), true);
-                    inst.nextStage();
+                    if (!this.getPlayerPositionsCollector().getPlayers().isEmpty()) {
+                        controller.setCurrentAttack(new GeburahRoundAndRoundLaserAttack(this, sideSwitch = !sideSwitch), true);
+                        inst.nextStage();
+                    }
                 } else if (localStage == 4){
                     if (controller.getCurrentAttack() == null){
                         inst.nextStage();
@@ -474,6 +475,10 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
 
     private void simpleCannonAttacks(int currentTick, int timeBetweenShots, int frequency){
         this.simpleCannonAttacks(currentTick,timeBetweenShots,frequency,80, -1);
+    }
+
+    private void simpleCannonAttacks(int currentTick, int timeBetweenShots, int frequency, int projectileFlyTime){
+        this.simpleCannonAttacks(currentTick,timeBetweenShots,frequency,projectileFlyTime, -1);
     }
 
     private void simpleCannonAttacks(int currentTick, int timeBetweenShots, int frequency, int projectileFlyTime, float fixedAngle){

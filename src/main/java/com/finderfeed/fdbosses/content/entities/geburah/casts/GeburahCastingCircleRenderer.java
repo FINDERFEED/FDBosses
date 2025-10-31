@@ -35,7 +35,7 @@ public class GeburahCastingCircleRenderer extends EntityRenderer<GeburahCastingC
                 .addArea(GeburahCastingCircle.FADE_IN, FDEasings::reversedEaseOut)
                 .build();
 
-        float rotation = entity.tickCount + pticks;
+        float rotation = 5 * (entity.tickCount + pticks);
         float scale = complexEasingFunction.apply(entity.tickCount + pticks);
 
         Vec3 direction = entity.getCastDirection();
