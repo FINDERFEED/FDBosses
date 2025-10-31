@@ -32,13 +32,14 @@ public class GeburahChainTrapEntity extends Entity implements AutoSerializable {
     @SerializableField
     private UUID entityAboutToTrap;
 
+    @SerializableField
+    private int catchTicks = 0;
+
     protected int catchingTime = -1;
 
     protected int pullingTime = -1;
 
     private Vec3 lastKnownTargetPos;
-
-
 
 
     public GeburahChainTrapEntity(EntityType<?> type, Level level) {
@@ -81,6 +82,7 @@ public class GeburahChainTrapEntity extends Entity implements AutoSerializable {
                         this.remove(RemovalReason.DISCARDED);
                     }
                 }
+                this.tickCaughtEntity();
             }
         }else{
 
@@ -107,6 +109,23 @@ public class GeburahChainTrapEntity extends Entity implements AutoSerializable {
             pullingTime = Mth.clamp(pullingTime - 1,0,PULL_TIME);
         }
 
+    }
+
+    private void tickCaughtEntity(){
+        var entity = this.getPassengers().getFirst();
+        int duration = 600;
+        if (entity instanceof Player player){
+            duration = 60;
+        }
+        if (catchTicks > duration){
+            this.remove(RemovalReason.DISCARDED);
+        }
+        catchTicks++;
+    }
+
+    @Override
+    public boolean isPickable() {
+        return true;
     }
 
     @Override

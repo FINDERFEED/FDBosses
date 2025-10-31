@@ -34,6 +34,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRen
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircleRenderer;
+import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.ChainTrapSummonProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquakeRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahSinCrystal;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallExplosionParticle;
@@ -275,6 +276,49 @@ public class BossClientModEvents {
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
 
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_SIN_CRYSTAL.get(), GeburahCastingCircleRenderer::new);
+        event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_CHAIN_TRAP.get(), GeburahCastingCircleRenderer::new);
+
+
+
+        event.registerEntityRenderer(BossEntities.GEBURAH_CHAIN_TRAP_SUMMON_PROJECTILE.get(), FDEntityRendererBuilder.<ChainTrapSummonProjectile>builder()
+                .addLayer(FDEntityRenderLayerOptions.<ChainTrapSummonProjectile>builder()
+                        .renderType(RenderType.text(FDBosses.location("textures/entities/geburah/crystal_of_sin_entity.png")))
+                        .model(BossModels.JUDGEMENT_BALL)
+                        .light(LightTexture.FULL_BRIGHT)
+                        .transformation(((judgementBallProjectile, poseStack, v) -> {
+                            poseStack.translate(0,judgementBallProjectile.getBbHeight()/2,0);
+
+                            float time = (judgementBallProjectile.tickCount + v) * 4f + judgementBallProjectile.getId();
+                            poseStack.mulPose(Axis.YP.rotationDegrees(time));
+                            poseStack.mulPose(Axis.ZP.rotationDegrees(time));
+
+                            poseStack.scale(0.5f,0.5f,0.5f);
+                        }))
+                        .build())
+
+                .freeRender(((judgementBallProjectile, v, v1, poseStack, multiBufferSource, i) -> {
+                    poseStack.pushPose();
+                    poseStack.translate(0,judgementBallProjectile.getBbHeight()/2,0);
+                    FDTrailRenderer.renderTrail(judgementBallProjectile, judgementBallProjectile.trail,
+                            multiBufferSource.getBuffer(RenderType.lightning()),
+                            poseStack,0.1f,4,10,v1,
+                            new FDColor(0.5f,0.7f,0.9f,0f),
+                            new FDColor(0.5f,0.7f,0.9f,0.7f)
+                    );
+                    poseStack.popPose();
+                }))
+                .shouldRender(((explosiveCrystal, frustum, v, v1, v2) -> {
+                    return frustum.isVisible(explosiveCrystal.getBoundingBox().inflate(10));
+                }))
+                .build());
+
+
+
+
+
+
+
+
 
         event.registerEntityRenderer(BossEntities.GEBURAH_SIN_CRYSTAL.get(), FDEntityRendererBuilder.<GeburahSinCrystal>builder()
                 .addLayer(FDEntityRenderLayerOptions.<GeburahSinCrystal>builder()

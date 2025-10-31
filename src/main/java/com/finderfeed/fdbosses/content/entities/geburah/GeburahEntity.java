@@ -2,7 +2,10 @@ package com.finderfeed.fdbosses.content.entities.geburah;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahChainTrapCastCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahSinCrystalCastCircle;
+import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.ChainTrapSummonProjectile;
+import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttackController;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahAttackFireDefaultProjectiles;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
@@ -28,6 +31,7 @@ import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
+import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
@@ -182,9 +186,40 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
             this.getStompingController().tick();
             this.getWeaponAttackController().tick();
             this.throwSinCrystals();
+            this.tickTrapEntitiesSpawn();
         }
 
         this.getWeaponRotationController().tick();
+
+    }
+
+    public void tickTrapEntitiesSpawn(){
+        if (tickCount % 20 != 0) return;
+
+        int angles = 4;
+        float angle = FDMathUtil.FPI * 2 / angles;
+
+        for (int i = 0; i < angles; i++){
+
+            float currentAngle = angle * i + FDMathUtil.FPI / 4 + (level().random.nextFloat() * 2 - 1) * FDMathUtil.FPI / 8;
+            Vec3 direction = new Vec3(1,0,0).yRot(currentAngle);
+
+            var entities = FDTargetFinder.getEntitiesInArc(Entity.class, level(), this.position().add(0,-0.1f,0),
+                    new Vec2((float) direction.x,(float) direction.z), FDMathUtil.FPI / 2, 30, ARENA_RADIUS, (entity) -> {
+                return entity instanceof GeburahChainTrapEntity || entity instanceof ChainTrapSummonProjectile || entity instanceof GeburahChainTrapCastCircle;
+            });
+
+            if (entities.isEmpty()){
+
+                Vec3 offsetPos = direction.scale(MAX_LASERS_RADIUS / 2 + level().random.nextFloat() * 10 - 5);
+                Vec3 targetPos = this.position().add(offsetPos);
+                Vec3 castCirclePos = this.position().add(direction.scale(3)).add(0,5,0);
+
+                GeburahChainTrapCastCircle.summon(level(), castCirclePos, direction.add(0,1,0), targetPos);
+
+            }
+
+        }
 
     }
 
