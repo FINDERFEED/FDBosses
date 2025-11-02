@@ -60,7 +60,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GeburahEntity extends FDLivingEntity implements AutoSerializable {
+public class GeburahEntity extends FDLivingEntity implements AutoSerializable, GeburahBossBuddy {
 
     public static final int CANNONS_AMOUNT = 8;
     public static final float RAY_PREPARATION_PARTICLES_OFFSET = 0.05f;

@@ -251,5 +251,9 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_bird"));
     });
 
+    public static DeferredHolder<Animation,Animation> JUDGEMENT_BIRD_CAST = ANIMATIONS.register("judgement_bird_cast", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_bird"));
+    });
+
 
 }

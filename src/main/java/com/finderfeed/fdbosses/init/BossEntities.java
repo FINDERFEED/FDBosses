@@ -21,6 +21,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahChainTrapCastCircle;
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahRayCastingCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahSinCrystalCastCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.ChainTrapSummonProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
@@ -356,6 +357,12 @@ public class BossEntities {
             )
             .sized(0.2f,0.2f)
             .build("geburah_casting_circle_chain_trap"));
+
+    public static final Supplier<EntityType<GeburahRayCastingCircle>> GEBURAH_CASTING_CIRCLE_RAY = ENTITIES.register("geburah_casting_circle_ray",()->EntityType.Builder.of(
+                    GeburahRayCastingCircle::new, MobCategory.MISC
+            )
+            .sized(0.2f,0.2f)
+            .build("geburah_casting_circle_ray"));
 
     public static final Supplier<EntityType<ChainTrapSummonProjectile>> GEBURAH_CHAIN_TRAP_SUMMON_PROJECTILE = ENTITIES.register("geburah_chain_trap_summon_projectile",()->EntityType.Builder.of(
                     ChainTrapSummonProjectile::new, MobCategory.MISC

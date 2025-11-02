@@ -51,7 +51,7 @@ public abstract class GeburahCastingCircle extends Entity {
     }
 
     public void setDirection(Vec3 direction){
-        this.getEntityData().set(DIRECTION, direction);
+        this.getEntityData().set(DIRECTION, direction.normalize());
     }
 
     public int getDuration(){
@@ -60,6 +60,10 @@ public abstract class GeburahCastingCircle extends Entity {
 
     public void setCastDuration(int duration){
         this.getEntityData().set(DURATION, FADE_IN + FADE_OUT + duration);
+    }
+
+    public void setColor(int color){
+        this.getEntityData().set(COLOR, color);
     }
 
     @Override

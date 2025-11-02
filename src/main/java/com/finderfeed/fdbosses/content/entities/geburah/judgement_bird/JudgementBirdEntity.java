@@ -1,5 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.geburah.judgement_bird;
 
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahBossBuddy;
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahRayCastingCircle;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossModels;
@@ -24,16 +26,21 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.Optional;
-
-public class JudgementBirdEntity extends FDMob implements AutoSerializable {
+public class JudgementBirdEntity extends FDMob implements AutoSerializable, GeburahBossBuddy {
 
     private static FDModel MODEL;
 
-    private static float ATTACK_RADIUS = 6.5f;
+    private static float FLY_TO_TARGET_RADIUS = 6.5f;
+    private static float ATTACK_RADIUS = 8f;
 
     @SerializableField
     private Vec3 targetPos;
+
+    @SerializableField
+    private int castingTicker = -1;
+
+    @SerializableField
+    private Vec3 castingTargetPos;
 
     private AABB roostingBox;
 
@@ -79,29 +86,68 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable {
 
     private void flyAndAttack(){
 
-        Animation animation = BossAnims.JUDGEMENT_BIRD_FLY.get();
-
-        if (this.getTarget() == null) {
-
-            if (this.roostingBox != null){
-                if (!this.roostingBox.contains(this.position())){
-                    this.setMoveTargetPos(this.roostingBox.getCenter());
-                }
-            }
-
-            if (this.targetPos != null) {
-                this.flyToPos(targetPos);
-            }
-
-        }else{
-            var target = this.getTarget();
-            Vec3 pos = this.getFlyToTargetPos(target);
-            this.flyToPos(pos);
-            this.lookAt(EntityAnchorArgument.Anchor.FEET, target.position());
+        if (this.castingTargetPos == null){
+            this.castingTicker = -1;
         }
 
-        this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(animation).build());
 
+        if (castingTicker == -1) {
+            Animation animation = BossAnims.JUDGEMENT_BIRD_FLY.get();
+
+            if (this.getTarget() == null) {
+
+                if (this.roostingBox != null) {
+                    if (!this.roostingBox.contains(this.position())) {
+                        this.setMoveTargetPos(this.roostingBox.getCenter());
+                    }
+                }
+
+                if (this.targetPos != null) {
+                    this.flyToPos(targetPos);
+                }
+
+            } else {
+                var target = this.getTarget();
+                Vec3 pos = this.getFlyToTargetPos(target);
+                this.flyToPos(pos);
+                this.lookAt(EntityAnchorArgument.Anchor.FEET, target.position());
+
+                if (this.distanceTo(target) < ATTACK_RADIUS){
+                    this.castingTicker = BossAnims.JUDGEMENT_BIRD_CAST.get().getAnimTime();
+                    this.castingTargetPos = target.position().add(0,target.getBbHeight()/2,0);
+                    this.setDeltaMovement(Vec3.ZERO);
+                }
+
+            }
+
+            this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(animation).build());
+        }else{
+
+
+
+            LivingEntity target = this.getTarget();
+
+            if (castingTicker > 30 && target != null){
+                this.castingTargetPos = target.position().add(0, target.getBbHeight() / 2, 0);
+            }
+
+            castingTicker = Mth.clamp(castingTicker - 1,0,Integer.MAX_VALUE);
+            this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.JUDGEMENT_BIRD_CAST)
+                            .nextAnimation(AnimationTicker.builder(BossAnims.JUDGEMENT_BIRD_FLY).build())
+                    .build());
+
+            this.lookAt(EntityAnchorArgument.Anchor.FEET, castingTargetPos);
+
+            if (castingTicker == 30){
+                Vec3 startPos = this.position();
+                GeburahRayCastingCircle.summon(level(), startPos, castingTargetPos.subtract(startPos));
+            }
+
+            if (castingTicker == 0){
+                castingTargetPos = null;
+                castingTicker = -1;
+            }
+        }
     }
 
     @Override
@@ -118,7 +164,7 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable {
         if (roostingBox != null) {
             if (this.getTarget() != null) {
                 Vec3 targetPos = this.getFlyToTargetPos(this.getTarget());
-                if (!roostingBox.inflate(ATTACK_RADIUS).contains(targetPos)){
+                if (!roostingBox.inflate(FLY_TO_TARGET_RADIUS).contains(targetPos)){
                     this.setMoveTargetPos(this.roostingBox.getCenter());
                     this.setTarget(null);
                 }
@@ -168,7 +214,7 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable {
 
         Vec3 resultPos;
 
-        if (dist > ATTACK_RADIUS){
+        if (dist > FLY_TO_TARGET_RADIUS){
             resultPos =  targetPos;
         }else{
             resultPos = this.position();

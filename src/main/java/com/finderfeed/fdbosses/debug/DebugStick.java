@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.debug;
 
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahRayCastingCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.GeburahTriggerSinEffectPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -34,6 +35,8 @@ public class DebugStick extends Item {
                     sppos.y + 2,
                     sppos.z + 10
             ));
+
+//            GeburahRayCastingCircle.summon(level, player.getEyePosition().add(player.getLookAngle()), player.getLookAngle());
 
         }
 

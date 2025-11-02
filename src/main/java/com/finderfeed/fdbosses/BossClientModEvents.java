@@ -278,11 +278,20 @@ public class BossClientModEvents {
 
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_SIN_CRYSTAL.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_CHAIN_TRAP.get(), GeburahCastingCircleRenderer::new);
+        event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
 
         event.registerEntityRenderer(BossEntities.JUDGEMENT_BIRD.get(), FDEntityRendererBuilder.<JudgementBirdEntity>builder()
                         .addLayer(FDEntityRenderLayerOptions.<JudgementBirdEntity>builder()
                                 .model(BossModels.JUDGEMENT_BIRD)
                                 .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/geburah/judgement_bird.png")))
+                                .transformation(((judgementBirdEntity, poseStack, v) -> {
+                                    poseStack.translate(0,judgementBirdEntity.getBbHeight() / 2,0);
+                                }))
+                                .build())
+                        .addLayer(FDEntityRenderLayerOptions.<JudgementBirdEntity>builder()
+                                .model(BossModels.JUDGEMENT_BIRD_LAYER)
+                                .light(LightTexture.FULL_BRIGHT)
+                                .renderType(RenderType.eyes(FDBosses.location("textures/entities/geburah/judgement_bird_emissive.png")))
                                 .transformation(((judgementBirdEntity, poseStack, v) -> {
                                     poseStack.translate(0,judgementBirdEntity.getBbHeight() / 2,0);
                                 }))
