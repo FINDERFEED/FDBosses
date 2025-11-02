@@ -27,6 +27,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainT
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahSinCrystal;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
@@ -362,6 +363,12 @@ public class BossEntities {
             .sized(0.2f,0.2f)
             .build("geburah_chain_trap_summon_projectile"));
 
+    public static final Supplier<EntityType<JudgementBirdEntity>> JUDGEMENT_BIRD = ENTITIES.register("judgement_bird",()->EntityType.Builder.of(
+                    JudgementBirdEntity::new, MobCategory.CREATURE
+            )
+            .sized(0.5f,0.5f)
+            .build("judgement_bird"));
+
 
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event){
@@ -377,6 +384,10 @@ public class BossEntities {
 
 
         event.put(GEBURAH.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
+
+        event.put(JUDGEMENT_BIRD.get(), Mob.createMobAttributes()
+                        .add(Attributes.MOVEMENT_SPEED, 0.35f)
+                .build());
 
         event.put(FIRE_MALKUTH_WARRIOR.get(), Mob.createMobAttributes()
                         .add(Attributes.MAX_HEALTH,60)

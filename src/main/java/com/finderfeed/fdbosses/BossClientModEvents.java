@@ -39,6 +39,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.Gebur
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahSinCrystal;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallExplosionParticle;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayStrikeDecalParticle;
@@ -278,7 +279,16 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_SIN_CRYSTAL.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_CHAIN_TRAP.get(), GeburahCastingCircleRenderer::new);
 
+        event.registerEntityRenderer(BossEntities.JUDGEMENT_BIRD.get(), FDEntityRendererBuilder.<JudgementBirdEntity>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<JudgementBirdEntity>builder()
+                                .model(BossModels.JUDGEMENT_BIRD)
+                                .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/geburah/judgement_bird.png")))
+                                .transformation(((judgementBirdEntity, poseStack, v) -> {
+                                    poseStack.translate(0,judgementBirdEntity.getBbHeight() / 2,0);
+                                }))
+                                .build())
 
+                .build());
 
         event.registerEntityRenderer(BossEntities.GEBURAH_CHAIN_TRAP_SUMMON_PROJECTILE.get(), FDEntityRendererBuilder.<ChainTrapSummonProjectile>builder()
                 .addLayer(FDEntityRenderLayerOptions.<ChainTrapSummonProjectile>builder()

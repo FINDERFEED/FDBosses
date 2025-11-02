@@ -47,6 +47,7 @@ public class BossModels {
     public static final Supplier<FDModelInfo> JUDGEMENT_BALL = INFOS.register("judgement_ball",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_ball"),1f));
     public static final Supplier<FDModelInfo> JUDGEMENT_BALL_LAYER = INFOS.register("judgement_ball_layer",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_ball"),1.05f));
     public static final Supplier<FDModelInfo> JUSTICE_HAMMER = INFOS.register("justice_hammer",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"justice_hammer"),1.0f));
+    public static final Supplier<FDModelInfo> JUDGEMENT_BIRD = INFOS.register("judgement_bird",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_bird"),1.0f));
 
 
 }

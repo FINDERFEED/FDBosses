@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.debug;
 
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.GeburahTriggerSinEffectPacket;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -8,6 +9,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public class DebugStick extends Item {
@@ -21,13 +24,16 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-//            for (var dir : new HorizontalCircleRandomDirections(level.random,12,1f)) {
-//                level.addParticle(new ColoredJumpingParticleOptions(new FDColor(1f, 0, 0f, 1f), 5, 0.5f, 1f, -1),
-//                        player.getX(), player.getY() + 3, player.getZ(), dir.x * 0.5, player.getRandom().nextFloat() * 1f, dir.z * 0.5);
-//
-//            }
+            Vec3 sppos = player.position().add(0,5,0);
 
-            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
+            JudgementBirdEntity.summon(level, sppos, new AABB(
+                    sppos.x -  10,
+                    sppos.y - 2,
+                    sppos.z - 10,
+                    sppos.x + 10,
+                    sppos.y + 2,
+                    sppos.z + 10
+            ));
 
         }
 
