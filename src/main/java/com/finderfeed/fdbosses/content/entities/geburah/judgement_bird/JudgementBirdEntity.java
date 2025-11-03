@@ -42,21 +42,25 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable, Gebu
     @SerializableField
     private Vec3 castingTargetPos;
 
+    @SerializableField
+    private Vec3 noTargetFlyToPos;
+
     private AABB roostingBox;
 
 
-    public static JudgementBirdEntity summon(Level level, Vec3 pos, AABB roostingBox){
+    public static JudgementBirdEntity summon(Level level, Vec3 pos, Vec3 noTargetFlyToPos, AABB roostingBox){
 
         JudgementBirdEntity entity = new JudgementBirdEntity(BossEntities.JUDGEMENT_BIRD.get(), level);
         entity.setPos(pos);
+        entity.noTargetFlyToPos = noTargetFlyToPos;
         entity.roostingBox = roostingBox;
         level.addFreshEntity(entity);
 
         return entity;
     }
 
-    public static JudgementBirdEntity summon(Level level, Vec3 pos){
-        return summon(level, pos,null);
+    public static JudgementBirdEntity summon(Level level, Vec3 pos, Vec3 noTargetFlyToPos){
+        return summon(level, pos,noTargetFlyToPos,null);
     }
 
     public JudgementBirdEntity(EntityType<? extends Mob> type, Level level) {
@@ -165,7 +169,7 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable, Gebu
             if (this.getTarget() != null) {
                 Vec3 targetPos = this.getFlyToTargetPos(this.getTarget());
                 if (!roostingBox.inflate(FLY_TO_TARGET_RADIUS).contains(targetPos)){
-                    this.setMoveTargetPos(this.roostingBox.getCenter());
+                    this.setMoveTargetPos(this.noTargetFlyToPos);
                     this.setTarget(null);
                 }
             }

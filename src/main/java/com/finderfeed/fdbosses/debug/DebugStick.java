@@ -25,16 +25,16 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            Vec3 sppos = player.position().add(0,5,0);
-
-            JudgementBirdEntity.summon(level, sppos, new AABB(
-                    sppos.x -  10,
-                    sppos.y - 2,
-                    sppos.z - 10,
-                    sppos.x + 10,
-                    sppos.y + 2,
-                    sppos.z + 10
-            ));
+//            Vec3 sppos = player.position().add(0,5,0);
+//
+//            JudgementBirdEntity.summon(level, sppos, new AABB(
+//                    sppos.x -  10,
+//                    sppos.y - 2,
+//                    sppos.z - 10,
+//                    sppos.x + 10,
+//                    sppos.y + 2,
+//                    sppos.z + 10
+//            ));
 
 //            GeburahRayCastingCircle.summon(level, player.getEyePosition().add(player.getLookAngle()), player.getLookAngle());
 

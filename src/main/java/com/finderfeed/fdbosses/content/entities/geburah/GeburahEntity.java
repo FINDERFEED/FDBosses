@@ -1,7 +1,9 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
+import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircleJudgementBird;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahChainTrapCastCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahSinCrystalCastCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.ChainTrapSummonProjectile;
@@ -10,6 +12,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahW
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahAttackFireDefaultProjectiles;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahRoundAndRoundLaserAttack;
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahWeaponRotationController;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.PlayerSinsHandler;
@@ -91,6 +94,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public static EntityDataAccessor<Boolean> LASERS_ACTIVE = SynchedEntityData.defineId(GeburahEntity.class, EntityDataSerializers.BOOLEAN);
 
     @SerializableField
+    private int judgementBirdSpawnTicker = 0;
+
+    @SerializableField
     private GeburahStompingController stompingController;
     protected GeburahWeaponRotationController rotatingWeaponsHandler;
     private GeburahRayController rayController;
@@ -105,6 +111,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public int sinsAppearTickO = 0;
     public static final int MAX_LASER_VISUAL_DISAPPEAR_TIME = 5;
     public int laserVisualDisappearTicker = 0;
+
+
 
     public GeburahLaserAttackPreparator laserAttackPreparator;
 
@@ -187,6 +195,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             this.getWeaponAttackController().tick();
             this.throwSinCrystals();
             this.tickTrapEntitiesSpawn();
+            this.tickJudgementBirdSpawn();
         }
 
         this.getWeaponRotationController().tick();
@@ -216,6 +225,63 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 Vec3 castCirclePos = this.position().add(direction.scale(3)).add(0,5,0);
 
                 GeburahChainTrapCastCircle.summon(level(), castCirclePos, direction.add(0,1,0), targetPos);
+
+            }
+
+        }
+
+    }
+
+    public void tickJudgementBirdSpawn(){
+        if (this.judgementBirdSpawnTicker != 0) {
+            this.judgementBirdSpawnTicker = Mth.clamp(judgementBirdSpawnTicker - 1,0,Integer.MAX_VALUE);
+            return;
+        }
+
+        this.judgementBirdSpawnTicker = 400;
+
+        int angles = 4;
+        float angle = FDMathUtil.FPI * 2 / angles;
+        float halfRadius = ARENA_RADIUS / 2f;
+        float roostingBoxCenterHeight = 5;
+        double centerDirectionOffset = Math.sqrt(halfRadius * halfRadius + halfRadius * halfRadius);
+
+        for (int i = 0; i < angles; i++){
+
+            float currentAngle = angle * i + FDMathUtil.FPI / 4;
+            Vec3 direction = new Vec3(1,0,0).yRot(currentAngle);
+
+
+            Vec3 roostingBoxCenter = this.position().add(direction.scale(centerDirectionOffset)).add(0,roostingBoxCenterHeight,0);
+
+            AABB roostingBox = new AABB(
+                    roostingBoxCenter.x - halfRadius,
+                    roostingBoxCenter.y - 0.5,
+                    roostingBoxCenter.z - halfRadius,
+                    roostingBoxCenter.x + halfRadius,
+                    roostingBoxCenter.y + 0.5,
+                    roostingBoxCenter.z + halfRadius
+            );
+            AABB findEntityBox = new AABB(
+                    roostingBoxCenter.x - halfRadius,
+                    roostingBoxCenter.y - roostingBoxCenterHeight,
+                    roostingBoxCenter.z - halfRadius,
+                    roostingBoxCenter.x + halfRadius,
+                    roostingBoxCenter.y + 5,
+                    roostingBoxCenter.z + halfRadius
+            );
+
+            var entities = level().getEntitiesOfClass(Entity.class, findEntityBox,(entity -> {
+                return entity instanceof GeburahCastingCircleJudgementBird || entity instanceof JudgementBirdEntity;
+            }));
+
+            if (entities.isEmpty()){
+
+                Vec3 castCirclePos = this.position().add(direction.scale(3)).add(0,roostingBoxCenterHeight,0);
+
+                Vec3 flyTo = castCirclePos.add(direction.scale(7));
+
+                GeburahCastingCircleJudgementBird.summon(level(), castCirclePos, direction, flyTo, roostingBox);
 
             }
 

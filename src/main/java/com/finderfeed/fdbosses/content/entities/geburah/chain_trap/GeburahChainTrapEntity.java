@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.geburah.chain_trap;
 
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
@@ -112,15 +113,17 @@ public class GeburahChainTrapEntity extends Entity implements AutoSerializable {
     }
 
     private void tickCaughtEntity(){
-        var entity = this.getPassengers().getFirst();
-        int duration = 600;
-        if (entity instanceof Player player){
-            duration = 60;
+        if (!this.getPassengers().isEmpty()) {
+            var entity = this.getPassengers().getFirst();
+            int duration = 600;
+            if (entity instanceof Player player) {
+                duration = 60;
+            }
+            if (catchTicks > duration) {
+                this.remove(RemovalReason.DISCARDED);
+            }
+            catchTicks++;
         }
-        if (catchTicks > duration){
-            this.remove(RemovalReason.DISCARDED);
-        }
-        catchTicks++;
     }
 
     @Override
@@ -174,6 +177,9 @@ public class GeburahChainTrapEntity extends Entity implements AutoSerializable {
 
         Vec3 pos = FDMathUtil.interpolateVectors(lastKnownTargetPos, target, p);
 
+        if (entity instanceof JudgementBirdEntity){
+            pos = pos.add(0,1f,0);
+        }
 
         return pos;
     }

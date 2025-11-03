@@ -20,6 +20,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.Ra
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircleJudgementBird;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahChainTrapCastCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahRayCastingCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahSinCrystalCastCircle;
@@ -363,6 +364,12 @@ public class BossEntities {
             )
             .sized(0.2f,0.2f)
             .build("geburah_casting_circle_ray"));
+
+    public static final Supplier<EntityType<GeburahCastingCircleJudgementBird>> GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD = ENTITIES.register("geburah_casting_circle_judgement_bird",()->EntityType.Builder.of(
+                    GeburahCastingCircleJudgementBird::new, MobCategory.MISC
+            )
+            .sized(0.2f,0.2f)
+            .build("geburah_casting_circle_judgement_bird"));
 
     public static final Supplier<EntityType<ChainTrapSummonProjectile>> GEBURAH_CHAIN_TRAP_SUMMON_PROJECTILE = ENTITIES.register("geburah_chain_trap_summon_projectile",()->EntityType.Builder.of(
                     ChainTrapSummonProjectile::new, MobCategory.MISC
