@@ -75,14 +75,26 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable, Gebu
     @Override
     protected void registerGoals() {
         super.registerGoals();
-        this.targetSelector.addGoal(0,new NearestAttackableTargetGoal<>(this, Player.class, true));
+        this.targetSelector.addGoal(0,new NearestAttackableTargetGoal<>(this, Player.class, true){
+            @Override
+            protected void findTarget() {
+                super.findTarget();
+                if (this.target != null){
+                    if (!isTargetInRoostingBox(this.target)){
+                        this.target = null;
+                    }
+                }
+            }
+        });
     }
 
     @Override
     public void tick() {
         if (!level().isClientSide){
             if (!this.isDeadOrDying()) {
-                this.checkTargetInRoostingBox();
+                if (this.getTarget() != null) {
+                    this.checkTargetInRoostingBox(this.getTarget());
+                }
                 this.flyAndAttack();
             }
         }else{
@@ -166,14 +178,19 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable, Gebu
         return true;
     }
 
-    private void checkTargetInRoostingBox(){
+    private boolean isTargetInRoostingBox(LivingEntity target){
+        if (roostingBox != null){
+            Vec3 targetPos = this.getFlyToTargetPos(target);
+            return roostingBox.inflate(FLY_TO_TARGET_RADIUS).contains(targetPos);
+        }
+        return true;
+    }
+
+    private void checkTargetInRoostingBox(LivingEntity target){
         if (roostingBox != null) {
-            if (this.getTarget() != null) {
-                Vec3 targetPos = this.getFlyToTargetPos(this.getTarget());
-                if (!roostingBox.inflate(FLY_TO_TARGET_RADIUS).contains(targetPos)){
-                    this.setMoveTargetPos(this.noTargetFlyToPos);
-                    this.setTarget(null);
-                }
+            if (!this.isTargetInRoostingBox(target)){
+                this.setMoveTargetPos(this.noTargetFlyToPos);
+                this.setTarget(null);
             }
         }
     }

@@ -400,6 +400,7 @@ public class BossEntities {
         event.put(GEBURAH.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
 
         event.put(JUDGEMENT_BIRD.get(), Mob.createMobAttributes()
+                        .add(Attributes.FOLLOW_RANGE, 32)
                         .add(Attributes.MOVEMENT_SPEED, 0.35f)
                 .build());
 
