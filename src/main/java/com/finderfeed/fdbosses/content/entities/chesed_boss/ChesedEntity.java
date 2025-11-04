@@ -3134,6 +3134,11 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         this.bossBar.removePlayer(player);
     }
 
+    @Override
+    public boolean fireImmune() {
+        return true;
+    }
+
     public void setRolling(boolean state){
         this.entityData.set(IS_ROLLING,state);
     }

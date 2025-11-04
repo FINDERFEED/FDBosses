@@ -48,7 +48,7 @@ public class GeburahRayCastingCircle extends GeburahCastingCircle {
         var res = level().clip(clipContext);
         end = res.getLocation();
 
-        var entities = FDHelpers.traceEntities(level(), this.position(),end, 0.2f, (e)->e instanceof LivingEntity livingEntity && !(e instanceof GeburahBossBuddy));
+        var entities = FDHelpers.traceEntities(level(), this.position(),end, 0.0f, (e)->e instanceof LivingEntity livingEntity && !(e instanceof GeburahBossBuddy));
 
         for (var entity : entities){
             entity.hurt(level().damageSources().generic(), 1f);
@@ -61,7 +61,7 @@ public class GeburahRayCastingCircle extends GeburahCastingCircle {
                 .build(),end,40);
 
         GeburahRayOptions options = GeburahRayOptions.builder()
-                .width(0.35f)
+                .width(0.25f)
                 .color(0.3f,0.8f,1f,1f)
                 .end(end)
                 .stay(2)

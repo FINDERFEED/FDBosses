@@ -244,7 +244,7 @@ public class BossClientPackets {
         Vec3 b = new Vec3(rad,0,0);
         float angle;
         if (rad != 0){
-            angle = 1f / rad;
+            angle = 3f / rad;
         }else{
             angle = FDMathUtil.FPI * 2;
         }

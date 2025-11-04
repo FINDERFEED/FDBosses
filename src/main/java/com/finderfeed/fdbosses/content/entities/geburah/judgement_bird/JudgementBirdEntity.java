@@ -81,8 +81,10 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable, Gebu
     @Override
     public void tick() {
         if (!level().isClientSide){
-            this.checkTargetInRoostingBox();
-            this.flyAndAttack();
+            if (!this.isDeadOrDying()) {
+                this.checkTargetInRoostingBox();
+                this.flyAndAttack();
+            }
         }else{
         }
         super.tick();

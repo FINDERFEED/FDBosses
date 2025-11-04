@@ -46,6 +46,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -76,6 +77,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public static final String LIMITED_BUTTONS_LASERS_AND_EARTHQUAKES = "limited_buttons_lasers_and_earthquakes";
     public static final String NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES = "no_jump_rays_earthquakes_projectiles";
     public static final String SIN_CRYSTALS_LASERS_AND_CANNONS = "sin_crystals_lasers_and_cannons";
+    public static final String NO_KILL_ENTITIES_ATTACK = "no_kill_entities_attack";
     public static final String EMPTY_SINS_AND_DELAY = "empty_sins_and_delay";
 
     public static final String GEBURAH_STOMPING_LAYER = "stomping";
@@ -151,6 +153,11 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .addAttack(EMPTY_SINS_AND_DELAY)
                 .build();
 
+        AttackOptions<?> noKillEntitiesAttack = AttackOptions.chainOptionsBuilder()
+                .addAttack(NO_KILL_ENTITIES_ATTACK)
+                .addAttack(EMPTY_SINS_AND_DELAY)
+                .build();
+
         this.mainAttackChain = new AttackChain(level.random)
                 .registerAttack(EMPTY_SINS_AND_DELAY, this::emptySinsAndDelay)
                 .registerAttack(SIMPLE_NO_SIN_RUN_AROUND, this::simpleNoSinRunAroundAttack)
@@ -158,7 +165,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .registerAttack(LIMITED_BUTTONS_LASERS_AND_EARTHQUAKES, this::limitedButtonsRotatingLasers)
                 .registerAttack(NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES, this::noJumpEarthquakesProjectilesRays)
                 .registerAttack(SIN_CRYSTALS_LASERS_AND_CANNONS, this::sinCrystalsLasersAndCannons)
-                .addAttack(0, sinCrystalsLasersAndCannons)
+                .registerAttack(NO_KILL_ENTITIES_ATTACK, this::noKillEntitiesAttack)
+                .addAttack(0, noKillEntitiesAttack)
         ;
 
         this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
@@ -336,6 +344,40 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public boolean emptySinsAndDelay(AttackInstance attackInstance){
         this.propagateSins(20);
         return attackInstance.tick > 60;
+    }
+
+    public boolean noKillEntitiesAttack(AttackInstance inst){
+
+        this.propagateSins(0, GeburahSins.KILL_ENTITY_SIN.get());
+
+        int localStagesCount = 3;
+        int stage = inst.stage;
+        int tick = inst.tick;
+        int localStage = stage % localStagesCount;
+        var attackController = this.getWeaponAttackController();
+
+        int maxStages = 8 * localStagesCount;
+
+        if (this.getPlayerPositionsCollector().getPlayers().isEmpty()) return false;
+
+        if (stage < maxStages) {
+            if (localStage == 0) {
+                this.getStompingController().stompFullCircle(30, true, 1f, 1f);
+                attackController.setCurrentAttack(new GeburahRoundAndRoundLaserAttack(this, this.sideSwitch), false);
+                this.sideSwitch = !sideSwitch;
+                inst.nextStage();
+            } else if (localStage == 1) {
+                if (!attackController.isAttacking()) {
+                    inst.nextStage();
+                }
+            } else if (localStage == 2) {
+                if (tick >= 30) {
+                    inst.nextStage();
+                }
+            }
+        }
+
+        return stage >= maxStages;
     }
 
 
@@ -952,6 +994,27 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public boolean shouldRender(double p_20296_, double p_20297_, double p_20298_) {
         return true;
     }
+
+    @Override
+    public boolean fireImmune() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeAffected(MobEffectInstance p_21197_) {
+        return false;
+    }
+
+    @Override
+    public void setDeltaMovement(Vec3 p_20257_) {
+
+    }
+
+    @Override
+    public void setDeltaMovement(double p_20335_, double p_20336_, double p_20337_) {
+
+    }
+
 
     @EventBusSubscriber(modid = FDBosses.MOD_ID)
     public static class Events {

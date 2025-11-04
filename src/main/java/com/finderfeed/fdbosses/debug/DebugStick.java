@@ -25,6 +25,8 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
+
 //            Vec3 sppos = player.position().add(0,5,0);
 //
 //            JudgementBirdEntity.summon(level, sppos, new AABB(
