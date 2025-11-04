@@ -54,7 +54,7 @@ public class DistortionSphereEffectHandler {
         double time = FDClientHelpers.getClientLevel().getGameTime() + event.getPartialTick().getGameTimeDeltaPartialTick(false);
         time /= 10f;
 
-        Vec3 spherePos = new Vec3(Math.sin(time) * 2 + 0.5,100.5,Math.cos(time) * 2 + 0.5);
+        Vec3 spherePos = new Vec3( 0.5,100.5,0.5);
 
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         Vec3 camPos = camera.getPosition();
@@ -66,15 +66,19 @@ public class DistortionSphereEffectHandler {
         Matrix4f mat = new Matrix4f(event.getModelViewMatrix());
         Matrix4f projection = new Matrix4f(event.getProjectionMatrix());
 
+        float floorY = 101f;
+
+        float floorOffset = (float) (floorY - camPos.y);
 
 
         for (var pass : sphericalDistortionEffect.passes){
             var effect = pass.getEffect();
-            effect.safeGetUniform("modelview").set(mat);
-            effect.safeGetUniform("projection").set(projection);
             effect.safeGetUniform("inverseProjection").set(projection.invert(new Matrix4f()));
+            effect.safeGetUniform("inverseModelview").set(mat.invert(new Matrix4f()));
             effect.safeGetUniform("sphereRelativePosition").set(relativeSpherePos);
-            effect.safeGetUniform("sphereRadius").set(0.5f);
+            effect.safeGetUniform("sphereRadius").set(5f);
+            effect.safeGetUniform("innerSphereRadius").set(4.5f);
+            effect.safeGetUniform("floorOffset").set(2f * (float) Math.sin(time));
         }
 
 

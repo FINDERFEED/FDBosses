@@ -2,12 +2,13 @@
 
 uniform sampler2D DiffuseSampler;
 
-uniform mat4 modelview;
-uniform mat4 projection;
 uniform mat4 inverseProjection;
-uniform vec2 ScreenSize;
+uniform mat4 inverseModelview;
 uniform vec3 sphereRelativePosition;
 uniform float sphereRadius;
+uniform float innerSphereRadius;
+
+uniform float floorOffset;
 
 in vec2 texCoord;
 
@@ -19,47 +20,57 @@ float distanceToSphere(vec3 currentPos, vec3 spherePos, float sphereRadius){
     return l;
 }
 
-float distanceToEllipse(vec3 pos, vec3 ellipsePos, vec3 r){
+vec3 getRayDirection(){
 
-    pos -= ellipsePos;
+    vec2 uv = (texCoord - 0.5) * 2.0;
+    vec4 rayDirW = inverseModelview * inverseProjection * vec4(uv.x,uv.y, 1.0, 1.0);
+    rayDirW /= rayDirW.w;
 
-    float k0 = length(pos/r);
-    float k1 = length(pos/(r*r));
-    return k0*(k0-1.0)/k1;
+    return normalize(rayDirW.xyz);
 }
 
 
+//https://www.shadertoy.com/view/stKSzc
+float distanceToCutSphere(vec3 pos, vec3 spherePos,float sphereRadius,float planePos){
+
+    planePos = clamp(planePos, -sphereRadius, sphereRadius);
+
+    pos -= spherePos;
+
+    float w = sqrt(sphereRadius*sphereRadius-planePos*planePos);
+
+    vec2 q = vec2( length(pos.xz), pos.y );
+
+    float s = max( (planePos-sphereRadius)*q.x*q.x+w*w*(planePos+sphereRadius-2.0*q.y), planePos*q.x-w*q.y );
+
+    return (s<0.0) ? length(q)-sphereRadius :
+    (q.x<w) ? planePos - q.y     :
+    length(q-vec2(w,planePos));
+}
 
 
 void main(){
 
     vec4 color = texture(DiffuseSampler, texCoord);
 
-    vec2 uv = (texCoord - 0.5) * 2.0;
-    float ar = (ScreenSize.y / ScreenSize.x);
-//    uv.y *= (ScreenSize.y / ScreenSize.x);
-
-    vec4 rayDirW = inverseProjection * vec4(uv.x,uv.y, 1.0, 1.0);
-    rayDirW /= rayDirW.w;
-
-    vec3 rayDir = normalize(rayDirW.xyz);
+    vec3 rayDir = getRayDirection();
 
     int steps = 100;
     float currentDistance = 0.0;
     int wasTargetHit = 0;
 
-    vec4 p = vec4(sphereRelativePosition.x, sphereRelativePosition.y, sphereRelativePosition.z, 1.0);
-
-    float actualRadius = sphereRadius;
-
-    vec4 res = modelview * p;
-    vec3 spherePos = res.xyz;
+    vec3 spherePos = sphereRelativePosition;
 
 
     for (int i = 0; i < steps; i++){
 
         vec3 pos = rayDir * currentDistance;
-        float dist = distanceToSphere(pos, spherePos, sphereRadius);
+        float distOuter = distanceToCutSphere(pos, spherePos, sphereRadius, floorOffset);
+        float distInner = distanceToCutSphere(pos, spherePos - vec3(0,0.05,0), innerSphereRadius, floorOffset);
+
+
+        float dist = max(-distInner, distOuter);
+
 
         if (dist < 0.01){
             wasTargetHit = 1;
@@ -73,7 +84,7 @@ void main(){
     }
 
 
-    vec3 col = vec3(currentDistance * 0.25);
+    vec3 col = vec3(currentDistance * 0.1);
 
     if (wasTargetHit == 0){
         fragColor = color;
