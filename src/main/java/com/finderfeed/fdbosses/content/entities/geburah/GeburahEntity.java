@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahChainTrapCa
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahSinCrystalCastCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.ChainTrapSummonProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.StartGeburahDistortionEffectPacket;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttackController;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahAttackFireDefaultProjectiles;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
@@ -59,6 +60,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
@@ -170,12 +172,13 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .registerAttack(SIN_CRYSTALS_LASERS_AND_CANNONS, this::sinCrystalsLasersAndCannons)
                 .registerAttack(NO_KILL_ENTITIES_ATTACK, this::noKillEntitiesAttack)
                 .attackListener(this::attackListener)
-                .addAttack(0, noKillEntitiesAttack)
-                .addAttack(0, simpleRunAroundNoSins)
-                .addAttack(0, noJumpRaysEarthquakesProjectiles)
-                .addAttack(0, runClockwiseHammersRayProjectiles)
-                .addAttack(0, limitedButtonsLasersAndEarthquakes)
-                .addAttack(0, sinCrystalsLasersAndCannons)
+                .addAttack(0, EMPTY_SINS_AND_DELAY)
+//                .addAttack(0, noKillEntitiesAttack)
+//                .addAttack(0, simpleRunAroundNoSins)
+//                .addAttack(0, noJumpRaysEarthquakesProjectiles)
+//                .addAttack(0, runClockwiseHammersRayProjectiles)
+//                .addAttack(0, limitedButtonsLasersAndEarthquakes)
+//                .addAttack(0, sinCrystalsLasersAndCannons)
         ;
 
         this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
@@ -231,8 +234,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             float currentAngle = angle * i + FDMathUtil.FPI / 4 + (level().random.nextFloat() * 2 - 1) * FDMathUtil.FPI / 8;
             Vec3 direction = new Vec3(1,0,0).yRot(currentAngle);
 
-            var entities = FDTargetFinder.getEntitiesInArc(Entity.class, level(), this.position().add(0,-0.1f,0),
-                    new Vec2((float) direction.x,(float) direction.z), FDMathUtil.FPI / 2, 30, ARENA_RADIUS, (entity) -> {
+            var entities = FDTargetFinder.getEntitiesInArc(Entity.class, level(), this.position().add(0,-5f,0),
+                    new Vec2((float) direction.x,(float) direction.z), FDMathUtil.FPI / 2, 35, ARENA_RADIUS, (entity) -> {
                 return entity instanceof GeburahChainTrapEntity || entity instanceof ChainTrapSummonProjectile || entity instanceof GeburahChainTrapCastCircle;
             });
 
@@ -386,11 +389,14 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         }
 
-        if (attackInstance.tick > 60){
+        if (attackInstance.tick == 60){
+            for (var serverPlayer : FDTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level(), this.position().add(0,-0.1,0), 40, ARENA_RADIUS)){
+                PacketDistributor.sendToPlayer(serverPlayer, new StartGeburahDistortionEffectPacket(this));
+            }
             level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.ATTACK_DING.get(), SoundSource.HOSTILE, 5f, 1f);
         }
 
-        return attackInstance.tick > 60;
+        return attackInstance.tick > 150;
     }
 
     public boolean noKillEntitiesAttack(AttackInstance inst){

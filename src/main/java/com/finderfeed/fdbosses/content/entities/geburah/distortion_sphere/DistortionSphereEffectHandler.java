@@ -12,6 +12,8 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import net.neoforged.neoforge.client.event.ViewportEvent;
 import org.joml.Matrix4f;
@@ -24,7 +26,30 @@ import java.io.IOException;
 public class DistortionSphereEffectHandler {
 
     private static PostChain sphericalDistortionEffect;
-    private static boolean shouldRenderEffect = false;
+
+    private static DistortionSphereEffect currentEffect;
+
+    public static void setDistortionSphereEffect(DistortionSphereEffect effect){
+        currentEffect = effect;
+    }
+
+    public static DistortionSphereEffect getCurrentEffect() {
+        return currentEffect;
+    }
+
+    @SubscribeEvent
+    public static void loggingOut(ClientPlayerNetworkEvent.LoggingOut event){
+        currentEffect = null;
+    }
+
+    @SubscribeEvent
+    public static void clientTickEvent(ClientTickEvent.Pre event){
+        if (currentEffect != null && !Minecraft.getInstance().isPaused()){
+            if (currentEffect.tick()){
+                currentEffect = null;
+            }
+        }
+    }
 
     @SubscribeEvent
     public static void registerPostShader(FDPostShaderInitializeEvent event){
@@ -48,37 +73,40 @@ public class DistortionSphereEffectHandler {
         var stage = event.getStage();
         if (stage != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) return;
 
+        if (currentEffect == null) return;
 
-        var matrices = event.getPoseStack();
-
-        double time = FDClientHelpers.getClientLevel().getGameTime() + event.getPartialTick().getGameTimeDeltaPartialTick(false);
-        time /= 10f;
-
-        Vec3 spherePos = new Vec3( 0.5,100.5,0.5);
 
         Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
         Vec3 camPos = camera.getPosition();
 
-        Vector3f relativeSpherePos = spherePos.subtract(camPos).toVector3f();
 
-        shouldRenderEffect = relativeSpherePos.length() < 100;
+        Vec3 spherePos = currentEffect.position;
+        Vector3f relativeSpherePos = spherePos.subtract(camPos).toVector3f();
 
         Matrix4f mat = new Matrix4f(event.getModelViewMatrix());
         Matrix4f projection = new Matrix4f(event.getProjectionMatrix());
 
-        float floorY = 101f;
+        float pticks = event.getPartialTick().getGameTimeDeltaPartialTick(false);
 
-        float floorOffset = (float) (floorY - camPos.y);
+        float radius = currentEffect.getSphereRadius(pticks);
+        float innerRadius = currentEffect.getInnerSphereRadius(pticks);
+        float strength = currentEffect.getEffectStrength(pticks);
 
+        float y = currentEffect.yFloorPos;
+        float floorOffset = y - (float)spherePos.y;
+
+        Matrix4f invertedProjection = projection.invert(new Matrix4f());
+        Matrix4f invertedModelview = mat.invert(new Matrix4f());
 
         for (var pass : sphericalDistortionEffect.passes){
             var effect = pass.getEffect();
-            effect.safeGetUniform("inverseProjection").set(projection.invert(new Matrix4f()));
-            effect.safeGetUniform("inverseModelview").set(mat.invert(new Matrix4f()));
+            effect.safeGetUniform("inverseProjection").set(invertedProjection);
+            effect.safeGetUniform("inverseModelview").set(invertedModelview);
             effect.safeGetUniform("sphereRelativePosition").set(relativeSpherePos);
-            effect.safeGetUniform("sphereRadius").set(20f);
-            effect.safeGetUniform("innerSphereRadius").set(19f);
-            effect.safeGetUniform("floorOffset").set(-2.5f);
+            effect.safeGetUniform("sphereRadius").set(radius);
+            effect.safeGetUniform("innerSphereRadius").set(innerRadius);
+            effect.safeGetUniform("floorOffset").set(floorOffset);
+            effect.safeGetUniform("effectStrength").set(strength * 2);
         }
 
 
@@ -87,9 +115,20 @@ public class DistortionSphereEffectHandler {
     @SubscribeEvent
     public static void renderShader(FDRenderPostShaderEvent.Level event) {
         if (sphericalDistortionEffect == null) return;
-        if (shouldRenderEffect) {
-            event.doDefaultShaderBeforeShaderStuff();
-            sphericalDistortionEffect.process(event.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+        if (currentEffect != null) {
+            Vec3 position = currentEffect.position;
+
+            Camera camera = Minecraft.getInstance().gameRenderer.getMainCamera();
+            Vec3 camPos = camera.getPosition();
+
+            float renderDistance = Minecraft.getInstance().options.renderDistance().get() * 16;
+
+
+            if (camPos.distanceTo(position) < renderDistance) {
+                event.doDefaultShaderBeforeShaderStuff();
+                sphericalDistortionEffect.process(event.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+            }
+
         }
     }
 

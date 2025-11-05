@@ -159,7 +159,7 @@ vec3 getRayDirection(){
 //https://www.shadertoy.com/view/stKSzc
 float distanceToCutSphere(vec3 pos, vec3 spherePos,float sphereRadius,float planePos){
 
-    planePos = clamp(planePos, -sphereRadius, sphereRadius);
+    planePos = clamp(planePos, -sphereRadius + 0.01, sphereRadius - 0.01);
 
     pos -= spherePos;
 
@@ -184,6 +184,16 @@ vec4 srcOneSrcAlpha(vec4 src, vec4 dest){
     );
 }
 
+
+bool isInsideSphere(){
+
+    vec3 spherePos = sphereRelativePosition;
+    float len = length(spherePos);
+
+    return len <= innerSphereRadius;
+
+}
+
 void main(){
 
 
@@ -201,11 +211,23 @@ void main(){
 
     vec3 hitPos;
 
+
     for (int i = 0; i < steps; i++){
 
         vec3 pos = rayDir * currentDistance;
-        float distOuter = distanceToCutSphere(pos, spherePos, sphereRadius, floorOffset);
-        float distInner = distanceToCutSphere(pos, spherePos - vec3(0,0.05,0), innerSphereRadius, floorOffset);
+
+
+        float distOuter;
+        float distInner;
+
+        if (isInsideSphere()){
+            distOuter = distanceToSphere(pos, spherePos, sphereRadius);
+            distInner = distanceToSphere(pos, spherePos, innerSphereRadius);
+        }else{
+            distOuter = distanceToCutSphere(pos, spherePos, sphereRadius, floorOffset);
+            distInner = distanceToCutSphere(pos, spherePos - vec3(0,0.05,0), innerSphereRadius, floorOffset);
+        }
+
 
         float dist = max(-distInner, distOuter);
 
@@ -247,7 +269,7 @@ void main(){
 
         vec3 noisePos = hitPos;
         float sections = 0.5;
-        float sections2 = 0.25;
+        float sections2 = 0.15;
         float distanceToHitPos = length(hitPos);
 
         if (length(hitPos) < 0.01){

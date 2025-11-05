@@ -12,6 +12,8 @@ import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
+import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffectHandler;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahWeaponRotationController;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahWeaponRotation;
@@ -138,6 +140,18 @@ public class BossClientPackets {
         }
     }
 
+    public static void startGeburahDistortionEffect(int entityId){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
+
+            Vec3 corePos = geburah.getCorePosition();
+            Vec3 pos = geburah.position();
+
+            DistortionSphereEffectHandler.setDistortionSphereEffect(new DistortionSphereEffect(
+                    corePos, 60, GeburahEntity.ARENA_RADIUS * 2,2, (float)pos.y
+            ));
+
+        }
+    }
 
     public static void openBossDossierScreen(int spawnerId, List<Item> drops){
         Level level = FDClientHelpers.getClientLevel();
