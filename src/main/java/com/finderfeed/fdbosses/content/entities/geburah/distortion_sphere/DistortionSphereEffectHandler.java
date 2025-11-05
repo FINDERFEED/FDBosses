@@ -76,8 +76,8 @@ public class DistortionSphereEffectHandler {
             effect.safeGetUniform("inverseProjection").set(projection.invert(new Matrix4f()));
             effect.safeGetUniform("inverseModelview").set(mat.invert(new Matrix4f()));
             effect.safeGetUniform("sphereRelativePosition").set(relativeSpherePos);
-            effect.safeGetUniform("sphereRadius").set(5f);
-            effect.safeGetUniform("innerSphereRadius").set(4f);
+            effect.safeGetUniform("sphereRadius").set(20f);
+            effect.safeGetUniform("innerSphereRadius").set(19f);
             effect.safeGetUniform("floorOffset").set(-2.5f);
         }
 

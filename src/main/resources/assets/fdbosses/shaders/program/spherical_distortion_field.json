@@ -20,6 +20,7 @@
     { "name": "sphereRelativePosition", "type": "float",     "count": 3,  "values": [ 10.0, 10.0, 10.0 ] },
     { "name": "sphereRadius", "type": "float",     "count": 1,  "values": [ 1.0 ] },
     { "name": "innerSphereRadius", "type": "float",     "count": 1,  "values": [ 1.0 ] },
-    { "name": "floorOffset", "type": "float",     "count": 1,  "values": [ 1.0 ] }
+    { "name": "floorOffset", "type": "float",     "count": 1,  "values": [ 1.0 ] },
+    { "name": "effectStrength", "type": "float",     "count": 1,  "values": [ 1.0 ] }
   ]
 }

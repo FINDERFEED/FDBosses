@@ -7,6 +7,7 @@ uniform mat4 inverseModelview;
 uniform vec3 sphereRelativePosition;
 uniform float sphereRadius;
 uniform float innerSphereRadius;
+uniform float effectStrength;
 
 uniform float floorOffset;
 
@@ -173,6 +174,15 @@ float distanceToCutSphere(vec3 pos, vec3 spherePos,float sphereRadius,float plan
     length(q-vec2(w,planePos));
 }
 
+vec4 srcOneSrcAlpha(vec4 src, vec4 dest){
+
+    return vec4(
+    src.r + dest.r * src.a,
+    src.g + dest.g * src.a,
+    src.b + dest.b * src.a,
+    src.a + dest.a * src.a
+    );
+}
 
 void main(){
 
@@ -236,17 +246,20 @@ void main(){
 
 
         vec3 noisePos = hitPos;
-        float sections = 1;
+        float sections = 0.5;
+        float sections2 = 0.25;
         float distanceToHitPos = length(hitPos);
 
         if (length(hitPos) < 0.01){
             float z = length(sphereRelativePosition - innerSphereRadius) / 3.;
             noisePos = vec3(texCoord.x,texCoord.y, z);
             sections = 10;
+            sections2 = 5;
             distanceToHitPos = 10;
         }
 
         float noise = perlinNoise(noisePos.x,noisePos.y,noisePos.z,sections,1);
+        float noise2 = perlinNoise(noisePos.x,noisePos.y,noisePos.z,sections2,1);
 
         noise = (noise + 1) / 2;
 
@@ -254,7 +267,8 @@ void main(){
 
         mat2 rotation = rotationMatrix(rotationAngle);
 
-        float shiftDensity = pow(density, 4) * screenEdgeModifier;
+        float shiftDensityNoScreen = pow(density, 4) * effectStrength;
+        float shiftDensity = shiftDensityNoScreen * screenEdgeModifier;
 
 
         vec3 col = vec3(pow(density, 4) * noise);
@@ -271,9 +285,16 @@ void main(){
         vec4 colorG = texture(DiffuseSampler, texCoord + offset);
         vec4 colorB = texture(DiffuseSampler, texCoord + offset + vec2(-rgbOffset,rgbOffset) * shiftDensity);
 
+        vec4 addedColorMain = vec4(1f,0.8f,0.3f,1f);
+        vec4 addedColorSecondary = vec4(0,0,0,0);
+
+        vec4 addedColor = mix(addedColorMain, addedColorSecondary, noise2);
+        addedColor = srcOneSrcAlpha(addedColor,addedColor) * shiftDensityNoScreen;
+
+
         fragColor = vec4(colorR.r,colorG.g,colorB.b,colorG.a);
-//        fragColor = vec4(noise * noise * shiftDensity);
-//        fragColor = vec4(screenEdgeModifier);
+        fragColor.rgb += addedColor.rgb * 0.025;
+
     }
 
 }
