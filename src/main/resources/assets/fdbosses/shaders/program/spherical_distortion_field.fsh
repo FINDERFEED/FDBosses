@@ -57,10 +57,13 @@ void main(){
 
     int steps = 100;
     float currentDistance = 0.0;
-    int wasTargetHit = 0;
+
+    float density = 0.0;
 
     vec3 spherePos = sphereRelativePosition;
 
+    int maxInsideSphereSteps = 10;
+    float insideSphereStep = 0.1;
 
     for (int i = 0; i < steps; i++){
 
@@ -68,12 +71,32 @@ void main(){
         float distOuter = distanceToCutSphere(pos, spherePos, sphereRadius, floorOffset);
         float distInner = distanceToCutSphere(pos, spherePos - vec3(0,0.05,0), innerSphereRadius, floorOffset);
 
-
         float dist = max(-distInner, distOuter);
 
 
         if (dist < 0.01){
-            wasTargetHit = 1;
+
+            vec3 normal = normalize(pos - spherePos);
+            float d = abs(dot(normalize(spherePos), normal));
+            density = d;
+
+
+//            for (int k = 1; k < maxInsideSphereSteps; k++){
+//
+//                float offset = insideSphereStep * k;
+//                vec3 insidePos = pos + rayDir * offset;
+//
+//                float distOuter2 = distanceToCutSphere(insidePos, spherePos, sphereRadius, floorOffset);
+//                float distInner2 = distanceToCutSphere(insidePos, spherePos - vec3(0,0.05,0), innerSphereRadius, floorOffset);
+//
+//                if (distOuter2 <= 0 && distInner2 >= 0){
+//                    density += insideSphereStep;
+//                }else{
+//                    break;
+//                }
+//
+//            }
+
             break;
         }else if (dist > 100){
             break;
@@ -84,9 +107,9 @@ void main(){
     }
 
 
-    vec3 col = vec3(currentDistance * 0.1);
+    vec3 col = color.rgb + density / 2;
 
-    if (wasTargetHit == 0){
+    if (density == 0){
         fragColor = color;
     }else{
         fragColor = vec4(col.x,col.y,col.z,1.0);

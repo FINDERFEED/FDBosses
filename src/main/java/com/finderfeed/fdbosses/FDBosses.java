@@ -44,5 +44,4 @@ public class FDBosses {
         BossEntityDataSerializers.ENTITY_DATA_SERIALIZERS.register(bus);
     }
 
-
 }
