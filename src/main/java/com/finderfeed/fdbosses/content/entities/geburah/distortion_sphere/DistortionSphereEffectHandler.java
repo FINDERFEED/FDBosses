@@ -78,7 +78,7 @@ public class DistortionSphereEffectHandler {
             effect.safeGetUniform("sphereRelativePosition").set(relativeSpherePos);
             effect.safeGetUniform("sphereRadius").set(5f);
             effect.safeGetUniform("innerSphereRadius").set(4f);
-            effect.safeGetUniform("floorOffset").set(-2f);
+            effect.safeGetUniform("floorOffset").set(-2.5f);
         }
 
 
