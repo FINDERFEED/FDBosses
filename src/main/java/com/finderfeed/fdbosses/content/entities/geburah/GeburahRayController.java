@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAtta
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
@@ -17,6 +18,7 @@ import com.finderfeed.fdlib.util.client.particles.options.AlphaOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
@@ -71,8 +73,12 @@ public class GeburahRayController {
             currentShotCharge = Mth.clamp(currentShotCharge - 1,0,Integer.MAX_VALUE);
         }else if (currentShotCharge == 0){
 
-            for (var target : this.targets){
-               this.fireRayAtPos(target,1, damageRadius);
+            if (!this.targets.isEmpty()) {
+                for (var target : this.targets) {
+                    this.fireRayAtPos(target, 1, damageRadius, false);
+                }
+                Vec3 start = geburah.getCorePosition();
+                geburah.level().playSound(null, start.x,start.y,start.z, BossSounds.GEBURAH_CORE_RAY_STRIKE.get(), SoundSource.HOSTILE, 10f, 1f);
             }
 
             this.currentShotCharge = -1;
@@ -81,14 +87,20 @@ public class GeburahRayController {
 
     }
 
-    public void fireRayAtPos(Vec3 target, float damage, float damageRadius){
+    public void fireRayAtPos(Vec3 target, float damage, float damageRadius, boolean playSound){
         Vec3 start = geburah.getCorePosition();
+
+        if (playSound){
+            geburah.level().playSound(null, start.x,start.y,start.z, BossSounds.GEBURAH_CORE_RAY_STRIKE.get(), SoundSource.HOSTILE, 5f, 1f);
+        }
 
         Level level = geburah.level();
 
         Vec3 between = target.subtract(start).normalize();
 
-        Vec3 end = target.add(between.multiply(10,10,10));
+        Vec3 end = target.add(between.add(between.normalize().scale(10)));
+
+        between = between.normalize();
 
         ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
         BlockHitResult result = level.clip(clipContext);
@@ -112,6 +124,7 @@ public class GeburahRayController {
         FDLibCalls.sendParticles((ServerLevel) level, options, start, 200);
 
         if (result.getType() != HitResult.Type.MISS) {
+
             BossUtil.createOnEarthBlockExplosionEffect(level, result.getLocation(), between, 10, Blocks.STONE.defaultBlockState());
 
             Direction direction = result.getDirection();
@@ -125,7 +138,7 @@ public class GeburahRayController {
 
 
 
-            FDLibCalls.sendParticles((ServerLevel) geburah.level(), decal, target.add(
+            FDLibCalls.sendParticles((ServerLevel) geburah.level(), decal, result.getLocation().add(
                     direction.getStepX() * GeburahEntity.RAY_DECAL_OFFSET,
                     direction.getStepY() * GeburahEntity.RAY_DECAL_OFFSET,
                     direction.getStepZ() * GeburahEntity.RAY_DECAL_OFFSET),
@@ -137,9 +150,10 @@ public class GeburahRayController {
 
         PositionedScreenShakePacket.send((ServerLevel) level, FDShakeData.builder()
                 .amplitude(1f)
+                        .stayTime(5)
                 .outTime(5)
-                .frequency(20)
-                .build(), result.getLocation(), 60);
+                .frequency(40)
+                .build(), result.getLocation(), 120);
 
 
 

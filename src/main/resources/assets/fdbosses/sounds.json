@@ -162,5 +162,8 @@
   },
   "rotating_weapons_cling": {
     "sounds": [ "fdbosses:rotating_weapons_cling" ]
+  },
+  "geburah_core_ray_strike": {
+    "sounds": [ "fdbosses:geburah_core_ray_strike" ]
   }
 }

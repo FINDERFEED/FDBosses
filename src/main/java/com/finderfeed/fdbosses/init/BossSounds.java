@@ -64,6 +64,7 @@ public class BossSounds {
 
     public static final Supplier<SoundEvent> GEBURAH_SIN = SOUNDS.register("geburah_sin",()->SoundEvent.createVariableRangeEvent(FDBosses.location("geburah_sin")));
     public static final Supplier<SoundEvent> GEBURAH_WEAPON_ROTATION_CLING = SOUNDS.register("rotating_weapons_cling",()->SoundEvent.createVariableRangeEvent(FDBosses.location("rotating_weapons_cling")));
+    public static final Supplier<SoundEvent> GEBURAH_CORE_RAY_STRIKE = SOUNDS.register("geburah_core_ray_strike",()->SoundEvent.createVariableRangeEvent(FDBosses.location("geburah_core_ray_strike")));
 
 
 }

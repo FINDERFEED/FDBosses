@@ -30,7 +30,9 @@ public class GeburahWeaponRotationController {
         this.oldRotation = currentRotation;
         if (weaponRotation != null){
             weaponRotation.tick();
+            if (weaponRotation.shouldPlayRotationSound()){
             this.playRotationSound();
+            }
             if (weaponRotation.finishedRotation()){
                 weaponRotation = null;
                 this.trySendRotationSyncPacket();
@@ -44,7 +46,7 @@ public class GeburahWeaponRotationController {
             float distForSound = 20;
             if (rotationForSound > distForSound) {
                 rotationForSound = rotationForSound % distForSound;
-                geburah.level().playSound(null, geburah.getX(),geburah.getY(), geburah.getZ(), BossSounds.GEBURAH_WEAPON_ROTATION_CLING.get(), SoundSource.HOSTILE, 5f, 1f);
+                geburah.level().playSound(null, geburah.getX(),geburah.getY(), geburah.getZ(), BossSounds.GEBURAH_WEAPON_ROTATION_CLING.get(), SoundSource.HOSTILE, 3f, 1f);
             }
         }
     }

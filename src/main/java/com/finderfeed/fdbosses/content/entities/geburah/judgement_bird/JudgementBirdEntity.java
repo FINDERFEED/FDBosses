@@ -181,7 +181,14 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable, Gebu
     private boolean isTargetInRoostingBox(LivingEntity target){
         if (roostingBox != null){
             Vec3 targetPos = this.getFlyToTargetPos(target);
-            return roostingBox.inflate(FLY_TO_TARGET_RADIUS).contains(targetPos);
+            return new AABB(
+                    roostingBox.minX,
+                    roostingBox.minY - FLY_TO_TARGET_RADIUS,
+                    roostingBox.minZ,
+                    roostingBox.maxX,
+                    roostingBox.maxY + FLY_TO_TARGET_RADIUS,
+                    roostingBox.maxZ
+            ).contains(targetPos);
         }
         return true;
     }
