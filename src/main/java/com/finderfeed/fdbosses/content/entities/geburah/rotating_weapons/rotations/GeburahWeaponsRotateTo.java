@@ -76,6 +76,11 @@ public class GeburahWeaponsRotateTo extends GeburahWeaponRotation {
     }
 
     @Override
+    public boolean shouldPlayRotationSound() {
+        return true;
+    }
+
+    @Override
     public Type rotationType() {
         return Type.ROTATE_TO;
     }

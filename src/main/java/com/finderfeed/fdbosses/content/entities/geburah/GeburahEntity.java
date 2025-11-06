@@ -69,7 +69,7 @@ import java.util.List;
 
 public class GeburahEntity extends FDLivingEntity implements AutoSerializable, GeburahBossBuddy {
 
-    public static final int ATTACK_START_DELAY = 20;
+    public static final int ATTACK_START_DELAY = 40;
 
     public static final int CANNONS_AMOUNT = 8;
     public static final float RAY_PREPARATION_PARTICLES_OFFSET = 0.05f;
@@ -172,13 +172,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .registerAttack(SIN_CRYSTALS_LASERS_AND_CANNONS, this::sinCrystalsLasersAndCannons)
                 .registerAttack(NO_KILL_ENTITIES_ATTACK, this::noKillEntitiesAttack)
                 .attackListener(this::attackListener)
-                .addAttack(0, EMPTY_SINS_AND_DELAY)
-//                .addAttack(0, noKillEntitiesAttack)
-//                .addAttack(0, simpleRunAroundNoSins)
-//                .addAttack(0, noJumpRaysEarthquakesProjectiles)
-//                .addAttack(0, runClockwiseHammersRayProjectiles)
-//                .addAttack(0, limitedButtonsLasersAndEarthquakes)
-//                .addAttack(0, sinCrystalsLasersAndCannons)
+                .addAttack(0, noKillEntitiesAttack)
+                .addAttack(0, simpleRunAroundNoSins)
+                .addAttack(0, noJumpRaysEarthquakesProjectiles)
+                .addAttack(0, runClockwiseHammersRayProjectiles)
+                .addAttack(0, limitedButtonsLasersAndEarthquakes)
+                .addAttack(0, sinCrystalsLasersAndCannons)
         ;
 
         this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
@@ -396,7 +395,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.ATTACK_DING.get(), SoundSource.HOSTILE, 5f, 1f);
         }
 
-        return attackInstance.tick > 150;
+        return attackInstance.tick > 60;
     }
 
     public boolean noKillEntitiesAttack(AttackInstance inst){

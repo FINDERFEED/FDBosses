@@ -63,6 +63,7 @@ public class BossSounds {
     public static final Supplier<SoundEvent> MALKUTH_SWORD_ULTIMATE_IMPACT = SOUNDS.register("malkuth_sword_ultimate_impact",()->SoundEvent.createVariableRangeEvent(FDBosses.location("malkuth_sword_ultimate_impact")));
 
     public static final Supplier<SoundEvent> GEBURAH_SIN = SOUNDS.register("geburah_sin",()->SoundEvent.createVariableRangeEvent(FDBosses.location("geburah_sin")));
+    public static final Supplier<SoundEvent> GEBURAH_WEAPON_ROTATION_CLING = SOUNDS.register("rotating_weapons_cling",()->SoundEvent.createVariableRangeEvent(FDBosses.location("rotating_weapons_cling")));
 
 
 }

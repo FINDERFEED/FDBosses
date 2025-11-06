@@ -18,6 +18,8 @@ public abstract class GeburahWeaponRotation {
 
     public abstract boolean finishedRotation();
 
+    public abstract boolean shouldPlayRotationSound();
+
     public abstract Type rotationType();
 
     //This is dirty, but i don't want to make a useless registry

@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
+import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahConstantWeaponRotation;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahLerpingRotation;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
@@ -151,6 +152,9 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
             }
 
             this.geburah.getWeaponRotationController().startConstantRotation(maxSpeed);
+            if (this.geburah.getWeaponRotationController().getWeaponRotation() instanceof GeburahConstantWeaponRotation constantWeaponRotation){
+                constantWeaponRotation.setPlaySound(true);
+            }
         }
     }
 

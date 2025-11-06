@@ -5,8 +5,10 @@ import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotatio
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahWeaponRotation;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahWeaponsRotateTo;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.StartGeburahWeaponRotationPacket;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public class GeburahWeaponRotationController {
@@ -15,6 +17,8 @@ public class GeburahWeaponRotationController {
 
     public float currentRotation = 0;
     protected float oldRotation = 0;
+
+    private float rotationForSound = 0;
 
     protected GeburahWeaponRotation weaponRotation;
 
@@ -26,9 +30,21 @@ public class GeburahWeaponRotationController {
         this.oldRotation = currentRotation;
         if (weaponRotation != null){
             weaponRotation.tick();
+            this.playRotationSound();
             if (weaponRotation.finishedRotation()){
                 weaponRotation = null;
                 this.trySendRotationSyncPacket();
+            }
+        }
+    }
+
+    private void playRotationSound(){
+        if (!geburah.level().isClientSide) {
+            rotationForSound += Math.abs(currentRotation - oldRotation);
+            float distForSound = 20;
+            if (rotationForSound > distForSound) {
+                rotationForSound = rotationForSound % distForSound;
+                geburah.level().playSound(null, geburah.getX(),geburah.getY(), geburah.getZ(), BossSounds.GEBURAH_WEAPON_ROTATION_CLING.get(), SoundSource.HOSTILE, 5f, 1f);
             }
         }
     }
@@ -89,6 +105,10 @@ public class GeburahWeaponRotationController {
 
     public float getLerpedRotation(float pticks){
         return FDMathUtil.lerp(oldRotation,currentRotation,pticks);
+    }
+
+    public GeburahWeaponRotation getWeaponRotation() {
+        return weaponRotation;
     }
 
     public boolean finishedRotation(){

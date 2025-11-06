@@ -16,6 +16,8 @@ public class GeburahConstantWeaponRotation extends GeburahWeaponRotation {
 
     private float rotationSpeed;
 
+    private boolean playSound = false;
+
     public GeburahConstantWeaponRotation(GeburahConstantWeaponRotation other){
         this.rotationSpeed = other.rotationSpeed;
     }
@@ -36,6 +38,11 @@ public class GeburahConstantWeaponRotation extends GeburahWeaponRotation {
     }
 
     @Override
+    public boolean shouldPlayRotationSound() {
+        return playSound;
+    }
+
+    @Override
     public Type rotationType() {
         return Type.CONSTANT_ROTATION;
     }
@@ -44,4 +51,7 @@ public class GeburahConstantWeaponRotation extends GeburahWeaponRotation {
         return rotationSpeed;
     }
 
+    public void setPlaySound(boolean playSound) {
+        this.playSound = playSound;
+    }
 }

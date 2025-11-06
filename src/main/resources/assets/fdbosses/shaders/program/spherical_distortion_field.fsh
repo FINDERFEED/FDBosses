@@ -269,7 +269,7 @@ void main(){
 
         vec3 noisePos = hitPos;
         float sections = 0.5;
-        float sections2 = 0.15;
+        float sections2 = 0.05;
         float distanceToHitPos = length(hitPos);
 
         if (length(hitPos) < 0.01){
@@ -282,6 +282,9 @@ void main(){
 
         float noise = perlinNoise(noisePos.x,noisePos.y,noisePos.z,sections,1);
         float noise2 = perlinNoise(noisePos.x,noisePos.y,noisePos.z,sections2,1);
+
+        noise2 = 1 - abs(noise2);
+        noise2 *= noise2;
 
         noise = (noise + 1) / 2;
 
@@ -310,7 +313,7 @@ void main(){
         vec4 addedColorMain = vec4(1f,0.8f,0.3f,1f);
         vec4 addedColorSecondary = vec4(0,0,0,0);
 
-        vec4 addedColor = mix(addedColorMain, addedColorSecondary, noise2);
+        vec4 addedColor = mix(addedColorSecondary, addedColorMain, noise2);
         addedColor = srcOneSrcAlpha(addedColor,addedColor) * shiftDensityNoScreen;
 
 

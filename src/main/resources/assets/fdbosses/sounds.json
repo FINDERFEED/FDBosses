@@ -159,5 +159,8 @@
   },
   "geburah_sin": {
     "sounds": [ "fdbosses:geburah_sin" ]
+  },
+  "rotating_weapons_cling": {
+    "sounds": [ "fdbosses:rotating_weapons_cling" ]
   }
 }

@@ -68,6 +68,11 @@ public class GeburahLerpingRotation extends GeburahWeaponRotation {
     }
 
     @Override
+    public boolean shouldPlayRotationSound() {
+        return true;
+    }
+
+    @Override
     public Type rotationType() {
         return Type.LERPING_ROTATE_BY;
     }
