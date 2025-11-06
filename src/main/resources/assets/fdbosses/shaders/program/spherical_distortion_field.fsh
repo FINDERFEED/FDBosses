@@ -277,7 +277,7 @@ void main(){
             noisePos = vec3(texCoord.x,texCoord.y, z);
             sections = 10;
             sections2 = 5;
-            distanceToHitPos = 10;
+            distanceToHitPos = 20;
         }
 
         float noise = perlinNoise(noisePos.x,noisePos.y,noisePos.z,sections,1);
@@ -297,7 +297,7 @@ void main(){
 
 
 
-        float distanceModifier = max(0, 1 - distanceToHitPos / 100);
+        float distanceModifier = min(3, 10 / distanceToHitPos);
         float rgbOffset = 0.0025 * distanceModifier;
         float distortionOffset = 0.01 * distanceModifier;
 

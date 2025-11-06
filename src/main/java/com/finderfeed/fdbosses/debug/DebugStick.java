@@ -1,6 +1,8 @@
 package com.finderfeed.fdbosses.debug;
 
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahRayCastingCircle;
+import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
+import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffectHandler;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.GeburahTriggerSinEffectPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,7 +27,7 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
+//            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket());
 
 //            Vec3 sppos = player.position().add(0,5,0);
 //
@@ -40,6 +42,9 @@ public class DebugStick extends Item {
 
 //            GeburahRayCastingCircle.summon(level, player.getEyePosition().add(player.getLookAngle()), player.getLookAngle());
 
+        }else{
+            DistortionSphereEffectHandler.setDistortionSphereEffect(new DistortionSphereEffect(player.getEyePosition().add(player.getLookAngle().scale(50)),
+                    80,80,1, (float) -100));
         }
 
         return super.use(level, player, hand);
