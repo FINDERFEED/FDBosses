@@ -6,12 +6,14 @@ import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahW
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahConstantWeaponRotation;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahLerpingRotation;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -71,6 +73,7 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
             BossUtil.geburahWeaponsStartLaser((ServerLevel) geburah.level(), this.geburah.position(), 120, geburah);
 
         }
+
         this.geburah.setLaserVisualsState(true);
         for (var cannonData : this.geburah.getCannonsPositionAndDirection()){
 
@@ -115,6 +118,8 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
             }else{
                 if (controller.finishedRotation()){
                     this.fireLasers(true);
+                    geburah.level().playSound(null, geburah.getX(),geburah.getY(),geburah.getZ(), BossSounds.GEBURAH_RAY_SHOT.get(), SoundSource.HOSTILE, 4f ,1f);
+
                     fireShotTime = 5;
                 }
             }

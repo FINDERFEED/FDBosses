@@ -395,7 +395,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.ATTACK_DING.get(), SoundSource.HOSTILE, 5f, 1f);
         }
 
-        return attackInstance.tick > 60;
+        return attackInstance.tick > 80;
     }
 
     public boolean noKillEntitiesAttack(AttackInstance inst){
@@ -842,7 +842,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
                 Vec3 between = newPos.subtract(oldPos);
 
-                if (between.length() < 0.1) continue;
+                if (between.length() < 0.2) continue;
 
 
                 Vec3 betweenThisAndThat = newPos.subtract(this.position().multiply(1,0,1));

@@ -4,8 +4,10 @@ import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
 
 public class GeburahAttackFireDefaultProjectiles extends GeburahWeaponAttack {
@@ -34,6 +36,7 @@ public class GeburahAttackFireDefaultProjectiles extends GeburahWeaponAttack {
         int attackTick = Math.round(BossAnims.GEBURAH_FIRE_CANNONS.get().getAnimTime() / speed * 0.6f);
 
         if (this.getCurrentTick() == attackTick){
+            geburah.level().playSound(null, geburah.getX(),geburah.getY(), geburah.getZ(), BossSounds.GEBURAH_CANNON_SHOOT.get(), SoundSource.HOSTILE, 4f ,1f);
             for (var cannon : this.geburah.getCannonsPositionAndDirection()){
 
                 Vec3 position = cannon.first.add(0,-0.25f,0);

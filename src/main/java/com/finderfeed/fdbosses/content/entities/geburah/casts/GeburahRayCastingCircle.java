@@ -3,12 +3,14 @@ package com.finderfeed.fdbosses.content.entities.geburah.casts;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahBossBuddy;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
@@ -42,11 +44,13 @@ public class GeburahRayCastingCircle extends GeburahCastingCircle {
     @Override
     public void cast() {
 
+
         Vec3 end = this.position().add(this.getCastDirection().scale(20));
 
         ClipContext clipContext = new ClipContext(this.position(), end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
         var res = level().clip(clipContext);
         end = res.getLocation();
+        level().playSound(null, end.x,end.y,end.z, BossSounds.GEBURAH_RAY_SHOT.get(), SoundSource.HOSTILE, 2f, 1f);
 
         var entities = FDHelpers.traceEntities(level(), this.position(),end, 0.0f, (e)->e instanceof LivingEntity livingEntity && !(e instanceof GeburahBossBuddy));
 

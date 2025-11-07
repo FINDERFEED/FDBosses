@@ -165,5 +165,14 @@
   },
   "geburah_core_ray_strike": {
     "sounds": [ "fdbosses:geburah_core_ray_strike" ]
+  },
+  "geburah_ray_shot": {
+    "sounds": [ "fdbosses:geburah_ray_shot" ]
+  },
+  "geburah_ray_loop": {
+    "sounds": [ "fdbosses:geburah_ray_loop" ]
+  },
+  "geburah_cannon_shoot": {
+    "sounds": [ "fdbosses:geburah_cannon_shoot" ]
   }
 }
