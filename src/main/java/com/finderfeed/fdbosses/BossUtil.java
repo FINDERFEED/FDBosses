@@ -74,6 +74,7 @@ public class BossUtil {
     public static final int GEBURAH_RAY_PARTICLES = 14;
     public static final int GEBURAH_RAY_CHARGE_PARTICLES = 15;
     public static final int GEBURAH_WEAPONS_START_LASER = 16;
+    public static final int JUDGEMENT_BIRD_RAY_PARTICLES = 17;
 
     public static Vec3 matTransformDirectionVec3(Matrix4f mat, Vec3 v){
         Vector3f v1 = mat.transformDirection(
@@ -283,6 +284,10 @@ public class BossUtil {
 
     public static void geburahWeaponsStartLaser(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){
         posEvent(serverLevel, pos, GEBURAH_WEAPONS_START_LASER, geburah.getId(), radius);
+    }
+
+    public static void judgementBirdRayParticles(ServerLevel serverLevel, Vec3 pos, double radius, Vec3 direction){
+        posEvent(serverLevel, pos, JUDGEMENT_BIRD_RAY_PARTICLES, FDUtil.encodeDirection(direction), radius);
     }
 
     public static void geburahRayChargeParticles(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){

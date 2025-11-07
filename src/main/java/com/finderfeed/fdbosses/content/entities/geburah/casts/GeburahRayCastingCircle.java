@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.geburah.casts;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahBossBuddy;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdbosses.init.BossEntities;
@@ -73,6 +74,8 @@ public class GeburahRayCastingCircle extends GeburahCastingCircle {
                 .build();
 
         FDLibCalls.sendParticles((ServerLevel) level(), options, this.position(), 120);
+
+        BossUtil.judgementBirdRayParticles((ServerLevel) level(), end, 100, this.position().subtract(end).normalize());
 
     }
 

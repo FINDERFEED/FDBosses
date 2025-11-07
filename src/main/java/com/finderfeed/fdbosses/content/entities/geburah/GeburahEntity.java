@@ -392,7 +392,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             for (var serverPlayer : FDTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level(), this.position().add(0,-0.1,0), 40, ARENA_RADIUS)){
                 PacketDistributor.sendToPlayer(serverPlayer, new StartGeburahDistortionEffectPacket(this));
             }
-            level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.ATTACK_DING.get(), SoundSource.HOSTILE, 5f, 1f);
+            level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.GEBURAH_SIN.get(), SoundSource.HOSTILE, 5f, 1f);
         }
 
         return attackInstance.tick > 80;
@@ -853,11 +853,11 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 double dot = between.normalize().dot(rotated.normalize());
 
                 if (playerSins.hasSinActive(GeburahSins.MOVE_CLOCKWISE_SIN.get())) {
-                    if (dot < 0) {
+                    if (dot < -0.1) {
                         PlayerSinsHandler.sin((ServerPlayer) player, 40);
                     }
                 }else{
-                    if (dot > 0) {
+                    if (dot > 0.1) {
                         PlayerSinsHandler.sin((ServerPlayer) player, 40);
                     }
                 }
