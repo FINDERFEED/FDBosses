@@ -174,5 +174,8 @@
   },
   "geburah_cannon_shoot": {
     "sounds": [ "fdbosses:geburah_cannon_shoot" ]
+  },
+  "geburah_sin_change": {
+    "sounds": [ "fdbosses:geburah_sin_change" ]
   }
 }

@@ -16,6 +16,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 
@@ -75,8 +76,9 @@ public class GeburahRayCastingCircle extends GeburahCastingCircle {
 
         FDLibCalls.sendParticles((ServerLevel) level(), options, this.position(), 120);
 
-        BossUtil.judgementBirdRayParticles((ServerLevel) level(), end, 100, this.position().subtract(end).normalize());
-
+        if (res.getType() != HitResult.Type.MISS) {
+            BossUtil.judgementBirdRayParticles((ServerLevel) level(), end, 100, this.position().subtract(end).normalize());
+        }
     }
 
 }

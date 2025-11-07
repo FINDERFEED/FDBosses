@@ -819,6 +819,41 @@ public class BossClientPackets {
 
 
 
+        //SMOKE
+        int smokesCount = 10;
+        float smokesFriction = 0.7f;
+        int smokesTravelTime = 20;
+
+        for (int i = 0; i < smokesCount; i++){
+
+            float p = i / (float) (smokesCount - 1);
+            int count = Math.round(FDMathUtil.lerp(6,12,p));
+            float distance = 0.3f * i;
+
+            for (var dir : new HorizontalCircleRandomDirections(level.random, count, 1f)){
+
+                float particleSpeed = (distance * (1 - smokesFriction) / (1 - (float) Math.pow(smokesFriction, smokesTravelTime)));
+
+                Vec3 pspeed = dir.multiply(particleSpeed,0,particleSpeed);
+
+                float col = 0.2f + random.nextFloat() * 0.2f;
+
+                BigSmokeParticleOptions options = BigSmokeParticleOptions.builder()
+                        .color(col,col,col)
+                        .friction(smokesFriction)
+                        .size(1f)
+                        .minSpeed(0.025f)
+                        .lifetime(0,0,30)
+                        .build();
+
+                level.addParticle(options, true, pos.x,pos.y,pos.z,pspeed.x,pspeed.y,pspeed.z);
+
+
+            }
+
+        }
+
+
         //JUMPING PARTICLES
         for (var dir : new HorizontalCircleRandomDirections(level.random, 12, 1f)){
 

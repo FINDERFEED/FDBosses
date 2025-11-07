@@ -53,6 +53,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
@@ -392,7 +393,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             for (var serverPlayer : FDTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level(), this.position().add(0,-0.1,0), 40, ARENA_RADIUS)){
                 PacketDistributor.sendToPlayer(serverPlayer, new StartGeburahDistortionEffectPacket(this));
             }
-            level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.GEBURAH_SIN.get(), SoundSource.HOSTILE, 5f, 1f);
+            level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.GEBURAH_SIN_CHANGE.get(), SoundSource.HOSTILE, 5f, 1f);
         }
 
         return attackInstance.tick > 80;
@@ -1147,14 +1148,25 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             var source = event.getSource();
             Level level = entity.level();
 
-            if (source.getEntity() instanceof ServerPlayer serverPlayer){
-                PlayerSins playerSins = PlayerSins.getPlayerSins(serverPlayer);
+            if (!(entity instanceof ServerPlayer player)) {
+                if (source.getEntity() instanceof ServerPlayer serverPlayer) {
+                    PlayerSins playerSins = PlayerSins.getPlayerSins(serverPlayer);
 
-                if (playerSins.hasSinActive(GeburahSins.KILL_ENTITY_SIN.get())){
-                    PlayerSinsHandler.sin(serverPlayer, 100);
+                    if (playerSins.hasSinActive(GeburahSins.KILL_ENTITY_SIN.get())) {
+                        PlayerSinsHandler.sin(serverPlayer, 100);
+                    }
+
                 }
+            }else{
+                var inventory = player.getInventory();
+                for (int i = 0; i < inventory.getContainerSize(); i++){
 
+                    var item = inventory.getItem(i);
+                    if (item.is(BossItems.GEBURAH_EXPLOSIVE_CRYSTAL.get())){
+                        inventory.setItem(i, ItemStack.EMPTY);
+                    }
 
+                }
             }
 
         }
