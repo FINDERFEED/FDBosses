@@ -56,6 +56,12 @@ public class BossItems {
     public static final Supplier<Item> CHISELED_JUSTICESTONE_BRICKS = ITEMS.register("chiseled_justicestone_bricks",
             ()->new BlockItem(BossBlocks.CHISELED_JUSTICESTONE_BRICKS.get(), new Item.Properties()));
 
+    public static final Supplier<Item> JUSTICESTONE_BEAM = ITEMS.register("justicestone_beam",
+            ()->new BlockItem(BossBlocks.JUSTICESTONE_BEAM.get(), new Item.Properties()));
+
+    public static final Supplier<Item> JUSTICESTONE_COLUMN = ITEMS.register("justicestone_column",
+            ()->new BlockItem(BossBlocks.JUSTICESTONE_COLUMN.get(), new Item.Properties()));
+
     public static final Supplier<Item> GEBURAH_EXPLOSIVE_CRYSTAL = ITEMS.register("geburah_explosive_crystal",
             ()->new ExplosiveCrystalItem(new Item.Properties()));
 
@@ -76,6 +82,8 @@ public class BossItems {
                 event.accept(MALKUTH_TROPHY.get());
                 event.accept(JUSTICESTONE_BRICKS.get());
                 event.accept(CHISELED_JUSTICESTONE_BRICKS.get());
+                event.accept(JUSTICESTONE_BEAM.get());
+                event.accept(JUSTICESTONE_COLUMN.get());
             }else if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)){
                 event.accept(MALKUTH_FIRE_WARRIOR_SPAWN_EGG.get());
                 event.accept(MALKUTH_ICE_WARRIOR_SPAWN_EGG.get());

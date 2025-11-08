@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "fdbosses:block/chiseled_justicestone_bricks",
+    "east": "fdbosses:block/justicestone_beam",
+    "north": "fdbosses:block/justicestone_beam",
+    "particle": "fdbosses:block/justicestone_beam",
+    "south": "fdbosses:block/justicestone_beam",
+    "up": "fdbosses:block/chiseled_justicestone_bricks",
+    "west": "fdbosses:block/justicestone_beam"
+  }
+}
