@@ -91,7 +91,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public static final String GEBURAH_TILT_LAYER = "tilt";
 
     public static final int ARENA_HEIGHT = 30;
-    public static final int ARENA_RADIUS = 40;
+    public static final int ARENA_RADIUS = 32;
     public static final float MAX_LASERS_RADIUS = ARENA_RADIUS;
 
 
@@ -241,7 +241,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
             if (entities.isEmpty()){
 
-                Vec3 offsetPos = direction.scale(MAX_LASERS_RADIUS / 2 + level().random.nextFloat() * 10 - 5);
+                Vec3 offsetPos = direction.scale(MAX_LASERS_RADIUS / 2 + level().random.nextFloat() * 3 - 1.5 + 2);
                 Vec3 targetPos = this.position().add(offsetPos);
                 Vec3 castCirclePos = this.position().add(direction.scale(3)).add(0,5,0);
 

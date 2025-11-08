@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.geburah.chain_trap;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
@@ -71,6 +72,13 @@ public class GeburahChainTrapEntity extends Entity implements AutoSerializable {
                     this.getEntityData().set(ENTITY_ABOUT_TO_TRAP, entityAboutToTrap.getId());
                 } else {
                     for (var entity : FDTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position().add(0,-0.1,0),5,1.5f)){
+
+                        if (entity instanceof Player player){
+                            if (!BossUtil.isPlayerInSurvival(player)){
+                                continue;
+                            }
+                        }
+
                         if (!(entity.getVehicle() instanceof GeburahChainTrapEntity)){
                             this.trapEntity(entity);
                             break;

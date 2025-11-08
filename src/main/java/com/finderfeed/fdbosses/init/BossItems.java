@@ -50,8 +50,16 @@ public class BossItems {
     public static final Supplier<Item> MALKUTH_TROPHY = ITEMS.register("malkuth_trophy",
             ()->new BlockItem(BossBlocks.MALKUTH_TROPHY.get(), new Item.Properties().stacksTo(1)));
 
+    public static final Supplier<Item> JUSTICESTONE_BRICKS = ITEMS.register("justicestone_bricks",
+            ()->new BlockItem(BossBlocks.JUSTICESTONE_BRICKS.get(), new Item.Properties()));
+
+    public static final Supplier<Item> CHISELED_JUSTICESTONE_BRICKS = ITEMS.register("chiseled_justicestone_bricks",
+            ()->new BlockItem(BossBlocks.CHISELED_JUSTICESTONE_BRICKS.get(), new Item.Properties()));
+
     public static final Supplier<Item> GEBURAH_EXPLOSIVE_CRYSTAL = ITEMS.register("geburah_explosive_crystal",
             ()->new ExplosiveCrystalItem(new Item.Properties()));
+
+
 
     @EventBusSubscriber(modid = FDBosses.MOD_ID)
     public static class AddToCreativeTabs{
@@ -66,6 +74,8 @@ public class BossItems {
                 event.accept(EYE_OF_MALKUTH.get());
                 event.accept(CHESED_TROPHY.get());
                 event.accept(MALKUTH_TROPHY.get());
+                event.accept(JUSTICESTONE_BRICKS.get());
+                event.accept(CHISELED_JUSTICESTONE_BRICKS.get());
             }else if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)){
                 event.accept(MALKUTH_FIRE_WARRIOR_SPAWN_EGG.get());
                 event.accept(MALKUTH_ICE_WARRIOR_SPAWN_EGG.get());

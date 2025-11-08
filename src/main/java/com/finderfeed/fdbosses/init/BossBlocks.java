@@ -40,5 +40,8 @@ public class BossBlocks {
     ));
 
 
+    public static final Supplier<Block> JUSTICESTONE_BRICKS = BLOCKS.register("justicestone_bricks", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
+    public static final Supplier<Block> CHISELED_JUSTICESTONE_BRICKS = BLOCKS.register("chiseled_justicestone_bricks", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
+
 
 }
