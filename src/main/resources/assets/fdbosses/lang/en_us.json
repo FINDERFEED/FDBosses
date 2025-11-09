@@ -1,6 +1,12 @@
 {
   "block.fdbosses.chesed_trophy": "Chesed Trophy",
   "block.fdbosses.malkuth_trophy": "Malkuth Trophy",
+  "block.fdbosses.justicestone_bricks": "Justicestone Bricks",
+  "block.fdbosses.chiseled_justicestone_bricks": "Chiseled Justicestone Bricks",
+  "block.fdbosses.justicestone_beam": "Justicestone Beam",
+  "block.fdbosses.justicestone_column": "Justicestone Column",
+  "block.fdbosses.justicestone_wall": "Justicestone Wall",
+  "block.fdbosses.justicestone_stairs": "Justicestone Stairs",
   "item.fdbosses.lightning_core": "Lightning Core",
   "item.fdbosses.geburah_explosive_crystal": "Crystal Of Sin",
   "item.fdbosses.fire_and_ice_core": "Fire and Ice Core",
