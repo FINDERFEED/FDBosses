@@ -47,6 +47,7 @@ public class BossBlocks {
     public static final Supplier<Block> JUSTICESTONE_BEAM = BLOCKS.register("justicestone_beam", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
     public static final Supplier<Block> JUSTICESTONE_COLUMN = BLOCKS.register("justicestone_column", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
     public static final Supplier<Block> JUSTICESTONE_WALL = BLOCKS.register("justicestone_wall", ()->new WallBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_BRICK_WALL).forceSolidOn()));
+    public static final Supplier<Block> JUSTICESTONE_COLUMN_WALL = BLOCKS.register("justicestone_column_wall", ()->new WallBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_BRICK_WALL).forceSolidOn()));
     public static final Supplier<Block> JUSTICESTONE_STAIRS = BLOCKS.register("justicestone_stairs", ()->new StairBlock(JUSTICESTONE_BRICKS.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_STAIRS)));
 
 
