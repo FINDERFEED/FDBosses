@@ -65,6 +65,9 @@ public class BossItems {
     public static final Supplier<Item> JUSTICESTONE_WALL = ITEMS.register("justicestone_wall",
             ()->new BlockItem(BossBlocks.JUSTICESTONE_WALL.get(), new Item.Properties()));
 
+    public static final Supplier<Item> POLISHED_JUSTICESTONE = ITEMS.register("polished_justicestone",
+            ()->new BlockItem(BossBlocks.POLISHED_JUSTICESTONE.get(), new Item.Properties()));
+
     public static final Supplier<Item> JUSTICESTONE_COLUMN_WALL = ITEMS.register("justicestone_column_wall",
             ()->new BlockItem(BossBlocks.JUSTICESTONE_COLUMN_WALL.get(), new Item.Properties()));
 
@@ -96,6 +99,7 @@ public class BossItems {
                 event.accept(JUSTICESTONE_WALL.get());
                 event.accept(JUSTICESTONE_COLUMN_WALL.get());
                 event.accept(JUSTICESTONE_STAIRS.get());
+                event.accept(POLISHED_JUSTICESTONE.get());
             }else if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)){
                 event.accept(MALKUTH_FIRE_WARRIOR_SPAWN_EGG.get());
                 event.accept(MALKUTH_ICE_WARRIOR_SPAWN_EGG.get());
