@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "fdbosses:block/polished_justicestone_slab"
+    },
+    "type=double": {
+      "model": "fdbosses:block/polished_justicestone"
+    },
+    "type=top": {
+      "model": "fdbosses:block/polished_justicestone_slab_top"
+    }
+  }
+}

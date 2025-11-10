@@ -5,10 +5,7 @@ import com.finderfeed.fdbosses.content.blocks.NoEntitySpawnBlock;
 import com.finderfeed.fdbosses.content.blocks.TrophyBlock;
 import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.StairBlock;
-import net.minecraft.world.level.block.WallBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
@@ -43,13 +40,16 @@ public class BossBlocks {
 
 
     public static final Supplier<Block> JUSTICESTONE_BRICKS = BLOCKS.register("justicestone_bricks", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
+    public static final Supplier<Block> JUSTICESTONE_BRICKS_SLAB = BLOCKS.register("justicestone_bricks_slab", ()->new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
     public static final Supplier<Block> CHISELED_JUSTICESTONE_BRICKS = BLOCKS.register("chiseled_justicestone_bricks", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
     public static final Supplier<Block> JUSTICESTONE_BEAM = BLOCKS.register("justicestone_beam", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
-    public static final Supplier<Block> JUSTICESTONE_COLUMN = BLOCKS.register("justicestone_column", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
+    public static final Supplier<Block> JUSTICESTONE_COLUMN = BLOCKS.register("justicestone_column", ()->new RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
     public static final Supplier<Block> JUSTICESTONE_WALL = BLOCKS.register("justicestone_wall", ()->new WallBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_BRICK_WALL).forceSolidOn()));
     public static final Supplier<Block> JUSTICESTONE_COLUMN_WALL = BLOCKS.register("justicestone_column_wall", ()->new WallBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_BRICK_WALL).forceSolidOn()));
     public static final Supplier<Block> JUSTICESTONE_STAIRS = BLOCKS.register("justicestone_stairs", ()->new StairBlock(JUSTICESTONE_BRICKS.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_STAIRS)));
     public static final Supplier<Block> POLISHED_JUSTICESTONE = BLOCKS.register("polished_justicestone", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
+    public static final Supplier<Block> POLISHED_JUSTICESTONE_SLAB = BLOCKS.register("polished_justicestone_slab", ()->new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
+    public static final Supplier<Block> POLISHED_JUSTICESTONE_STAIRS = BLOCKS.register("polished_justicestone_stairs", ()->new StairBlock(POLISHED_JUSTICESTONE.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_STAIRS)));
 
 
 }
