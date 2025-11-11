@@ -1,0 +1,21 @@
+{
+  "targets": [
+    "swap"
+  ],
+  "passes": [
+    {
+      "name": "fdbosses:test_post_depth",
+      "intarget": "minecraft:main",
+      "outtarget": "swap",
+      "uniforms": [],
+      "auxtargets": [
+      ]
+    },
+    {
+      "name": "blit",
+      "intarget": "swap",
+      "outtarget": "minecraft:main",
+      "uniforms": []
+    }
+  ]
+}
