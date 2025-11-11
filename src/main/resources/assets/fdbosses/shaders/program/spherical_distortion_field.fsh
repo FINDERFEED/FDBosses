@@ -310,7 +310,7 @@ void main(){
         vec4 colorG = texture(DiffuseSampler, texCoord + offset);
         vec4 colorB = texture(DiffuseSampler, texCoord + offset + vec2(-rgbOffset,rgbOffset) * shiftDensity);
 
-        vec4 addedColorMain = vec4(1f,0.8f,0.3f,1f);
+        vec4 addedColorMain = vec4(1,0.8,0.3,1);
         vec4 addedColorSecondary = vec4(0,0,0,0);
 
         vec4 addedColor = mix(addedColorSecondary, addedColorMain, noise2);

@@ -2,8 +2,10 @@ package com.finderfeed.fdbosses.content.entities.geburah;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSin;
+import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.init.BossRegistries;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDFreeEntityRenderer;
+import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.util.math.ComplexEasingFunction;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -17,6 +19,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -27,6 +31,20 @@ import java.util.List;
 
 public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
+    private static final int IMPACT_TIME = 5;
+    private static final int END_PREPARING_SIN_PUNISHMENT = GeburahEntity.SIN_PUNISHMENT_ATTACK_DURATION - IMPACT_TIME;
+
+    private static final ComplexEasingFunction GEBURAH_SIN_PUNISHMENT_EASING = ComplexEasingFunction.builder()
+            .addArea(END_PREPARING_SIN_PUNISHMENT, FDEasings::linear)
+            .addArea(IMPACT_TIME, FDEasings::linear)
+            .build();
+
+    private static FDModel hammerModel;
+
+    public GeburahRenderer(){
+
+    }
+
     @Override
     public void render(GeburahEntity geburah, float v, float v1, PoseStack poseStack, MultiBufferSource multiBufferSource, int i) {
 
@@ -36,6 +54,54 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
         this.renderSins(geburah,v,v1,poseStack,multiBufferSource,i);
 
         this.renderRayPreparations(geburah, v, v1, poseStack, multiBufferSource, i);
+        this.renderSinPunishmentAttackEffect(geburah, v, v1, poseStack, multiBufferSource, i);
+
+    }
+
+    private void renderSinPunishmentAttackEffect(GeburahEntity geburah, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light){
+
+        int tick = geburah.sinPunishmentAttackTicker;
+        if (tick == -1) return;
+
+        if (hammerModel == null){
+            hammerModel = new FDModel(BossModels.JUSTICE_HAMMER.get());
+        }
+
+        float time = Mth.clamp((GeburahEntity.SIN_PUNISHMENT_ATTACK_DURATION - tick) + pticks, 0, GeburahEntity.SIN_PUNISHMENT_ATTACK_DURATION);
+
+        float maxHammerHeight = 20;
+
+        float hammerHeight = maxHammerHeight;
+        float hammerRotation = 360;
+        float alpha = 1;
+
+
+        float localP = GEBURAH_SIN_PUNISHMENT_EASING.apply(time);
+
+        if (time < END_PREPARING_SIN_PUNISHMENT){
+            alpha = localP;
+            hammerRotation = 360 * FDEasings.easeOut(Mth.clamp(localP * 1.1f,0,1));
+            hammerHeight = maxHammerHeight - (1 - FDEasings.easeOut(localP)) * 10;
+        }else{
+            hammerHeight = maxHammerHeight * (1 - FDEasings.easeIn(localP));
+        }
+
+        float offset = GeburahEntity.ARENA_RADIUS / 2f;
+        int hammersAmount = 8;
+        float angle = 360f / hammersAmount;
+
+        for (int i = 0; i < hammersAmount; i++){
+            matrices.pushPose();
+
+            matrices.mulPose(Axis.YP.rotationDegrees(angle * i));
+            matrices.translate(offset,hammerHeight,0);
+            matrices.mulPose(Axis.YP.rotationDegrees(hammerRotation + 90));
+            matrices.mulPose(Axis.XP.rotationDegrees(180));
+
+            hammerModel.render(matrices,src.getBuffer(RenderType.lightning()), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0.3f,0.7f,1f,alpha * 0.75f);
+
+            matrices.popPose();
+        }
 
     }
 

@@ -359,7 +359,15 @@ public class BossClientPackets {
             case BossUtil.JUDGEMENT_BIRD_RAY_PARTICLES -> {
                 judgementBirdRayParticles(pos, data);
             }
+            case BossUtil.TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_EFFECT -> {
+                geburahTriggerSinPunishmentAttackEffect(pos, data);
+            }
         }
+    }
+
+    public static void geburahTriggerSinPunishmentAttackEffect(Vec3 pos, int data){
+        if (!(FDClientHelpers.getClientLevel().getEntity(data) instanceof GeburahEntity geburah)) return;
+        geburah.sinPunishmentAttackTicker = GeburahEntity.SIN_PUNISHMENT_ATTACK_DURATION;
     }
 
     public static void geburahWeaponsStartLaser(Vec3 pos, int data){

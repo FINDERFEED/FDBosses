@@ -70,6 +70,8 @@ import java.util.List;
 
 public class GeburahEntity extends FDLivingEntity implements AutoSerializable, GeburahBossBuddy {
 
+    public static final int SIN_PUNISHMENT_ATTACK_DURATION = 40;
+
     public static final int ATTACK_START_DELAY = 40;
 
     public static final int CANNONS_AMOUNT = 8;
@@ -120,9 +122,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public static final int MAX_LASER_VISUAL_DISAPPEAR_TIME = 5;
     public int laserVisualDisappearTicker = 0;
 
-
-
     public GeburahLaserAttackPreparator laserAttackPreparator;
+
+    public int sinPunishmentAttackTicker = -1;
 
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
@@ -204,6 +206,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         super.tick();
 
         if (level().isClientSide) {
+
             this.particles();
             this.tickSinsAppearTick();
             this.laserAttackPreparator.tick();
@@ -221,6 +224,10 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         this.getWeaponRotationController().tick();
 
+    }
+
+    private void tickSinPunishmentEffect(){
+        this.sinPunishmentAttackTicker = Mth.clamp(sinPunishmentAttackTicker - 1,-1, GeburahEntity.SIN_PUNISHMENT_ATTACK_DURATION);
     }
 
     public void tickTrapEntitiesSpawn(){
