@@ -10,6 +10,7 @@ out vec4 fragColor;
 void main(){
 
     float depth = texture(DiffuseDepthSampler, texCoord).r;
+    depth = depth * depth * depth * depth * depth * depth * depth * depth * depth * depth * depth * depth;
 
     fragColor = vec4(depth, depth, depth, 1.0);
 
