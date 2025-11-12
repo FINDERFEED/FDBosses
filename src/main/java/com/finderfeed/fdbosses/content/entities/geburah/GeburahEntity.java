@@ -368,9 +368,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     private AttackAction attackListener(String s) {
 
-//        if (this.getPlayerPositionsCollector().getPlayers().isEmpty()){
-//            return AttackAction.WAIT;
-//        }
+        if (this.getPlayerPositionsCollector().getPlayers().isEmpty()){
+            return AttackAction.WAIT;
+        }
 
         return AttackAction.PROCEED;
     }

@@ -42,7 +42,7 @@ public class BossBlocks {
     public static final Supplier<Block> JUSTICESTONE_BRICKS = BLOCKS.register("justicestone_bricks", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
     public static final Supplier<Block> JUSTICESTONE_BRICKS_SLAB = BLOCKS.register("justicestone_bricks_slab", ()->new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
     public static final Supplier<Block> CHISELED_JUSTICESTONE_BRICKS = BLOCKS.register("chiseled_justicestone_bricks", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
-    public static final Supplier<Block> JUSTICESTONE_BEAM = BLOCKS.register("justicestone_beam", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
+    public static final Supplier<Block> JUSTICESTONE_BEAM = BLOCKS.register("justicestone_beam", ()->new RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
     public static final Supplier<Block> JUSTICESTONE_COLUMN = BLOCKS.register("justicestone_column", ()->new RotatedPillarBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
     public static final Supplier<Block> JUSTICESTONE_WALL = BLOCKS.register("justicestone_wall", ()->new WallBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_BRICK_WALL).forceSolidOn()));
     public static final Supplier<Block> JUSTICESTONE_COLUMN_WALL = BLOCKS.register("justicestone_column_wall", ()->new WallBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_BRICK_WALL).forceSolidOn()));
