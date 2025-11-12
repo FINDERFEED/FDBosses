@@ -35,6 +35,10 @@ import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
+import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
+import com.finderfeed.fdlib.systems.impact_frames.ImpactFramesPacket;
+import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -43,6 +47,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -86,6 +91,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public static final String NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES = "no_jump_rays_earthquakes_projectiles";
     public static final String SIN_CRYSTALS_LASERS_AND_CANNONS = "sin_crystals_lasers_and_cannons";
     public static final String NO_KILL_ENTITIES_ATTACK = "no_kill_entities_attack";
+    public static final String SIN_PUNISHMENT_ATTACK = "sin_punishment_attack";
     public static final String EMPTY_SINS_AND_DELAY = "empty_sins_and_delay";
 
     public static final String GEBURAH_STOMPING_LAYER = "stomping";
@@ -174,8 +180,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .registerAttack(NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES, this::noJumpEarthquakesProjectilesRays)
                 .registerAttack(SIN_CRYSTALS_LASERS_AND_CANNONS, this::sinCrystalsLasersAndCannons)
                 .registerAttack(NO_KILL_ENTITIES_ATTACK, this::noKillEntitiesAttack)
+                .registerAttack(SIN_PUNISHMENT_ATTACK, this::sinPunishmentAttack)
                 .attackListener(this::attackListener)
-                .addAttack(0, EMPTY_SINS_AND_DELAY)
+                .addAttack(0, SIN_PUNISHMENT_ATTACK)
 //                .addAttack(0, noKillEntitiesAttack)
 //                .addAttack(0, simpleRunAroundNoSins)
 //                .addAttack(0, noJumpRaysEarthquakesProjectiles)
@@ -207,7 +214,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         super.tick();
 
         if (level().isClientSide) {
-
+            this.tickSinPunishmentEffect();
             this.particles();
             this.tickSinsAppearTick();
             this.laserAttackPreparator.tick();
@@ -372,6 +379,48 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
 //-------------------------------------------------------------------ATTACKS--------------------------------------------------------------------------
 
+    public boolean sinPunishmentAttack(AttackInstance instance){
+
+        int stage = instance.stage;
+        int tick = instance.tick;
+
+        if (stage == 0){
+            BossUtil.geburahTriggerSinPunishmentAttack((ServerLevel) level(), this.position(), 120, this);
+            instance.nextStage();
+        }else if (stage == 1){
+
+            if (tick == SIN_PUNISHMENT_ATTACK_DURATION - 2){
+                for (var entity : this.playerPositionsCollector.getPlayers()) {
+
+                    PacketDistributor.sendToPlayer((ServerPlayer) entity, new ImpactFramesPacket(
+                            List.of(
+                                    new ImpactFrame().setDuration(2),
+                                    new ImpactFrame().setDuration(1).setInverted(true),
+                                    new ImpactFrame().setDuration(1),
+                                    new ImpactFrame().setDuration(1).setInverted(true)
+                            )
+                    ));
+                }
+            }else if (tick == SIN_PUNISHMENT_ATTACK_DURATION){
+                BossUtil.geburahTriggerSinPunishmentAttackImpactEffect((ServerLevel) level(), this.position(), 120, GeburahEntity.ARENA_RADIUS / 2);
+                BossUtil.geburahSinPunishmentAttackServerEffect(level(), this.position(), ARENA_RADIUS / 2f, BossBlocks.JUSTICESTONE_BRICKS.get().defaultBlockState());
+                for (var entity : this.playerPositionsCollector.getPlayers()) {
+
+
+                    PacketDistributor.sendToPlayer((ServerPlayer) entity, new DefaultShakePacket(FDShakeData.builder()
+                            .amplitude(0.3f)
+                            .outTime(80)
+                            .build()));
+                }
+
+
+            }else if (tick >= SIN_PUNISHMENT_ATTACK_DURATION + 50){
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     public boolean emptySinsAndDelay(AttackInstance attackInstance){
         this.propagateSins(20);

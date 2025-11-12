@@ -31,6 +31,7 @@ import java.util.List;
 
 public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
+    public static final int HAMMER_AMOUNT = 8;
     private static final int IMPACT_TIME = 5;
     private static final int END_PREPARING_SIN_PUNISHMENT = GeburahEntity.SIN_PUNISHMENT_ATTACK_DURATION - IMPACT_TIME;
 
@@ -87,10 +88,9 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
         }
 
         float offset = GeburahEntity.ARENA_RADIUS / 2f;
-        int hammersAmount = 8;
-        float angle = 360f / hammersAmount;
+        float angle = 360f / HAMMER_AMOUNT;
 
-        for (int i = 0; i < hammersAmount; i++){
+        for (int i = 0; i < HAMMER_AMOUNT; i++){
             matrices.pushPose();
 
             matrices.mulPose(Axis.YP.rotationDegrees(angle * i));

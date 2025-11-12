@@ -76,6 +76,7 @@ public class BossUtil {
     public static final int GEBURAH_WEAPONS_START_LASER = 16;
     public static final int JUDGEMENT_BIRD_RAY_PARTICLES = 17;
     public static final int TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_EFFECT = 18;
+    public static final int TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_IMPACT = 19;
 
     public static Vec3 matTransformDirectionVec3(Matrix4f mat, Vec3 v){
         Vector3f v1 = mat.transformDirection(
@@ -225,6 +226,58 @@ public class BossUtil {
         }
     }
 
+    public static void geburahSinPunishmentAttackServerEffect(Level level, Vec3 pos, float radius, BlockState state){
+
+        float length = FDMathUtil.FPI * 2 * radius;
+        float step = 500 / length;
+        float stonesDirStep = FDMathUtil.FPI / 8;
+
+        for (float i = 0; i < length; i+=step){
+
+            float p = i / length;
+
+            Vec3 direction = new Vec3(1,0,0).yRot(FDMathUtil.FPI * 2 * p + random.nextFloat() * FDMathUtil.FPI / 16);
+            Vec3 between = direction.scale(radius);
+            Vec3 reversedDir = direction.reverse();
+            Vec3 ppos = pos.add(between);
+
+
+            int stonesCount = 2;
+            for (int c = 0; c < stonesCount; c++) {
+                float stonesP = c / (stonesCount - 1f);
+                for (int dirswitch = -1; dirswitch <= 1; dirswitch += 2) {
+                    for (int k = -1; k < 1; k++) {
+                        Vec3 stoneDir = direction.scale(dirswitch).yRot(k * stonesDirStep);
+
+                        Vec3 speed = stoneDir.scale(1.5 * (0.1f + random.nextFloat() * 0.5f) ).add(0,(0.25f + random.nextFloat() * 0.3f) * 1.75, 0);
+
+                        ChesedFallingBlock block = ChesedFallingBlock.summon(level, state, ppos.add(
+                                random.nextFloat() * 2 - 1,
+                                0,
+                                random.nextFloat() * 2 - 1
+                        ), speed,0,(float)Player.DEFAULT_BASE_GRAVITY * 0.8f);
+
+                        block.softerSound = true;
+
+                        float rnd = random.nextFloat() * 0.05f;
+                        FDLibCalls.addParticleEmitter(level, 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+                                        .color(0.35f - rnd, 0.35f - rnd, 0.35f - rnd)
+                                        .lifetime(0, 0, 10)
+                                        .size(1.5f)
+                                        .build())
+                                .lifetime(200)
+                                .processor(new BoundToEntityProcessor(block.getId(), Vec3.ZERO))
+                                .position(pos)
+                                .build());
+
+                    }
+                }
+            }
+
+        }
+
+    }
+
     public static double getToolDamage(LivingEntity owner, Entity target, ItemStack itemStack){
         var attribute = owner.getAttribute(Attributes.ATTACK_DAMAGE);
 
@@ -282,6 +335,11 @@ public class BossUtil {
             return x * x + z * z <= radius * radius;
         };
     }
+
+    public static void geburahTriggerSinPunishmentAttackImpactEffect(ServerLevel serverLevel, Vec3 pos, double radius, int attackRadius){
+        posEvent(serverLevel, pos, TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_IMPACT, attackRadius, radius);
+    }
+
 
     public static void geburahTriggerSinPunishmentAttack(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){
         posEvent(serverLevel, pos, TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_EFFECT, geburah.getId(), radius);

@@ -12,6 +12,7 @@ import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffectHandler;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
@@ -362,7 +363,136 @@ public class BossClientPackets {
             case BossUtil.TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_EFFECT -> {
                 geburahTriggerSinPunishmentAttackEffect(pos, data);
             }
+            case BossUtil.TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_IMPACT -> {
+                sinPunishmentParticles(pos, data);
+            }
         }
+    }
+
+    public static void sinPunishmentParticles(Vec3 pos, int radius){
+
+        Level level = FDClientHelpers.getClientLevel();
+
+        float length = FDMathUtil.FPI * 2 * radius;
+        float step = 300 / length;
+        float smokeDirStep = FDMathUtil.FPI / 8;
+
+        float minSmokeSize = 3f;
+        float maxSmokeSize = 5f;
+        float smokeFriction = 0.7f;
+
+
+
+        for (float i = 0; i < length; i+=step){
+
+            float p = i / length;
+
+            Vec3 direction = new Vec3(1,0,0).yRot(FDMathUtil.FPI * 2 * p + random.nextFloat() * FDMathUtil.FPI / 16);
+            Vec3 between = direction.scale(radius);
+            Vec3 reversedDir = direction.reverse();
+            Vec3 ppos = pos.add(between);
+
+            //SMOKE
+            float smokeTravelDistance = 0.5f;
+            int smokeCount = 3;
+            for (int c = 0; c < smokeCount; c++) {
+                float smokeP = c / (smokeCount - 1f);
+                float particleSize = FDMathUtil.lerp(minSmokeSize, maxSmokeSize, 1 - smokeP);
+                for (int dirswitch = -1; dirswitch <= 1; dirswitch += 2) {
+                    for (int k = -4; k < 4; k++) {
+
+                        Vec3 smokeDir = direction.scale(dirswitch).yRot(k * smokeDirStep);
+                        float smokeSpeed = calculateParticleSpeed(smokeTravelDistance + random.nextFloat() * particleSize, smokeFriction, 40);
+                        Vec3 speed = smokeDir.scale(smokeSpeed);
+                        float color = random.nextFloat() * 0.2f + 0.2f;
+
+                        BigSmokeParticleOptions options = BigSmokeParticleOptions.builder()
+                                .color(color,color,color)
+                                .friction(smokeFriction)
+                                .minSpeed(0.005f)
+                                .size(particleSize)
+                                .lifetime(0,2,60 + random.nextInt(20))
+                                .build();
+
+                        level.addParticle(options, ppos.x,ppos.y,ppos.z, speed.x,random.nextFloat() * (1 - p) * 0.05f,speed.z);
+
+                    }
+                }
+                smokeTravelDistance += particleSize;
+            }
+
+            //BALLS (not that balls, no, NO!)
+
+            for (int count = 0; count < 7; count++){
+
+                for (int dirswitch = -1; dirswitch <= 1; dirswitch += 2){
+
+                    Vec3 randomOffset = direction.scale(dirswitch * random.nextFloat() * radius / 2)
+                            .yRot(FDMathUtil.FPI / 4 * random.nextFloat());
+                    float len = (float) randomOffset.length();
+                    float pb = len / (radius / 2f);
+                    float ballSize = FDMathUtil.lerp(0.5f,1f,1 - pb);
+                    float ballYSpeed = FDMathUtil.lerp(
+                            0.1f + random.nextFloat() * 0.2f,
+                            0.3f + random.nextFloat() * 0.6f,FDEasings.easeOut(1 - pb));
+
+
+                    Vec3 actualppos = ppos.add(randomOffset);
+
+
+                    BallParticleOptions options = BallParticleOptions.builder()
+                            .color(0.3f + random.nextFloat() * 0.1f,0.8f, 1f)
+                            .brightness(2)
+                            .size(ballSize)
+                            .friction(0.6f + random.nextFloat() * 0.2f)
+                            .scalingOptions(2,0,20 + random.nextInt(40))
+                            .build();
+
+                    Vec3 vspeed = direction.scale(dirswitch).scale(FDEasings.easeIn(pb));
+
+                    level.addParticle(options, actualppos.x,actualppos.y,actualppos.z,vspeed.x,ballYSpeed, vspeed.z);
+
+                }
+
+            }
+
+        }
+
+        //JUMPING PARTICLES
+
+        int hammersCount = GeburahRenderer.HAMMER_AMOUNT;
+        float angle = FDMathUtil.FPI * 2 / hammersCount;
+        for (int i = 0; i < hammersCount; i++){
+
+            Vec3 hammerOffset = new Vec3(1,0,0).yRot(angle * i);
+
+            Vec3 hammerImpactPos = pos.add(hammerOffset.scale(radius));
+
+            for (var dir : new HorizontalCircleRandomDirections(level.random, 24, 0.5f)){
+
+                ColoredJumpingParticleOptions options = ColoredJumpingParticleOptions.builder()
+                        .colorStart(new FDColor(0.5f,0.8f,1f,1f))
+                        .colorEnd(new FDColor(1f,1f,1f,1f))
+                        .maxJumpAmount(1)
+                        .maxPointsInTrail(3)
+                        .reflectionStrength(0.5f)
+                        .size(0.05f)
+                        .gravity(2)
+                        .lifetime(-1)
+                        .build();
+
+                float randomXZSpeed = random.nextFloat() * 0.3f + 0.3f;
+
+                Vec3 speed = new Vec3(dir.x * randomXZSpeed,0.4f + random.nextFloat() * 0.2f, dir.z * randomXZSpeed);
+
+                level.addParticle(options, hammerImpactPos.x + dir.x,hammerImpactPos.y,hammerImpactPos.z + dir.z,
+                        speed.x,speed.y,speed.z);
+
+            }
+
+        }
+
+
     }
 
     public static void geburahTriggerSinPunishmentAttackEffect(Vec3 pos, int data){
