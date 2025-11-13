@@ -314,4 +314,9 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable, Gebu
         }
     }
 
+    @Override
+    public boolean isPersistenceRequired() {
+        return true;
+    }
+
 }
