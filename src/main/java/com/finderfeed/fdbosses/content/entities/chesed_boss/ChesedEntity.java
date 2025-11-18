@@ -267,7 +267,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     @Override
     public boolean hurt(DamageSource src, float damage) {
 
-        if (!level().isClientSide && src.getEntity() instanceof LivingEntity livingEntity){
+        if (!level().isClientSide && src.getEntity() instanceof LivingEntity livingEntity && !(livingEntity instanceof ChesedEntity)){
             if (!this.isRolling()) {
                 Vec3 between = livingEntity.position().subtract(this.position());
                 double distance = between.length();
