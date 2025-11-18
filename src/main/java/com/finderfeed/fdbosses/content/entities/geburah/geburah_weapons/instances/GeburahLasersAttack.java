@@ -4,6 +4,8 @@ import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttack;
+import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.util.FDTargetFinder;
@@ -61,8 +63,11 @@ public class GeburahLasersAttack extends GeburahWeaponAttack {
                         return !(livingEntity instanceof GeburahEntity);
             });
 
+
+            float damage = BossUtil.transformDamage(geburah.level(), BossConfigs.BOSS_CONFIG.get().geburahConfig.rotatingLaserAttackDamage);
+
             for (var target : targets){
-                target.hurt(geburah.level().damageSources().generic(),1);
+                target.hurt(BossDamageSources.GEBURAH_LASER_STRIKE_SOURCE,damage);
             }
 
 

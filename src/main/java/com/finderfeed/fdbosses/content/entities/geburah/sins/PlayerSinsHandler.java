@@ -5,6 +5,8 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.ActivePlayerSinInstance;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSins;
 import com.finderfeed.fdbosses.content.util.WorldBox;
+import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossDataAttachments;
 import com.finderfeed.fdbosses.init.GeburahSins;
 import net.minecraft.server.level.ServerPlayer;
@@ -72,8 +74,8 @@ public class PlayerSinsHandler {
 
             int sinnedTimes = playerSins.getSinnedTimes();
 
-            if (sinnedTimes + 1 >= PlayerSins.MAX_SIN_TIMES){
-                player.kill();
+            if (sinnedTimes + 1 >= BossConfigs.BOSS_CONFIG.get().geburahConfig.maxPlayerSins){
+                player.hurt(BossDamageSources.GEBURAH_SINNED_TOO_MUCH_SOURCE, Float.MAX_VALUE);
             }else {
                 playerSins.setSinnedTimes(sinnedTimes + 1);
                 playerSins.setSinGainCooldown(cooldown);

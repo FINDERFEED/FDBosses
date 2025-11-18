@@ -17,6 +17,12 @@
   "item.fdbosses.malkuth_fire_warrior_spawn_egg": "Malkuth Warrior Spawn Egg (Fire)",
   "item.fdbosses.malkuth_ice_warrior_spawn_egg": "Malkuth Warrior Spawn Egg (Ice)",
 
+  "death.attack.geburah_ray_strike": "%s sins were obliterated",
+  "death.attack.geburah_laser_strike": "%s sins were cleansed by a deadly laser",
+  "death.attack.geburah_earthquake": "%s sins were buried under the rocks",
+  "death.attack.geburah_justice_hammer": "%s was sentenced to infinite years inescapable prison",
+  "death.attack.geburah_sinned_too_much": "%s commited too much sins",
+
   "death.attack.malkuth_cannons": "%s lost the cannon duel",
   "death.attack.malkuth_chainpunch": "%s was punched to death",
   "death.attack.malkuth_earthshatter": "%s became one with the earth",

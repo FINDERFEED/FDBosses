@@ -6,6 +6,8 @@ import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahW
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahConstantWeaponRotation;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahLerpingRotation;
+import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
@@ -95,9 +97,13 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
 
 
             var entities = FDHelpers.traceEntities(geburah.level(), position, end, 0.5f,(e)->e instanceof LivingEntity);
+
+
+            float damage = BossUtil.transformDamage(geburah.level(), BossConfigs.BOSS_CONFIG.get().geburahConfig.predictiveLaserAttackDamage);
+
             for (var entity : entities){
                 if (entity instanceof LivingEntity livingEntity){
-                    livingEntity.hurt(geburah.level().damageSources().generic(),1);
+                    livingEntity.hurt(BossDamageSources.GEBURAH_LASER_STRIKE_SOURCE,damage);
                 }
             }
 

@@ -5,6 +5,8 @@ import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOptions;
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
@@ -151,8 +153,9 @@ public class JusticeHammerAttack extends FDEntity {
             return true;
         });
 
+        float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().geburahConfig.justiceHammerDamage);
         for (var entity : entities){
-            entity.hurt(level().damageSources().generic(), 1);
+            entity.hurt(BossDamageSources.GEBURAH_JUSTICE_HAMMER_SOURCE, damage);
         }
 
         PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()

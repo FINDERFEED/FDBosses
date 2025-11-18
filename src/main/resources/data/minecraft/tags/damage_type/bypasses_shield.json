@@ -10,8 +10,8 @@
     "fdbosses:chesed_roll_attack",
     "fdbosses:chesed_rock_attack",
     "fdbosses:malkuth_tsars_wrath",
-    "fdbosses:malkuth_cowardice"
-
+    "fdbosses:malkuth_cowardice",
+    "fdbosses:sinned_too_much"
   ],
   "replace": false
 }

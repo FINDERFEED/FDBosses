@@ -13,7 +13,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.server.ServerStartedEvent;
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID,bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = FDBosses.MOD_ID)
 public class BossDamageSources {
 
     public static final ResourceKey<DamageType> CHESED_ATTACK = key("chesed_attack");
@@ -36,6 +36,12 @@ public class BossDamageSources {
     public static final ResourceKey<DamageType> MALKUTH_SLASHES = key("malkuth_slashes");
     public static final ResourceKey<DamageType> MALKUTH_TSARS_WRATH = key("malkuth_tsars_wrath");
 
+    public static final ResourceKey<DamageType> GEBURAH_RAY_STRIKE = key("geburah_ray_strike");
+    public static final ResourceKey<DamageType> GEBURAH_LASER_STRIKE = key("geburah_laser_strike");
+    public static final ResourceKey<DamageType> GEBURAH_EARTHQUAKE = key("geburah_earthquake");
+    public static final ResourceKey<DamageType> GEBURAH_JUSTICE_HAMMER = key("geburah_justice_hammer");
+    public static final ResourceKey<DamageType> GEBURAH_SINNED_TOO_MUCH = key("sinned_too_much");
+
 
     private static EntityDamageSource CHESED_ATTACK_SOURCE;
     private static EntityDamageSource CHESED_LOR_ATTACK_SOURCE;
@@ -56,6 +62,13 @@ public class BossDamageSources {
     public static DamageSource MALKUTH_SIDE_ROCKS_SOURCE;
     public static DamageSource MALKUTH_SLASHES_SOURCE;
     public static DamageSource MALKUTH_TSARS_WRATH_SOURCE;
+
+
+    public static DamageSource GEBURAH_RAY_STRIKE_SOURCE;
+    public static DamageSource GEBURAH_LASER_STRIKE_SOURCE;
+    public static DamageSource GEBURAH_EARTHQUAKE_SOURCE;
+    public static DamageSource GEBURAH_SINNED_TOO_MUCH_SOURCE;
+    public static DamageSource GEBURAH_JUSTICE_HAMMER_SOURCE;
 
     public static DamageSource chesedAttack(Entity attacker){
         return CHESED_ATTACK_SOURCE.create(attacker);
@@ -94,6 +107,12 @@ public class BossDamageSources {
         MALKUTH_SLASHES_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_SLASHES));
         MALKUTH_TSARS_WRATH_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_TSARS_WRATH));
         MALKUTH_EARTHSHATTER_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_EARTHSHATTER));
+
+        GEBURAH_RAY_STRIKE_SOURCE = new DamageSource(access.holderOrThrow(GEBURAH_RAY_STRIKE));
+        GEBURAH_LASER_STRIKE_SOURCE = new DamageSource(access.holderOrThrow(GEBURAH_LASER_STRIKE));
+        GEBURAH_EARTHQUAKE_SOURCE = new DamageSource(access.holderOrThrow(GEBURAH_EARTHQUAKE));
+        GEBURAH_SINNED_TOO_MUCH_SOURCE = new DamageSource(access.holderOrThrow(GEBURAH_SINNED_TOO_MUCH));
+        GEBURAH_JUSTICE_HAMMER_SOURCE = new DamageSource(access.holderOrThrow(GEBURAH_JUSTICE_HAMMER));
 
     }
 

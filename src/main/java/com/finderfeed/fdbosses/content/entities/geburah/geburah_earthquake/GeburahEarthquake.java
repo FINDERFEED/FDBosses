@@ -146,7 +146,7 @@ public class GeburahEarthquake  extends Entity implements AutoSerializable {
         List<LivingEntity> entities = level().getEntitiesOfClass(LivingEntity.class, box, predicate);
 
         for (LivingEntity entity : entities){
-            entity.hurt(BossDamageSources.CHESED_EARTHQUAKE_SOURCE,this.damage);
+            entity.hurt(BossDamageSources.GEBURAH_EARTHQUAKE_SOURCE,this.damage);
         }
 
         PacketDistributor.sendToPlayersNear((ServerLevel) level(), null, this.getX(),this.getY(),this.getZ(), Math.max(endRadius * 2,120), new SpawnRadialEarthquakeOnRadiusPacket(

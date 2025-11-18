@@ -7,6 +7,8 @@ import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAtta
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
+import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
@@ -74,9 +76,14 @@ public class GeburahRayController {
         }else if (currentShotCharge == 0){
 
             if (!this.targets.isEmpty()) {
+
+
+                float damage = BossUtil.transformDamage(geburah.level(), BossConfigs.BOSS_CONFIG.get().geburahConfig.coreRayStrikeDamage);
+
                 for (var target : this.targets) {
-                    this.fireRayAtPos(target, 1, damageRadius, false);
+                    this.fireRayAtPos(target, damage, damageRadius, false);
                 }
+
                 Vec3 start = geburah.getCorePosition();
                 geburah.level().playSound(null, start.x,start.y,start.z, BossSounds.GEBURAH_CORE_RAY_STRIKE.get(), SoundSource.HOSTILE, 10f, 1f);
             }
@@ -110,8 +117,10 @@ public class GeburahRayController {
         targets.addAll(FDTargetFinder.getEntitiesInSphere(LivingEntity.class, level, target, damageRadius));
         targets.addAll(FDHelpers.traceEntities(level, start, location, 0.1f,(r)->r instanceof LivingEntity).stream().map(v->(LivingEntity)v).toList());
 
+
+
         for (var living : targets){
-            living.hurt(level.damageSources().generic(),damage);
+            living.hurt(BossDamageSources.GEBURAH_RAY_STRIKE_SOURCE,damage);
         }
 
         var options = GeburahRayOptions.builder()

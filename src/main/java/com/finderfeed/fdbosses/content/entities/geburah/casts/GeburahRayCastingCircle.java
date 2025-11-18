@@ -3,6 +3,8 @@ package com.finderfeed.fdbosses.content.entities.geburah.casts;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahBossBuddy;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
+import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDHelpers;
@@ -56,8 +58,11 @@ public class GeburahRayCastingCircle extends GeburahCastingCircle {
 
         var entities = FDHelpers.traceEntities(level(), this.position(),end, 0.0f, (e)->e instanceof LivingEntity livingEntity && !(e instanceof GeburahBossBuddy));
 
+
+        float damage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().geburahConfig.judgementBirdDamage);
+
         for (var entity : entities){
-            entity.hurt(level().damageSources().generic(), 1f);
+            entity.hurt(BossDamageSources.GEBURAH_LASER_STRIKE_SOURCE, damage);
         }
 
         PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
