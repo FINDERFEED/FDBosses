@@ -17,6 +17,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instance
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahWeaponRotationController;
+import com.finderfeed.fdbosses.content.entities.geburah.scales_controller.GeburahScalesController;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.PlayerSinsHandler;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.ActivePlayerSinInstance;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSin;
@@ -97,7 +98,6 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public static final String GEBURAH_STOMPING_LAYER = "stomping";
     public static final String GEBURAH_CANNONS_LAYER = "cannons";
-    public static final String GEBURAH_TILT_LAYER = "tilt";
 
     public static final int ARENA_HEIGHT = 30;
     public static final int ARENA_RADIUS = 32;
@@ -118,6 +118,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     protected GeburahWeaponRotationController rotatingWeaponsHandler;
     private GeburahRayController rayController;
     private GeburahWeaponAttackController attackController;
+    private GeburahScalesController scalesController;
 
     private AttackChain mainAttackChain;
 
@@ -140,7 +141,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         this.rayController = new GeburahRayController(this);
         this.stompingController = new GeburahStompingController(this, ARENA_RADIUS);
         this.attackController = new GeburahWeaponAttackController(this);
-
+        this.scalesController = new GeburahScalesController(this);
 
         AttackOptions<?> simpleRunAroundNoSins = AttackOptions.chainOptionsBuilder()
                 .addAttack(SIMPLE_NO_SIN_RUN_AROUND)
@@ -183,7 +184,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .registerAttack(NO_KILL_ENTITIES_ATTACK, this::noKillEntitiesAttack)
                 .registerAttack(SIN_PUNISHMENT_ATTACK, this::sinPunishmentAttack)
                 .attackListener(this::attackListener)
-                .addAttack(0, SIN_PUNISHMENT_ATTACK)
+                .addAttack(0, EMPTY_SINS_AND_DELAY)
 //                .addAttack(0, noKillEntitiesAttack)
 //                .addAttack(0, simpleRunAroundNoSins)
 //                .addAttack(0, noJumpRaysEarthquakesProjectiles)
@@ -194,7 +195,6 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
 
-        this.getAnimationSystem().startAnimation(GEBURAH_TILT_LAYER, AnimationTicker.builder(BossAnims.GEBURAH_TILT_LEFT).build());
 
     }
 
@@ -231,6 +231,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             this.tickJudgementBirdSpawn();
         }
 
+        this.getScalesController().tick();
         this.getWeaponRotationController().tick();
 
     }
@@ -369,9 +370,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     private AttackAction attackListener(String s) {
 
-        if (this.getPlayerPositionsCollector().getPlayers().isEmpty()){
-            return AttackAction.WAIT;
-        }
+//        if (this.getPlayerPositionsCollector().getPlayers().isEmpty()){
+//            return AttackAction.WAIT;
+//        }
 
         return AttackAction.PROCEED;
     }
@@ -430,24 +431,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         this.propagateSins(20);
 
         if (attackInstance.tick == 0) {
-            var currentAnim = this.getAnimationSystem().getTickerAnimation(GEBURAH_TILT_LAYER);
-
-            if (currentAnim == null || currentAnim.isToNullTransition()) {
-                currentAnim = BossAnims.GEBURAH_TILT_RIGHT.get();
-            }else if (currentAnim instanceof TransitionAnimation transitionAnimation){
-                currentAnim = transitionAnimation.getTransitionTo();
-            }
-
-            if (currentAnim == BossAnims.GEBURAH_TILT_RIGHT.get()){
-                this.getAnimationSystem().startAnimation(GEBURAH_TILT_LAYER, AnimationTicker.builder(BossAnims.GEBURAH_TILT_LEFT)
-                                .setSpeed(1.25f)
-                        .build());
+            int currentDisplacement = this.getScalesController().getCurrentDisplacement();
+            if (currentDisplacement >= 0){
+                this.getScalesController().setCurrentDisplacement(-GeburahScalesController.MAX_DISPLACEMENT, 80);
             }else{
-                this.getAnimationSystem().startAnimation(GEBURAH_TILT_LAYER, AnimationTicker.builder(BossAnims.GEBURAH_TILT_RIGHT)
-                        .setSpeed(1.25f)
-                        .build());
+                this.getScalesController().setCurrentDisplacement(GeburahScalesController.MAX_DISPLACEMENT, 80);
             }
-
         }
 
         if (attackInstance.tick == 60){
@@ -1137,6 +1126,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public void startSeenByPlayer(ServerPlayer player) {
         super.startSeenByPlayer(player);
         this.getWeaponRotationController().onStartSeeingGeburah(player);
+        this.getScalesController().syncToPlayer(player);
     }
 
     @Override
@@ -1191,6 +1181,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     @Override
     public void setDeltaMovement(Vec3 p_20257_) {
 
+    }
+
+
+
+    public GeburahScalesController getScalesController() {
+        return scalesController;
     }
 
     @Override

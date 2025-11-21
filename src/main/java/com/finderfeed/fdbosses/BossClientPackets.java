@@ -73,6 +73,12 @@ public class BossClientPackets {
 
     private static Random random = new Random();
 
+    public static void geburahScalesControllerSetDisplacement(int entityId, int displacement, int displacementTime){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
+            geburah.getScalesController().setCurrentDisplacement(displacement, displacementTime);
+        }
+    }
+
     public static void setPlayerMalkuthWeaknessAmount(int amount){
         MalkuthWeaknessHandler.setCurrentWeakness(FDClientHelpers.getClientPlayer(), amount);
     }

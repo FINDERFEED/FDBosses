@@ -48,6 +48,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.Ge
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahRotatingWeaponsBoneController;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayParticle;
+import com.finderfeed.fdbosses.content.entities.geburah.scales_controller.GeburahScalesBoneController;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boulder.MalkuthBoulderRenderer;
@@ -500,6 +501,7 @@ public class BossClientModEvents {
                             return RenderType.entityCutout(FDBosses.location("textures/entities/geburah/geburah.png"));
                         }))
                         .addBoneController("rotating_weapons", new GeburahRotatingWeaponsBoneController())
+                        .addBoneController("scales_plates", new GeburahScalesBoneController())
                         .build())
 
                 .freeRender(new GeburahRenderer())
