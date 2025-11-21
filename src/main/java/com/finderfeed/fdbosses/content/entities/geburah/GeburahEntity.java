@@ -1,8 +1,8 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
-import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircleJudgementBird;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahChainTrapCastCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahSinCrystalCastCircle;
@@ -26,11 +26,11 @@ import com.finderfeed.fdbosses.content.util.CylinderPlayerPositionsCollector;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.content.util.WorldBox;
 import com.finderfeed.fdbosses.init.*;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
-import com.finderfeed.fdlib.systems.bedrock.animations.TransitionAnimation;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
+import com.finderfeed.fdlib.network.lib_packets.PlaySoundInEarsPacket;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
@@ -41,10 +41,12 @@ import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFramesPacket;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
+import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -55,7 +57,10 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -70,6 +75,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix4f;
+import org.joml.Vector3d;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -93,7 +100,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public static final String NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES = "no_jump_rays_earthquakes_projectiles";
     public static final String SIN_CRYSTALS_LASERS_AND_CANNONS = "sin_crystals_lasers_and_cannons";
     public static final String NO_KILL_ENTITIES_ATTACK = "no_kill_entities_attack";
-    public static final String SIN_PUNISHMENT_ATTACK = "sin_punishment_attack";
+    public static final String BELL_ATTACK = "bell_attack";
     public static final String EMPTY_SINS_AND_DELAY = "empty_sins_and_delay";
 
     public static final String GEBURAH_STOMPING_LAYER = "stomping";
@@ -102,11 +109,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public static final int ARENA_HEIGHT = 30;
     public static final int ARENA_RADIUS = 32;
     public static final float MAX_LASERS_RADIUS = ARENA_RADIUS;
-
+    public static final float BELL_ATTACK_HAMMER_OFFSET = GeburahEntity.ARENA_RADIUS / 2f + 2;
 
 
     private static FDModel CLIENT_MODEL;
 
+    public static EntityDataAccessor<Boolean> PREPARING_FINAL_ATTACK = SynchedEntityData.defineId(GeburahEntity.class, EntityDataSerializers.BOOLEAN);
     public static EntityDataAccessor<List<PlayerSin>> ACTIVE_SINS = SynchedEntityData.defineId(GeburahEntity.class, BossEntityDataSerializers.SINS.get());
     public static EntityDataAccessor<Boolean> LASERS_ACTIVE = SynchedEntityData.defineId(GeburahEntity.class, EntityDataSerializers.BOOLEAN);
 
@@ -118,6 +126,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     protected GeburahWeaponRotationController rotatingWeaponsHandler;
     private GeburahRayController rayController;
     private GeburahWeaponAttackController attackController;
+
+    @SerializableField
     private GeburahScalesController scalesController;
 
     private AttackChain mainAttackChain;
@@ -134,9 +144,13 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public int sinPunishmentAttackTicker = -1;
 
+    public int finalAttackPrepareClientTick = 0;
+
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
-        this.playerPositionsCollector = new CylinderPlayerPositionsCollector(level, ARENA_RADIUS, ARENA_HEIGHT, BossUtil::isPlayerInSurvival);
+        this.playerPositionsCollector = new CylinderPlayerPositionsCollector(level, ARENA_RADIUS, ARENA_HEIGHT, player -> {
+            return true;
+        });
         this.rotatingWeaponsHandler = new GeburahWeaponRotationController(this);
         this.rayController = new GeburahRayController(this);
         this.stompingController = new GeburahStompingController(this, ARENA_RADIUS);
@@ -182,9 +196,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .registerAttack(NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES, this::noJumpEarthquakesProjectilesRays)
                 .registerAttack(SIN_CRYSTALS_LASERS_AND_CANNONS, this::sinCrystalsLasersAndCannons)
                 .registerAttack(NO_KILL_ENTITIES_ATTACK, this::noKillEntitiesAttack)
-                .registerAttack(SIN_PUNISHMENT_ATTACK, this::sinPunishmentAttack)
+                .registerAttack(BELL_ATTACK, this::bellAttack)
                 .attackListener(this::attackListener)
-                .addAttack(0, EMPTY_SINS_AND_DELAY)
+                .addAttack(0, BELL_ATTACK)
 //                .addAttack(0, noKillEntitiesAttack)
 //                .addAttack(0, simpleRunAroundNoSins)
 //                .addAttack(0, noJumpRaysEarthquakesProjectiles)
@@ -215,6 +229,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         super.tick();
 
         if (level().isClientSide) {
+            this.tickFinalAttackPreparation();
             this.tickSinPunishmentEffect();
             this.particles();
             this.tickSinsAppearTick();
@@ -234,6 +249,149 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         this.getScalesController().tick();
         this.getWeaponRotationController().tick();
 
+    }
+
+    private void tickFinalAttackPreparation(){
+        if (this.isPreparingFinalAttack()){
+            this.finalAttackPrepareClientTick++;
+
+            this.prepareHammers(false);
+            this.spawnPlatesFlamesParticles();
+
+        }else{
+            if (this.finalAttackPrepareClientTick != 0){
+                this.prepareHammers(true);
+            }
+            this.finalAttackPrepareClientTick = 0;
+        }
+    }
+
+    private void prepareHammers(boolean end){
+
+        int hammerCount = GeburahRenderer.HAMMER_AMOUNT;
+
+        float angle = FDMathUtil.FPI * 2 / hammerCount;
+
+        for (int i = 0; i < hammerCount; i++){
+
+            Vec3 hammerOffset = new Vec3(BELL_ATTACK_HAMMER_OFFSET,0,0).yRot(i * angle);
+
+
+            Vec3 pos = this.getCorePosition().add(hammerOffset);
+
+            if (!end) {
+                float ballParticleSize = Mth.clamp(finalAttackPrepareClientTick / 200f,0.01f,1) * 4;
+
+                BallParticleOptions options = BallParticleOptions.builder()
+                        .size(ballParticleSize)
+                        .brightness(2)
+                        .color(0.1f,0.8f,1f)
+                        .scalingOptions(0,0,5)
+                        .build();
+
+
+                level().addParticle(options, true, pos.x,pos.y,pos.z,0,0,0);
+
+                if (finalAttackPrepareClientTick % 2 == 0) {
+
+                    int k = i % 2 == 0 ? -1 : 1;
+
+                    StripeParticleOptions stripeParticleOptions = StripeParticleOptions.createHorizontalCircling(
+                            new FDColor(0.1f, 0.4f, 1f, 1f),new FDColor(0.1f, 0.8f, 1f, 1f),
+                            new Vec3(0, 1, 0), (finalAttackPrepareClientTick / 2) * (FDMathUtil.FPI / 2) * k, 0.3f, 10, 50, 0, 5, 0.5f,
+                            0.75f, i % 2 == 0, true
+                    );
+
+                    level().addParticle(stripeParticleOptions, true, pos.x,pos.y,pos.z,0,0,0);
+                }
+            }else{
+
+                for (int l = 0; l < 40; l++) {
+                    BallParticleOptions options = BallParticleOptions.builder()
+                            .size(random.nextFloat() * 0.25f + 0.25f)
+                            .brightness(2)
+                            .friction(0.8f)
+                            .color(0.1f, 0.8f, 1f)
+                            .scalingOptions(0, 0, 100)
+                            .build();
+
+                    Vec3 rnd = new Vec3(
+                            random.nextFloat() * 2 - 1f,
+                            random.nextFloat() * 2 - 1f,
+                            random.nextFloat() * 2 - 1f
+                    ).normalize();
+
+                    level().addParticle(options,true,
+                            pos.x,pos.y,pos.z,
+                            rnd.x,
+                            rnd.y,
+                            rnd.z
+                    );
+
+                }
+
+            }
+
+
+
+        }
+
+    }
+
+
+
+    private void spawnPlatesFlamesParticles(){
+
+        if (tickCount % 2 != 0) return;
+
+        Matrix4f scalesPlatesPos = this.getModelPartTransformation(this,"scales_plates", getClientModel());
+
+        Vector3f scalesPlates = scalesPlatesPos.transformPosition(new Vector3f());
+
+        Matrix4f newMat = new Matrix4f();
+        float rotation = this.getScalesController().getClientDisplacementAngle(0);
+        newMat.rotateX((float)Math.toRadians(rotation));
+
+        Vector3f dir1 = newMat.transformDirection(new Vector3f(0,0,6.5f));
+        Vector3f dir2 = dir1.mul(-1,new Vector3f());
+
+        Vector3f southPos = scalesPlates.add(dir1,new Vector3f());
+        Vector3f northPos = scalesPlates.add(dir2,new Vector3f());
+
+
+
+        BallParticleOptions redFlame = BallParticleOptions.builder()
+                .brightness(2)
+                .color(1f,0.3f,0.1f,1f)
+                .scalingOptions(0,0,20)
+                .size(3)
+                .build();
+
+
+        BallParticleOptions blueFlame = BallParticleOptions.builder()
+                .brightness(2)
+                .color(0.1f,0.8f,1f,1f)
+                .scalingOptions(0,0,20)
+                .size(3)
+                .build();
+
+        level().addParticle(redFlame,true,
+                this.getX() + southPos.x + random.nextFloat() * 0.5 - 0.25,
+                this.getY() + southPos.y - 6.5,
+                this.getZ() + southPos.z + random.nextFloat() * 0.5 - 0.25,
+                0,
+                0.25,
+                0
+        );
+
+        level().addParticle(blueFlame,true,
+                this.getX() + northPos.x + random.nextFloat() * 0.5 - 0.25,
+                this.getY() + northPos.y - 6.5,
+                this.getZ() + northPos.z + random.nextFloat() * 0.5 - 0.25,
+                0,
+                0.25,
+                0
+        );
     }
 
     private void tickSinPunishmentEffect(){
@@ -359,7 +517,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public Player pickRandomCombatant(){
         var positionsCollector = this.getPlayerPositionsCollector();
 
-        List<Player> players = new ArrayList<>(positionsCollector.getPlayers());
+        List<Player> players = new ArrayList<>(positionsCollector.getPlayers().stream().filter(BossUtil::isPlayerInSurvival).toList());
 
         if (players.isEmpty()){
             return null;
@@ -379,53 +537,198 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
 
     public void bellRang(GeburahBell bellEntity){
-        level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.GEBURAH_SIN_CHANGE.get(), SoundSource.HOSTILE, 5f, 1.25f);
+        level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.GEBURAH_SIN_CHANGE.get(), SoundSource.HOSTILE, 5f, 1.25f + random.nextFloat() * 0.1f);
+        var scalesController = this.getScalesController();
+        if (bellEntity.isRed()){
+            scalesController.setCurrentDisplacement(scalesController.getCurrentDisplacement() + 1,10);
+        }else{
+            scalesController.setCurrentDisplacement(scalesController.getCurrentDisplacement() - 1,10);
+        }
+
+        if (this.scalesController.getCurrentDisplacement() == 0){
+            for (var player : this.playerPositionsCollector.getPlayers()){
+                PacketDistributor.sendToPlayer((ServerPlayer) player, new PlaySoundInEarsPacket(BossSounds.ATTACK_DING.get(),1f,1f));
+            }
+        }
+
     }
 
 //-------------------------------------------------------------------ATTACKS--------------------------------------------------------------------------
 
-    public boolean sinPunishmentAttack(AttackInstance instance){
+    public boolean bellAttack(AttackInstance instance){
 
         int stage = instance.stage;
         int tick = instance.tick;
 
+        var scalesController = this.getScalesController();
+
         if (stage == 0){
-            BossUtil.geburahTriggerSinPunishmentAttack((ServerLevel) level(), this.position(), 120, this);
+            int random = (3 + level().random.nextInt(3)) * BossUtil.randomPlusMinus();
+
+            scalesController.setCurrentDisplacement(random, 40);
+            this.summonBells();
             instance.nextStage();
         }else if (stage == 1){
 
-            if (tick == SIN_PUNISHMENT_ATTACK_DURATION - 2){
+            this.setPreparingFinalAttack(true);
+
+            if (tick > 300){
+                instance.nextStage();
+            }
+
+        }else if (stage == 2){
+
+
+
+            if (scalesController.getCurrentDisplacement() == 0) {
+                this.setPreparingFinalAttack(false);
+                return true;
+            }
+
+
+            BossUtil.geburahTriggerSinPunishmentAttack((ServerLevel) level(), this.position(), 120, this);
+            instance.nextStage();
+
+        }else if (stage == 3){
+
+
+
+            if (tick == SIN_PUNISHMENT_ATTACK_DURATION - 3){
                 for (var entity : this.playerPositionsCollector.getPlayers()) {
 
                     PacketDistributor.sendToPlayer((ServerPlayer) entity, new ImpactFramesPacket(
                             List.of(
-                                    new ImpactFrame().setDuration(2),
+                                    new ImpactFrame().setDuration(3),
+                                    new ImpactFrame().setDuration(1).setInverted(true),
+                                    new ImpactFrame().setDuration(1),
                                     new ImpactFrame().setDuration(1).setInverted(true),
                                     new ImpactFrame().setDuration(1),
                                     new ImpactFrame().setDuration(1).setInverted(true)
                             )
                     ));
                 }
-            }else if (tick == SIN_PUNISHMENT_ATTACK_DURATION){
-                BossUtil.geburahTriggerSinPunishmentAttackImpactEffect((ServerLevel) level(), this.position(), 120, GeburahEntity.ARENA_RADIUS / 2);
-                BossUtil.geburahSinPunishmentAttackServerEffect(level(), this.position(), ARENA_RADIUS / 2f, BossBlocks.JUSTICESTONE_BRICKS.get().defaultBlockState());
-                for (var entity : this.playerPositionsCollector.getPlayers()) {
+            }else if (tick == SIN_PUNISHMENT_ATTACK_DURATION - 8){
 
+                this.setPreparingFinalAttack(false);
+
+            }else if (tick == SIN_PUNISHMENT_ATTACK_DURATION){
+                BossUtil.geburahTriggerSinPunishmentAttackImpactEffect((ServerLevel) level(), this.position(), 120, (int) BELL_ATTACK_HAMMER_OFFSET);
+                BossUtil.geburahSinPunishmentAttackServerEffect(level(), this.position(), BELL_ATTACK_HAMMER_OFFSET, BossBlocks.JUSTICESTONE_BRICKS.get().defaultBlockState());
+
+                for (var entity : this.playerPositionsCollector.getPlayers()) {
 
                     PacketDistributor.sendToPlayer((ServerPlayer) entity, new DefaultShakePacket(FDShakeData.builder()
                             .amplitude(0.3f)
                             .outTime(80)
                             .build()));
+
+
+                    if (BossUtil.isPlayerInSurvival(entity)){
+
+                       this.removePositiveEffects(entity);
+
+                       var health = entity.getHealth();
+                       if (health > 1) {
+                           entity.setHealth(health / 2);
+                       }
+                       entity.hurt(level().damageSources().generic(),0.1f);
+
+                        PlayerSinsHandler.sin((ServerPlayer) entity, 0, 1f);
+                    }
+
+                    //hehe asset reuse
+                    PacketDistributor.sendToPlayer((ServerPlayer) entity,new PlaySoundInEarsPacket(BossSounds.CHESED_FINAL_ATTACK_EXPLOSION_BIGGER.get(), 1f,  1.5f));
+
+
                 }
 
-
+                this.removeBells();
             }else if (tick >= SIN_PUNISHMENT_ATTACK_DURATION + 50){
+                this.setPreparingFinalAttack(false);
                 return true;
             }
         }
 
         return false;
     }
+
+    private void removePositiveEffects(Player player){
+
+        List<Holder<MobEffect>> effectsToRemove = new ArrayList<>();
+        for (var effect : player.getActiveEffects()){
+            var category = effect.getEffect().value().getCategory();
+            if ( (category == MobEffectCategory.BENEFICIAL || category == MobEffectCategory.NEUTRAL) && !effect.is(MobEffects.NIGHT_VISION)){
+                effectsToRemove.add(effect.getEffect());
+            }
+        }
+
+        effectsToRemove.forEach(player::removeEffect);
+
+    }
+
+    private void summonBells(){
+        this.removeBells();
+
+        int count = 18;
+
+        float angle = FDMathUtil.FPI * 2 / count;
+        float randomOffset = random.nextFloat() * FDMathUtil.FPI * 2;
+
+        for (int i = 0; i < count; i++){
+
+            Vec3 v = new Vec3(ARENA_RADIUS - 3,0,0).yRot(randomOffset + angle * i);
+
+            Vec3 bellPos = this.position().add(v).add(0,1,0);
+
+            GeburahBell.summon(this, bellPos, this.position(), i % 2 == 0);
+
+        }
+
+
+    }
+
+    private void removeBells(){
+        for (var bell : FDTargetFinder.getEntitiesInCylinder(GeburahBell.class, level(), this.position().add(0,-1,0), 30,ARENA_RADIUS * 2)){
+            bell.setRemoved(RemovalReason.DISCARDED);
+        }
+    }
+
+
+
+//        if (stage == 0){
+//            BossUtil.geburahTriggerSinPunishmentAttack((ServerLevel) level(), this.position(), 120, this);
+//            instance.nextStage();
+//        }else if (stage == 1){
+//
+//            if (tick == SIN_PUNISHMENT_ATTACK_DURATION - 2){
+//                for (var entity : this.playerPositionsCollector.getPlayers()) {
+//
+//                    PacketDistributor.sendToPlayer((ServerPlayer) entity, new ImpactFramesPacket(
+//                            List.of(
+//                                    new ImpactFrame().setDuration(2),
+//                                    new ImpactFrame().setDuration(1).setInverted(true),
+//                                    new ImpactFrame().setDuration(1),
+//                                    new ImpactFrame().setDuration(1).setInverted(true)
+//                            )
+//                    ));
+//                }
+//            }else if (tick == SIN_PUNISHMENT_ATTACK_DURATION){
+//                BossUtil.geburahTriggerSinPunishmentAttackImpactEffect((ServerLevel) level(), this.position(), 120, GeburahEntity.ARENA_RADIUS / 2);
+//                BossUtil.geburahSinPunishmentAttackServerEffect(level(), this.position(), ARENA_RADIUS / 2f, BossBlocks.JUSTICESTONE_BRICKS.get().defaultBlockState());
+//                for (var entity : this.playerPositionsCollector.getPlayers()) {
+//
+//
+//                    PacketDistributor.sendToPlayer((ServerPlayer) entity, new DefaultShakePacket(FDShakeData.builder()
+//                            .amplitude(0.3f)
+//                            .outTime(80)
+//                            .build()));
+//                }
+//
+//
+//            }else if (tick >= SIN_PUNISHMENT_ATTACK_DURATION + 50){
+//                return true;
+//            }
+//        }
 
     public boolean emptySinsAndDelay(AttackInstance attackInstance){
         this.propagateSins(20);
@@ -465,7 +768,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         int maxStages = 8 * localStagesCount;
 
-        if (this.getPlayerPositionsCollector().getPlayers().isEmpty()) return false;
+        if (this.getPlayerPositionsCollector().getPlayers().stream().noneMatch(BossUtil::isPlayerInSurvival)) return false;
 
         if (stage < maxStages) {
             if (localStage == 0) {
@@ -498,7 +801,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         if (activeSins.contains(GeburahSins.CRYSTAL_OF_SIN.get())) {
             if (sinCrystalsThrowTick % 200 == 0) {
 
-                var players = new ArrayList<>(this.playerPositionsCollector.getPlayers());
+                var players = new ArrayList<>(this.playerPositionsCollector.getPlayers().stream().filter(BossUtil::isPlayerInSurvival).toList());
 
                 if (!players.isEmpty()) {
                     for (int i = 0; i < 4; i++) {
@@ -558,7 +861,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
                 GeburahWeaponAttackController controller = this.getWeaponAttackController();
                 if (localStage == 3) {
-                    if (!this.getPlayerPositionsCollector().getPlayers().isEmpty()) {
+                    if (this.getPlayerPositionsCollector().getPlayers().stream().anyMatch(BossUtil::isPlayerInSurvival)) {
                         controller.setCurrentAttack(new GeburahRoundAndRoundLaserAttack(this, sideSwitch = !sideSwitch), true);
                         inst.nextStage();
                     }
@@ -881,7 +1184,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public void tickClockwiseSin(){
 
-        for (var player : this.playerPositionsCollector.getPlayers()){
+        for (var player : this.playerPositionsCollector.getPlayers().stream().filter(BossUtil::isPlayerInSurvival).toList()){
 
             PlayerSins playerSins = PlayerSins.getPlayerSins(player);
 
@@ -1085,7 +1388,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         AABB sinBox = this.constructSinBox();
 
-        for (var player : this.playerPositionsCollector.getPlayers()){
+        for (var player : this.playerPositionsCollector.getPlayers().stream().filter(BossUtil::isPlayerInSurvival).toList()){
 
             PlayerSins playerSins = PlayerSins.getPlayerSins(player);
 
@@ -1139,6 +1442,15 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         super.defineSynchedData(builder);
         builder.define(LASERS_ACTIVE, false);
         builder.define(ACTIVE_SINS, new ArrayList<>());
+        builder.define(PREPARING_FINAL_ATTACK, false);
+    }
+
+    public boolean isPreparingFinalAttack(){
+        return this.getEntityData().get(PREPARING_FINAL_ATTACK);
+    }
+
+    public void setPreparingFinalAttack(boolean preparing){
+        this.getEntityData().set(PREPARING_FINAL_ATTACK, preparing);
     }
 
     @Override

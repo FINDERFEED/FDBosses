@@ -5,6 +5,8 @@ import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -58,6 +60,46 @@ public class GeburahBell extends FDLivingEntity {
             if (geburah == null){
                 this.setRemoved(RemovalReason.DISCARDED);
             }
+        }else{
+
+            if (this.tickCount > 10 && !this.isDeadOrDying()) {
+
+
+
+                for (int i = 0; i < 2; i++) {
+
+                    Vec3 offset = new Vec3(1,0,0).yRot(i * FDMathUtil.FPI + this.tickCount * FDMathUtil.FPI / 32);
+
+                    BallParticleOptions options;
+
+                    if (this.isRed()) {
+                        options = BallParticleOptions.builder()
+                                .brightness(4)
+                                .color(1f, 0.3f, 0.1f, 1f)
+                                .scalingOptions(0, 0, 20)
+                                .size(0.1f + random.nextFloat() * 0.2f)
+                                .build();
+                    } else {
+                        options = BallParticleOptions.builder()
+                                .brightness(4)
+                                .color(0.1f, 0.8f, 1f, 1f)
+                                .scalingOptions(0, 0, 20)
+                                .size(0.1f + random.nextFloat() * 0.2f)
+                                .build();
+                    }
+
+                    level().addParticle(options,
+                            this.getX() + offset.x,
+                            this.getY() + 0.5,
+                            this.getZ() + offset.z,
+                            random.nextFloat() * 0.01 - 0.005,
+                            random.nextFloat() * 0.01 - 0.005,
+                            random.nextFloat() * 0.01 - 0.005
+                    );
+
+                }
+            }
+
         }
     }
 
@@ -101,9 +143,12 @@ public class GeburahBell extends FDLivingEntity {
             return super.hurt(source, 10);
         }
 
-        if (!source.is(DamageTypes.GENERIC_KILL) || !source.is(DamageTypes.FELL_OUT_OF_WORLD)) return false;
+        if (source.is(DamageTypes.GENERIC_KILL) || source.is(DamageTypes.FELL_OUT_OF_WORLD)) {
+            return super.hurt(source, damage);
+        }else{
+            return false;
+        }
 
-        return super.hurt(source, damage);
     }
 
     public boolean isRed(){

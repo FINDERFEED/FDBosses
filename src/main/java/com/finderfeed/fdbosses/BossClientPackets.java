@@ -99,10 +99,10 @@ public class BossClientPackets {
         }
     }
 
-    public static void triggerSinEffect(){
+    public static void triggerSinEffect(float soundPitch){
 
         SoundManager soundManager = Minecraft.getInstance().getSoundManager();
-        soundManager.play(SimpleSoundInstance.forUI(BossSounds.GEBURAH_SIN.get(),0.95f + random.nextFloat() * 0.1f,1f));
+        soundManager.play(SimpleSoundInstance.forUI(BossSounds.GEBURAH_SIN.get(),soundPitch * (0.95f + random.nextFloat() * 0.1f),0.5f));
         ClientMixinHandler.addShake(new DefaultShake(FDShakeData.builder()
                 .amplitude(0.5f)
                 .outTime(10)
@@ -415,12 +415,12 @@ public class BossClientPackets {
                         BigSmokeParticleOptions options = BigSmokeParticleOptions.builder()
                                 .color(color,color,color)
                                 .friction(smokeFriction)
-                                .minSpeed(0.005f)
+                                .minSpeed(0.01f)
                                 .size(particleSize)
-                                .lifetime(0,2,60 + random.nextInt(20))
+                                .lifetime(0,2,100 + random.nextInt(60))
                                 .build();
 
-                        level.addParticle(options, ppos.x,ppos.y,ppos.z, speed.x,random.nextFloat() * (1 - p) * 0.05f,speed.z);
+                        level.addParticle(options, ppos.x,ppos.y,ppos.z, speed.x,random.nextFloat() * (1 - p) * 1f,speed.z);
 
                     }
                 }
@@ -429,7 +429,7 @@ public class BossClientPackets {
 
             //BALLS (not that balls, no, NO!)
 
-            for (int count = 0; count < 7; count++){
+            for (int count = 0; count < 10; count++){
 
                 for (int dirswitch = -1; dirswitch <= 1; dirswitch += 2){
 
@@ -437,7 +437,7 @@ public class BossClientPackets {
                             .yRot(FDMathUtil.FPI / 4 * random.nextFloat());
                     float len = (float) randomOffset.length();
                     float pb = len / (radius / 2f);
-                    float ballSize = FDMathUtil.lerp(0.5f,1f,1 - pb);
+                    float ballSize = FDMathUtil.lerp(1f,1.5f,1 - pb);
                     float ballYSpeed = FDMathUtil.lerp(
                             0.1f + random.nextFloat() * 0.2f,
                             0.3f + random.nextFloat() * 0.6f,FDEasings.easeOut(1 - pb));

@@ -11,22 +11,24 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 @RegisterFDPacket("fdbosses:")
 public class GeburahTriggerSinEffectPacket extends FDPacket {
 
-    public GeburahTriggerSinEffectPacket(){
+    private float soundPitch;
 
+    public GeburahTriggerSinEffectPacket(float soundPitch){
+        this.soundPitch = soundPitch;
     }
 
     public GeburahTriggerSinEffectPacket(FriendlyByteBuf buf){
-
+        this.soundPitch = buf.readFloat();
     }
 
     @Override
     public void write(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
-
+        registryFriendlyByteBuf.writeFloat(this.soundPitch);
     }
 
     @Override
     public void clientAction(IPayloadContext iPayloadContext) {
-        BossClientPackets.triggerSinEffect();
+        BossClientPackets.triggerSinEffect(soundPitch);
     }
 
     @Override

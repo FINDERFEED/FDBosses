@@ -249,13 +249,16 @@ public class BossUtil {
                     for (int k = -1; k < 1; k++) {
                         Vec3 stoneDir = direction.scale(dirswitch).yRot(k * stonesDirStep);
 
-                        Vec3 speed = stoneDir.scale(1.5 * (0.1f + random.nextFloat() * 0.5f) ).add(0,(0.25f + random.nextFloat() * 0.3f) * 1.75, 0);
+                        Vec3 speed = stoneDir.scale(1.5 * (0.1f + random.nextFloat() * 0.5f) ).add(0,(0.25f + random.nextFloat() * 0.3f) * 1.25, 0);
+
+                        float speedScale = random.nextFloat() * 0.8f + 0.1f;
+                        speed = speed.multiply(speedScale,1,speedScale);
 
                         ChesedFallingBlock block = ChesedFallingBlock.summon(level, state, ppos.add(
                                 random.nextFloat() * 2 - 1,
                                 0,
                                 random.nextFloat() * 2 - 1
-                        ), speed,0,(float)Player.DEFAULT_BASE_GRAVITY * 0.8f);
+                        ), speed,0);
 
                         block.softerSound = true;
 

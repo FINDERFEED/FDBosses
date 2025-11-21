@@ -87,7 +87,7 @@ dependencies {
     implementation "curse.maven:irisshaders-455508:6213632"
     implementation "curse.maven:worldedit-225608:5830452"
 //    implementation "curse.maven:gravestone-mod-238551:5794085"
-//    implementation "curse.maven:flickerfix-431430:5424859"
+    implementation "curse.maven:flickerfix-431430:5424859"
 //    implementation "curse.maven:asyncparticles-1215753:6963092"
 //    implementation "curse.maven:placebo-283644:6446766"
 //    implementation "curse.maven:fastworkbench-288885:5670423"

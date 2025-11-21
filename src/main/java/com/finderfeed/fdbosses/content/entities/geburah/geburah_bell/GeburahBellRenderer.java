@@ -58,7 +58,7 @@ public class GeburahBellRenderer implements FDFreeEntityRenderer<GeburahBell> {
             float effect2Alpha = EFFECT2_ALPHA.apply(time);
             float effect2Pos = EFFECT2_POS.apply(time);
 
-            FDColor color = geburahBell.isRed() ? new FDColor(1f,0.1f,0.1f,1f) : new FDColor(0.3f,0.8f,1f,1f);
+            FDColor color = geburahBell.isRed() ? new FDColor(1f,0.3f,0.1f,1f) : new FDColor(0.3f,0.8f,1f,1f);
 
             float effectDisplace = 1.25f;
 
@@ -74,7 +74,7 @@ public class GeburahBellRenderer implements FDFreeEntityRenderer<GeburahBell> {
                     .translate(-effectDisplace * effect1Pos,0,0)
                     .pose(matrices)
                     .size(effect1Pos * 0.75f)
-                    .color(color.r,color.g,color.b, effect1Alpha * 0.5f)
+                    .color(color.r,color.g,color.b, effect1Alpha * 0.25f)
                     .render();
 
             QuadRenderer.start(vertexConsumer)
@@ -84,7 +84,7 @@ public class GeburahBellRenderer implements FDFreeEntityRenderer<GeburahBell> {
                     .translate(effectDisplace * effect1Pos,0,0)
                     .pose(matrices)
                     .size(effect1Pos * 0.75f)
-                    .color(color.r,color.g,color.b, effect1Alpha * 0.5f)
+                    .color(color.r,color.g,color.b, effect1Alpha * 0.25f)
                     .render();
 
 
@@ -94,7 +94,7 @@ public class GeburahBellRenderer implements FDFreeEntityRenderer<GeburahBell> {
                     .translate(-effectDisplace * effect2Pos,0,0)
                     .pose(matrices)
                     .size(effect2Pos * 0.75f)
-                    .color(color.r,color.g,color.b, effect2Alpha * 0.5f)
+                    .color(color.r,color.g,color.b, effect2Alpha * 0.25f)
                     .render();
 
             QuadRenderer.start(vertexConsumer)
@@ -104,7 +104,7 @@ public class GeburahBellRenderer implements FDFreeEntityRenderer<GeburahBell> {
                     .translate(effectDisplace * effect2Pos,0,0)
                     .pose(matrices)
                     .size(effect2Pos * 0.75f)
-                    .color(color.r,color.g,color.b, effect2Alpha * 0.5f)
+                    .color(color.r,color.g,color.b, effect2Alpha * 0.25f)
                     .render();
             matrices.popPose();
 

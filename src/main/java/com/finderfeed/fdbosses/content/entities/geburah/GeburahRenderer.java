@@ -70,7 +70,8 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
         float time = Mth.clamp((GeburahEntity.SIN_PUNISHMENT_ATTACK_DURATION - tick) + pticks, 0, GeburahEntity.SIN_PUNISHMENT_ATTACK_DURATION);
 
-        float maxHammerHeight = 20;
+        float maxHammerHeight = 22;
+        float hammerScale = 1f;
 
         float hammerHeight = maxHammerHeight;
         float hammerRotation = 360;
@@ -82,12 +83,12 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
         if (time < END_PREPARING_SIN_PUNISHMENT){
             alpha = localP;
             hammerRotation = 360 * FDEasings.easeOut(Mth.clamp(localP * 1.1f,0,1));
-            hammerHeight = maxHammerHeight - (1 - FDEasings.easeOut(localP)) * 10;
+            hammerScale = localP;
         }else{
             hammerHeight = maxHammerHeight * (1 - FDEasings.easeIn(localP));
         }
 
-        float offset = GeburahEntity.ARENA_RADIUS / 2f;
+        float offset = GeburahEntity.BELL_ATTACK_HAMMER_OFFSET;
         float angle = 360f / HAMMER_AMOUNT;
 
         for (int i = 0; i < HAMMER_AMOUNT; i++){
@@ -97,6 +98,7 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
             matrices.translate(offset,hammerHeight,0);
             matrices.mulPose(Axis.YP.rotationDegrees(hammerRotation + 90));
             matrices.mulPose(Axis.XP.rotationDegrees(180));
+            matrices.scale(hammerScale,hammerScale,hammerScale);
 
             hammerModel.render(matrices,src.getBuffer(RenderType.lightning()), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0.3f,0.7f,1f,alpha * 0.75f);
 

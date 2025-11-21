@@ -286,6 +286,7 @@ public class BossClientModEvents {
 
         event.registerEntityRenderer(BossEntities.GEBURAH_BELL.get(), FDEntityRendererBuilder.<GeburahBell>builder()
                         .addLayer(FDEntityRenderLayerOptions.<GeburahBell>builder()
+                                .ignoreHurtOverlay(true)
                                 .model(BossModels.GEBURAH_BELL)
                                 .renderType(((geburahBell, v) -> {
                                     return RenderType.entityTranslucentCull(FDBosses.location("textures/entities/geburah/geburah_bell.png"));
@@ -303,7 +304,7 @@ public class BossClientModEvents {
                                     }
 
                                     if (geburahBell.isRed()){
-                                        return new FDColor(1f,0.1f,0.1f,alpha * 0.75f);
+                                        return new FDColor(1f,0.3f,0.1f,alpha * 0.75f);
                                     }else{
                                         return new FDColor(0.3f,0.8f,1f,alpha * 0.75f);
                                     }
@@ -495,7 +496,6 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH.get(), FDEntityRendererBuilder.<GeburahEntity>builder()
                 .addLayer(FDEntityRenderLayerOptions.<GeburahEntity>builder()
                         .model(BossModels.GEBURAH)
-                        .light(LightTexture.FULL_BRIGHT)
                         .ignoreHurtOverlay(true)
                         .renderType(((geburah, v) -> {
                             return RenderType.entityCutout(FDBosses.location("textures/entities/geburah/geburah.png"));
