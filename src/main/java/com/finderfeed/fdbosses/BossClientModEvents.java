@@ -35,6 +35,8 @@ import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircleRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.ChainTrapSummonProjectile;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBell;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBellRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquakeRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahSinCrystal;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallExplosionParticle;
@@ -280,6 +282,45 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_CHAIN_TRAP.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD.get(), GeburahCastingCircleRenderer::new);
+
+        event.registerEntityRenderer(BossEntities.GEBURAH_BELL.get(), FDEntityRendererBuilder.<GeburahBell>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<GeburahBell>builder()
+                                .model(BossModels.GEBURAH_BELL)
+                                .renderType(((geburahBell, v) -> {
+                                    return RenderType.entityTranslucentCull(FDBosses.location("textures/entities/geburah/geburah_bell.png"));
+                                }))
+                                .color(((geburahBell, v) -> {
+
+                                    int appearDuration = 20;
+
+                                    float alpha;
+
+                                    if (!geburahBell.isDeadOrDying()) {
+                                        alpha = FDEasings.easeOut(Mth.clamp((geburahBell.tickCount + v) / appearDuration, 0, 1));
+                                    }else{
+                                        alpha = 1 - FDEasings.easeOut(Mth.clamp((geburahBell.deathTime + v) / BossAnims.GEBURAH_BELL_RING.get().getAnimTime(), 0, 1));
+                                    }
+
+                                    if (geburahBell.isRed()){
+                                        return new FDColor(1f,0.1f,0.1f,alpha * 0.75f);
+                                    }else{
+                                        return new FDColor(0.3f,0.8f,1f,alpha * 0.75f);
+                                    }
+                                }))
+                                .transformation(((geburahBell, matrices, pticks) -> {
+                                    int appearDuration = 20;
+                                    float t = Mth.clamp((geburahBell.tickCount + pticks) / appearDuration,0,1);
+
+                                    Random random = new Random(geburahBell.getId() * 34L);
+                                    float rndFly = (float) Math.sin(random.nextFloat() * FDMathUtil.FPI * 2 + (geburahBell.tickCount + pticks) / 10f) * 0.1f;
+
+                                    matrices.translate(0,(1-FDEasings.easeOut(t)) * 0.25 + rndFly,0);
+                                }))
+                                .build())
+
+                        .freeRender(new GeburahBellRenderer())
+
+                .build());
 
         event.registerEntityRenderer(BossEntities.JUDGEMENT_BIRD.get(), FDEntityRendererBuilder.<JudgementBirdEntity>builder()
                         .addLayer(FDEntityRenderLayerOptions.<JudgementBirdEntity>builder()

@@ -9,6 +9,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahSinCrystalC
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.ChainTrapSummonProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.StartGeburahDistortionEffectPacket;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBell;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttackController;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahAttackFireDefaultProjectiles;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
@@ -376,6 +377,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     }
 
 
+    public void bellRang(GeburahBell bellEntity){
+        level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.GEBURAH_SIN_CHANGE.get(), SoundSource.HOSTILE, 5f, 1.25f);
+    }
 
 //-------------------------------------------------------------------ATTACKS--------------------------------------------------------------------------
 

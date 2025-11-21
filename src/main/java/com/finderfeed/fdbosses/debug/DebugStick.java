@@ -1,8 +1,11 @@
 package com.finderfeed.fdbosses.debug;
 
+import com.finderfeed.fdbosses.BossTargetFinder;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahRayCastingCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffectHandler;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBell;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.GeburahTriggerSinEffectPacket;
 import net.minecraft.server.level.ServerPlayer;
@@ -42,9 +45,14 @@ public class DebugStick extends Item {
 
 //            GeburahRayCastingCircle.summon(level, player.getEyePosition().add(player.getLookAngle()), player.getLookAngle());
 
+            for (var geburah : BossTargetFinder.getEntitiesInSphere(GeburahEntity.class, level, player.position(), 100)){
+                GeburahBell.summon(geburah, player.position(), geburah.position(), true);
+                GeburahBell.summon(geburah, player.position().add(10,0,10), geburah.position(), false);
+            }
+
         }else{
-            DistortionSphereEffectHandler.setDistortionSphereEffect(new DistortionSphereEffect(player.getEyePosition().add(player.getLookAngle().scale(50)),
-                    80,80,1, (float) -100));
+//            DistortionSphereEffectHandler.setDistortionSphereEffect(new DistortionSphereEffect(player.getEyePosition().add(player.getLookAngle().scale(50)),
+//                    80,80,1, (float) -100));
         }
 
         return super.use(level, player, hand);

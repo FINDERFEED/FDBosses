@@ -226,7 +226,6 @@ public class BossAnims {
     });
 
     //GEBURAH
-
     public static DeferredHolder<Animation,Animation> GEBURAH_STOMP = ANIMATIONS.register("geburah_stomp", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"));
     });
@@ -253,6 +252,10 @@ public class BossAnims {
 
     public static DeferredHolder<Animation,Animation> JUDGEMENT_BIRD_CAST = ANIMATIONS.register("judgement_bird_cast", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_bird"));
+    });
+
+    public static DeferredHolder<Animation,Animation> GEBURAH_BELL_RING = ANIMATIONS.register("geburah_bell_ring", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah_bell"));
     });
 
 

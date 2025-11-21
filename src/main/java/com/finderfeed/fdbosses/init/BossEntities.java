@@ -26,6 +26,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahRayCastingC
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahSinCrystalCastCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.ChainTrapSummonProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBell;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahSinCrystal;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
@@ -383,9 +384,20 @@ public class BossEntities {
             .sized(0.5f,0.5f)
             .build("judgement_bird"));
 
+    public static final Supplier<EntityType<GeburahBell>> GEBURAH_BELL = ENTITIES.register("geburah_bell",()->EntityType.Builder.of(
+                    GeburahBell::new, MobCategory.CREATURE
+            )
+            .sized(1f,1f)
+            .build("geburah_bell"));
+
 
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event){
+
+        event.put(GEBURAH_BELL.get(), LivingEntity.createLivingAttributes()
+                        .add(Attributes.MAX_HEALTH, 2)
+                .build());
+
         event.put(CHESED.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,10).build());
         event.put(CHESED_ELECTRIC_SPHERE.get(), LivingEntity.createLivingAttributes().build());
         event.put(CHESED_VERTICAL_RAY_ATTACK.get(), LivingEntity.createLivingAttributes().build());
