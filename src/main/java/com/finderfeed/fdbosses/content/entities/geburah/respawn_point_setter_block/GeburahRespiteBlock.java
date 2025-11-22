@@ -26,7 +26,7 @@ public class GeburahRespiteBlock extends GlazedTerracottaBlock implements Entity
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult p_60508_) {
 
         if (player instanceof ServerPlayer serverPlayer){
-            serverPlayer.setRespawnPosition(serverPlayer.level().dimension(), serverPlayer.getOnPos(), serverPlayer.getYRot(), true,true);
+            serverPlayer.setRespawnPosition(serverPlayer.level().dimension(), serverPlayer.getOnPos().above(), serverPlayer.getYRot(), true,true);
 
             serverPlayer.swing(InteractionHand.MAIN_HAND);
             return InteractionResult.SUCCESS;

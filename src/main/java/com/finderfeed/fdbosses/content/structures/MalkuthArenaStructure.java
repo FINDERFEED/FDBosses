@@ -53,7 +53,6 @@ public class MalkuthArenaStructure extends Structure {
     protected Optional<GenerationStub> findGenerationPoint(GenerationContext ctx) {
         ChunkPos chunkpos = ctx.chunkPos();
         BlockPos blockpos = new BlockPos(chunkpos.getMinBlockX() + 8, -3, chunkpos.getMinBlockZ() + 8);
-//        int maxDistanceFromCenter = 115;
         int maxDistanceFromCenter = 128;
         return JigsawPlacement.addPieces(
                 ctx,

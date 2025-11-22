@@ -1,0 +1,41 @@
+{
+  "type": "fdbosses:geburah_arena",
+  "biomes": "#minecraft:has_structure/end_city",
+  "start_pool": "fdbosses:geburah_arena",
+  "step": "top_layer_modification",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {
+    "ambient": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "axolotls": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "creature": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "misc": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "monster": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "underground_water_creature": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "water_ambient": {
+      "bounding_box": "piece",
+      "spawns": []
+    },
+    "water_creature": {
+      "bounding_box": "piece",
+      "spawns": []
+    }
+  }
+}
