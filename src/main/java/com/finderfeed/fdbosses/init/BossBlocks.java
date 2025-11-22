@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.init;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.blocks.NoEntitySpawnBlock;
 import com.finderfeed.fdbosses.content.blocks.TrophyBlock;
+import com.finderfeed.fdbosses.content.entities.geburah.respawn_point_setter_block.GeburahRespiteBlock;
 import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.*;
@@ -50,6 +51,7 @@ public class BossBlocks {
     public static final Supplier<Block> POLISHED_JUSTICESTONE = BLOCKS.register("polished_justicestone", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
     public static final Supplier<Block> POLISHED_JUSTICESTONE_SLAB = BLOCKS.register("polished_justicestone_slab", ()->new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
     public static final Supplier<Block> POLISHED_JUSTICESTONE_STAIRS = BLOCKS.register("polished_justicestone_stairs", ()->new StairBlock(POLISHED_JUSTICESTONE.get().defaultBlockState(), BlockBehaviour.Properties.ofFullCopy(Blocks.STONE_STAIRS)));
+    public static final Supplier<Block> GEBURAH_RESPAWN_POINT_SETTER = BLOCKS.register("geburah_respite_point", ()->new GeburahRespiteBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.BEDROCK)));
 
 
 }

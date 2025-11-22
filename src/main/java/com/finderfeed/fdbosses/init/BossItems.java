@@ -83,6 +83,9 @@ public class BossItems {
     public static final Supplier<Item> JUSTICESTONE_BRICKS_SLAB = ITEMS.register("justicestone_bricks_slab",
             ()->new BlockItem(BossBlocks.JUSTICESTONE_BRICKS_SLAB.get(), new Item.Properties()));
 
+    public static final Supplier<Item> GEBURAH_RESPITE_POINT = ITEMS.register("geburah_respite_point",
+            ()->new BlockItem(BossBlocks.GEBURAH_RESPAWN_POINT_SETTER.get(), new Item.Properties()));
+
     public static final Supplier<Item> GEBURAH_EXPLOSIVE_CRYSTAL = ITEMS.register("geburah_explosive_crystal",
             ()->new ExplosiveCrystalItem(new Item.Properties()));
 
@@ -112,6 +115,7 @@ public class BossItems {
                 event.accept(POLISHED_JUSTICESTONE_STAIRS.get());
                 event.accept(POLISHED_JUSTICESTONE_SLAB.get());
                 event.accept(JUSTICESTONE_BRICKS_SLAB.get());
+                event.accept(GEBURAH_RESPITE_POINT.get());
             }else if (event.getTabKey().equals(CreativeModeTabs.SPAWN_EGGS)){
                 event.accept(MALKUTH_FIRE_WARRIOR_SPAWN_EGG.get());
                 event.accept(MALKUTH_ICE_WARRIOR_SPAWN_EGG.get());

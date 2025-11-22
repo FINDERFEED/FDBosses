@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "fdbosses:block/geburah_respite_point",
+      "y": 270
+    },
+    "facing=north": {
+      "model": "fdbosses:block/geburah_respite_point",
+      "y": 180
+    },
+    "facing=south": {
+      "model": "fdbosses:block/geburah_respite_point"
+    },
+    "facing=west": {
+      "model": "fdbosses:block/geburah_respite_point",
+      "y": 90
+    }
+  }
+}
