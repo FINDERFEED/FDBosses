@@ -36,17 +36,17 @@ public class GeburahArenaStructure extends Structure {
     @Override
     protected Optional<GenerationStub> findGenerationPoint(GenerationContext ctx) {
 
-        BlockPos blockpos = this.getLowestYIn5by5BoxOffset7Blocks(ctx, Rotation.NONE);
+        BlockPos blockpos = ctx.chunkPos().getMiddleBlockPosition(210);
 
         return JigsawPlacement.addPieces(
                 ctx,
                 this.startPool,
                 Optional.empty(),
-                10,
+                20,
                 blockpos,
                 false,
                 Optional.empty(),
-                128,
+                200,
                 PoolAliasLookup.create(new ArrayList<>(), blockpos, ctx.seed()),
                 DimensionPadding.ZERO,
                 LiquidSettings.IGNORE_WATERLOGGING

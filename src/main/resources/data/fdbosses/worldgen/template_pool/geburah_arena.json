@@ -112,6 +112,132 @@
         "location": "fdbosses:geburah_arena/geburah_arena_outer_part_4",
         "processors": "minecraft:empty"
       }
+    },
+
+
+
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_outer_part_11",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_outer_part_12",
+        "processors": "minecraft:empty"
+      }
+    },
+
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_outer_part_21",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_outer_part_22",
+        "processors": "minecraft:empty"
+      }
+    },
+
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_outer_part_31",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_outer_part_32",
+        "processors": "minecraft:empty"
+      }
+    },
+
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_outer_part_41",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_outer_part_42",
+        "processors": "minecraft:empty"
+      }
+    },
+
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_part_1_endstone",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_part_2_endstone",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_part_3_endstone",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_part_4_endstone",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 10,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_part_5_endstone",
+        "processors": "minecraft:empty"
+      }
     }
+
+
   ]
 }
