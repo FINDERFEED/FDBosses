@@ -36,7 +36,17 @@ public class GeburahArenaStructure extends Structure {
     @Override
     protected Optional<GenerationStub> findGenerationPoint(GenerationContext ctx) {
 
-        BlockPos blockpos = ctx.chunkPos().getMiddleBlockPosition(210);
+
+        var pos = this.getLowestYIn5by5BoxOffset7Blocks(ctx, Rotation.NONE);
+
+        if (pos.getY() != -1){
+            return Optional.empty();
+        }
+
+
+//        BlockPos blockpos = ctx.chunkPos().getMiddleBlockPosition(140);
+        BlockPos blockpos = new BlockPos(pos.getX(), 140, pos.getZ());
+
 
         return JigsawPlacement.addPieces(
                 ctx,

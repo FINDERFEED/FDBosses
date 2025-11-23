@@ -116,6 +116,49 @@
 
 
 
+
+
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_outer_part_1_two",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_outer_part_2_two",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_outer_part_3_two",
+        "processors": "minecraft:empty"
+      }
+    },
+    {
+      "weight": 1,
+      "element": {
+        "projection": "rigid",
+        "element_type": "minecraft:single_pool_element",
+        "location": "fdbosses:geburah_arena/geburah_arena_outer_part_4_two",
+        "processors": "minecraft:empty"
+      }
+    },
+
+
+
+
+
     {
       "weight": 1,
       "element": {

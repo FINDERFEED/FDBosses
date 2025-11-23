@@ -35,18 +35,23 @@ public class DebugStick extends Item {
         if (!level.isClientSide){
 
 
-            int height = 45 * 2;
-            for (int i = 0; i < height; i++) {
-                BlockPos pos = player.getOnPos().offset(0,-i,0);
+//            int height = 45 * 2;
+//            for (int i = 0; i < height; i++) {
+//                BlockPos pos = player.getOnPos().offset(0,-i,0);
+//
+//                float p = i / (height - 1f);
+//
+//                int radius = (int) Math.ceil(FDEasings.easeIn(1 - p) * 60);
+//
+//                float percent = FDMathUtil.lerp(0.2f,0.95f,FDEasings.easeOut(1 - p));
+//
+//                createGeburahArenaCircleAtPos(level, pos, radius,percent, 60);
+//            }
 
-                float p = i / (height - 1f);
+            createGeburahArenaCircleAtPos(level,player.getOnPos().below(), 60, 0.95f, 60);
 
-                int radius = (int) Math.ceil(FDEasings.easeIn(1 - p) * 60);
 
-                float percent = FDMathUtil.lerp(0.2f,0.95f,FDEasings.easeOut(1 - p));
 
-                createGeburahArenaCircleAtPos(level, pos, radius,percent, 60);
-            }
         }else{
 //            DistortionSphereEffectHandler.setDistortionSphereEffect(new DistortionSphereEffect(player.getEyePosition().add(player.getLookAngle().scale(50)),
 //                    80,80,1, (float) -100));
@@ -81,16 +86,18 @@ public class DebugStick extends Item {
                 BlockPos offsetPos = pos.offset(x,0,z);
 
                 if (len < currentRadius){
-                    level.setBlock(offsetPos, Blocks.END_STONE.defaultBlockState(), 2);
-                    if (level.random.nextFloat() > 0.7f){
-                        for (int i = 1; i < 4 + level.random.nextInt(2); i++){
-                            level.setBlock(pos.offset(x,-i,z), Blocks.END_STONE.defaultBlockState(), 2);
-                        }
+                    if (level.getBlockState(offsetPos).isAir()) {
+                        level.setBlock(offsetPos, Blocks.END_STONE.defaultBlockState(), 2);
                     }
+//                    if (level.random.nextFloat() > 0.7f){
+//                        for (int i = 1; i < 4 + level.random.nextInt(2); i++){
+//                            level.setBlock(pos.offset(x,-i,z), Blocks.END_STONE.defaultBlockState(), 2);
+//                        }
+//                    }
                 }else{
-                    if (!level.getBlockState(offsetPos).is(Blocks.END_STONE)){
-                        level.setBlock(offsetPos, Blocks.STRUCTURE_VOID.defaultBlockState(),2);
-                    }
+//                    if (!level.getBlockState(offsetPos).is(Blocks.END_STONE)){
+//                        level.setBlock(offsetPos, Blocks.STRUCTURE_VOID.defaultBlockState(),2);
+//                    }
                 }
 
 
