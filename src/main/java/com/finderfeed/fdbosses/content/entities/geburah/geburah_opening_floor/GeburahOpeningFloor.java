@@ -29,7 +29,7 @@ public class GeburahOpeningFloor extends Entity {
 
 
         } else {
-            if (tickCount == 15) {
+            if (tickCount == 17) {
                 for (int i = 0; i < 200;i ++){
 
                     float c = 0.3f + random.nextFloat() * 0.2f;
@@ -40,11 +40,17 @@ public class GeburahOpeningFloor extends Entity {
                             .size(1f + random.nextFloat() * 2f)
                             .lifetime(5 + random.nextInt(5),0,40 + random.nextInt(20))
                             .color(c,c,c,c)
+                            .minSpeed(0.05f)
+                            .friction(0.7f)
                             .build();
 
                     Vec3 pos = this.position().add(v).add(0,0.1f,0);
 
-                    level().addParticle(bigSmokeParticle, true,pos.x,pos.y,pos.z,0,0,0);
+                    level().addParticle(bigSmokeParticle, true,pos.x,pos.y,pos.z,
+                            random.nextFloat() * 4 - 2,
+                            0,
+                            random.nextFloat() * 4 - 2
+                            );
 
                 }
             }

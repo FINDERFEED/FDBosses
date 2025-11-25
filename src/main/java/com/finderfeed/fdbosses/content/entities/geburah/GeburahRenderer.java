@@ -68,7 +68,7 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
         float time = geburah.clientOperatingTicks + pticks;
         Vec3 corePos = geburah.getCorePosition().subtract(geburah.position());
 
-        float haloExplosionTime = 30;
+        float haloExplosionTime = 35;
         if (time <= haloExplosionTime) {
             float p = Mth.clamp(time / haloExplosionTime, 0, 1);
 
