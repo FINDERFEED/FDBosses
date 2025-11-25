@@ -29,6 +29,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainT
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBell;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahSinCrystal;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_opening_floor.GeburahOpeningFloor;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
@@ -389,6 +390,12 @@ public class BossEntities {
             )
             .sized(1f,1f)
             .build("geburah_bell"));
+
+    public static final Supplier<EntityType<GeburahOpeningFloor>> GEBURAH_OPENING_FLOOR = ENTITIES.register("geburah_opening_floor",()->EntityType.Builder.of(
+                    GeburahOpeningFloor::new, MobCategory.CREATURE
+            )
+            .sized(1f,1f)
+            .build("geburah_opening_floor"));
 
 
     @SubscribeEvent

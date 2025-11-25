@@ -39,6 +39,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBell
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBellRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquakeRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahSinCrystal;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_opening_floor.GeburahOpeningFloorRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallExplosionParticle;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
@@ -282,6 +283,7 @@ public class BossClientModEvents {
 
         event.registerBlockEntityRenderer(BossTileEntities.GEBURAH_RESPITE_BLOCK.get(), GeburahRespiteBlockEntityRenderer::new);
 
+        event.registerEntityRenderer(BossEntities.GEBURAH_OPENING_FLOOR.get(), GeburahOpeningFloorRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_SIN_CRYSTAL.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_CHAIN_TRAP.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
