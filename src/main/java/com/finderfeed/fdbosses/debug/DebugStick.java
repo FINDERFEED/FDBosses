@@ -48,9 +48,10 @@ public class DebugStick extends Item {
 //                createGeburahArenaCircleAtPos(level, pos, radius,percent, 60);
 //            }
 
-            createGeburahArenaCircleAtPos(level,player.getOnPos().below(), 60, 0.95f, 60);
+//            createGeburahArenaCircleAtPos(level,player.getOnPos().below(), 60, 0.95f, 60);
 
 
+            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket(1));
 
         }else{
 //            DistortionSphereEffectHandler.setDistortionSphereEffect(new DistortionSphereEffect(player.getEyePosition().add(player.getLookAngle().scale(50)),

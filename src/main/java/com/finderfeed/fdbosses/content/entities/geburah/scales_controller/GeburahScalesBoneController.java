@@ -18,9 +18,9 @@ public class GeburahScalesBoneController implements BoneTransformationController
 
         float rotation = geburah.getScalesController().getClientDisplacementAngle(v);
 
-        scalesPlates.setXRot(rotation);
-        scalesPlate1.setXRot(-rotation);
-        scalesPlate2.setXRot(-rotation);
+        scalesPlates.addXRot(rotation);
+        scalesPlate1.addXRot(-rotation);
+        scalesPlate2.addXRot(-rotation);
         
     }
 

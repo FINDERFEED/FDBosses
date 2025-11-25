@@ -20,6 +20,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.Vec3;
@@ -30,6 +31,9 @@ import org.joml.Vector4f;
 import java.util.List;
 
 public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
+
+    public static final ResourceLocation HALO_EXPLOSION = FDBosses.location("textures/entities/geburah/geburah_halo_explosion.png");
+
 
     public static final int HAMMER_AMOUNT = 8;
     private static final int IMPACT_TIME = 5;
@@ -50,12 +54,36 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
     public void render(GeburahEntity geburah, float v, float v1, PoseStack poseStack, MultiBufferSource multiBufferSource, int i) {
 
         this.renderLasers(geburah,v,v1,poseStack,multiBufferSource,i);
-
-
         this.renderSins(geburah,v,v1,poseStack,multiBufferSource,i);
-
         this.renderRayPreparations(geburah, v, v1, poseStack, multiBufferSource, i);
         this.renderSinPunishmentAttackEffect(geburah, v, v1, poseStack, multiBufferSource, i);
+        this.renderStartOperating(geburah, v, v1, poseStack, multiBufferSource, i);
+
+    }
+
+    private void renderStartOperating(GeburahEntity geburah, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light){
+
+        if (!geburah.getEntityData().get(GeburahEntity.OPERATING)) return;
+
+        float time = geburah.clientOperatingTicks + pticks;
+        Vec3 corePos = geburah.getCorePosition().subtract(geburah.position());
+
+        float haloExplosionTime = 30;
+        if (time <= haloExplosionTime) {
+            float p = Mth.clamp(time / haloExplosionTime, 0, 1);
+
+
+            QuadRenderer.start(src.getBuffer(RenderType.text(HALO_EXPLOSION)))
+                    .pose(matrices)
+                    .translate(0, (float) corePos.y, 0)
+                    .size(FDEasings.easeOut(FDEasings.easeOut(p)) * 26)
+                    .rotationDegrees(FDEasings.easeOut(FDEasings.easeOut(p)) * 20)
+                    .color(1f, 1f, 1f, (1 - p) * 0.8f )
+                    .renderBack()
+                    .render();
+        };
+
+
 
     }
 
@@ -203,17 +231,36 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
     private void renderSinAtScreen(PlayerSin sin, int screenId, GeburahEntity geburah, float pticks, PoseStack matrices, MultiBufferSource src){
         matrices.pushPose();
 
-        Matrix4f tv_1 = geburah.getModelPartTransformation("tv_1_"+screenId,GeburahEntity.getClientModel());
-        matrices.mulPose(tv_1);
-        
+        float time = geburah.clientOperatingTicks + pticks;
 
-        QuadRenderer.start(src.getBuffer(RenderType.entityCutout(FDBosses.location("textures/entities/geburah/screen_sin/base_screen.png"))))
+        float screenStartup = 11f;
+        float alpha = 0f;
+        if (geburah.getEntityData().get(GeburahEntity.OPERATING)){
+            if (time <= screenStartup){
+                alpha = ((float)Math.sin(time / screenStartup * FDMathUtil.FPI * 8f) + 1) / 2f * 0.75f + 0.25f;
+            }else{
+                alpha = 1f;
+            }
+        }
+
+
+        Matrix4f tv_1 = geburah.getModelPartTransformation("tv_1_"+screenId,GeburahEntity.getClientModel(), pticks);
+        matrices.mulPose(tv_1);
+
+        VertexConsumer vrtx;
+
+        if (time <= screenStartup){
+            vrtx = src.getBuffer(RenderType.entityTranslucent(FDBosses.location("textures/entities/geburah/screen_sin/base_screen.png")));
+        }else{
+            vrtx = src.getBuffer(RenderType.entityCutout(FDBosses.location("textures/entities/geburah/screen_sin/base_screen.png")));
+        }
+        QuadRenderer.start(vrtx)
                 .pose(matrices)
                 .sizeY(0.562f)
                 .sizeX(1.185f)
                 .light(LightTexture.FULL_BRIGHT)
                 .offsetOnDirection(0.01f)
-                .color(1f,1f,1f,0.85f)
+                .color(1f,1f,1f,alpha)
                 .direction(new Vec3(-1,0,0))
                 .render();
 

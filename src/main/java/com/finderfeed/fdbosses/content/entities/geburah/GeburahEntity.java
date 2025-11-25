@@ -105,6 +105,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public static final String GEBURAH_STOMPING_LAYER = "stomping";
     public static final String GEBURAH_CANNONS_LAYER = "cannons";
+    public static final String MAIN_LAYER = "layer";
 
     public static final int ARENA_HEIGHT = 30;
     public static final int ARENA_RADIUS = 32;
@@ -117,6 +118,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public static EntityDataAccessor<Boolean> PREPARING_FINAL_ATTACK = SynchedEntityData.defineId(GeburahEntity.class, EntityDataSerializers.BOOLEAN);
     public static EntityDataAccessor<List<PlayerSin>> ACTIVE_SINS = SynchedEntityData.defineId(GeburahEntity.class, BossEntityDataSerializers.SINS.get());
     public static EntityDataAccessor<Boolean> LASERS_ACTIVE = SynchedEntityData.defineId(GeburahEntity.class, EntityDataSerializers.BOOLEAN);
+    public static EntityDataAccessor<Boolean> OPERATING = SynchedEntityData.defineId(GeburahEntity.class, EntityDataSerializers.BOOLEAN);
 
     @SerializableField
     private int judgementBirdSpawnTicker = 0;
@@ -146,11 +148,19 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public int finalAttackPrepareClientTick = 0;
 
+    public int clientOperatingTicks = -1;
+
+    @SerializableField
+    private GeburahBossInitializer bossInitializer;
+
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
         this.playerPositionsCollector = new CylinderPlayerPositionsCollector(level, ARENA_RADIUS, ARENA_HEIGHT, player -> {
             return true;
         });
+
+        this.bossInitializer = new GeburahBossInitializer(this);
+
         this.rotatingWeaponsHandler = new GeburahWeaponRotationController(this);
         this.rayController = new GeburahRayController(this);
         this.stompingController = new GeburahStompingController(this, ARENA_RADIUS);
@@ -198,13 +208,13 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .registerAttack(NO_KILL_ENTITIES_ATTACK, this::noKillEntitiesAttack)
                 .registerAttack(BELL_ATTACK, this::bellAttack)
                 .attackListener(this::attackListener)
-                .addAttack(0, BELL_ATTACK)
-//                .addAttack(0, noKillEntitiesAttack)
-//                .addAttack(0, simpleRunAroundNoSins)
-//                .addAttack(0, noJumpRaysEarthquakesProjectiles)
-//                .addAttack(0, runClockwiseHammersRayProjectiles)
-//                .addAttack(0, limitedButtonsLasersAndEarthquakes)
-//                .addAttack(0, sinCrystalsLasersAndCannons)
+                .addAttack(0, noKillEntitiesAttack)
+                .addAttack(0, simpleRunAroundNoSins)
+                .addAttack(0, noJumpRaysEarthquakesProjectiles)
+                .addAttack(0, runClockwiseHammersRayProjectiles)
+                .addAttack(0, limitedButtonsLasersAndEarthquakes)
+                .addAttack(0, sinCrystalsLasersAndCannons)
+                .addAttack(1, BELL_ATTACK)
         ;
 
         this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
@@ -228,7 +238,13 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         super.tick();
 
+        if (this.getEntityData().get(OPERATING)){
+            this.clientOperatingTicks++;
+        }
+
         if (level().isClientSide) {
+
+
             this.tickFinalAttackPreparation();
             this.tickSinPunishmentEffect();
             this.particles();
@@ -236,14 +252,25 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             this.laserAttackPreparator.tick();
             this.tickLaserVisualDisappearance();
         }else{
-            this.mainAttackChain.tick();
-            this.tickClockwiseSin();
+
+            if (!this.isDeadOrDying()) {
+                if (this.bossInitializer.isFinished()) {
+                    this.getEntityData().set(OPERATING, true);
+                    this.mainAttackChain.tick();
+                    this.throwSinCrystals();
+                    this.tickTrapEntitiesSpawn();
+                    this.tickJudgementBirdSpawn();
+                } else {
+                    this.bossInitializer.tick();
+                }
+                this.tickClockwiseSin();
+            }
+
             this.getRayController().tick();
             this.getStompingController().tick();
             this.getWeaponAttackController().tick();
-            this.throwSinCrystals();
-            this.tickTrapEntitiesSpawn();
-            this.tickJudgementBirdSpawn();
+
+
         }
 
         this.getScalesController().tick();
@@ -528,7 +555,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     private AttackAction attackListener(String s) {
 
-        if (this.getPlayerPositionsCollector().getPlayers().isEmpty()){
+        if (this.getPlayerPositionsCollector().getPlayers().stream().noneMatch(BossUtil::isPlayerInSurvival)){
             return AttackAction.WAIT;
         }
 
@@ -693,42 +720,6 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         }
     }
 
-
-
-//        if (stage == 0){
-//            BossUtil.geburahTriggerSinPunishmentAttack((ServerLevel) level(), this.position(), 120, this);
-//            instance.nextStage();
-//        }else if (stage == 1){
-//
-//            if (tick == SIN_PUNISHMENT_ATTACK_DURATION - 2){
-//                for (var entity : this.playerPositionsCollector.getPlayers()) {
-//
-//                    PacketDistributor.sendToPlayer((ServerPlayer) entity, new ImpactFramesPacket(
-//                            List.of(
-//                                    new ImpactFrame().setDuration(2),
-//                                    new ImpactFrame().setDuration(1).setInverted(true),
-//                                    new ImpactFrame().setDuration(1),
-//                                    new ImpactFrame().setDuration(1).setInverted(true)
-//                            )
-//                    ));
-//                }
-//            }else if (tick == SIN_PUNISHMENT_ATTACK_DURATION){
-//                BossUtil.geburahTriggerSinPunishmentAttackImpactEffect((ServerLevel) level(), this.position(), 120, GeburahEntity.ARENA_RADIUS / 2);
-//                BossUtil.geburahSinPunishmentAttackServerEffect(level(), this.position(), ARENA_RADIUS / 2f, BossBlocks.JUSTICESTONE_BRICKS.get().defaultBlockState());
-//                for (var entity : this.playerPositionsCollector.getPlayers()) {
-//
-//
-//                    PacketDistributor.sendToPlayer((ServerPlayer) entity, new DefaultShakePacket(FDShakeData.builder()
-//                            .amplitude(0.3f)
-//                            .outTime(80)
-//                            .build()));
-//                }
-//
-//
-//            }else if (tick >= SIN_PUNISHMENT_ATTACK_DURATION + 50){
-//                return true;
-//            }
-//        }
 
     public boolean emptySinsAndDelay(AttackInstance attackInstance){
         this.propagateSins(20);
@@ -1369,17 +1360,53 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     }
 
     private void coreParticles(){
-        if (level().getGameTime() % 3 == 0) {
-            BallParticleOptions ballParticle = BallParticleOptions.builder()
-                    .color(1f,0.8f, 0.3f)
-                    .scalingOptions(0, 0, 20)
-                    .brightness(1)
-                    .size(2f)
-                    .build();
+        if (this.getEntityData().get(OPERATING)) {
 
-            Vec3 corePos = this.getCorePosition();
 
-            level().addParticle(ballParticle, true, corePos.x, corePos.y, corePos.z, 0, 0, 0);
+
+
+            if (level().getGameTime() % 3 == 0) {
+                BallParticleOptions ballParticle = BallParticleOptions.builder()
+                        .color(1f,0.8f, 0.3f)
+                        .scalingOptions(0, 0, 20)
+                        .brightness(1)
+                        .size(2f)
+                        .build();
+                Vec3 corePos = this.getCorePosition();
+                level().addParticle(ballParticle, true, corePos.x, corePos.y, corePos.z, 0, 0, 0);
+            }
+
+            if (this.clientOperatingTicks == 0){
+
+                Vec3 corePos = this.getCorePosition();
+
+                float minSize = 0.25f;
+                float maxSize = 1.5f;
+
+                for (int i = 0; i < 200;i++){
+
+                    float size = minSize + random.nextFloat() * (maxSize - minSize);
+
+                    float sizeP = (size - minSize) / (maxSize - minSize);
+
+                    BallParticleOptions ballParticle = BallParticleOptions.builder()
+                            .color(1f,0.8f, 0.3f)
+                            .scalingOptions(0, 0, 40)
+                            .brightness(1)
+                            .friction(0.8f)
+                            .size(size)
+                            .build();
+
+                    Vec3 v = new Vec3(1,0,0).yRot(FDMathUtil.FPI * 2f * random.nextFloat())
+                            .scale((1 - sizeP) * 3f + 0.2f);
+
+
+
+                    level().addParticle(ballParticle, true, corePos.x, corePos.y, corePos.z, v.x,v.y,v.z);
+
+                }
+
+            }
 
         }
     }
@@ -1443,6 +1470,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         builder.define(LASERS_ACTIVE, false);
         builder.define(ACTIVE_SINS, new ArrayList<>());
         builder.define(PREPARING_FINAL_ATTACK, false);
+        builder.define(OPERATING, false);
     }
 
     public boolean isPreparingFinalAttack(){

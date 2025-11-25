@@ -16,7 +16,7 @@ public class GeburahRotatingWeaponsBoneController implements BoneTransformationC
 
         float currentRotation = rotationHandler.getLerpedRotation(v);
 
-        fdModelPart.setYRot(currentRotation);
+        fdModelPart.addYRot(currentRotation);
 
     }
 
