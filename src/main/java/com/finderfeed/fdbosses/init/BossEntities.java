@@ -19,6 +19,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.flying_block_entity.
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahBossSpawner;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircleJudgementBird;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahChainTrapCastCircle;
@@ -396,6 +397,12 @@ public class BossEntities {
             )
             .sized(1f,1f)
             .build("geburah_opening_floor"));
+
+    public static final Supplier<EntityType<GeburahBossSpawner>> GEBURAH_BOSS_SPAWNER = ENTITIES.register("geburah_boss_spawner",()->EntityType.Builder.of(
+                    GeburahBossSpawner::new, MobCategory.MISC
+            )
+            .sized(1f,2f)
+            .build("geburah_boss_spawner"));
 
 
     @SubscribeEvent

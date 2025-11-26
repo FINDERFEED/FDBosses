@@ -50,6 +50,7 @@ public class BossModels {
     public static final Supplier<FDModelInfo> JUDGEMENT_BIRD = INFOS.register("judgement_bird",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_bird"),1.0f));
     public static final Supplier<FDModelInfo> JUDGEMENT_BIRD_LAYER = INFOS.register("judgement_bird_layer",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_bird"),1.05f));
     public static final Supplier<FDModelInfo> GEBURAH_BELL = INFOS.register("geburah_bell",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah_bell"),1f));
+    public static final Supplier<FDModelInfo> JUSTITIA = INFOS.register("justitia",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"justitia"),1f));
 
 
 }

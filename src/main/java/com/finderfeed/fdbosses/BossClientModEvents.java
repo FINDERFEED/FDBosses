@@ -31,6 +31,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayReflectorRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahBossSpawner;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircleRenderer;
@@ -288,6 +289,24 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_CHAIN_TRAP.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD.get(), GeburahCastingCircleRenderer::new);
+
+        event.registerEntityRenderer(BossEntities.GEBURAH_BOSS_SPAWNER.get(), FDEntityRendererBuilder.builder()
+                .addLayer(FDEntityRenderLayerOptions.builder()
+                        .model(BossModels.JUSTITIA)
+                        .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/geburah/justitia.png")))
+                        .renderCondition((entity -> {
+                            return ((BossSpawnerEntity)entity).isActive();
+                        }))
+                        .build())
+                .addLayer(FDEntityRenderLayerOptions.builder()
+                        .model(BossModels.JUSTITIA)
+                        .renderType(RenderType.text(FDBosses.location("textures/entities/geburah/justitia_max_light.png")))
+                        .light(LightTexture.FULL_BRIGHT)
+                        .renderCondition((entity -> {
+                            return ((BossSpawnerEntity)entity).isActive();
+                        }))
+                        .build())
+                .build());
 
         event.registerEntityRenderer(BossEntities.GEBURAH_BELL.get(), FDEntityRendererBuilder.<GeburahBell>builder()
                         .addLayer(FDEntityRenderLayerOptions.<GeburahBell>builder()

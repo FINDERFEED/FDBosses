@@ -3,6 +3,8 @@ package com.finderfeed.fdbosses.content.entities.geburah;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
+import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
+import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircleJudgementBird;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahChainTrapCastCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahSinCrystalCastCircle;
@@ -82,7 +84,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class GeburahEntity extends FDLivingEntity implements AutoSerializable, GeburahBossBuddy {
+public class GeburahEntity extends FDLivingEntity implements AutoSerializable, GeburahBossBuddy, BossSpawnerContextAssignable {
 
     public static final int SIN_PUNISHMENT_ATTACK_DURATION = 40;
 
@@ -1532,6 +1534,21 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     @Override
     public void setDeltaMovement(double p_20335_, double p_20336_, double p_20337_) {
 
+    }
+
+    @Override
+    public void setSpawnedBy(BossSpawnerEntity bossSpawnerEntity) {
+
+    }
+
+    @Override
+    public void setSpawnPosition(Vec3 spawnPosition) {
+
+    }
+
+    @Override
+    public BossSpawnerEntity getSpawner() {
+        return null;
     }
 
 
