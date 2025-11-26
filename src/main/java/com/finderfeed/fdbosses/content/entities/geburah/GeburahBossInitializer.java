@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
 import com.finderfeed.fdbosses.BossTargetFinder;
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_opening_floor.GeburahOpeningFloor;
 import com.finderfeed.fdbosses.init.BossAnims;
@@ -44,9 +45,29 @@ public class GeburahBossInitializer extends BossInitializer<GeburahEntity> {
 
         var cutscene = this.cutsceneData();
 
-        for (var serverPlayer : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level, geburah.position(), 80, GeburahEntity.ARENA_RADIUS)){
+        List<ServerPlayer> players = BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level, geburah.position(), 80, GeburahEntity.ARENA_RADIUS);
+
+        for (var serverPlayer : players){
             FDLibCalls.startCutsceneForPlayer(serverPlayer,cutscene);
         }
+
+
+        int count = players.size();
+
+        float angle = FDMathUtil.FPI * 2 / count;
+
+        for (int i = 0; i < count; i++){
+
+            float a = angle * i;
+
+            Vec3 v = new Vec3(20,0,0).yRot(a);
+
+            Vec3 pos = v.add(geburah.position());
+
+            ServerPlayer player = players.get(i);
+            player.teleportTo((ServerLevel) geburah.level(), pos.x,pos.y,pos.z, (float) -Math.toDegrees(a) + 90,0);
+        }
+
 
     }
 
