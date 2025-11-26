@@ -83,6 +83,7 @@ import org.joml.Vector3f;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 public class GeburahEntity extends FDLivingEntity implements AutoSerializable, GeburahBossBuddy, BossSpawnerContextAssignable {
 
@@ -121,6 +122,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public static EntityDataAccessor<List<PlayerSin>> ACTIVE_SINS = SynchedEntityData.defineId(GeburahEntity.class, BossEntityDataSerializers.SINS.get());
     public static EntityDataAccessor<Boolean> LASERS_ACTIVE = SynchedEntityData.defineId(GeburahEntity.class, EntityDataSerializers.BOOLEAN);
     public static EntityDataAccessor<Boolean> OPERATING = SynchedEntityData.defineId(GeburahEntity.class, EntityDataSerializers.BOOLEAN);
+
+    private UUID geburahSpawnerUUID;
 
     @SerializableField
     private int judgementBirdSpawnTicker = 0;
@@ -1441,6 +1444,16 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     }
 
+    @Override
+    protected void tickDeath() {
+        super.tickDeath();
+        if (!level().isClientSide){
+            if (this.getSpawner() != null){
+                this.getSpawner().setActive(true);
+            }
+        }
+    }
+
     private AABB constructSinBox(){
         return new AABB(
                 -ARENA_RADIUS,-2,-ARENA_RADIUS,
@@ -1538,7 +1551,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     @Override
     public void setSpawnedBy(BossSpawnerEntity bossSpawnerEntity) {
-
+        this.geburahSpawnerUUID = bossSpawnerEntity.getUUID();
     }
 
     @Override
@@ -1548,7 +1561,11 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     @Override
     public BossSpawnerEntity getSpawner() {
-        return null;
+        if (geburahSpawnerUUID != null && ((ServerLevel)level()).getEntity(geburahSpawnerUUID) instanceof BossSpawnerEntity bossSpawner){
+            return bossSpawner;
+        }else{
+            return null;
+        }
     }
 
 

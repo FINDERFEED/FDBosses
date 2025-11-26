@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.client.boss_screen.screen_definitions;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.boss_screen.BaseBossScreen;
 import com.finderfeed.fdbosses.client.boss_screen.ChesedBossScreen;
+import com.finderfeed.fdbosses.client.boss_screen.GeburahBossScreen;
 import com.finderfeed.fdbosses.client.boss_screen.MalkuthBossScreen;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossItems;
@@ -183,6 +184,18 @@ public class BossScreens {
                         Component.translatable("fdbosses.skills.malkuth.hellshaper_stats"),
                         Component.translatable("fdbosses.skills.malkuth.hellshaper_description")
                 ))
+        );
+    });
+
+
+
+
+    public static final BiFunction<Integer, List<Item>, BaseBossScreen> GEBURAH_BOSS_SCREEN = register(BossEntities.GEBURAH.get(), (id, drops) -> {
+        return new GeburahBossScreen(id, drops, new BossScreenOptions()
+                .setEntityType(BossEntities.GEBURAH.get())
+                .setBossDescription(Component.translatable("fdbosses.bosses.description.geburah"))
+                .setTLDRComponent(Component.translatable("fdbosses.tldr.geburah"))
+
         );
     });
 
