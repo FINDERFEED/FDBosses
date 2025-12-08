@@ -211,24 +211,22 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
         List<PlayerSin> playerSins = geburah.getEntityData().get(GeburahEntity.ACTIVE_SINS);
 
         if (playerSins.isEmpty()){
-            this.renderSinAtScreen(null, 1, geburah, pticks, matrices, src);
-            this.renderSinAtScreen(null, 2, geburah, pticks, matrices, src);
-            this.renderSinAtScreen(null, 3, geburah, pticks, matrices, src);
-            this.renderSinAtScreen(null, 4, geburah, pticks, matrices, src);
+            this.renderSinsAtScreen(null, 1, geburah, pticks, matrices, src);
+            this.renderSinsAtScreen(null, 2, geburah, pticks, matrices, src);
+            this.renderSinsAtScreen(null, 3, geburah, pticks, matrices, src);
+            this.renderSinsAtScreen(null, 4, geburah, pticks, matrices, src);
         }else{
 
             for (int i = 0; i < 4; i++){
-                int id = i % playerSins.size();
-                PlayerSin sin = playerSins.get(id);
                 int screenId = i + 1;
-                this.renderSinAtScreen(sin,screenId,geburah,pticks,matrices,src);
+                this.renderSinsAtScreen(playerSins,screenId,geburah,pticks,matrices,src);
             }
 
         }
 
     }
 
-    private void renderSinAtScreen(PlayerSin sin, int screenId, GeburahEntity geburah, float pticks, PoseStack matrices, MultiBufferSource src){
+    private void renderSinsAtScreen(List<PlayerSin> sins, int screenId, GeburahEntity geburah, float pticks, PoseStack matrices, MultiBufferSource src){
         matrices.pushPose();
 
         float time = geburah.clientOperatingTicks + pticks;
@@ -264,17 +262,35 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
                 .direction(new Vec3(-1,0,0))
                 .render();
 
-        if (sin != null) {
-            var key = BossRegistries.PLAYER_SINS.getKey(sin);
-            var idStart = key.getPath();
-            QuadRenderer.start(src.getBuffer(RenderType.entityCutout(FDBosses.location("textures/entities/geburah/screen_sin/sin_" + idStart + ".png"))))
-                    .pose(matrices)
-                    .size(0.56f)
-                    .light(LightTexture.FULL_BRIGHT)
-                    .offsetOnDirection(0.011f)
-                    .color(1f, 1f, 1f, 1f)
-                    .direction(new Vec3(-1, 0, 0))
-                    .render();
+        if (sins != null) {
+
+            float sinSize = 0.5f;
+
+            int size = sins.size();
+
+            float startOffset = 0;
+
+            if (size % 2 == 0){
+                startOffset = sinSize + (size / 2f - 1) * sinSize * 2;
+            }else{
+                startOffset = (size / 2) * sinSize;
+            }
+
+            for (int i = 0; i < size; i++) {
+                var sin = sins.get(i);
+
+                var key = BossRegistries.PLAYER_SINS.getKey(sin);
+                var idStart = key.getPath();
+                QuadRenderer.start(src.getBuffer(RenderType.entityCutout(FDBosses.location("textures/entities/geburah/screen_sin/sin_" + idStart + ".png"))))
+                        .pose(matrices)
+                        .size(sinSize)
+                        .light(LightTexture.FULL_BRIGHT)
+                        .offsetOnDirection(0.011f)
+                        .translate(0,0,-startOffset + sinSize * i * 2)
+                        .color(1f, 1f, 1f, 1f)
+                        .direction(new Vec3(-1, 0, 0))
+                        .render();
+            }
         }
 
         matrices.popPose();
@@ -311,7 +327,7 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
             Vec3 pos = pair.first;
 
-            Vec3 posEnd = pos.add(dir.scale(GeburahEntity.MAX_LASERS_RADIUS));
+            Vec3 posEnd = pos.add(dir.scale(GeburahEntity.MAX_LASERS_RADIUS - 5));
 
             ClipContext clipContext = new ClipContext(pos,posEnd, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
             var res = geburah.level().clip(clipContext);

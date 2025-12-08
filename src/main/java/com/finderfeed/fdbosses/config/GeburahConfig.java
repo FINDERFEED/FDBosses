@@ -22,6 +22,9 @@ public class GeburahConfig {
     public float judgementBirdDamage = 10;
 
     @ConfigValue
+    public float earthquakeDamage = 20;
+
+    @ConfigValue
     public int maxPlayerSins = 5;
 
 }

@@ -28,7 +28,6 @@ import com.finderfeed.fdbosses.content.util.CylinderPlayerPositionsCollector;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.content.util.WorldBox;
 import com.finderfeed.fdbosses.init.*;
-import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
@@ -77,7 +76,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix4f;
-import org.joml.Vector3d;
 import org.joml.Vector3f;
 
 import java.util.ArrayList;
@@ -86,6 +84,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class GeburahEntity extends FDLivingEntity implements AutoSerializable, GeburahBossBuddy, BossSpawnerContextAssignable {
+
+    public static final int MAX_GEBURAH_SINS = 10;
 
     public static final int SIN_PUNISHMENT_ATTACK_DURATION = 40;
 
@@ -157,6 +157,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     @SerializableField
     private GeburahBossInitializer bossInitializer;
+
+    @SerializableField
+    private int sinnedTimes = 0;
 
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
@@ -462,16 +465,19 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public void tickJudgementBirdSpawn(){
         if (this.judgementBirdSpawnTicker != 0) {
-            this.judgementBirdSpawnTicker = Mth.clamp(judgementBirdSpawnTicker - 1,0,Integer.MAX_VALUE);
+            var birds = FDTargetFinder.getEntitiesInCylinder(JudgementBirdEntity.class, level(), this.position().add(0,-1,0),ARENA_HEIGHT, ARENA_RADIUS);
+            if (birds.size() < 4) {
+                this.judgementBirdSpawnTicker = Mth.clamp(judgementBirdSpawnTicker - 1, 0, Integer.MAX_VALUE);
+            }
             return;
         }
 
-        this.judgementBirdSpawnTicker = 400;
+        this.judgementBirdSpawnTicker = 800;
 
         int angles = 4;
         float angle = FDMathUtil.FPI * 2 / angles;
         float halfRadius = ARENA_RADIUS / 2f;
-        float roostingBoxCenterHeight = 5;
+        float roostingBoxCenterHeight = 4;
         double centerDirectionOffset = Math.sqrt(halfRadius * halfRadius + halfRadius * halfRadius);
 
         for (int i = 0; i < angles; i++){
@@ -487,7 +493,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                     roostingBoxCenter.y - 0.5,
                     roostingBoxCenter.z - halfRadius,
                     roostingBoxCenter.x + halfRadius,
-                    roostingBoxCenter.y + 0.5,
+                    roostingBoxCenter.y + 2,
                     roostingBoxCenter.z + halfRadius
             );
             AABB findEntityBox = new AABB(
@@ -505,7 +511,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
             if (entities.isEmpty()){
 
-                Vec3 castCirclePos = this.position().add(direction.scale(3)).add(0,roostingBoxCenterHeight,0);
+                Vec3 castCirclePos = this.position().add(direction.scale(3)).add(0,roostingBoxCenterHeight + 1,0);
 
                 Vec3 flyTo = castCirclePos.add(direction.scale(7));
 
@@ -613,6 +619,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
 
             if (scalesController.getCurrentDisplacement() == 0) {
+                this.removeBells();
                 this.setPreparingFinalAttack(false);
                 return true;
             }
@@ -677,6 +684,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 this.removeBells();
             }else if (tick >= SIN_PUNISHMENT_ATTACK_DURATION + 50){
                 this.setPreparingFinalAttack(false);
+
+                this.removeBells();
                 return true;
             }
         }
@@ -750,7 +759,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public boolean noKillEntitiesAttack(AttackInstance inst){
 
-        this.propagateSins(0, GeburahSins.KILL_ENTITY_SIN.get());
+        if (!this.sinnedHalfTimes()){
+            this.propagateSins(0, GeburahSins.KILL_ENTITY_SIN.get());
+        }else{
+            this.propagateSins(0, GeburahSins.KILL_ENTITY_SIN.get(), GeburahSins.CRYSTAL_OF_SIN.get());
+        }
+
         int localStagesCount = 3;
         int stage = inst.stage;
         int tick = inst.tick;
@@ -768,7 +782,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         if (stage < maxStages) {
             if (localStage == 0) {
-                this.getStompingController().stompFullCircle(30, true, 1f, 1f);
+                this.getStompingController().stompFullCircle(30, true, 1f, BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage);
                 attackController.setCurrentAttack(new GeburahRoundAndRoundLaserAttack(this, this.sideSwitch), false);
                 this.sideSwitch = !sideSwitch;
                 inst.nextStage();
@@ -795,7 +809,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         var activeSins = this.getEntityData().get(ACTIVE_SINS);
 
         if (activeSins.contains(GeburahSins.CRYSTAL_OF_SIN.get())) {
-            if (sinCrystalsThrowTick % 200 == 0) {
+            if (sinCrystalsThrowTick % 250 == 0) {
 
                 var players = new ArrayList<>(this.playerPositionsCollector.getPlayers().stream().filter(BossUtil::isPlayerInSurvival).toList());
 
@@ -962,11 +976,13 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
             this.getRayController().shoot(frequency - 20, rayShotRadius, true, rayPositions);
 
-            stompingController.stomp(frequency - 30, true, 1f, 1f, stompInstances);
+            stompingController.stomp(frequency - 30, true, 1f, BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage, stompInstances);
         }
 
     }
 
+    @SerializableField
+    private boolean rotatingLaserDirection = false;
 
     public boolean limitedButtonsRotatingLasers(AttackInstance attackInstance){
 
@@ -985,17 +1001,31 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         if (tick < attackDuration){
 
-            this.constantRotatingLaser(0.5f);
+            if (tick % 100 == 0){
+                rotatingLaserDirection = !rotatingLaserDirection;
+                for (var player : this.playerPositionsCollector.getPlayers()){
+                    PacketDistributor.sendToPlayer((ServerPlayer) player, new PlaySoundInEarsPacket(BossSounds.ATTACK_DING.get(),1f,1f));
+                }
+            }
+
+            int md = rotatingLaserDirection ? -1 : 1;
+            this.constantRotatingLaser(md * 0.5f);
 
             if ((tick + 50) % 100 == 0){
-                this.getStompingController().stompFullCircle(20,true,1f,1f);
+                this.getStompingController().stompFullCircle(20,true,1f,BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage);
             }
 
         }else{
             this.stopLaser();
         }
 
-        return tick > attackDuration;
+        if (tick > attackDuration){
+            rotatingLaserDirection = !rotatingLaserDirection;
+            this.stopLaser();
+            return true;
+        }
+
+        return false;
     }
 
     private void constantRotatingLaser(float rotationSpeed){
@@ -1026,12 +1056,20 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     private boolean clockwise = true;
 
     public boolean runClockwiseProjectilesHammersRay(AttackInstance attackInstance){
-
-        if (clockwise) {
-            this.propagateSins(20, GeburahSins.MOVE_CLOCKWISE_SIN.get());
+        if (!this.sinnedHalfTimes()) {
+            if (clockwise) {
+                this.propagateSins(20, GeburahSins.MOVE_CLOCKWISE_SIN.get());
+            } else {
+                this.propagateSins(20, GeburahSins.MOVE_COUNTERCLOCKWISE_SIN.get());
+            }
         }else{
-            this.propagateSins(20, GeburahSins.MOVE_COUNTERCLOCKWISE_SIN.get());
+            if (clockwise) {
+                this.propagateSins(40, GeburahSins.MOVE_CLOCKWISE_SIN.get(), GeburahSins.JUMPING_SIN.get());
+            } else {
+                this.propagateSins(40, GeburahSins.MOVE_COUNTERCLOCKWISE_SIN.get(), GeburahSins.JUMPING_SIN.get());
+            }
         }
+
         int tick = attackInstance.tick;
 
         if (tick < ATTACK_START_DELAY){
@@ -1313,6 +1351,10 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     @Override
     protected void pushEntities() {
 
+    }
+
+    private boolean sinnedHalfTimes(){
+        return this.sinnedTimes >= MAX_GEBURAH_SINS / 2 || true;
     }
 
     private void laserParticles(){

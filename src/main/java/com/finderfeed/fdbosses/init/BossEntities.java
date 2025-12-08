@@ -383,7 +383,7 @@ public class BossEntities {
     public static final Supplier<EntityType<JudgementBirdEntity>> JUDGEMENT_BIRD = ENTITIES.register("judgement_bird",()->EntityType.Builder.of(
                     JudgementBirdEntity::new, MobCategory.CREATURE
             )
-            .sized(0.5f,0.5f)
+            .sized(0.5f,1f)
             .build("judgement_bird"));
 
     public static final Supplier<EntityType<GeburahBell>> GEBURAH_BELL = ENTITIES.register("geburah_bell",()->EntityType.Builder.of(
