@@ -35,7 +35,7 @@ import org.joml.Random;
 import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = FDBosses.MOD_ID, value = Dist.CLIENT)
 public class MalkuthWeaknessOverlay implements LayeredDraw.Layer {
 
     public static Random random = new Random();

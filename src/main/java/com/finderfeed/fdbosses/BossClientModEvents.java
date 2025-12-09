@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.boss_screen.text_block_processors.BossConfigFloatValueProcessor;
 import com.finderfeed.fdbosses.client.boss_screen.text_block_processors.MobEffectTextProcessor;
 import com.finderfeed.fdbosses.client.overlay.ElectrifiedOverlay;
+import com.finderfeed.fdbosses.client.overlay.GeburahSinsOverlay;
 import com.finderfeed.fdbosses.client.overlay.MalkuthWeaknessOverlay;
 import com.finderfeed.fdbosses.client.particles.FlameWithStoneParticle;
 import com.finderfeed.fdbosses.client.particles.IceChunkParticle;
@@ -257,6 +258,7 @@ public class BossClientModEvents {
     public static void registerOverlays(RegisterGuiLayersEvent event){
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("electrified"),new ElectrifiedOverlay());
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("malkuth_weakness"),new MalkuthWeaknessOverlay());
+        event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("geburah_sin_overlay"),new GeburahSinsOverlay());
     }
 
 

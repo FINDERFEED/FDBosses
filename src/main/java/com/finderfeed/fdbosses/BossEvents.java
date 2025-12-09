@@ -53,7 +53,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = FDBosses.MOD_ID)
 public class BossEvents {
 
     public static final TagKey<MobEffect> NOT_CURABLE_EFFECTS = TagKey.create(Registries.MOB_EFFECT, FDBosses.location("not_curable"));

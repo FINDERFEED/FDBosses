@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
+import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
@@ -74,6 +75,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -278,12 +280,26 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             this.getStompingController().tick();
             this.getWeaponAttackController().tick();
 
+            this.setSinners(this.isDeadOrDying());
 
         }
 
         this.getScalesController().tick();
         this.getWeaponRotationController().tick();
 
+    }
+
+    private void setSinners(boolean dying){
+        for (var entity : this.playerPositionsCollector.getPlayers()){
+            if (!dying){
+                if (!entity.hasEffect(BossEffects.SINNER)){
+                    var inst = new MobEffectInstance(BossEffects.SINNER, -1, 0, true, false);
+                    entity.addEffect(inst);
+                }
+            }else{
+                entity.removeEffect(BossEffects.SINNER);
+            }
+        }
     }
 
     private void tickFinalAttackPreparation(){
@@ -1613,6 +1629,23 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     @EventBusSubscriber(modid = FDBosses.MOD_ID)
     public static class Events {
+
+        @SubscribeEvent
+        public static void handleSinnerEffect(PlayerTickEvent.Pre event){
+            var player = event.getEntity();
+            if (!player.level().isClientSide){
+                if (player.hasEffect(BossEffects.SINNER)){
+                    float cylinderHeight = 4;
+                    var entities = BossTargetFinder.getEntitiesInCylinder(GeburahEntity.class, player.level(), player.position().add(0,-cylinderHeight,0), cylinderHeight + 1, ARENA_RADIUS);
+                    if (entities.isEmpty()){
+                        if (player.tickCount % 100 == 0){
+                            PlayerSinsHandler.sin((ServerPlayer) player, 0);
+                        }
+
+                    }
+                }
+            }
+        }
 
         @SubscribeEvent
         public static void killEvent(LivingDeathEvent event){
