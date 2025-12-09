@@ -11,6 +11,7 @@
   "block.fdbosses.polished_justicestone": "Polished Justicestone",
   "block.fdbosses.geburah_respite_point": "Respite Point",
   "item.fdbosses.lightning_core": "Lightning Core",
+  "item.fdbosses.justice_core": "Justice Core",
   "item.fdbosses.geburah_explosive_crystal": "Crystal Of Sin",
   "item.fdbosses.fire_and_ice_core": "Fire and Ice Core",
   "item.fdbosses.eye_of_chesed": "Eye Of Chesed",
@@ -195,5 +196,6 @@
   "fdbosses.word.not_updated": "The data is not updated online yet. I will add new subscribers with subsequent updates.",
   "fdbosses.word.core_lose": "WARNING: You cannot put two or more different cores on one item!",
   "fdbosses.core_ability.lightning_core": "Can be combined with items that has damage. Gives an ability to summon Chesed lightnings on hit.",
-  "fdbosses.core_ability.fire_and_ice_core": "Can be combined with items that has damage. Allows summoning Malkuth fireballs on item use."
+  "fdbosses.core_ability.fire_and_ice_core": "Can be combined with items that has damage. Allows summoning Malkuth fireballs on item use.",
+  "fdbosses.core_ability.justice_core": "Can be combined with equippable items. Incoming damage amount cannot exceed the last damage amount you have received. Decreases incoming damage by %s%%."
 }

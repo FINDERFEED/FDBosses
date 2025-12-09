@@ -18,6 +18,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,6 +27,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -38,10 +40,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.event.entity.living.MobEffectEvent;
+import net.neoforged.neoforge.event.entity.living.*;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -285,6 +284,57 @@ public class BossEvents {
             }
 
         }
+    }
+
+    private static final EquipmentSlot[] EQUIPMENT_SLOTS = {
+            EquipmentSlot.FEET,
+            EquipmentSlot.CHEST,
+            EquipmentSlot.LEGS,
+            EquipmentSlot.HEAD,
+    };
+
+    @SubscribeEvent
+    public static void justiceCore(LivingDamageEvent.Pre event){
+
+        LivingEntity livingEntity = event.getEntity();
+        if (!livingEntity.level().isClientSide){
+            for (var slot : EQUIPMENT_SLOTS){
+
+                ItemStack itemStack = livingEntity.getItemBySlot(slot);
+                if (itemStack == null) continue;
+
+                if (itemStack.has(BossDataComponents.ITEM_CORE)){
+                    var core = itemStack.get(BossDataComponents.ITEM_CORE);
+
+                    if (core != null && core.getCoreType() == ItemCoreDataComponent.CoreType.JUSTICE_CORE){
+
+                        var amount = event.getNewDamage();
+
+                        CompoundTag data = livingEntity.getPersistentData();
+                        if (data.contains("fdbosses_last_damage_received")){
+                            float damage = data.getFloat("fdbosses_last_damage_received");
+                            data.putFloat("fdbosses_last_damage_received", amount);
+                            amount = Math.clamp(amount,0, damage);
+                        }else{
+                            data.putFloat("fdbosses_last_damage_received", amount);
+                        }
+
+                        int reduction = BossConfigs.BOSS_CONFIG.get().itemConfig.justiceCoreDamageReduction;
+                        float p = 1 - reduction / 100f;
+
+                        amount *= p;
+
+                        event.setNewDamage(amount);
+
+                        break;
+
+                    }
+
+                }
+
+            }
+        }
+
     }
 
     @SubscribeEvent

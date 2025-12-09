@@ -21,4 +21,7 @@ public class ItemConfig {
     @ConfigValue
     public int playerMalkuthFireballAbilityCooldown = 200;
 
+    @ConfigValue
+    public int justiceCoreDamageReduction = 15;
+
 }
