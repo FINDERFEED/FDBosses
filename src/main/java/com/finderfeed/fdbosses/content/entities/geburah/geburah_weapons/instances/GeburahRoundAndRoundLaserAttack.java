@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instanc
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttack;
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahConstantWeaponRotation;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahLerpingRotation;
@@ -102,9 +103,17 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
             float damage = BossUtil.transformDamage(geburah.level(), BossConfigs.BOSS_CONFIG.get().geburahConfig.predictiveLaserAttackDamage);
 
             for (var entity : entities){
-                if (entity instanceof LivingEntity livingEntity){
+
+                if (entity instanceof JudgementBirdEntity judgementBirdEntity){
+                    if (geburah.canBeDamaged) {
+                        geburah.canBeDamaged = false;
+                        geburah.setSinnedTimes(geburah.getSinnedTimes());
+                        judgementBirdEntity.kill();
+                    }
+                }else if (entity instanceof LivingEntity livingEntity){
                     livingEntity.hurt(BossDamageSources.GEBURAH_LASER_STRIKE_SOURCE,damage);
                 }
+
             }
 
         }

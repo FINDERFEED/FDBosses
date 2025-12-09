@@ -39,6 +39,7 @@ import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
+import com.finderfeed.fdlib.systems.hud.bossbars.FDServerBossBar;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFramesPacket;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
@@ -86,6 +87,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class GeburahEntity extends FDLivingEntity implements AutoSerializable, GeburahBossBuddy, BossSpawnerContextAssignable {
+
+    public final FDServerBossBar BOSS_BAR = new FDServerBossBar(BossBars.GEBURAG_BOSS_BAR, this);
 
     public static final int MAX_GEBURAH_SINS = 10;
 
@@ -262,6 +265,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             this.laserAttackPreparator.tick();
             this.tickLaserVisualDisappearance();
         }else{
+
+            BOSS_BAR.setPercentage((float) this.sinnedTimes / MAX_GEBURAH_SINS);
 
             if (!this.isDeadOrDying()) {
                 if (this.bossInitializer.isFinished()) {
@@ -607,7 +612,18 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     }
 
-//-------------------------------------------------------------------ATTACKS--------------------------------------------------------------------------
+    public void setSinnedTimes(int sinnedTimes) {
+        this.sinnedTimes = Mth.clamp(sinnedTimes,0,MAX_GEBURAH_SINS);
+        if (this.sinnedTimes == MAX_GEBURAH_SINS){
+            this.kill();
+        }
+    }
+
+    public int getSinnedTimes() {
+        return sinnedTimes;
+    }
+
+    //-------------------------------------------------------------------ATTACKS--------------------------------------------------------------------------
 
     public boolean bellAttack(AttackInstance instance){
 
@@ -773,6 +789,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         return attackInstance.tick > 80;
     }
 
+    @SerializableField
+    public boolean canBeDamaged = false;
+
     public boolean noKillEntitiesAttack(AttackInstance inst){
 
         if (!this.sinnedHalfTimes()){
@@ -781,9 +800,16 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             this.propagateSins(0, GeburahSins.KILL_ENTITY_SIN.get(), GeburahSins.CRYSTAL_OF_SIN.get());
         }
 
+
+
         int localStagesCount = 3;
         int stage = inst.stage;
         int tick = inst.tick;
+
+
+        if (stage == 0 && tick == 0){
+            canBeDamaged = true;
+        }
 
         if (stage == 0 && tick < ATTACK_START_DELAY){
             return false;
@@ -813,7 +839,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             }
         }
 
-        return stage >= maxStages;
+        if (stage >= maxStages){
+            canBeDamaged = true;
+            return true;
+        }
+
+        return false;
     }
 
 
@@ -1370,7 +1401,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     }
 
     private boolean sinnedHalfTimes(){
-        return this.sinnedTimes >= MAX_GEBURAH_SINS / 2 || true;
+        return this.sinnedTimes >= MAX_GEBURAH_SINS / 2;
     }
 
     private void laserParticles(){
@@ -1530,11 +1561,13 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         super.startSeenByPlayer(player);
         this.getWeaponRotationController().onStartSeeingGeburah(player);
         this.getScalesController().syncToPlayer(player);
+        BOSS_BAR.addPlayer(player);
     }
 
     @Override
-    public void stopSeenByPlayer(ServerPlayer p_20174_) {
-        super.stopSeenByPlayer(p_20174_);
+    public void stopSeenByPlayer(ServerPlayer player) {
+        super.stopSeenByPlayer(player);
+        BOSS_BAR.removePlayer(player);
     }
 
     @Override

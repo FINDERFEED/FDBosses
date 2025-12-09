@@ -177,5 +177,8 @@
   },
   "geburah_sin_change": {
     "sounds": [ "fdbosses:geburah_sin_change" ]
+  },
+  "geburah_stomp": {
+    "sounds": [ "fdbosses:geburah_stomp" ]
   }
 }

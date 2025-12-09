@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.content.entities.geburah;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
@@ -13,6 +14,7 @@ import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -67,6 +69,10 @@ public class GeburahStompingController implements AutoSerializable {
             float angle = stomp.angle;
             GeburahEarthquake geburahEarthquake = GeburahEarthquake.summon(geburah.level(), geburah.getOnPos(), 5, stompRadius, travelSpeed, damage,
                     new Vec3(direction.x,0,direction.y),angle);
+        }
+
+        if (!stomps.isEmpty()){
+            geburah.level().playSound(null, geburah.getX(),geburah.getY(),geburah.getZ(), BossSounds.GEBURAH_STOMP.get(), SoundSource.HOSTILE, 3f, .6f);
         }
 
     }
