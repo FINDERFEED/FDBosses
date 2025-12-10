@@ -700,7 +700,11 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
                        var health = entity.getHealth();
                        if (health > 1) {
-                           entity.setHealth(health / 2);
+
+                           float percent = (1 - BossConfigs.BOSS_CONFIG.get().geburahConfig.ultimateMoveHealthPercentage / 100f);
+
+
+                           entity.setHealth(health * percent);
                        }
                        entity.hurt(level().damageSources().generic(),0.1f);
 

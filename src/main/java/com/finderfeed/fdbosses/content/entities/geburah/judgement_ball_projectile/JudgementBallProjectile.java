@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
@@ -26,10 +27,12 @@ public class JudgementBallProjectile extends FDEntity implements AutoSerializabl
 
     public FDTrailDataGenerator<JudgementBallProjectile> trail;
 
-    public static JudgementBallProjectile summon(Level level, ProjectileMovementPath projectileMovementPath){
+    public static JudgementBallProjectile summon(Level level, ProjectileMovementPath projectileMovementPath, float damage){
         JudgementBallProjectile judgementBallProjectile = new JudgementBallProjectile(BossEntities.GEBURAH_JUDGEMENT_BALL.get(), level);
 
         judgementBallProjectile.setPos(projectileMovementPath.getPositions().getFirst());
+
+        judgementBallProjectile.damage = BossUtil.transformDamage(level, damage);
 
         judgementBallProjectile.projectileMovementPath = projectileMovementPath;
 

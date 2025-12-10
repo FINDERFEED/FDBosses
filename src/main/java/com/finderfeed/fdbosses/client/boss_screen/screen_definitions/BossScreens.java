@@ -6,8 +6,6 @@ import com.finderfeed.fdbosses.client.boss_screen.ChesedBossScreen;
 import com.finderfeed.fdbosses.client.boss_screen.GeburahBossScreen;
 import com.finderfeed.fdbosses.client.boss_screen.MalkuthBossScreen;
 import com.finderfeed.fdbosses.init.BossEntities;
-import com.finderfeed.fdbosses.init.BossItems;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.Item;
@@ -15,7 +13,6 @@ import net.minecraft.world.item.Item;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 
 public class BossScreens {
 
@@ -195,6 +192,99 @@ public class BossScreens {
                 .setEntityType(BossEntities.GEBURAH.get())
                 .setBossDescription(Component.translatable("fdbosses.bosses.description.geburah"))
                 .setTLDRComponent(Component.translatable("fdbosses.tldr.geburah"))
+
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/gui/skills/geburah/sinner.png"),
+                        Component.translatable("fdbosses.skills.sinner.sinner"),
+                        Component.translatable("fdbosses.skills.sinner.sinner_stats"),
+                        Component.translatable("fdbosses.skills.sinner.sinner_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/gui/skills/geburah/birds_of_justice.png"),
+                        Component.translatable("fdbosses.skills.geburah.birds_of_justice"),
+                        Component.translatable("fdbosses.skills.geburah.birds_of_justice_stats"),
+                        Component.translatable("fdbosses.skills.geburah.birds_of_justice_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/gui/skills/geburah/traps.png"),
+                        Component.translatable("fdbosses.skills.geburah.traps"),
+                        null,
+                        Component.translatable("fdbosses.skills.geburah.traps_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/gui/skills/geburah/roundstrike.png"),
+                        Component.translatable("fdbosses.skills.geburah.roundstrike"),
+                        Component.translatable("fdbosses.skills.geburah.roundstrike_stats"),
+                        Component.translatable("fdbosses.skills.geburah.roundstrike_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/gui/skills/geburah/ray.png"),
+                        Component.translatable("fdbosses.skills.geburah.ray"),
+                        Component.translatable("fdbosses.skills.geburah.ray_stats"),
+                        Component.translatable("fdbosses.skills.geburah.ray_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/gui/skills/geburah/earthquake.png"),
+                        Component.translatable("fdbosses.skills.geburah.earthquake"),
+                        Component.translatable("fdbosses.skills.geburah.earthquake_stats"),
+                        Component.translatable("fdbosses.skills.geburah.earthquake_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/gui/skills/geburah/laser_beam.png"),
+                        Component.translatable("fdbosses.skills.geburah.laser_beam"),
+                        Component.translatable("fdbosses.skills.geburah.laser_beam_stats"),
+                        Component.translatable("fdbosses.skills.geburah.laser_beam_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/gui/skills/geburah/round_and_round_laser.png"),
+                        Component.translatable("fdbosses.skills.geburah.round_and_round_laser"),
+                        Component.translatable("fdbosses.skills.geburah.round_and_round_laser_stats"),
+                        Component.translatable("fdbosses.skills.geburah.round_and_round_laser_description")
+                ))
+
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/gui/skills/geburah/justice_hammer.png"),
+                        Component.translatable("fdbosses.skills.geburah.justice_hammer"),
+                        Component.translatable("fdbosses.skills.geburah.justice_hammer_stats"),
+                        Component.translatable("fdbosses.skills.geburah.justice_hammer_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/gui/skills/geburah/divine_judgement.png"),
+                        Component.translatable("fdbosses.skills.geburah.divine_judgement"),
+                        Component.translatable("fdbosses.skills.geburah.divine_judgement_stats"),
+                        Component.translatable("fdbosses.skills.geburah.divine_judgement_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/entities/geburah/screen_sin/sin_crystal_of_sin.png"),
+                        Component.translatable("fdbosses.skills.geburah.sin_crystal_of_sin"),
+                        null,
+                        Component.translatable("fdbosses.skills.geburah.sin_crystal_of_sin_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/entities/geburah/screen_sin/sin_jumping_sin.png"),
+                        Component.translatable("fdbosses.skills.geburah.sin_jumping_sin"),
+                        null,
+                        Component.translatable("fdbosses.skills.geburah.sin_jumping_sin_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/entities/geburah/screen_sin/sin_kill_entity_sin.png"),
+                        Component.translatable("fdbosses.skills.geburah.sin_kill_entity_sin"),
+                        null,
+                        Component.translatable("fdbosses.skills.geburah.sin_kill_entity_sin_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/entities/geburah/screen_sin/sin_move_clockwise_sin.png"),
+                        Component.translatable("fdbosses.skills.geburah.sin_move_clockwise_sin"),
+                        null,
+                        Component.translatable("fdbosses.skills.geburah.sin_move_clockwise_sin_description")
+                ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/entities/geburah/screen_sin/sin_pressed_too_many_buttons.png"),
+                        Component.translatable("fdbosses.skills.geburah.sin_pressed_too_many_buttons"),
+                        null,
+                        Component.translatable("fdbosses.skills.geburah.sin_pressed_too_many_buttons_description")
+                ))
+
 
         );
     });

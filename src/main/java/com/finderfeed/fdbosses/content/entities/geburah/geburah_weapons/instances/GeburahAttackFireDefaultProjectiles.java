@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
@@ -43,7 +44,8 @@ public class GeburahAttackFireDefaultProjectiles extends GeburahWeaponAttack {
                 Vec3 direction = cannon.second;
                 JudgementBallProjectile judgementBallProjectile = JudgementBallProjectile.summon(geburah.level(), new ProjectileMovementPath(projectileFlyTime, false)
                         .addPos(position)
-                        .addPos(position.add(direction.scale(radius)))
+                        .addPos(position.add(direction.scale(radius))),
+                        BossConfigs.BOSS_CONFIG.get().geburahConfig.cannonProjectileDamage
                 );
 
             }

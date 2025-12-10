@@ -25,6 +25,12 @@ public class GeburahConfig {
     public float earthquakeDamage = 20;
 
     @ConfigValue
+    public float cannonProjectileDamage = 10;
+
+    @ConfigValue
+    public float ultimateMoveHealthPercentage = 50;
+
+    @ConfigValue
     public int maxPlayerSins = 5;
 
 }
