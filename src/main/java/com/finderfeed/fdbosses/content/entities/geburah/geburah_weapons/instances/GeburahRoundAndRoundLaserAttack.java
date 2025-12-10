@@ -107,9 +107,9 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
                 if (entity instanceof JudgementBirdEntity judgementBirdEntity){
                     if (geburah.canBeDamaged) {
                         geburah.canBeDamaged = false;
-                        geburah.setSinnedTimes(geburah.getSinnedTimes());
-                        judgementBirdEntity.kill();
+                        geburah.setSinnedTimes(geburah.getSinnedTimes() + 1);
                     }
+                    judgementBirdEntity.kill();
                 }else if (entity instanceof LivingEntity livingEntity){
                     livingEntity.hurt(BossDamageSources.GEBURAH_LASER_STRIKE_SOURCE,damage);
                 }

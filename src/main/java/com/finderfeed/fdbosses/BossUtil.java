@@ -1,13 +1,11 @@
 package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
-import com.finderfeed.fdbosses.config.BossConfig;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossConfigs;
-import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
@@ -18,13 +16,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlotGroup;
 import net.minecraft.world.entity.LivingEntity;
@@ -77,6 +73,7 @@ public class BossUtil {
     public static final int JUDGEMENT_BIRD_RAY_PARTICLES = 17;
     public static final int TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_EFFECT = 18;
     public static final int TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_IMPACT = 19;
+    public static final int GEBURAH_PREPARE_RAYS = 20;
 
     public static Vec3 matTransformDirectionVec3(Matrix4f mat, Vec3 v){
         Vector3f v1 = mat.transformDirection(
@@ -337,6 +334,10 @@ public class BossUtil {
             double z = pos.z - entity.getZ();
             return x * x + z * z <= radius * radius;
         };
+    }
+
+    public static void geburahChargeConstantLaserParticles(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){
+        posEvent(serverLevel, pos, GEBURAH_PREPARE_RAYS, geburah.getId(), radius);
     }
 
     public static void geburahTriggerSinPunishmentAttackImpactEffect(ServerLevel serverLevel, Vec3 pos, double radius, int attackRadius){

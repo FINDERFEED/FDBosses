@@ -372,7 +372,48 @@ public class BossClientPackets {
             case BossUtil.TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_IMPACT -> {
                 sinPunishmentParticles(pos, data);
             }
+            case BossUtil.GEBURAH_PREPARE_RAYS -> {
+                geburahPrepareParticles(pos, data);
+            }
         }
+    }
+
+    public static void geburahPrepareParticles(Vec3 p, int data){
+
+        Level level = FDClientHelpers.getClientLevel();
+        if (!(level.getEntity(data) instanceof GeburahEntity geburah)) return;
+
+        var positionsAndDirections = geburah.getCannonsPositionAndDirection();
+
+        for (var posAndDir : positionsAndDirections) {
+
+            Vec3 pos = posAndDir.first;
+            Vec3 direction = posAndDir.second;
+
+            Matrix4f mat = new Matrix4f();
+            FDRenderUtil.applyMovementMatrixRotations(mat, direction);
+
+            for (var dir : new HorizontalCircleRandomDirections(level.random, 6, 1f)) {
+
+                dir = BossUtil.matTransformDirectionVec3(mat, dir);
+
+                Vec3 startPos = pos.add(dir.scale(1.5)).add(direction.reverse().scale(2));
+
+                Vec3 speed = direction.scale(2).add(dir.reverse()).scale(0.3f);
+
+                BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                        .color(0.2f, 0.5f, 1f)
+                        .brightness(2)
+                        .friction(0.8f)
+                        .size(0.25f)
+                        .in(10)
+                        .out(1)
+                        .build();
+                level.addParticle(ballParticleOptions, true, startPos.x, startPos.y, startPos.z, speed.x,speed.y,speed.z);
+
+            }
+        }
+
     }
 
     public static void sinPunishmentParticles(Vec3 pos, int radius){
