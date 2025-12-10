@@ -79,6 +79,12 @@ public class BossClientPackets {
         }
     }
 
+    public static void geburahSinnedPacket(int entityId){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
+            geburah.sinnedTicks = GeburahEntity.SINNED_CLIENT_ANIM_DURATION;
+        }
+    }
+
     public static void setPlayerMalkuthWeaknessAmount(int amount){
         MalkuthWeaknessHandler.setCurrentWeakness(FDClientHelpers.getClientPlayer(), amount);
     }

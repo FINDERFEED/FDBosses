@@ -90,6 +90,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public final FDServerBossBar BOSS_BAR = new FDServerBossBar(BossBars.GEBURAG_BOSS_BAR, this);
 
+    public static final int SINNED_CLIENT_ANIM_DURATION = 20;
+
     public static final int MAX_GEBURAH_SINS = 10;
 
     public static final int SIN_PUNISHMENT_ATTACK_DURATION = 40;
@@ -165,6 +167,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     @SerializableField
     private int sinnedTimes = 0;
+
+    public int sinnedTicks = 0;
 
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
@@ -261,8 +265,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         }
 
         if (level().isClientSide) {
-
-
+            sinnedTicks = Mth.clamp(sinnedTicks - 1,0, Integer.MAX_VALUE);
             this.tickFinalAttackPreparation();
             this.tickSinPunishmentEffect();
             this.particles();
@@ -470,8 +473,10 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             float currentAngle = angle * i + FDMathUtil.FPI / 4 + (level().random.nextFloat() * 2 - 1) * FDMathUtil.FPI / 8;
             Vec3 direction = new Vec3(1,0,0).yRot(currentAngle);
 
+            Vec3 checkDir = new Vec3(1,0,0).yRot(angle * i + FDMathUtil.FPI / 4);
+
             var entities = FDTargetFinder.getEntitiesInArc(Entity.class, level(), this.position().add(0,-5f,0),
-                    new Vec2((float) direction.x,(float) direction.z), FDMathUtil.FPI / 2, 35, ARENA_RADIUS, (entity) -> {
+                    new Vec2((float) checkDir.x,(float) checkDir.z), FDMathUtil.FPI / 2, 35, ARENA_RADIUS, (entity) -> {
                 return entity instanceof GeburahChainTrapEntity || entity instanceof ChainTrapSummonProjectile || entity instanceof GeburahChainTrapCastCircle;
             });
 
@@ -619,6 +624,11 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public void setSinnedTimes(int sinnedTimes) {
         this.sinnedTimes = Mth.clamp(sinnedTimes,0,MAX_GEBURAH_SINS);
+
+        if (!level().isClientSide){
+            PacketDistributor.sendToPlayersTrackingEntity(this, new GeburahSinnedPacket(this));
+        }
+
         if (this.sinnedTimes == MAX_GEBURAH_SINS){
             this.kill();
         }
@@ -1550,12 +1560,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     @Override
     protected void tickDeath() {
-        super.tickDeath();
         if (!level().isClientSide){
             if (this.getSpawner() != null){
                 this.getSpawner().setActive(true);
             }
         }
+        super.tickDeath();
     }
 
     private AABB constructSinBox(){

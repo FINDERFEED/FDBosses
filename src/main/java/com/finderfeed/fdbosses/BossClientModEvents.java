@@ -519,7 +519,54 @@ public class BossClientModEvents {
 
         event.registerEntityRenderer(BossEntities.GEBURAH_CHAIN_TRAP.get(), GeburahChainTrapRenderer::new);
 
+
+
+
         event.registerEntityRenderer(BossEntities.GEBURAH.get(), FDEntityRendererBuilder.<GeburahEntity>builder()
+
+
+                .addLayer(FDEntityRenderLayerOptions.<GeburahEntity>builder()
+                        .model(BossModels.GEBURAH_LAYER)
+                        .ignoreHurtOverlay(true)
+                        .renderType(((geburah, v) -> {
+                            return RenderType.text(FDBosses.location("textures/misc/white_dot.png"));
+                        }))
+                        .transformation(generateGeburahHurtTransformation(0))
+                        .color(((geburah, v) -> {
+                            int tick = GeburahEntity.SINNED_CLIENT_ANIM_DURATION - geburah.sinnedTicks;
+                            float alpha = 1 - FDEasings.easeIn((tick + v) / GeburahEntity.SINNED_CLIENT_ANIM_DURATION);
+
+                            return new FDColor(1f,0.8f,0.3f,0.3f * alpha);
+                        }))
+                        .renderCondition((geburah -> {
+                            return geburah.sinnedTicks > 0;
+                        }))
+                        .light(LightTexture.FULL_BRIGHT)
+                        .addBoneController("rotating_weapons", new GeburahRotatingWeaponsBoneController())
+                        .addBoneController("scales_plates", new GeburahScalesBoneController())
+                        .build())
+
+                .addLayer(FDEntityRenderLayerOptions.<GeburahEntity>builder()
+                        .model(BossModels.GEBURAH_LAYER)
+                        .ignoreHurtOverlay(true)
+                        .renderType(((geburah, v) -> {
+                            return RenderType.text(FDBosses.location("textures/misc/white_dot.png"));
+                        }))
+                        .transformation(generateGeburahHurtTransformation(6354))
+                        .color(((geburah, v) -> {
+                            int tick = GeburahEntity.SINNED_CLIENT_ANIM_DURATION - geburah.sinnedTicks;
+                            float alpha = 1 - FDEasings.easeIn((tick + v) / GeburahEntity.SINNED_CLIENT_ANIM_DURATION);
+
+                            return new FDColor(0.3f,0.8f,1f,0.2f * alpha);
+                        }))
+                        .renderCondition((geburah -> {
+                            return geburah.sinnedTicks > 0;
+                        }))
+                        .light(LightTexture.FULL_BRIGHT)
+                        .addBoneController("rotating_weapons", new GeburahRotatingWeaponsBoneController())
+                        .addBoneController("scales_plates", new GeburahScalesBoneController())
+                        .build())
+
                 .addLayer(FDEntityRenderLayerOptions.<GeburahEntity>builder()
                         .model(BossModels.GEBURAH)
                         .ignoreHurtOverlay(true)
@@ -980,5 +1027,28 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.MALKUTH_PLAYER_FIREBALL.get(), MalkuthPlayerFireIceBallRenderer::new);
         event.registerEntityRenderer(BossEntities.MALKUTH_REPAIR_ENTITY.get(), MalkuthRepairEntityRenderer::new);
         event.registerEntityRenderer(BossEntities.CHESED_MINI_RAY.get(), ChesedMiniRayRenderer::new);
+    }
+
+    private static FDEntityTransformation<GeburahEntity> generateGeburahHurtTransformation(int offset){
+        return ((geburah, poseStack, v) -> {
+            Random random = new Random(geburah.tickCount * (234L + offset) + offset);
+            Random random2 = new Random((geburah.tickCount + 1) * (234L + offset) + offset);
+
+            Vec3 offs1 = new Vec3(
+                    random.nextFloat() * 2 - 1,
+                    random.nextFloat() * 2 - 1,
+                    random.nextFloat() * 2 - 1
+            );
+            Vec3 offs2 = new Vec3(
+                    random2.nextFloat() * 2 - 1,
+                    random2.nextFloat() * 2 - 1,
+                    random2.nextFloat() * 2 - 1
+            );
+            Vec3 t = FDMathUtil.interpolateVectors(offs1, offs2, FDEasings.easeInOut(v));
+            int tick = GeburahEntity.SINNED_CLIENT_ANIM_DURATION - geburah.sinnedTicks;
+            float alpha = 1 - FDEasings.easeOut((tick + v) / GeburahEntity.SINNED_CLIENT_ANIM_DURATION);
+            float ampl = 0.75f * alpha;
+            poseStack.translate(t.x * ampl,t.y * ampl,t.z * ampl);
+        });
     }
 }
