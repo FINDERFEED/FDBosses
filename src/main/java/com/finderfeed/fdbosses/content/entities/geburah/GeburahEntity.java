@@ -90,7 +90,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public final FDServerBossBar BOSS_BAR = new FDServerBossBar(BossBars.GEBURAG_BOSS_BAR, this);
 
-    public static final int SINNED_CLIENT_ANIM_DURATION = 20;
+    public static final int SINNED_CLIENT_ANIM_DURATION = 25;
 
     public static final int MAX_GEBURAH_SINS = 10;
 
@@ -503,7 +503,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             return;
         }
 
-        this.judgementBirdSpawnTicker = 800;
+        this.judgementBirdSpawnTicker = 400;
 
         int angles = 4;
         float angle = FDMathUtil.FPI * 2 / angles;
@@ -623,12 +623,19 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     }
 
     public void setSinnedTimes(int sinnedTimes) {
-        this.sinnedTimes = Mth.clamp(sinnedTimes,0,MAX_GEBURAH_SINS);
 
-        if (!level().isClientSide){
-            PacketDistributor.sendToPlayersTrackingEntity(this, new GeburahSinnedPacket(this));
+        if (!level().isClientSide) {
+            if (sinnedTimes > this.sinnedTimes) {
+                PacketDistributor.sendToPlayersTrackingEntity(this, new GeburahSinnedPacket(this));
+                PacketDistributor.sendToPlayersTrackingEntity(this, new DefaultShakePacket(FDShakeData.builder()
+                        .outTime(40)
+                        .amplitude(1f)
+                        .build()));
+                this.level().playSound(null, this.getX(),this.getY(),this.getZ(), BossSounds.GEBURAH_SIN.get(), SoundSource.HOSTILE, 5f, 0.75f);
+            }
         }
 
+        this.sinnedTimes = Mth.clamp(sinnedTimes,0,MAX_GEBURAH_SINS);
         if (this.sinnedTimes == MAX_GEBURAH_SINS){
             this.kill();
         }
@@ -644,6 +651,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         int stage = instance.stage;
         int tick = instance.tick;
+
+        this.propagateSins(0);
 
         var scalesController = this.getScalesController();
 

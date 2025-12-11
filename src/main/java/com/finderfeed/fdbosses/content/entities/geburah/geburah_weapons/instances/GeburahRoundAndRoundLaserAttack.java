@@ -105,8 +105,8 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
             for (var entity : entities){
 
                 if (entity instanceof JudgementBirdEntity judgementBirdEntity){
-                    if (geburah.canBeDamaged) {
-                        geburah.canBeDamaged = false;
+                    if (geburah.canBeDamaged && geburah.invulnerableTime == 0) {
+                        geburah.invulnerableTime = 20;
                         geburah.setSinnedTimes(geburah.getSinnedTimes() + 1);
                     }
                     judgementBirdEntity.kill();
