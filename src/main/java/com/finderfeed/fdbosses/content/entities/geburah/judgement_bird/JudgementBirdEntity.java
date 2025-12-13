@@ -11,11 +11,18 @@ import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.util.client.particles.FDBlockParticleOptions;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -23,8 +30,10 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 public class JudgementBirdEntity extends FDMob implements AutoSerializable, GeburahBossBuddy {
 
@@ -166,6 +175,50 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable, Gebu
                 castingTicker = -1;
             }
         }
+    }
+
+    @Override
+    protected void tickDeath() {
+        if (!this.level().isClientSide() && !this.isRemoved()) {
+
+            this.playSound(SoundEvents.STONE_BREAK, 1f, 0.5f);
+            this.playSound(SoundEvents.DEEPSLATE_BREAK, 1f ,0.5f);
+            this.playSound(SoundEvents.STEM_BREAK, 1f ,0.5f);
+
+            this.remove(Entity.RemovalReason.KILLED);
+            BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                    .size(0.25f)
+                    .scalingOptions(0,0,10)
+                    .color(0.3f,0.7f,1f)
+                    .friction(0.7f)
+                    .build();
+
+            ((ServerLevel)level()).sendParticles(ballParticleOptions, this.getX(), this.getY() + this.getBbHeight(), this.getZ(),70,0.1f,0.1f,0.1f,0.4f);
+
+            FDBlockParticleOptions blockParticleOptions = FDBlockParticleOptions.builder()
+                    .lifetime(40)
+                    .state(Blocks.DEEPSLATE)
+                    .quadSizeMultiplier(0.75f + random.nextFloat() * 0.5f)
+                    .build();
+
+            ((ServerLevel)level()).sendParticles(blockParticleOptions, this.getX(), this.getY() + this.getBbHeight(), this.getZ(),70,0.1f,0.1f,0.1f,0.4f);
+
+
+
+        }
+    }
+
+
+    @Override
+    protected void playHurtSound(DamageSource p_21493_) {
+        this.playSound(SoundEvents.STONE_BREAK, 1f, 0.5f);
+        this.playSound(SoundEvents.DEEPSLATE_BREAK, 1f ,0.5f);
+    }
+
+    @Nullable
+    @Override
+    protected SoundEvent getDeathSound() {
+        return null;
     }
 
     @Override
