@@ -33,6 +33,7 @@ import java.util.List;
 public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
     public static final ResourceLocation HALO_EXPLOSION = FDBosses.location("textures/entities/geburah/geburah_halo_explosion.png");
+    public static final ResourceLocation HALO = FDBosses.location("textures/entities/geburah/geburah_halo.png");
 
 
     public static final int HAMMER_AMOUNT = 8;
@@ -68,6 +69,9 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
         float time = geburah.clientOperatingTicks + pticks;
         Vec3 corePos = geburah.getCorePosition().subtract(geburah.position());
 
+
+        float haloRot = time / 10;
+
         float haloExplosionTime = 35;
         if (time <= haloExplosionTime) {
             float p = Mth.clamp(time / haloExplosionTime, 0, 1);
@@ -81,7 +85,29 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
                     .color(1f, 1f, 1f, (1 - p) * 0.8f )
                     .renderBack()
                     .render();
-        };
+
+            QuadRenderer.start(src.getBuffer(RenderType.text(HALO)))
+                    .pose(matrices)
+                    .direction(new Vec3(0,-1,0))
+                    .translate(0, (float) corePos.y + 3 * p, 0)
+                    .size(FDEasings.easeOut(FDEasings.easeOut(p)) * 21)
+                    .rotationDegrees(-haloRot + 20 - FDEasings.easeOut(FDEasings.easeOut(p)) * 20)
+                    .color(1f, 1f, 1f, p * 0.5f )
+                    .renderBack()
+                    .render();
+
+        }else{
+
+            QuadRenderer.start(src.getBuffer(RenderType.text(HALO)))
+                    .pose(matrices)
+                    .direction(new Vec3(0,-1,0))
+                    .translate(0, (float) corePos.y + 3, 0)
+                    .size(21)
+                    .rotationDegrees(-haloRot)
+                    .color(1f, 1f, 1f, 0.35f)
+                    .renderBack()
+                    .render();
+        }
 
 
 
