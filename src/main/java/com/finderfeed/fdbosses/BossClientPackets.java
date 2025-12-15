@@ -73,6 +73,14 @@ public class BossClientPackets {
 
     private static Random random = new Random();
 
+    public static void summonParticle(ParticleOptions particleOptions, double x,double y, double z,  double xd,double yd, double zd, int lifetime){
+        var engine = Minecraft.getInstance().particleEngine;
+        var particle = engine.createParticle(particleOptions,x,y,z,xd,yd,zd);
+        particle.lifetime = lifetime;
+    }
+
+
+
     public static void geburahScalesControllerSetDisplacement(int entityId, int displacement, int displacementTime){
         if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
             geburah.getScalesController().setCurrentDisplacement(displacement, displacementTime);

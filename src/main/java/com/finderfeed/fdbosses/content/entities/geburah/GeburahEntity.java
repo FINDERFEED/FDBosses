@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
+import com.finderfeed.fdbosses.BossClientPackets;
 import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
@@ -55,8 +56,11 @@ import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import net.minecraft.core.Holder;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -1622,16 +1626,63 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             if (this.getSpawner() != null){
                 this.getSpawner().setActive(true);
             }
+
+            if (this.deathTime == 132){
+                this.level().playSound(null, this.getX(),this.getY(),this.getZ(), BossSounds.GEBURAH_DEATH.get(), SoundSource.HOSTILE, 3f, 1f);
+            }
+
         }
         this.deathTime++;
-        if (this.deathTime >= 150 && !this.level().isClientSide() && !this.isRemoved()) {
-            this.remove(Entity.RemovalReason.KILLED);
+        if (this.deathTime >= 150) {
+            if (!this.isRemoved()) {
+                if (!level().isClientSide) {
+                    this.remove(Entity.RemovalReason.KILLED);
+                }
+            }
+        }else if (this.deathTime == 145 && this.level().isClientSide){
+            this.spawnDeathParticles();
+        }
+    }
+
+    private void spawnDeathParticles(){
+        for (int i = 0; i < 1500;i ++){
+
+            float dist = FDEasings.easeOut(random.nextFloat()) * 20;
+
+            Vec3 v = new Vec3(dist,0,0).yRot(random.nextFloat() * FDMathUtil.FPI * 2);
+
+            float height = random.nextFloat() * 40;
+
+            Vec3 ppos = this.position().add(v).add(0,height,0);
+
+            ParticleOptions particleOptions;
+            Vec3 speed = new Vec3(
+                    random.nextFloat() * 2 - 1,
+                    random.nextFloat() * 2 - 1,
+                    random.nextFloat() * 2 - 1
+            ).normalize().scale(0.035f);
+
+            if (level().random.nextBoolean()){
+                particleOptions = BallParticleOptions.builder()
+                        .color(1f,0.8f,0.3f,0.75f)
+                        .scalingOptions(0,0,200)
+                        .brightness(2 + random.nextInt(2))
+                        .build();
+                level().addParticle(particleOptions, true, ppos.x,ppos.y,ppos.z,speed.x,speed.y,speed.z);
+            }else{
+                particleOptions = ParticleTypes.END_ROD;
+                BossClientPackets.summonParticle(particleOptions, ppos.x,ppos.y,ppos.z,speed.x,speed.y,speed.z,200);
+            }
+
+
+
         }
     }
 
     private CutsceneData deathCutscene(){
 
         CutsceneData cutsceneData = CutsceneData.create()
+                .addScreenEffect(0, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1f),0,0,40)
                 .timeEasing(EasingType.EASE_IN_OUT)
                 .time(120);
 
@@ -1659,8 +1710,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         }
 
         CutsceneData cutsceneData1 = CutsceneData.create()
-                .addScreenEffect(14, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(1f,1f,1f,1f),0,40,40)
-                .time(100)
+                .addScreenEffect(14, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(1f,1f,1f,1f),0,40,60)
+                .addScreenEffect(125, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0,0,0,1f),20,10,20)
+                .time(150)
                 .addCameraPos(lastPos);
 
         cutsceneData.nextCutscene(cutsceneData1);

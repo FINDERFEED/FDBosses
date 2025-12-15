@@ -180,5 +180,8 @@
   },
   "geburah_stomp": {
     "sounds": [ "fdbosses:geburah_stomp" ]
+  },
+  "geburah_death": {
+    "sounds": [ "fdbosses:geburah_death" ]
   }
 }
