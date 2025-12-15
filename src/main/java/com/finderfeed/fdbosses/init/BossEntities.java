@@ -393,7 +393,7 @@ public class BossEntities {
             .build("geburah_bell"));
 
     public static final Supplier<EntityType<GeburahOpeningFloor>> GEBURAH_OPENING_FLOOR = ENTITIES.register("geburah_opening_floor",()->EntityType.Builder.of(
-                    GeburahOpeningFloor::new, MobCategory.CREATURE
+                    GeburahOpeningFloor::new, MobCategory.MISC
             )
             .sized(1f,1f)
             .build("geburah_opening_floor"));

@@ -53,13 +53,16 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
     @Override
     public void render(GeburahEntity geburah, float v, float v1, PoseStack poseStack, MultiBufferSource multiBufferSource, int i) {
-
+        if (hammerModel == null){
+            hammerModel = new FDModel(BossModels.JUSTICE_HAMMER.get());
+        }
         this.renderLasers(geburah,v,v1,poseStack,multiBufferSource,i);
         this.renderSins(geburah,v,v1,poseStack,multiBufferSource,i);
         this.renderRayPreparations(geburah, v, v1, poseStack, multiBufferSource, i);
         this.renderSinPunishmentAttackEffect(geburah, v, v1, poseStack, multiBufferSource, i);
         this.renderStartOperating(geburah, v, v1, poseStack, multiBufferSource, i);
         this.renderSecondPhase(geburah, v, v1, poseStack, multiBufferSource, i);
+        this.renderDeath(geburah, v, v1, poseStack, multiBufferSource, i);
 
     }
 
@@ -146,9 +149,7 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
         int tick = geburah.sinPunishmentAttackTicker;
         if (tick == -1) return;
 
-        if (hammerModel == null){
-            hammerModel = new FDModel(BossModels.JUSTICE_HAMMER.get());
-        }
+
 
         float time = Mth.clamp((GeburahEntity.SIN_PUNISHMENT_ATTACK_DURATION - tick) + pticks, 0, GeburahEntity.SIN_PUNISHMENT_ATTACK_DURATION);
 
@@ -454,6 +455,73 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
         }
 
         matrices.popPose();;
+
+    }
+
+    private void renderDeath(GeburahEntity geburah, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light){
+
+        if (!geburah.isDeadOrDying()) return;
+
+        int tick = geburah.deathTime;
+
+        int c = 8;
+        int c2 = 4;
+
+        float angle = FDMathUtil.FPI * 2 / c;
+        float angle2 = FDMathUtil.FPI * 2 / c2;
+
+        for (int i = 0; i < c; i++) {
+            this.renderDeathHammer(tick, i * 10, 130, 60, angle * i + angle / 2, geburah,3,pticks,matrices,src,light);
+        }
+
+        for (int i = 0; i < c2; i++) {
+            this.renderDeathHammer(tick, i * 20, 130, 60, angle2 * i + angle2 / 2, geburah,13,pticks,matrices,src,light);
+        }
+
+    }
+
+    private void renderDeathHammer(int currentTick, int appearTick, int strikeTick, int hammerPrepareTime, float angle, GeburahEntity geburah, float originOffset, float pticks, PoseStack matrices, MultiBufferSource src, int light){
+
+        float tick = Mth.clamp(currentTick - appearTick + pticks,0,Integer.MAX_VALUE);
+
+        Vec3 v = new Vec3(1,0,0).yRot(angle);
+
+        ComplexEasingFunction hammerEasing = ComplexEasingFunction.builder()
+                .addArea(hammerPrepareTime, FDEasings::easeOut)
+                .addArea(strikeTick - hammerPrepareTime - appearTick, FDEasings::one)
+                .addArea(7,FDEasings::reversedEaseInOut)
+                .build();
+
+        ComplexEasingFunction hammerAlpha = ComplexEasingFunction.builder()
+                .addArea(hammerPrepareTime, FDEasings::easeIn)
+                .build();
+
+
+        float s = (float) Math.sin(tick / 10) * 0.25f;
+
+
+        matrices.pushPose();
+
+        matrices.translate(0,originOffset,0);
+
+        Vec3 dir = v.add(0,-0.5,0);
+
+        FDRenderUtil.applyMovementMatrixRotations(matrices,dir);
+
+        float offset = hammerEasing.apply(tick);
+
+        matrices.translate(0,-offset * 20 + s,0);
+
+
+        matrices.mulPose(Axis.YP.rotationDegrees(offset * 360));
+
+        matrices.scale(0.75f,0.75f,0.75f);
+
+        float alpha = hammerAlpha.apply(tick);
+
+        hammerModel.render(matrices,src.getBuffer(RenderType.lightning()), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 0.3f,0.7f,1f,alpha * 0.75f);
+
+        matrices.popPose();
 
     }
 

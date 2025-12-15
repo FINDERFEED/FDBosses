@@ -30,12 +30,17 @@ import com.finderfeed.fdbosses.content.util.CylinderPlayerPositionsCollector;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.content.util.WorldBox;
 import com.finderfeed.fdbosses.init.*;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.data_structures.Pair;
+import com.finderfeed.fdlib.init.FDScreenEffects;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.network.lib_packets.PlaySoundInEarsPacket;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
+import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
+import com.finderfeed.fdlib.systems.cutscenes.EasingType;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
@@ -43,6 +48,7 @@ import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
 import com.finderfeed.fdlib.systems.hud.bossbars.FDServerBossBar;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFramesPacket;
+import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.util.FDColor;
@@ -183,7 +189,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             return true;
         });
 
-        this.sinnedTimes = MAX_GEBURAH_SINS / 2;
+//        this.sinnedTimes = MAX_GEBURAH_SINS / 2;
 
         this.bossInitializer = new GeburahBossInitializer(this);
         this.secondPhaseBossInitializer = new GeburahSecondPhaseInitializer(this);
@@ -1591,6 +1597,14 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     @Override
     protected void tickDeath() {
         if (!level().isClientSide){
+
+            if (deathTime == 0){
+                var data = this.deathCutscene();
+                for (var player : this.getPlayerPositionsCollector().getPlayers()){
+                    FDLibCalls.startCutsceneForPlayer((ServerPlayer) player, data);
+                }
+            }
+
             this.propagateSins(0);
 
             if (deathTime < 5){
@@ -1609,7 +1623,49 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 this.getSpawner().setActive(true);
             }
         }
-        super.tickDeath();
+        this.deathTime++;
+        if (this.deathTime >= 150 && !this.level().isClientSide() && !this.isRemoved()) {
+            this.remove(Entity.RemovalReason.KILLED);
+        }
+    }
+
+    private CutsceneData deathCutscene(){
+
+        CutsceneData cutsceneData = CutsceneData.create()
+                .timeEasing(EasingType.EASE_IN_OUT)
+                .time(120);
+
+        CameraPos lastPos = null;
+
+        Vec3 lastLook = null;
+
+        Vec3 origin = this.position().add(0,12,0);
+
+        int c = 24;
+        float angle = FDMathUtil.FPI * 2 / c;
+
+        for (var dir : new HorizontalCircleRandomDirections(random,c,0)){
+            Vec3 offs = dir.reverse().add(0,0.2,0).yRot(angle);
+
+            Vec3 camPos = origin.add(offs.scale(25));
+
+            lastLook = offs.reverse();
+
+            CameraPos cameraPos = new CameraPos(camPos, offs.reverse());
+
+            lastPos = cameraPos;
+
+            cutsceneData.addCameraPos(cameraPos);
+        }
+
+        CutsceneData cutsceneData1 = CutsceneData.create()
+                .addScreenEffect(14, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(1f,1f,1f,1f),0,40,40)
+                .time(100)
+                .addCameraPos(lastPos);
+
+        cutsceneData.nextCutscene(cutsceneData1);
+
+        return cutsceneData;
     }
 
     protected <T extends Entity> List<T> getArenaEntities(Class<T> clazz){
