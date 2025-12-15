@@ -194,13 +194,13 @@ public class BossScreens {
                 .setTLDRComponent(Component.translatable("fdbosses.tldr.geburah"))
 
                 .addSkill(new BossInfo(
-                        FDBosses.location("textures/gui/skills/geburah/sinner.png"),
+                        FDBosses.location("textures/mob_effect/sinner.png"),
                         Component.translatable("fdbosses.skills.sinner.sinner"),
                         Component.translatable("fdbosses.skills.sinner.sinner_stats"),
                         Component.translatable("fdbosses.skills.sinner.sinner_description")
                 ))
                 .addSkill(new BossInfo(
-                        FDBosses.location("textures/gui/skills/geburah/birds_of_justice.png"),
+                        FDBosses.location("textures/gui/skills/geburah/judgement_birds.png"),
                         Component.translatable("fdbosses.skills.geburah.birds_of_justice"),
                         Component.translatable("fdbosses.skills.geburah.birds_of_justice_stats"),
                         Component.translatable("fdbosses.skills.geburah.birds_of_justice_description")
@@ -212,28 +212,28 @@ public class BossScreens {
                         Component.translatable("fdbosses.skills.geburah.traps_description")
                 ))
                 .addSkill(new BossInfo(
+                        FDBosses.location("textures/gui/skills/geburah/core_ray.png"),
+                        Component.translatable("fdbosses.skills.geburah.ray"),
+                        Component.translatable("fdbosses.skills.geburah.ray_stats"),
+                        Component.translatable("fdbosses.skills.geburah.ray_description")
+                ))
+                .addSkill(new BossInfo(
                         FDBosses.location("textures/gui/skills/geburah/roundstrike.png"),
                         Component.translatable("fdbosses.skills.geburah.roundstrike"),
                         Component.translatable("fdbosses.skills.geburah.roundstrike_stats"),
                         Component.translatable("fdbosses.skills.geburah.roundstrike_description")
                 ))
                 .addSkill(new BossInfo(
-                        FDBosses.location("textures/gui/skills/geburah/ray.png"),
-                        Component.translatable("fdbosses.skills.geburah.ray"),
-                        Component.translatable("fdbosses.skills.geburah.ray_stats"),
-                        Component.translatable("fdbosses.skills.geburah.ray_description")
+                        FDBosses.location("textures/gui/skills/geburah/laser_beam.png"),
+                        Component.translatable("fdbosses.skills.geburah.laser_beam"),
+                        Component.translatable("fdbosses.skills.geburah.laser_beam_stats"),
+                        Component.translatable("fdbosses.skills.geburah.laser_beam_description")
                 ))
                 .addSkill(new BossInfo(
                         FDBosses.location("textures/gui/skills/geburah/earthquake.png"),
                         Component.translatable("fdbosses.skills.geburah.earthquake"),
                         Component.translatable("fdbosses.skills.geburah.earthquake_stats"),
                         Component.translatable("fdbosses.skills.geburah.earthquake_description")
-                ))
-                .addSkill(new BossInfo(
-                        FDBosses.location("textures/gui/skills/geburah/laser_beam.png"),
-                        Component.translatable("fdbosses.skills.geburah.laser_beam"),
-                        Component.translatable("fdbosses.skills.geburah.laser_beam_stats"),
-                        Component.translatable("fdbosses.skills.geburah.laser_beam_description")
                 ))
                 .addSkill(new BossInfo(
                         FDBosses.location("textures/gui/skills/geburah/round_and_round_laser.png"),
