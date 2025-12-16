@@ -183,5 +183,8 @@
   },
   "geburah_death": {
     "sounds": [ "fdbosses:geburah_death" ]
+  },
+  "geburah_helicopter": {
+    "sounds": [ "fdbosses:helicopter" ]
   }
 }

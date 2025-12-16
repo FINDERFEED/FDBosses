@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreenOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
@@ -14,6 +15,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import org.joml.Vector2f;
@@ -110,6 +113,11 @@ public class GeburahBossScreen extends BaseBossScreen {
         animationSystem.tick();
 
         oldTick = geburahHelicopterTick;
+
+        if (geburahRotationSpeed == 100){
+            SoundManager soundManager = Minecraft.getInstance().getSoundManager();
+            soundManager.play(SimpleSoundInstance.forUI(BossSounds.GEBURAH_HELICOPTER.get(), 1f, 1f));
+        }
 
         if (geburahRotationSpeed != -1){
             geburahRotationSpeed++;

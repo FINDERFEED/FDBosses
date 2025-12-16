@@ -5,6 +5,8 @@ import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
+import com.finderfeed.fdbosses.content.entities.BossDespawner;
+import com.finderfeed.fdbosses.content.entities.FDDespawnable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircle;
@@ -78,6 +80,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Targeting;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -89,6 +92,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -97,7 +101,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
-public class GeburahEntity extends FDLivingEntity implements AutoSerializable, GeburahBossBuddy, BossSpawnerContextAssignable {
+public class GeburahEntity extends FDLivingEntity implements AutoSerializable, GeburahBossBuddy, BossSpawnerContextAssignable, Targeting, FDDespawnable {
 
     public final FDServerBossBar BOSS_BAR = new FDServerBossBar(BossBars.GEBURAG_BOSS_BAR, this);
 
@@ -187,13 +191,21 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public int sinnedTicks = 0;
 
+    private BossDespawner<GeburahEntity> bossDespawner;
+
     public GeburahEntity(EntityType<? extends LivingEntity> type, Level level) {
         super(type, level);
         this.playerPositionsCollector = new CylinderPlayerPositionsCollector(level, ARENA_RADIUS, ARENA_HEIGHT, player -> {
             return true;
         });
 
-//        this.sinnedTimes = MAX_GEBURAH_SINS / 2;
+        bossDespawner = new BossDespawner<>(this, new AABB(-ARENA_RADIUS,-2,-ARENA_RADIUS,ARENA_RADIUS,ARENA_HEIGHT,ARENA_RADIUS), 20,
+                JudgementBirdEntity.class,
+                GeburahCastingCircle.class,
+                GeburahBell.class,
+                GeburahEntity.class,
+                GeburahChainTrapEntity.class
+        );
 
         this.bossInitializer = new GeburahBossInitializer(this);
         this.secondPhaseBossInitializer = new GeburahSecondPhaseInitializer(this);
@@ -298,10 +310,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             this.tickLaserVisualDisappearance();
         }else{
 
+
             BOSS_BAR.setPercentage((float) this.sinnedTimes / MAX_GEBURAH_SINS);
 
             if (!this.isDeadOrDying()) {
                 if (this.bossInitializer.isFinished() && (!this.sinnedHalfTimes() || this.secondPhaseBossInitializer.isFinished() && this.sinnedHalfTimes())) {
+                    this.bossDespawner.tick();
                     this.getEntityData().set(OPERATING, true);
                     this.mainAttackChain.tick();
                     this.throwSinCrystals();
@@ -1853,6 +1867,26 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         }else{
             return null;
         }
+    }
+
+    @Nullable
+    @Override
+    public LivingEntity getTarget() {
+        List<Player> players = this.getPlayerPositionsCollector().getPlayers().stream().filter(BossUtil::isPlayerInSurvival).toList();
+        if (!players.isEmpty()){
+            return players.get(0);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean onFDDespawn() {
+        var spawner = this.getSpawner();
+        if (spawner != null){
+            spawner.setActive(true);
+            return true;
+        }
+        return false;
     }
 
 
