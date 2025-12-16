@@ -38,6 +38,7 @@ public class BossItems {
 
     public static final Supplier<LocatorEye<?>> EYE_OF_CHESED = ITEMS.register("eye_of_chesed", ()->new LocatorEye<>(BossUtil.StructureTags.EYE_OF_CHESED_LOCATED, BossEntities.EYE_OF_CHESED));
     public static final Supplier<LocatorEye<?>> EYE_OF_MALKUTH = ITEMS.register("eye_of_malkuth", ()->new LocatorEye<>(BossUtil.StructureTags.EYE_OF_MALKUTH_LOCATED, BossEntities.EYE_OF_MALKUTH));
+    public static final Supplier<LocatorEye<?>> EYE_OF_GEBURAH = ITEMS.register("eye_of_geburah", ()->new LocatorEye<>(BossUtil.StructureTags.EYE_OF_GEBURAH_LOCATED, BossEntities.EYE_OF_GEBURAH));
 
     public static final Supplier<SpawnEggItem> MALKUTH_FIRE_WARRIOR_SPAWN_EGG = ITEMS.register("malkuth_fire_warrior_spawn_egg", ()->new DeferredSpawnEggItem(BossEntities.FIRE_MALKUTH_WARRIOR,
             0xffffff,0xffffff,new Item.Properties()));
@@ -110,6 +111,7 @@ public class BossItems {
                 event.accept(JUSTICE_CORE.get());
                 event.accept(EYE_OF_CHESED.get());
                 event.accept(EYE_OF_MALKUTH.get());
+                event.accept(EYE_OF_GEBURAH.get());
                 event.accept(CHESED_TROPHY.get());
                 event.accept(MALKUTH_TROPHY.get());
                 event.accept(GEBURAH_TROPHY.get());

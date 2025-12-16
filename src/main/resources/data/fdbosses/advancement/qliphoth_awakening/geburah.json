@@ -1,0 +1,33 @@
+{
+  "parent": "fdbosses:qliphoth_awakening/root",
+  "criteria": {
+    "killed_geburah": {
+      "conditions": {
+        "boss_entity_type": "fdbosses:geburah"
+      },
+      "trigger": "fdbosses:boss_killed"
+    }
+  },
+  "display": {
+    "description": {
+      "translate": "advancements.qliphoth_awakening.geburah.description"
+    },
+    "frame": "challenge",
+    "icon": {
+      "count": 1,
+      "id": "fdbosses:geburah_trophy"
+    },
+    "title": {
+      "translate": "advancements.qliphoth_awakening.geburah.title"
+    }
+  },
+  "requirements": [
+    [
+      "killed_geburah"
+    ]
+  ],
+  "rewards": {
+    "experience": 300
+  },
+  "sends_telemetry_event": true
+}

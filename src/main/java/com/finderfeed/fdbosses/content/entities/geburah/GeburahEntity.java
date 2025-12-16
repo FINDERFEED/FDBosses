@@ -1636,7 +1636,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         if (this.deathTime >= 150) {
             if (!this.isRemoved()) {
                 if (!level().isClientSide) {
-
+                    for (var player : this.getPlayerPositionsCollector().getPlayers()){
+                        BossCriteriaTriggers.BOSS_KILLED.get().trigger((ServerPlayer) player, this);
+                    }
                     this.remove(Entity.RemovalReason.KILLED);
                 }
             }

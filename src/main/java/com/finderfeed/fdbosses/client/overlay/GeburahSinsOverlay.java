@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.PlayerSinsHandler;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSins;
 import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
@@ -32,7 +33,7 @@ public class GeburahSinsOverlay implements LayeredDraw.Layer {
     @Override
     public void render(GuiGraphics graphics, DeltaTracker deltaTracker) {
 
-        if (Minecraft.getInstance().player == null || Minecraft.getInstance().options.hideGui) return;
+        if (Minecraft.getInstance().player == null || Minecraft.getInstance().options.hideGui || !Minecraft.getInstance().player.hasEffect(BossEffects.SINNER)) return;
 
         float pticks = deltaTracker.getGameTimeDeltaPartialTick(false);
 
