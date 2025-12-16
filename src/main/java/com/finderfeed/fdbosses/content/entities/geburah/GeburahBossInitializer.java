@@ -14,6 +14,7 @@ import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
 import com.finderfeed.fdlib.systems.cutscenes.EasingType;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
+import com.finderfeed.fdlib.systems.screen.screen_effect.instances.chromatic_abberation.ChromaticAbberationData;
 import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
@@ -158,6 +159,7 @@ public class GeburahBossInitializer extends BossInitializer<GeburahEntity> {
 
 
         CutsceneData cutsceneData4 = CutsceneData.create()
+                .addScreenEffect(0, FDScreenEffects.CHROMATIC_ABBERATION, new ChromaticAbberationData(0.025f),0,0,20)
                 .time(30)
                 .addCameraPos(last)
                 .timeEasing(EasingType.EASE_OUT)

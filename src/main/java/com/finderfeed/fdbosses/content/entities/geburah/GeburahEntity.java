@@ -1636,11 +1636,16 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         if (this.deathTime >= 150) {
             if (!this.isRemoved()) {
                 if (!level().isClientSide) {
+
                     this.remove(Entity.RemovalReason.KILLED);
                 }
             }
-        }else if (this.deathTime == 145 && this.level().isClientSide){
-            this.spawnDeathParticles();
+        }else if (this.deathTime == 145){
+            if (this.level().isClientSide) {
+                this.spawnDeathParticles();
+            }else{
+                //this.dropAllDeathLoot((ServerLevel) level(), level().damageSources().generic());
+            }
         }
     }
 

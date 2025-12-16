@@ -7,7 +7,10 @@
     "fdbosses:justicestone_stairs",
     "fdbosses:justicestone_column",
     "fdbosses:justicestone_beam",
-    "fdbosses:polished_justicestone"
+    "fdbosses:polished_justicestone",
+    "fdbosses:justicestone_bricks_slab",
+    "fdbosses:polished_justicestone_slab",
+    "fdbosses:polished_justicestone_stairs"
   ],
   "replace": false
 }

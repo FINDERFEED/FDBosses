@@ -1,0 +1,33 @@
+{
+  "type": "minecraft:entity",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [],
+          "name": "fdbosses:justice_core"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": 512
+            }
+          ],
+          "name": "fdbosses:polished_justicestone"
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "fdbosses:entities/geburah"
+}
