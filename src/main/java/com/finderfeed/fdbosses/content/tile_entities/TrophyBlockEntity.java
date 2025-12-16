@@ -41,7 +41,7 @@ public abstract class TrophyBlockEntity extends FDBlockEntity {
         super.tick();
         if (level.isClientSide){
             TrophyBlock trophyBlock = this.getBlock();
-            if (this.getAnimationSystem().getTicker("IDLE") == null) {
+            if (this.getAnimationSystem().getTicker("IDLE") == null && trophyBlock.getIdleAnimation() != null) {
                 this.getAnimationSystem().startAnimation("IDLE", AnimationTicker.builder(trophyBlock.getIdleAnimation())
                         .setLoopMode(Animation.LoopMode.LOOP)
                         .build());

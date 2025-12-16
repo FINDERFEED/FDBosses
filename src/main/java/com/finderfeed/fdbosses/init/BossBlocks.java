@@ -39,6 +39,15 @@ public class BossBlocks {
             (pos,state)-> BossTileEntities.MALKUTH_TROPHY.get().create(pos,state)
     ));
 
+    public static final Supplier<TrophyBlock> GEBURAH_TROPHY = BLOCKS.register("geburah_trophy",()->new TrophyBlock(
+            BlockBehaviour.Properties.of().mapColor(MapColor.STONE).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 6.0F)
+                    .instabreak()
+                    .noOcclusion(),
+            null,
+            null,
+            (pos,state)-> BossTileEntities.GEBURAH_TROPHY.get().create(pos,state)
+    ));
+
 
     public static final Supplier<Block> JUSTICESTONE_BRICKS = BLOCKS.register("justicestone_bricks", ()->new Block(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));
     public static final Supplier<Block> JUSTICESTONE_BRICKS_SLAB = BLOCKS.register("justicestone_bricks_slab", ()->new SlabBlock(BlockBehaviour.Properties.ofFullCopy(Blocks.STONE)));

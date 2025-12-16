@@ -73,6 +73,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.Malku
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
 import com.finderfeed.fdbosses.content.projectiles.renderers.MalkuthPlayerFireIceBallRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
+import com.finderfeed.fdbosses.content.tile_entities.GeburahTrophyBlockEntity;
 import com.finderfeed.fdbosses.content.tile_entities.MalkuthTrophyBlockEntity;
 import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
 import com.finderfeed.fdbosses.ik_2d.InverseKinematics2BoneTransform;
@@ -154,6 +155,36 @@ public class BossClientModEvents {
                     return new Vector3f(0.1f,0f,0f);
                 })
         ), BossItems.CHESED_TROPHY.get());
+
+        event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
+                .addModel(BossModels.GEBURAH,RenderType.entityCutout(FDBosses.location("textures/entities/geburah/geburah.png")))
+                .setScale((ctx)->{
+                    if (ctx == ItemDisplayContext.GROUND){
+                        return 0.05f;
+                    }else if (ctx == ItemDisplayContext.GUI){
+                        return 0.045f;
+                    }
+                    return 0.05f;
+                })
+                .addRotation((itemDisplayContext -> {
+                    if (itemDisplayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND || itemDisplayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND){
+                        return 180f;
+                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND){
+                        return 40f;
+                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND){
+                        return -40f;
+                    }
+                    return 0f;
+                }))
+                .addTranslation((ctx)->{
+                    if (ctx == ItemDisplayContext.GUI){
+                        return new Vector3f(0,-0.1f,0);
+                    }else if (ctx == ItemDisplayContext.GROUND){
+                        return new Vector3f();
+                    }
+                    return new Vector3f(0.1f,0f,0f);
+                })
+        ), BossItems.GEBURAH_TROPHY.get());
 
         event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
                 .addModel(BossModels.MALKUTH_SCREEN,RenderType.entityTranslucent(FDBosses.location("textures/entities/malkuth/malkuth_screen.png")))
@@ -250,6 +281,20 @@ public class BossClientModEvents {
                             })
                             .transformation(malkuthTransform)
                             .build())
+                    .build());
+
+            BlockEntityRenderers.register((BlockEntityType<GeburahTrophyBlockEntity>)BossTileEntities.GEBURAH_TROPHY.get(),
+                    FDBlockEntityRendererBuilder.<GeburahTrophyBlockEntity>builder()
+                    .addLayer(FDBlockRenderLayerOptions.<GeburahTrophyBlockEntity>builder()
+                            .model(BossModels.GEBURAH)
+                            .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/geburah/geburah.png")))
+                            .transformation(((geburahTrophyBlockEntity, poseStack, v) -> {
+                                baseTransform.apply(geburahTrophyBlockEntity,poseStack,v);
+                                poseStack.scale(0.1f,0.1f,0.1f);
+                            }))
+                            .build()
+                    )
+
                     .build());
         });
     }

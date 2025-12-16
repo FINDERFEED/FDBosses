@@ -1,5 +1,6 @@
 {
   "block.fdbosses.chesed_trophy": "Chesed Trophy",
+  "block.fdbosses.geburah_trophy": "Geburah Trophy",
   "block.fdbosses.malkuth_trophy": "Malkuth Trophy",
   "block.fdbosses.justicestone_bricks": "Justicestone Bricks",
   "block.fdbosses.chiseled_justicestone_bricks": "Chiseled Justicestone Bricks",
@@ -244,5 +245,10 @@
   "fdbosses.skills.geburah.justice_hammer_description": "Summons a magic justice hammer that strikes the ground after a small delay.",
   "fdbosses.skills.geburah.divine_judgement": "Divine Judgement",
   "fdbosses.skills.geburah.divine_judgement_stats": "Current HP damage percent: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=geburahConfig, value=ultimateMoveHealthPercentage}}%",
-  "fdbosses.skills.geburah.divine_judgement_description": "Ignites two flames on the scales and starts charging a powerful move.\n\nSummons bells around the arena, each bell, when hit, displaces the corresponding scale plate and disappears.\n\nIf the scales are balanced attack is §acanceled.§r If the scales are not balanced, Geburah §claunches the attack.§r\n\nEach combatant on the arena is damaged for the percentage of their current hp, accumulate 1 sin and have all their positive effects removed."
+  "fdbosses.skills.geburah.divine_judgement_description": "Ignites two flames on the scales and starts charging a powerful move.\n\nSummons bells around the arena, each bell, when hit, displaces the corresponding scale plate and disappears.\n\nIf the scales are balanced attack is §acanceled.§r If the scales are not balanced, Geburah §claunches the attack.§r\n\nEach combatant on the arena is damaged for the percentage of their current hp, accumulate 1 sin and have all their positive effects removed.",
+
+  "fdbosses.boss_drop.fdbosses.geburah.fdbosses.justice_core.info": "Geburah's Core.\n\nCan be applied to any armor in crafting table.\n\nGives players a buff: Incoming damage is reduced and is capped at the amount of the last damage taken (after all resistances).\n\nNot stackable.",
+  "fdbosses.boss_drop.fdbosses.geburah.fdbosses.justice_core.stats": "Damage reduction:\n{{(fdlib:image)path=fdbosses:boss_protection}}: {{(fdbosses:config_float) config=itemConfig, value=justiceCoreDamageReduction}}% incoming damage reduction.",
+  "fdbosses.boss_drop.fdbosses.geburah.fdbosses.polished_justicestone.info": "A whole lot of Justicestone.",
+  "fdbosses.boss_drop.fdbosses.geburah.fdbosses.geburah_trophy.info": "A trophy of Geburah to showcase your heroic deeds"
 }

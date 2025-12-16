@@ -54,6 +54,9 @@ public class BossItems {
     public static final Supplier<Item> MALKUTH_TROPHY = ITEMS.register("malkuth_trophy",
             ()->new BlockItem(BossBlocks.MALKUTH_TROPHY.get(), new Item.Properties().stacksTo(1)));
 
+    public static final Supplier<Item> GEBURAH_TROPHY = ITEMS.register("geburah_trophy",
+            ()->new BlockItem(BossBlocks.GEBURAH_TROPHY.get(), new Item.Properties().stacksTo(1)));
+
     public static final Supplier<Item> JUSTICESTONE_BRICKS = ITEMS.register("justicestone_bricks",
             ()->new BlockItem(BossBlocks.JUSTICESTONE_BRICKS.get(), new Item.Properties()));
 
@@ -109,6 +112,7 @@ public class BossItems {
                 event.accept(EYE_OF_MALKUTH.get());
                 event.accept(CHESED_TROPHY.get());
                 event.accept(MALKUTH_TROPHY.get());
+                event.accept(GEBURAH_TROPHY.get());
                 event.accept(JUSTICESTONE_BRICKS.get());
                 event.accept(CHISELED_JUSTICESTONE_BRICKS.get());
                 event.accept(JUSTICESTONE_BEAM.get());

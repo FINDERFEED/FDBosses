@@ -1862,13 +1862,17 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             var player = event.getEntity();
             if (!player.level().isClientSide){
                 if (player.hasEffect(BossEffects.SINNER)){
-                    float cylinderHeight = 4;
-                    var entities = BossTargetFinder.getEntitiesInCylinder(GeburahEntity.class, player.level(), player.position().add(0,-cylinderHeight,0), cylinderHeight + 1, ARENA_RADIUS);
-                    if (entities.isEmpty()){
-                        if (player.tickCount % 100 == 0){
-                            PlayerSinsHandler.sin((ServerPlayer) player, 0);
-                        }
+                    if (BossUtil.isPlayerInSurvival(player)) {
+                        float cylinderHeight = 4;
+                        var entities = BossTargetFinder.getEntitiesInCylinder(GeburahEntity.class, player.level(), player.position().add(0, -cylinderHeight, 0), cylinderHeight + 1, ARENA_RADIUS);
+                        if (entities.isEmpty()) {
+                            if (player.tickCount % 100 == 0) {
+                                PlayerSinsHandler.sin((ServerPlayer) player, 0);
+                            }
 
+                        }
+                    }else{
+                        player.removeEffect(BossEffects.SINNER);
                     }
                 }
             }
