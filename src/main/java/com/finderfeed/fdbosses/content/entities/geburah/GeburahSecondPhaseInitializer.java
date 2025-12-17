@@ -4,6 +4,8 @@ import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircle;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.init.BossItems;
 import com.finderfeed.fdbosses.init.BossSounds;
@@ -139,7 +141,13 @@ public class GeburahSecondPhaseInitializer extends BossInitializer<GeburahEntity
 
         }else if (tick < 10){
             geburah.propagateSins(0);
-            for (var entity : BossTargetFinder.getEntitiesInSphere(JudgementBirdEntity.class, geburah.level(), geburah.position(), 60)){
+            for (var entity : geburah.getArenaEntities(JudgementBirdEntity.class)){
+                entity.remove(Entity.RemovalReason.DISCARDED);
+            }
+            for (var entity : geburah.getArenaEntities(GeburahCastingCircle.class)){
+                entity.remove(Entity.RemovalReason.DISCARDED);
+            }
+            for (var entity : geburah.getArenaEntities(GeburahEarthquake.class)){
                 entity.remove(Entity.RemovalReason.DISCARDED);
             }
             geburah.judgementBirdSpawnTicker = 0;

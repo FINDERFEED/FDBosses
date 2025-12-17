@@ -17,6 +17,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.ChainTrapSumm
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.StartGeburahDistortionEffectPacket;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBell;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttackController;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahAttackFireDefaultProjectiles;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
@@ -205,7 +206,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 GeburahCastingCircle.class,
                 GeburahBell.class,
                 GeburahEntity.class,
-                GeburahChainTrapEntity.class
+                GeburahChainTrapEntity.class,
+                GeburahEarthquake.class
         );
 
         this.bossInitializer = new GeburahBossInitializer(this);
@@ -249,8 +251,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .build();
 
         AttackOptions<?> bellAttack = AttackOptions.chainOptionsBuilder()
-                .addAttack(NO_KILL_ENTITIES_ATTACK)
                 .addAttack(BELL_ATTACK)
+                .addAttack(EMPTY_SINS_AND_DELAY)
                 .build();
 
         this.mainAttackChain = new AttackChain(level.random)
@@ -1658,6 +1660,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                     bird.remove(RemovalReason.DISCARDED);
                 }
                 for (var bird : this.getArenaEntities(GeburahCastingCircle.class)){
+                    bird.remove(RemovalReason.DISCARDED);
+                }
+                for (var bird : this.getArenaEntities(GeburahEarthquake.class)){
                     bird.remove(RemovalReason.DISCARDED);
                 }
             }
