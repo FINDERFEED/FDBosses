@@ -284,6 +284,12 @@ public class BossScreens {
                         null,
                         Component.translatable("fdbosses.skills.geburah.sin_pressed_too_many_buttons_description")
                 ))
+                .addSkill(new BossInfo(
+                        FDBosses.location("textures/entities/geburah/screen_sin/sin_stay_still_sin.png"),
+                        Component.translatable("fdbosses.skills.geburah.sin_stay_still_sin"),
+                        null,
+                        Component.translatable("fdbosses.skills.geburah.sin_stay_still_sin_description")
+                ))
 
 
         );

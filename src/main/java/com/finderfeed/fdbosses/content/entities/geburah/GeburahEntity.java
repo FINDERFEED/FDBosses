@@ -265,13 +265,13 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .registerAttack(NO_KILL_ENTITIES_ATTACK, this::noKillEntitiesAttack)
                 .registerAttack(BELL_ATTACK, this::bellAttack)
                 .attackListener(this::attackListener)
-                .addAttack(0, noKillEntitiesAttack)
-                .addAttack(0, simpleRunAroundNoSins)
-                .addAttack(0, noJumpRaysEarthquakesProjectiles)
+//                .addAttack(0, noKillEntitiesAttack)
+//                .addAttack(0, simpleRunAroundNoSins)
+//                .addAttack(0, noJumpRaysEarthquakesProjectiles)
                 .addAttack(0, runClockwiseHammersRayProjectiles)
-                .addAttack(0, limitedButtonsLasersAndEarthquakes)
-                .addAttack(0, sinCrystalsLasersAndCannons)
-                .addAttack(1, bellAttack)
+//                .addAttack(0, limitedButtonsLasersAndEarthquakes)
+//                .addAttack(0, sinCrystalsLasersAndCannons)
+//                .addAttack(1, bellAttack)
         ;
 
         this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
@@ -336,6 +336,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                     }
                 }
                 this.tickClockwiseSin();
+                this.tickStayStillSin();
             }
 
             this.getRayController().tick();
@@ -375,7 +376,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     }
 
     private void setSinners(boolean dying){
-        for (var entity : this.playerPositionsCollector.getPlayers()){
+        for (var entity : this.playerPositionsCollector.getPlayers().stream().filter(BossUtil::isPlayerInSurvival).toList()){
             if (!dying){
                 if (!entity.hasEffect(BossEffects.SINNER)){
                     var inst = new MobEffectInstance(BossEffects.SINNER, -1, 0, true, false);
@@ -1025,6 +1026,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 } else if (localStage == 4){
                     if (controller.getCurrentAttack() == null){
                         inst.nextStage();
+                        if (this.sinnedHalfTimes()) {
+                            this.getStompingController().stompFullCircle(10, true, 1f, BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage);
+                        }
                     }
                 }else{
                     if (tick > 2) inst.nextStage();
@@ -1039,7 +1043,11 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public boolean noJumpEarthquakesProjectilesRays(AttackInstance inst){
 
-        this.propagateSins(30, GeburahSins.JUMPING_SIN.get());
+        if (!this.sinnedHalfTimes()) {
+            this.propagateSins(30, GeburahSins.JUMPING_SIN.get());
+        }else{
+            this.propagateSins(30, GeburahSins.JUMPING_SIN.get(), GeburahSins.STAY_STILL_SIN.get());
+        }
 
         int tick = inst.tick;
 
@@ -1234,8 +1242,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         int attackDuration = 400;
 
         if (tick <= attackDuration) {
-            this.attackPlayersWithRay(tick, 20, 10, 60);
-            this.simpleCannonAttacks(tick, 5, 20);
+            this.attackPlayersWithRay(tick, 20, 10, 80);
+            this.simpleCannonAttacks(tick, 5, 20,80);
             this.smackWithHammersAround(tick + 1, 40);
         }
 
@@ -1332,11 +1340,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             float offsetFromCenter = 6;
 
 
-            int localDirectionSwap = hammerDirectionSwap > 1 ? -1 : 1;
+            int localDirectionSwap = hammerDirectionSwap == 0 ? -1 : 1;
 
             for (var dir : new HorizontalCircleRandomDirections(random, 8, 0)) {
-
-
                 Vec3 pos = this.position().add(dir.scale(centerOffset));
 
                 Vec3 hammerOffset = dir.scale(localDirectionSwap).scale(offsetFromCenter);
@@ -1346,7 +1352,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 localDirectionSwap = -localDirectionSwap;
             }
 
-            hammerDirectionSwap = (hammerDirectionSwap + 1) % 4;
+//            hammerDirectionSwap = (hammerDirectionSwap + 1) % 4;
+            hammerDirectionSwap = (hammerDirectionSwap + 1) % 2;
 
         }
 
@@ -1366,6 +1373,27 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             sinsAppearTick = Mth.clamp(sinsAppearTick - 1,0, MAX_SIN_APPEAR_TICK);
         }else{
             sinsAppearTick = Mth.clamp(sinsAppearTick + 1,0, MAX_SIN_APPEAR_TICK);
+        }
+    }
+
+
+    public void tickStayStillSin(){
+        for (var player : this.playerPositionsCollector.getPlayers().stream().filter(BossUtil::isPlayerInSurvival).toList()){
+
+            PlayerSins playerSins = PlayerSins.getPlayerSins(player);
+
+            if (playerSins.hasSinActive(GeburahSins.STAY_STILL_SIN.get()) && !playerSins.isGainingSinsOnCooldown()){
+
+                var positions = this.playerPositionsCollector.getOldAndCurrentPlayerPosition(player);
+                Vec3 oldPos = positions.first;
+                Vec3 newPos = positions.second;
+
+                if (oldPos.distanceTo(newPos) < 0.05){
+                    PlayerSinsHandler.sin((ServerPlayer) player, 20);
+                }
+
+            }
+
         }
     }
 
@@ -1394,11 +1422,11 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 double dot = between.normalize().dot(rotated.normalize());
 
                 if (playerSins.hasSinActive(GeburahSins.MOVE_CLOCKWISE_SIN.get())) {
-                    if (dot < -0.2) {
+                    if (dot < -0.5) {
                         PlayerSinsHandler.sin((ServerPlayer) player, 40);
                     }
                 }else{
-                    if (dot > 0.2) {
+                    if (dot > 0.5) {
                         PlayerSinsHandler.sin((ServerPlayer) player, 40);
                     }
                 }

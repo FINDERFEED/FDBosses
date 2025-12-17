@@ -39,7 +39,8 @@ public class JusticeHammerAttack extends FDEntity {
     public static JusticeHammerAttack summon(Level level, Vec3 pos, Vec3 direction){
         JusticeHammerAttack justiceHammerAttack = new JusticeHammerAttack(BossEntities.JUSTICE_HAMMER.get(), level);
 
-        ATTACK_LENGTH = 15;
+        ATTACK_LENGTH = 12;
+        ATTACK_WIDTH = 9;
 
         justiceHammerAttack.setPos(pos);
         justiceHammerAttack.lookAt(EntityAnchorArgument.Anchor.FEET, pos.add(direction.multiply(1,0,1).normalize().scale(200)));

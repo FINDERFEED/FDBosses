@@ -24,6 +24,7 @@
   "item.fdbosses.malkuth_fire_warrior_spawn_egg": "Malkuth Warrior Spawn Egg (Fire)",
   "item.fdbosses.malkuth_ice_warrior_spawn_egg": "Malkuth Warrior Spawn Egg (Ice)",
 
+  "death.attack.geburah_judgement_ball": "%s caught a stray sin in his face",
   "death.attack.geburah_ray_strike": "%s sins were obliterated",
   "death.attack.geburah_laser_strike": "%s sins were cleansed by a deadly laser",
   "death.attack.geburah_earthquake": "%s sins were buried under the rocks",
@@ -254,5 +255,7 @@
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.justice_core.stats": "Damage reduction:\n{{(fdlib:image)path=fdbosses:boss_protection}}: {{(fdbosses:config_float) config=itemConfig, value=justiceCoreDamageReduction}}% incoming damage reduction.",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.polished_justicestone.info": "A whole lot of Justicestone.",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.geburah_trophy.info": "A trophy of Geburah to showcase your heroic deeds",
-  "fdbosses.word.cant_find_arena": "Cannot find the structure in this dimension"
+  "fdbosses.word.cant_find_arena": "Cannot find the structure in this dimension",
+  "fdbosses.skills.geburah.sin_stay_still_sin": "Sin of Stillness",
+  "fdbosses.skills.geburah.sin_stay_still_sin_description": "When this sin is active, standing still is forbidden for humans."
 }

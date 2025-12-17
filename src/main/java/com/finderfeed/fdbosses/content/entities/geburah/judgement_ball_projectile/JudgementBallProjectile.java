@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile;
 
 import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
@@ -107,7 +108,7 @@ public class JudgementBallProjectile extends FDEntity implements AutoSerializabl
         if (!targets.isEmpty()){
 
             for (var target : targets){
-                target.hurt(level().damageSources().generic(), damage);
+                target.hurt(BossDamageSources.GEBURAH_EARTHQUAKE_SOURCE, damage);
             }
             this.setRemoved(RemovalReason.DISCARDED);
 

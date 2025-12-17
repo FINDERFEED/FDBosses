@@ -60,7 +60,15 @@ public class ChainTrapSummonProjectile extends FDEntity {
 
             var location = result.getLocation();
             GeburahChainTrapEntity trapEntity = new GeburahChainTrapEntity(BossEntities.GEBURAH_CHAIN_TRAP.get(), level());
-            trapEntity.setPos(location.add(0,0.01f,0));
+            float fraction = (float) (location.y - (int)location.y);
+
+            Vec3 pos = location.add(0,0.01f,0);
+
+            if (fraction > 0.25){
+                pos = new Vec3(pos.x,Math.ceil(pos.y),pos.z);
+            }
+
+            trapEntity.setPos(pos);
             level().addFreshEntity(trapEntity);
 
             this.setRemoved(RemovalReason.DISCARDED);

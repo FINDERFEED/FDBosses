@@ -36,6 +36,7 @@ public class BossDamageSources {
     public static final ResourceKey<DamageType> MALKUTH_SLASHES = key("malkuth_slashes");
     public static final ResourceKey<DamageType> MALKUTH_TSARS_WRATH = key("malkuth_tsars_wrath");
 
+    public static final ResourceKey<DamageType> GEBURAH_JUDGEMENT_BALL = key("geburah_judgement_ball");
     public static final ResourceKey<DamageType> GEBURAH_RAY_STRIKE = key("geburah_ray_strike");
     public static final ResourceKey<DamageType> GEBURAH_LASER_STRIKE = key("geburah_laser_strike");
     public static final ResourceKey<DamageType> GEBURAH_EARTHQUAKE = key("geburah_earthquake");
@@ -64,6 +65,7 @@ public class BossDamageSources {
     public static DamageSource MALKUTH_TSARS_WRATH_SOURCE;
 
 
+    public static DamageSource GEBURAH_JUDGEMENT_BALL_SOURCE;
     public static DamageSource GEBURAH_RAY_STRIKE_SOURCE;
     public static DamageSource GEBURAH_LASER_STRIKE_SOURCE;
     public static DamageSource GEBURAH_EARTHQUAKE_SOURCE;
@@ -108,6 +110,7 @@ public class BossDamageSources {
         MALKUTH_TSARS_WRATH_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_TSARS_WRATH));
         MALKUTH_EARTHSHATTER_SOURCE = new DamageSource(access.holderOrThrow(MALKUTH_EARTHSHATTER));
 
+        GEBURAH_JUDGEMENT_BALL_SOURCE = new DamageSource(access.holderOrThrow(GEBURAH_JUDGEMENT_BALL));
         GEBURAH_RAY_STRIKE_SOURCE = new DamageSource(access.holderOrThrow(GEBURAH_RAY_STRIKE));
         GEBURAH_LASER_STRIKE_SOURCE = new DamageSource(access.holderOrThrow(GEBURAH_LASER_STRIKE));
         GEBURAH_EARTHQUAKE_SOURCE = new DamageSource(access.holderOrThrow(GEBURAH_EARTHQUAKE));
