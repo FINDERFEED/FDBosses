@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
+import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.init.BossEntities;
@@ -7,6 +8,7 @@ import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.EntityType;
@@ -53,11 +55,13 @@ public class GeburahBossSpawner extends BossSpawnerEntity {
 
     @Override
     public boolean canInteractWithBlockPos(BlockPos blockPos) {
-        return true;
+        Vec3 pos = this.position();
+        Vec3 block = blockPos.getCenter();
+        return !BossTargetFinder.isPointInCylinder(block,pos.add(0,-2,0),200, GeburahEntity.ARENA_RADIUS + 20);
     }
 
     @Override
     public Component onArenaDestructionMessage() {
-        return Component.translatable("fdbosses.word.tried_to_break_arena");
+        return Component.translatable("fdbosses.word.tried_to_break_arena").withStyle(ChatFormatting.RED);
     }
 }

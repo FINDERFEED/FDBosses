@@ -33,6 +33,7 @@ import com.finderfeed.fdbosses.content.util.CylinderPlayerPositionsCollector;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.content.util.WorldBox;
 import com.finderfeed.fdbosses.init.*;
+import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.init.FDScreenEffects;
@@ -310,6 +311,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             this.tickLaserVisualDisappearance();
         }else{
 
+            this.pushAwayCombatants();
 
             BOSS_BAR.setPercentage((float) this.sinnedTimes / MAX_GEBURAH_SINS);
 
@@ -344,6 +346,29 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         this.getScalesController().tick();
         this.getWeaponRotationController().tick();
+
+    }
+
+    private void pushAwayCombatants(){
+
+        var entities = BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position().add(0,-1,0),4,6, living -> {
+            if (living instanceof Player player){
+                return !player.isSpectator();
+            }
+            return living != this;
+        });
+
+        Vec3 thisPos = this.position().add(0,-0.5,0);
+        for (var entity : entities){
+
+            Vec3 pushVector = entity.position().subtract(thisPos).normalize().scale(0.2);
+            if (entity instanceof ServerPlayer serverPlayer){
+                FDLibCalls.setServerPlayerSpeed(serverPlayer,pushVector);
+            }else {
+                entity.setDeltaMovement(pushVector);
+                entity.hasImpulse = true;
+            }
+        }
 
     }
 
