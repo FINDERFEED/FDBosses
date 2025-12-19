@@ -6,6 +6,8 @@ import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOp
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahSinCrystal;
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.init.BossItems;
 import com.finderfeed.fdbosses.init.BossSounds;
@@ -141,26 +143,10 @@ public class GeburahSecondPhaseInitializer extends BossInitializer<GeburahEntity
 
         }else if (tick < 10){
             geburah.propagateSins(0);
-            for (var entity : geburah.getArenaEntities(JudgementBirdEntity.class)){
-                entity.remove(Entity.RemovalReason.DISCARDED);
-            }
-            for (var entity : geburah.getArenaEntities(GeburahCastingCircle.class)){
-                entity.remove(Entity.RemovalReason.DISCARDED);
-            }
-            for (var entity : geburah.getArenaEntities(GeburahEarthquake.class)){
-                entity.remove(Entity.RemovalReason.DISCARDED);
-            }
+            geburah.removeAllArenaTrash();
             geburah.judgementBirdSpawnTicker = 0;
 
-            for (var entity : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, geburah.level(), geburah.position().add(0, -1, 0), GeburahEntity.ARENA_HEIGHT, GeburahEntity.ARENA_RADIUS + 10)) {
-                var inventory = entity.getInventory();
-                for (int i = 0; i < inventory.getContainerSize(); i++) {
-                    var item = inventory.getItem(i);
-                    if (item.getItem().equals(BossItems.GEBURAH_EXPLOSIVE_CRYSTAL.get())) {
-                        inventory.setItem(i, ItemStack.EMPTY);
-                    }
-                }
-            }
+           geburah.removeCrystalsFromPlayerInventories();
 
         }
 

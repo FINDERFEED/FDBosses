@@ -18,10 +18,12 @@ import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainT
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.StartGeburahDistortionEffectPacket;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBell;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahSinCrystal;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.GeburahWeaponAttackController;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahAttackFireDefaultProjectiles;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahLasersAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instances.GeburahRoundAndRoundLaserAttack;
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahWeaponRotationController;
@@ -265,13 +267,13 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .registerAttack(NO_KILL_ENTITIES_ATTACK, this::noKillEntitiesAttack)
                 .registerAttack(BELL_ATTACK, this::bellAttack)
                 .attackListener(this::attackListener)
-//                .addAttack(0, noKillEntitiesAttack)
-//                .addAttack(0, simpleRunAroundNoSins)
-//                .addAttack(0, noJumpRaysEarthquakesProjectiles)
+                .addAttack(0, noKillEntitiesAttack)
+                .addAttack(0, simpleRunAroundNoSins)
+                .addAttack(0, noJumpRaysEarthquakesProjectiles)
                 .addAttack(0, runClockwiseHammersRayProjectiles)
-//                .addAttack(0, limitedButtonsLasersAndEarthquakes)
-//                .addAttack(0, sinCrystalsLasersAndCannons)
-//                .addAttack(1, bellAttack)
+                .addAttack(0, limitedButtonsLasersAndEarthquakes)
+                .addAttack(0, sinCrystalsLasersAndCannons)
+                .addAttack(1, bellAttack)
         ;
 
         this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
@@ -576,7 +578,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             return;
         }
 
-        this.judgementBirdSpawnTicker = 400;
+        this.judgementBirdSpawnTicker = 600;
 
         int angles = 4;
         float angle = FDMathUtil.FPI * 2 / angles;
@@ -671,6 +673,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     private AttackAction attackListener(String s) {
 
         if (this.getPlayerPositionsCollector().getPlayers().stream().noneMatch(BossUtil::isPlayerInSurvival)){
+            this.setLaserVisualsState(false);
             return AttackAction.WAIT;
         }
 
@@ -1667,6 +1670,36 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     }
 
+    public void removeAllArenaTrash(){
+        for (var entity : this.getArenaEntities(JudgementBirdEntity.class)){
+            entity.remove(Entity.RemovalReason.DISCARDED);
+        }
+        for (var entity : this.getArenaEntities(GeburahCastingCircle.class)){
+            entity.remove(Entity.RemovalReason.DISCARDED);
+        }
+        for (var entity : this.getArenaEntities(GeburahEarthquake.class)){
+            entity.remove(Entity.RemovalReason.DISCARDED);
+        }
+        for (var bird : this.getArenaEntities(GeburahSinCrystal.class)){
+            bird.remove(Entity.RemovalReason.DISCARDED);
+        }
+        for (var bird : this.getArenaEntities(JudgementBallProjectile.class)){
+            bird.remove(Entity.RemovalReason.DISCARDED);
+        }
+    }
+
+    public void removeCrystalsFromPlayerInventories(){
+        for (var entity : this.getArenaEntities(ServerPlayer.class)) {
+            var inventory = entity.getInventory();
+            for (int i = 0; i < inventory.getContainerSize(); i++) {
+                var item = inventory.getItem(i);
+                if (item.getItem().equals(BossItems.GEBURAH_EXPLOSIVE_CRYSTAL.get())) {
+                    inventory.setItem(i, ItemStack.EMPTY);
+                }
+            }
+        }
+    }
+
     @Override
     protected void tickDeath() {
         if (!level().isClientSide){
@@ -1681,18 +1714,11 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             this.propagateSins(0);
 
             if (deathTime < 5){
-                for (var bird : this.getArenaEntities(JudgementBirdEntity.class)){
-                    bird.remove(RemovalReason.DISCARDED);
-                }
-                for (var bird : this.getArenaEntities(GeburahChainTrapEntity.class)){
-                    bird.remove(RemovalReason.DISCARDED);
-                }
-                for (var bird : this.getArenaEntities(GeburahCastingCircle.class)){
-                    bird.remove(RemovalReason.DISCARDED);
-                }
-                for (var bird : this.getArenaEntities(GeburahEarthquake.class)){
-                    bird.remove(RemovalReason.DISCARDED);
-                }
+
+                this.removeCrystalsFromPlayerInventories();
+
+
+                this.removeAllArenaTrash();
             }
 
             if (this.getSpawner() != null){
