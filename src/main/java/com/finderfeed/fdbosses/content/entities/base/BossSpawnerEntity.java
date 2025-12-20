@@ -35,8 +35,11 @@ public abstract class BossSpawnerEntity extends FDEntity {
             return InteractionResult.PASS;
         }
 
-        if (!level().isClientSide && hand == InteractionHand.MAIN_HAND && this.isActive()){
-            PacketDistributor.sendToPlayer((ServerPlayer) player, new OpenBossDossierPacket(this));
+        if (hand == InteractionHand.MAIN_HAND && this.isActive()){
+            if (!level().isClientSide) {
+                PacketDistributor.sendToPlayer((ServerPlayer) player, new OpenBossDossierPacket(this));
+            }
+            return InteractionResult.SUCCESS;
         }
 
         return super.interact(player, hand);

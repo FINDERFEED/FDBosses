@@ -20,7 +20,7 @@ import java.util.List;
 public class ExplosiveCrystalItem extends Item {
 
     public ExplosiveCrystalItem(Properties props) {
-        super(props.stacksTo(1).durability(300));
+        super(props.stacksTo(1).durability(350));
     }
 
     @Override

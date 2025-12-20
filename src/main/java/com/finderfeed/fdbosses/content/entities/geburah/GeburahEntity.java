@@ -100,10 +100,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class GeburahEntity extends FDLivingEntity implements AutoSerializable, GeburahBossBuddy, BossSpawnerContextAssignable, Targeting, FDDespawnable {
 
@@ -670,11 +667,21 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         return players.get(random.nextInt(players.size()));
     }
 
+    private boolean skipNext = false;
+
     private AttackAction attackListener(String s) {
 
         if (this.getPlayerPositionsCollector().getPlayers().stream().noneMatch(BossUtil::isPlayerInSurvival)){
             this.setLaserVisualsState(false);
             return AttackAction.WAIT;
+        }
+
+        if (this.sinnedHalfTimes() && Objects.equals(s, SIMPLE_NO_SIN_RUN_AROUND)){
+            skipNext = true;
+            return AttackAction.SKIP;
+        }else if (skipNext){
+            skipNext = false;
+            return AttackAction.SKIP;
         }
 
         return AttackAction.PROCEED;
@@ -1155,10 +1162,14 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             tick = tick - ATTACK_START_DELAY;
         }
 
-        int attackDuration = 400;
+        int attackDuration = 300;
 
 
         if (tick < attackDuration){
+
+            if (tick == 0){
+                rotatingLaserDirection = random.nextBoolean();
+            }
 
 
 
@@ -1175,7 +1186,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
             this.constantRotatingLaser(md * 0.5f);
 
-            if ((tick + 50) % 100 == 0){
+            if ((tick + 20) % 50 == 0){
                 this.getStompingController().stompFullCircle(20,true,1f,BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage);
             }
 
@@ -1274,7 +1285,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         this.simpleCannonAttacks(tick, 5,20);
 
-        return tick > 400;
+        return tick > 300;
     }
 
     private boolean cannonRotationSwap = false;

@@ -68,7 +68,7 @@ public class CylinderPlayerPositionsCollector {
     }
 
     private void removeUnusedPlayers(List<Player> currentPlayersInsideCylinder){
-        this.positionData.entrySet().removeIf(data -> !currentPlayersInsideCylinder.contains(data.getKey()));
+        this.positionData.entrySet().removeIf(data -> !currentPlayersInsideCylinder.contains(data.getKey()) || data.getKey().isDeadOrDying());
     }
 
     private static class PlayerPositionData {
