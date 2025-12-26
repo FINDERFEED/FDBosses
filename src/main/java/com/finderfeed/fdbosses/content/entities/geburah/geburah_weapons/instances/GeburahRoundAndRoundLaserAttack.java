@@ -58,9 +58,11 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
         }
 
         if (fireShotTime == -1){
-            float maxSpeed = 15f;
-            this.rotateUntilStopAngleIsReached(maxSpeed, 50);
-            this.rotateToTargetPos(maxSpeed);
+            if (targetPlayer != null) {
+                float maxSpeed = 15f;
+                this.rotateUntilStopAngleIsReached(maxSpeed, 50);
+                this.rotateToTargetPos(maxSpeed);
+            }
         }else{
             fireShotTime = Mth.clamp(fireShotTime - 1,0,Integer.MAX_VALUE);
             this.fireLasers(false);
@@ -128,6 +130,7 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
                 if (!forward){
                     rotationSnapshot = -rotationSnapshot;
                 }
+                BossUtil.geburahPrepareRoundAndRoundLasers((ServerLevel) geburah.level(), geburah.position(), 100, geburah);
                 controller.rotateWeapons(new GeburahLerpingRotation(controller, maxSpeed, rotationSnapshot));
                 rotationSnapshot = -1;
             }else{

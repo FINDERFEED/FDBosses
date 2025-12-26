@@ -36,7 +36,6 @@ import com.finderfeed.fdbosses.content.util.CylinderPlayerPositionsCollector;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.content.util.WorldBox;
 import com.finderfeed.fdbosses.init.*;
-import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.init.FDScreenEffects;
@@ -173,6 +172,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public int laserVisualDisappearTicker = 0;
 
     public GeburahLaserAttackPreparator laserAttackPreparator;
+
+    public int rayAttackPreparationTicker = -1;
 
     public int sinPunishmentAttackTicker = -1;
 
@@ -313,6 +314,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             this.clientSecondPhaseTicker++;
         }
 
+        rayAttackPreparationTicker = Mth.clamp(rayAttackPreparationTicker - 1,-1, Integer.MAX_VALUE);
+
         if (level().isClientSide) {
             sinnedTicks = Mth.clamp(sinnedTicks - 1,0, Integer.MAX_VALUE);
             this.tickFinalAttackPreparation();
@@ -360,6 +363,10 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         this.getScalesController().tick();
         this.getWeaponRotationController().tick();
 
+    }
+
+    public void triggerRaysShotPreparationEffect(){
+        this.rayAttackPreparationTicker = GeburahRenderer.RAY_ATTACK_PREPARATION_TIME;
     }
 
     private void pushAwayCombatants(){
@@ -1471,7 +1478,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 Vec3 oldPos = positions.first;
                 Vec3 newPos = positions.second;
 
-                if (oldPos.distanceTo(newPos) < 0.05){
+                if (oldPos.distanceTo(newPos) < 0.01){
                     PlayerSinsHandler.sin((ServerPlayer) player, 20);
                 }
 

@@ -34,7 +34,9 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
     public static final ResourceLocation HALO_EXPLOSION = FDBosses.location("textures/entities/geburah/geburah_halo_explosion.png");
     public static final ResourceLocation HALO = FDBosses.location("textures/entities/geburah/geburah_halo.png");
+    public static final ResourceLocation RAY_PREPARE_FRAME = FDBosses.location("textures/entities/geburah/geburah_ray_preparing.png");
 
+    public static final int RAY_ATTACK_PREPARATION_TIME = 30;
 
     public static final int HAMMER_AMOUNT = 8;
     private static final int IMPACT_TIME = 5;
@@ -63,6 +65,50 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
         this.renderStartOperating(geburah, v, v1, poseStack, multiBufferSource, i);
         this.renderSecondPhase(geburah, v, v1, poseStack, multiBufferSource, i);
         this.renderDeath(geburah, v, v1, poseStack, multiBufferSource, i);
+        this.renderRoundAndRoundRayPreparators(geburah, v, v1, poseStack, multiBufferSource, i);
+
+    }
+
+
+    private void renderRoundAndRoundRayPreparators(GeburahEntity geburah, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light){
+
+        int tick = geburah.rayAttackPreparationTicker;
+        if (tick == -1) return;
+
+        float time = Mth.clamp(RAY_ATTACK_PREPARATION_TIME - tick + pticks,0, RAY_ATTACK_PREPARATION_TIME);
+
+        VertexConsumer vertex = src.getBuffer(RenderType.text(RAY_PREPARE_FRAME));
+
+        float frameTime = 10;
+        for (var cannon : geburah.getCannonsPositionAndDirection(pticks)){
+
+            Vec3 pos = cannon.first;
+            Vec3 direction = cannon.second;
+
+            Vec3 offs = pos.subtract(geburah.getPosition(pticks));
+
+            matrices.pushPose();
+            matrices.translate(offs.x,offs.y,offs.z);
+
+            for (int i = 0; i < 6; i++){
+                int startTime2 = i * 3;
+                if (time > startTime2 && time <= startTime2 + frameTime) {
+                    float p = FDEasings.easeIn((time - startTime2) / frameTime);
+                    p *= p;
+                    QuadRenderer.start(vertex)
+                            .renderBack()
+                            .offsetOnDirection(-0.25f + p * 0.5f)
+                            .direction(direction)
+                            .size(1 - p)
+                            .color(1f,1f,1f,p)
+                            .pose(matrices)
+                            .render();
+                }
+            }
+
+            matrices.popPose();
+        }
+
 
     }
 

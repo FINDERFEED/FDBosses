@@ -389,6 +389,15 @@ public class BossClientPackets {
             case BossUtil.GEBURAH_PREPARE_RAYS -> {
                 geburahPrepareParticles(pos, data);
             }
+            case BossUtil.GEBURAH_PREPARE_RAYS_FRAMES -> {
+                geburahPrepareRoundAndRoundRays(pos, data);
+            }
+        }
+    }
+
+    public static void geburahPrepareRoundAndRoundRays(Vec3 p, int data){
+        if (FDClientHelpers.getClientLevel().getEntity(data) instanceof GeburahEntity geburah){
+            geburah.triggerRaysShotPreparationEffect();
         }
     }
 

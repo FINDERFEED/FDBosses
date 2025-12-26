@@ -74,6 +74,7 @@ public class BossUtil {
     public static final int TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_EFFECT = 18;
     public static final int TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_IMPACT = 19;
     public static final int GEBURAH_PREPARE_RAYS = 20;
+    public static final int GEBURAH_PREPARE_RAYS_FRAMES = 21;
 
     public static Vec3 matTransformDirectionVec3(Matrix4f mat, Vec3 v){
         Vector3f v1 = mat.transformDirection(
@@ -334,6 +335,10 @@ public class BossUtil {
             double z = pos.z - entity.getZ();
             return x * x + z * z <= radius * radius;
         };
+    }
+
+    public static void geburahPrepareRoundAndRoundLasers(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){
+        posEvent(serverLevel, pos, GEBURAH_PREPARE_RAYS_FRAMES, geburah.getId(), radius);
     }
 
     public static void geburahChargeConstantLaserParticles(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){
