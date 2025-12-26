@@ -10,6 +10,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotatio
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossSounds;
+import com.finderfeed.fdbosses.init.GeburahSins;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.data_structures.Pair;
@@ -107,11 +108,13 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
             for (var entity : entities){
 
                 if (entity instanceof JudgementBirdEntity judgementBirdEntity){
-                    if (geburah.canBeDamaged && geburah.invulnerableTime == 0) {
-                        geburah.invulnerableTime = 20;
-                        geburah.setSinnedTimes(geburah.getSinnedTimes() + 1);
+                    if (geburah.getEntityData().get(GeburahEntity.ACTIVE_SINS).contains(GeburahSins.KILL_ENTITY_SIN.get())) {
+                        if (geburah.canBeDamaged && geburah.invulnerableTime == 0) {
+                            geburah.invulnerableTime = 20;
+                            geburah.setSinnedTimes(geburah.getSinnedTimes() + 1);
+                        }
+                        judgementBirdEntity.kill();
                     }
-                    judgementBirdEntity.kill();
                 }else if (entity instanceof LivingEntity livingEntity){
                     livingEntity.hurt(BossDamageSources.GEBURAH_LASER_STRIKE_SOURCE,damage);
                 }

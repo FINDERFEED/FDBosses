@@ -40,7 +40,7 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable, Gebu
     private static FDModel MODEL;
 
     private static float FLY_TO_TARGET_RADIUS = 6.5f;
-    private static float ATTACK_RADIUS = 6.5f;
+    private static float ATTACK_RADIUS = 7f;
 
     @SerializableField
     private Vec3 targetPos;

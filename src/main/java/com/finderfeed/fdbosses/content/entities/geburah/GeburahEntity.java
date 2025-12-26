@@ -103,7 +103,7 @@ import java.util.*;
 
 public class GeburahEntity extends FDLivingEntity implements AutoSerializable, GeburahBossBuddy, BossSpawnerContextAssignable, Targeting, FDDespawnable {
 
-    public final FDServerBossBar BOSS_BAR = new FDServerBossBar(BossBars.GEBURAG_BOSS_BAR, this);
+    public final FDServerBossBar bossBar = new FDServerBossBar(BossBars.GEBURAG_BOSS_BAR, this);
 
     public static final int SINNED_CLIENT_ANIM_DURATION = 25;
 
@@ -259,7 +259,6 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         AttackOptions<?> bellAttack = AttackOptions.chainOptionsBuilder()
                 .addAttack(BELL_ATTACK)
-                .addAttack(EMPTY_SINS_AND_DELAY)
                 .build();
 
         this.mainAttackChain = new AttackChain(level.random)
@@ -273,20 +272,25 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .registerAttack(NO_KILL_ENTITIES_ATTACK, this::noKillEntitiesAttack)
                 .registerAttack(BELL_ATTACK, this::bellAttack)
                 .attackListener(this::attackListener)
-                .addAttack(0, noSinSecondPhase)
-                .addAttack(0, noKillEntitiesAttack)
-                .addAttack(0, simpleRunAroundNoSins)
-                .addAttack(0, noJumpRaysEarthquakesProjectiles)
-                .addAttack(0, runClockwiseHammersRayProjectiles)
-                .addAttack(0, limitedButtonsLasersAndEarthquakes)
-                .addAttack(0, sinCrystalsLasersAndCannons)
-                .addAttack(1, bellAttack)
+                .addAttack(0,EMPTY_SINS_AND_DELAY)
+                .addAttack(1, noSinSecondPhase)
+                .addAttack(1, simpleRunAroundNoSins)
+                .addAttack(1, noJumpRaysEarthquakesProjectiles)
+
+                .addAttack(1, limitedButtonsLasersAndEarthquakes)
+                .addAttack(1, runClockwiseHammersRayProjectiles)
+                .addAttack(1, sinCrystalsLasersAndCannons)
+
+
+                .addAttack(1, noKillEntitiesAttack)
+
+                .addAttack(2, bellAttack)
         ;
 
         this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
 
 
-//        this.sinnedTimes = MAX_GEBURAH_SINS / 2;
+        this.sinnedTimes = MAX_GEBURAH_SINS / 2 - 1;
 
     }
 
@@ -328,7 +332,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
             this.pushAwayCombatants();
 
-            BOSS_BAR.setPercentage((float) this.sinnedTimes / MAX_GEBURAH_SINS);
+            bossBar.setPercentage((float) this.sinnedTimes / MAX_GEBURAH_SINS);
 
             if (!this.isDeadOrDying()) {
                 if (this.bossInitializer.isFinished() && (!this.sinnedHalfTimes() || this.secondPhaseBossInitializer.isFinished() && this.sinnedHalfTimes())) {
@@ -732,6 +736,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                         .outTime(40)
                         .amplitude(1f)
                         .build()));
+                if (sinnedTimes > 0) {
+                    this.bossBar.broadcastEvent(GeburahBossBar.HIT_EVENT, sinnedTimes - 1);
+                }
                 this.level().playSound(null, this.getX(),this.getY(),this.getZ(), BossSounds.GEBURAH_SIN.get(), SoundSource.HOSTILE, 5f, 0.75f);
             }
         }
@@ -759,6 +766,10 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         if (stage == 0){
             int random = (3 + level().random.nextInt(3)) * BossUtil.randomPlusMinus();
+
+            if (this.sinnedHalfTimes()){
+                random = BossUtil.randomPlusMinus() * 5;
+            }
 
             scalesController.setCurrentDisplacement(random, 40);
             this.summonBells();
@@ -1466,8 +1477,14 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         }
     }
 
+    private HashMap<Player, Integer> stayingStillPlayers = new HashMap<>();
 
     public void tickStayStillSin(){
+
+        stayingStillPlayers.entrySet().removeIf(pair->{
+            return pair.getKey().isDeadOrDying() || pair.getKey().distanceTo(this) > 50;
+        });
+
         for (var player : this.playerPositionsCollector.getPlayers().stream().filter(BossUtil::isPlayerInSurvival).toList()){
 
             PlayerSins playerSins = PlayerSins.getPlayerSins(player);
@@ -1478,8 +1495,15 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 Vec3 oldPos = positions.first;
                 Vec3 newPos = positions.second;
 
-                if (oldPos.distanceTo(newPos) < 0.01){
-                    PlayerSinsHandler.sin((ServerPlayer) player, 20);
+                if (oldPos.distanceTo(newPos) < 0.05){
+                    int stayingStillTicks = stayingStillPlayers.computeIfAbsent(player, (p) -> 0);
+                    if (stayingStillTicks > 3){
+                        PlayerSinsHandler.sin((ServerPlayer) player, 20);
+                    }else{
+                        stayingStillPlayers.put(player, stayingStillTicks + 1);
+                    }
+                }else{
+                    stayingStillPlayers.remove(player);
                 }
 
             }
@@ -1934,13 +1958,13 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         super.startSeenByPlayer(player);
         this.getWeaponRotationController().onStartSeeingGeburah(player);
         this.getScalesController().syncToPlayer(player);
-        BOSS_BAR.addPlayer(player);
+        bossBar.addPlayer(player);
     }
 
     @Override
     public void stopSeenByPlayer(ServerPlayer player) {
         super.stopSeenByPlayer(player);
-        BOSS_BAR.removePlayer(player);
+        bossBar.removePlayer(player);
     }
 
     @Override
