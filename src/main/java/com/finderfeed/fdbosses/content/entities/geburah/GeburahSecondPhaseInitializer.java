@@ -45,8 +45,10 @@ public class GeburahSecondPhaseInitializer extends BossInitializer<GeburahEntity
         this.getBoss().mainAttackChain.reset();
         CutsceneData cutsceneData = this.createCutsceneData();
 
-        for (var serverPlayer : this.getBoss().getArenaEntities(ServerPlayer.class)){
-            FDLibCalls.startCutsceneForPlayer(serverPlayer, cutsceneData);
+        for (var serverPlayer : this.getBoss().getArenaEntities(ServerPlayer.class)) {
+            if (!serverPlayer.isDeadOrDying()) {
+                FDLibCalls.startCutsceneForPlayer(serverPlayer, cutsceneData);
+            }
         }
 
     }
@@ -77,8 +79,8 @@ public class GeburahSecondPhaseInitializer extends BossInitializer<GeburahEntity
         cutsceneData1.addCameraPos(lastPos = new CameraPos(lastPos.getPos().add(2,-0.5,0), new Vec3(-1,0.6,0)));
 
         CutsceneData cutsceneData2 = CutsceneData.create()
-                .addScreenEffect(0, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0f,0f,0f,1f),20,20,20)
-                .time(30)
+                .addScreenEffect(10, FDScreenEffects.SCREEN_COLOR, new ScreenColorData(0f,0f,0f,1f),20,20,20)
+                .time(40)
                 .addCameraPos(lastPos)
                 ;
 
@@ -99,7 +101,7 @@ public class GeburahSecondPhaseInitializer extends BossInitializer<GeburahEntity
         GeburahEntity geburah = this.getBoss();
         int tick = this.getTick();
 
-        if (tick > 120){
+        if (tick > 140){
             this.setFinished();
         }
 

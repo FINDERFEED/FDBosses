@@ -19,9 +19,13 @@ import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
 
@@ -36,6 +40,8 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
 
     private Vec3 targetPos;
     private float rotationSnapshot;
+
+    private boolean birdsWereHit = false;
 
     public GeburahRoundAndRoundLaserAttack(GeburahEntity geburah, boolean forward) {
         super(geburah);
@@ -81,6 +87,9 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
         }
 
         this.geburah.setLaserVisualsState(true);
+
+        List<Entity> allHitEntities = new ArrayList<>();
+
         for (var cannonData : this.geburah.getCannonsPositionAndDirection()){
 
             Vec3 position = cannonData.first;
@@ -101,27 +110,43 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
 
 
             var entities = FDHelpers.traceEntities(geburah.level(), position, end, 0.5f,(e)->e instanceof LivingEntity);
+            allHitEntities.addAll(entities);
 
+        }
+
+        var birds = allHitEntities.stream().filter(e -> e instanceof JudgementBirdEntity judgementBirdEntity).toList();
+        allHitEntities.removeAll(birds);
+
+        if (!geburah.isDeadOrDying()) {
+            boolean geburahWasHurt = false;
+
+            for (var bird : birds) {
+                if (geburah.getEntityData().get(GeburahEntity.ACTIVE_SINS).contains(GeburahSins.KILL_ENTITY_SIN.get())) {
+                    if (geburah.canBeDamaged && geburah.invulnerableTime == 0) {
+                        geburah.invulnerableTime = 20;
+                        geburah.setSinnedTimes(geburah.getSinnedTimes() + 1);
+                        geburahWasHurt = true;
+                    }
+                }
+                bird.kill();
+            }
 
             float damage = BossUtil.transformDamage(geburah.level(), BossConfigs.BOSS_CONFIG.get().geburahConfig.predictiveLaserAttackDamage);
 
-            for (var entity : entities){
-
-                if (entity instanceof JudgementBirdEntity judgementBirdEntity){
-                    if (geburah.getEntityData().get(GeburahEntity.ACTIVE_SINS).contains(GeburahSins.KILL_ENTITY_SIN.get())) {
-                        if (geburah.canBeDamaged && geburah.invulnerableTime == 0) {
-                            geburah.invulnerableTime = 20;
-                            geburah.setSinnedTimes(geburah.getSinnedTimes() + 1);
-                        }
-                        judgementBirdEntity.kill();
+            for (var entity : allHitEntities) {
+                if (entity instanceof LivingEntity livingEntity) {
+                    int geburahSinnedTimes = geburah.getSinnedTimes();
+                    if ((geburahSinnedTimes == GeburahEntity.MAX_GEBURAH_SINS / 2 || geburahSinnedTimes == GeburahEntity.MAX_GEBURAH_SINS) && geburahWasHurt) {
+                        livingEntity.invulnerableTime = 20;
+                    } else {
+                        livingEntity.hurt(BossDamageSources.GEBURAH_LASER_STRIKE_SOURCE, damage);
                     }
-                }else if (entity instanceof LivingEntity livingEntity){
-                    livingEntity.hurt(BossDamageSources.GEBURAH_LASER_STRIKE_SOURCE,damage);
                 }
-
             }
-
         }
+
+
+
     }
 
     private void rotateToTargetPos(float maxSpeed){

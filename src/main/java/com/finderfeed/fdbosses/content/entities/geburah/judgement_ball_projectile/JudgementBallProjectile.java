@@ -108,7 +108,7 @@ public class JudgementBallProjectile extends FDEntity implements AutoSerializabl
         if (!targets.isEmpty()){
 
             for (var target : targets){
-                target.hurt(BossDamageSources.GEBURAH_EARTHQUAKE_SOURCE, damage);
+                target.hurt(BossDamageSources.GEBURAH_JUDGEMENT_BALL_SOURCE, damage);
             }
             this.setRemoved(RemovalReason.DISCARDED);
 

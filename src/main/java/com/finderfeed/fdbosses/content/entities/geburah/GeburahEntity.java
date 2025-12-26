@@ -276,21 +276,20 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .addAttack(1, noSinSecondPhase)
                 .addAttack(1, simpleRunAroundNoSins)
                 .addAttack(1, noJumpRaysEarthquakesProjectiles)
-
                 .addAttack(1, limitedButtonsLasersAndEarthquakes)
-                .addAttack(1, runClockwiseHammersRayProjectiles)
-                .addAttack(1, sinCrystalsLasersAndCannons)
-
-
-                .addAttack(1, noKillEntitiesAttack)
-
-                .addAttack(2, bellAttack)
+                .addAttack(2, noKillEntitiesAttack)
+//
+                .addAttack(3, runClockwiseHammersRayProjectiles)
+                .addAttack(3, sinCrystalsLasersAndCannons)
+                .addAttack(4, noKillEntitiesAttack)
+//
+                .addAttack(5, bellAttack)
         ;
 
         this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
 
 
-        this.sinnedTimes = MAX_GEBURAH_SINS / 2 - 1;
+//        this.sinnedTimes = MAX_GEBURAH_SINS - 1;
 
     }
 
@@ -375,7 +374,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     private void pushAwayCombatants(){
 
-        var entities = BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position().add(0,-1,0),4,6, living -> {
+        var entities = BossTargetFinder.getEntitiesInCylinder(LivingEntity.class, level(), this.position().add(0,-1,0),4,7, living -> {
             if (living instanceof Player player){
                 return !player.isSpectator();
             }
@@ -1135,10 +1134,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
 
             List<Vec3> rayPositions = new ArrayList<>();
-            float startRadius = 10;
 
-            int id = random.nextBoolean() ? 0 : count - 1;
+            float startRadius = 6;
 
+            float radiusForRays = ARENA_RADIUS - startRadius - rayShotRadius * 2;
+
+            float startRadiusForRays = startRadius + rayShotRadius;
 
 
             for (int i = 0; i < count; i++) {
@@ -1148,23 +1149,30 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
                 stompInstances.add(new GeburahStompingController.StompInstance(new Vec2((float) stompDirection.x, (float) stompDirection.z), angle/2));
 
-                float randomRadius = startRadius + random.nextFloat() * (ARENA_RADIUS - startRadius - rayShotRadius);
 
-                if (i == id){
-                    randomRadius = Math.max(startRadius, (float) distToPlayer);
+                float randomRadius = startRadiusForRays + random.nextFloat() * radiusForRays;
+                if (i == 0 || i == count - 1){
+                    randomRadius = Math.min(Math.max(startRadiusForRays, (float) distToPlayer),ARENA_RADIUS - rayShotRadius);
                 }
 
-                float arcLength = FDMathUtil.FPI * 2 * randomRadius * (angle / FDMathUtil.FPI / 2);
-
-                float angleRandomCoefficient = arcLength / (rayShotRadius * 2) / 2;
-                float additionAngle = Math.max(0, angle / 2 * (angleRandomCoefficient - 1));
 
 
-
-                Vec3 rayDirection = direction.yRot(i * angle * 2 + angle + additionAngle * BossUtil.randomPlusMinus());
-                Vec3 rayPos = this.position().add(rayDirection.scale(randomRadius));
-
+                Vec3 rayPos = this.rayPosAtRadius(i, direction, randomRadius, angle, rayShotRadius);
                 rayPositions.add(rayPos);
+
+                if (this.sinnedHalfTimes()){
+
+                    float rad;
+                    if (randomRadius > startRadiusForRays + radiusForRays / 2){
+                        rad = startRadius + (randomRadius - startRadiusForRays) / 2;
+                    }else{
+                        float distToEdge = ARENA_RADIUS - randomRadius;
+                        rad = randomRadius + distToEdge / 2;
+                    }
+
+                    Vec3 rayPos2 = this.rayPosAtRadius(i, direction, rad,angle, rayShotRadius);
+                    rayPositions.add(rayPos2);
+                }
 
             }
 
@@ -1173,6 +1181,20 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             stompingController.stomp(frequency - 30, true, 1f, BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage, stompInstances);
         }
 
+    }
+
+    private Vec3 rayPosAtRadius(int i, Vec3 baseDirection, float randomRadius, float angle, float rayShotRadius){
+        float arcLength = FDMathUtil.FPI * 2 * randomRadius * (angle / FDMathUtil.FPI / 2);
+
+        float angleRandomCoefficient = arcLength / (rayShotRadius * 2) / 2;
+        float additionAngle = Math.max(0, angle / 2 * (angleRandomCoefficient - 1));
+
+
+
+        Vec3 rayDirection = baseDirection.yRot(i * angle * 2 + angle + additionAngle * BossUtil.randomPlusMinus());
+        Vec3 rayPos = this.position().add(rayDirection.scale(randomRadius));
+
+        return rayPos;
     }
 
     @SerializableField
@@ -1337,7 +1359,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
             int attackStagesCount = 4;
 
-            int maxStages = 8 * attackStagesCount;
+            int maxStages = 6 * attackStagesCount;
 
             int lstage = stage % attackStagesCount;
 
@@ -1795,6 +1817,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             bird.remove(Entity.RemovalReason.DISCARDED);
         }
         for (var bird : this.getArenaEntities(JudgementBallProjectile.class)){
+            bird.remove(Entity.RemovalReason.DISCARDED);
+        }
+        for (var bird : this.getArenaEntities(GeburahChainTrapEntity.class)){
             bird.remove(Entity.RemovalReason.DISCARDED);
         }
     }

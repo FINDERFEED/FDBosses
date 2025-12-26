@@ -1,15 +1,13 @@
 package com.finderfeed.fdbosses.content.util;
 
 import com.finderfeed.fdbosses.BossTargetFinder;
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdlib.data_structures.Pair;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class CylinderPlayerPositionsCollector {
@@ -60,11 +58,15 @@ public class CylinderPlayerPositionsCollector {
     }
 
     public List<Vec3> getCurrentPlayerPositions(){
-        return new ArrayList<>(this.positionData.values().stream().map(positionData -> positionData.currentPos).toList());
+        return new ArrayList<>(this.survivalPlayersData().stream().map(positionData -> positionData.currentPos).toList());
     }
 
     public List<Vec3> getOldPlayerPositions(){
-        return new ArrayList<>(this.positionData.values().stream().map(positionData -> positionData.oldPos).toList());
+        return new ArrayList<>(this.survivalPlayersData().stream().map(positionData -> positionData.oldPos).toList());
+    }
+
+    private List<PlayerPositionData> survivalPlayersData(){
+        return this.positionData.entrySet().stream().filter(e -> BossUtil.isPlayerInSurvival(e.getKey())).map(Map.Entry::getValue).toList();
     }
 
     private void removeUnusedPlayers(List<Player> currentPlayersInsideCylinder){

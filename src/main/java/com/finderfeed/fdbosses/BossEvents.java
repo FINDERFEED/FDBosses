@@ -22,6 +22,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -298,6 +299,10 @@ public class BossEvents {
 
         LivingEntity livingEntity = event.getEntity();
         if (!livingEntity.level().isClientSide){
+            var source = event.getSource();
+            if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)){
+                return;
+            }
             for (var slot : EQUIPMENT_SLOTS){
 
                 ItemStack itemStack = livingEntity.getItemBySlot(slot);
