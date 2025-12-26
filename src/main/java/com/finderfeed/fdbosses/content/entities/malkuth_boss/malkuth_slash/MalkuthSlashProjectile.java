@@ -85,6 +85,9 @@ public class MalkuthSlashProjectile extends FDProjectile implements AutoSerializ
         Vec3 newPos = this.position();
         if (!level().isClientSide){
             this.tickDamage();
+            if (tickCount > 2000){
+                this.remove(RemovalReason.DISCARDED);
+            }
         }else{
 
 

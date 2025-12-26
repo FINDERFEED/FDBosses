@@ -121,6 +121,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public static final float RAY_DECAL_OFFSET = 0.03f;
 
     public static final String SIMPLE_NO_SIN_RUN_AROUND = "simple_no_sin_run_around";
+    public static final String NO_SIN_SECOND_PHASE = "no_sin_second_phase";
     public static final String RUN_CLOCKWISE_HAMMERS_RAY_PROJECTILES = "run_clockwise_hammers_ray_projectiles";
     public static final String LIMITED_BUTTONS_LASERS_AND_EARTHQUAKES = "limited_buttons_lasers_and_earthquakes";
     public static final String NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES = "no_jump_rays_earthquakes_projectiles";
@@ -224,6 +225,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .build();
 
 
+        AttackOptions<?> noSinSecondPhase = AttackOptions.chainOptionsBuilder()
+                .addAttack(NO_SIN_SECOND_PHASE)
+                .addAttack(EMPTY_SINS_AND_DELAY)
+                .build();
+
+
         AttackOptions<?> noJumpRaysEarthquakesProjectiles = AttackOptions.chainOptionsBuilder()
                 .addAttack(NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES)
                 .addAttack(EMPTY_SINS_AND_DELAY)
@@ -257,6 +264,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         this.mainAttackChain = new AttackChain(level.random)
                 .registerAttack(EMPTY_SINS_AND_DELAY, this::emptySinsAndDelay)
                 .registerAttack(SIMPLE_NO_SIN_RUN_AROUND, this::simpleNoSinRunAroundAttack)
+                .registerAttack(NO_SIN_SECOND_PHASE, this::simpleNoSinAttackSecondPhase)
                 .registerAttack(RUN_CLOCKWISE_HAMMERS_RAY_PROJECTILES, this::runClockwiseProjectilesHammersRay)
                 .registerAttack(LIMITED_BUTTONS_LASERS_AND_EARTHQUAKES, this::limitedButtonsRotatingLasers)
                 .registerAttack(NO_JUMP_RAYS_EARTHQUAKES_PROJECTILES, this::noJumpEarthquakesProjectilesRays)
@@ -264,6 +272,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 .registerAttack(NO_KILL_ENTITIES_ATTACK, this::noKillEntitiesAttack)
                 .registerAttack(BELL_ATTACK, this::bellAttack)
                 .attackListener(this::attackListener)
+                .addAttack(0, noSinSecondPhase)
                 .addAttack(0, noKillEntitiesAttack)
                 .addAttack(0, simpleRunAroundNoSins)
                 .addAttack(0, noJumpRaysEarthquakesProjectiles)
@@ -275,6 +284,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
 
+
+//        this.sinnedTimes = MAX_GEBURAH_SINS / 2;
 
     }
 
@@ -676,7 +687,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             return AttackAction.WAIT;
         }
 
-        if (this.sinnedHalfTimes() && Objects.equals(s, SIMPLE_NO_SIN_RUN_AROUND)){
+        if (this.sinnedHalfTimes() && Objects.equals(s, SIMPLE_NO_SIN_RUN_AROUND) || !this.sinnedHalfTimes() && Objects.equals(s, NO_SIN_SECOND_PHASE)){
             skipNext = true;
             return AttackAction.SKIP;
         }else if (skipNext){
@@ -1288,6 +1299,64 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         return tick > 300;
     }
 
+    public boolean simpleNoSinAttackSecondPhase(AttackInstance attackInstance){
+
+        this.propagateSins(40, GeburahSins.STAY_STILL_SIN.get());
+
+        int stage = attackInstance.stage;
+
+        int tick = attackInstance.tick;
+
+        if (stage == 0) {
+            if (tick < ATTACK_START_DELAY) {
+                return false;
+            } else {
+                attackInstance.nextStage();
+            }
+        }else{
+
+            stage = stage - 1;
+
+            int attackStagesCount = 4;
+
+            int maxStages = 8 * attackStagesCount;
+
+            int lstage = stage % attackStagesCount;
+
+            if (stage < maxStages) {
+                if (lstage == 0) {
+                    this.simpleCannonAttacks(tick, 0, 15, 120);
+                    float earthquakeDamage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage);
+                    if (tick == 0 || tick == 20 || tick == 40) {
+                        this.getStompingController().stompFullCircle(15, true, 1f, earthquakeDamage);
+                    } else if (tick > 45) {
+                        attackInstance.nextStage();
+                    }
+                } else if (lstage == 1) {
+                    var currentAttack = this.getWeaponAttackController().getCurrentAttack();
+                    if (!(currentAttack instanceof GeburahRoundAndRoundLaserAttack attack) && !this.getPlayerPositionsCollector().getPlayers().stream().filter(BossUtil::isPlayerInSurvival).toList().isEmpty()) {
+                        this.getWeaponAttackController().setCurrentAttack(new GeburahRoundAndRoundLaserAttack(this, this.cannonRotationSwap), true);
+                        this.cannonRotationSwap = !this.cannonRotationSwap;
+                        attackInstance.nextStage();
+                    }
+                } else if (lstage == 2){
+                    var controller = this.getWeaponAttackController();
+                    if (!controller.isAttacking()){
+                        attackInstance.nextStage();
+                    }
+                } else if (lstage == 3) {
+                    if (tick > 0) {
+                        attackInstance.nextStage();
+                    }
+                }
+            }else{
+                return tick > 20;
+            }
+
+        }
+        return false;
+    }
+
     private boolean cannonRotationSwap = false;
 
     private void simpleCannonAttacks(int currentTick, int timeBetweenShots, int frequency){
@@ -1717,7 +1786,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
             if (deathTime == 0){
                 var data = this.deathCutscene();
-                for (var player : this.getPlayerPositionsCollector().getPlayers()){
+                for (var player : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level(), this.position().add(0,-1,0),ARENA_HEIGHT, ARENA_RADIUS + 20)){
                     FDLibCalls.startCutsceneForPlayer((ServerPlayer) player, data);
                 }
             }
