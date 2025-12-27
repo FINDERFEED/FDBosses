@@ -1339,6 +1339,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         return tick > 300;
     }
 
+    private int stompAmount = 2;
+
     public boolean simpleNoSinAttackSecondPhase(AttackInstance attackInstance){
 
         this.propagateSins(40, GeburahSins.STAY_STILL_SIN.get());
@@ -1367,9 +1369,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 if (lstage == 0) {
                     this.simpleCannonAttacks(tick, 0, 15, 120);
                     float earthquakeDamage = BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage);
-                    if (tick == 0 || tick == 20 || tick == 40) {
-                        this.getStompingController().stompFullCircle(15, true, 1f, earthquakeDamage);
-                    } else if (tick > 45) {
+                    if (tick % 20 == 0 && tick <= 20 * stompAmount) {
+                        this.getStompingController().stompFullCircle(15, tick == 0, 1f, earthquakeDamage);
+                    } else if (tick > stompAmount * 20 + 5) {
                         attackInstance.nextStage();
                     }
                 } else if (lstage == 1) {
@@ -1387,6 +1389,10 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 } else if (lstage == 3) {
                     if (tick > 0) {
                         attackInstance.nextStage();
+                        int st = stompAmount;
+                        while (stompAmount == st){
+                            stompAmount = 1 + random.nextInt(3);
+                        }
                     }
                 }
             }else{

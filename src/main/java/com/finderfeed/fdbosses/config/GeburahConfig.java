@@ -22,7 +22,7 @@ public class GeburahConfig {
     public float judgementBirdDamage = 10;
 
     @ConfigValue
-    public float earthquakeDamage = 20;
+    public float earthquakeDamage = 30;
 
     @ConfigValue
     public float cannonProjectileDamage = 10;
