@@ -8,9 +8,17 @@ import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.Distor
 import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBell;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.GeburahTriggerSinEffectPacket;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.init.BossSounds;
+import com.finderfeed.fdlib.systems.music.data.FDMusicData;
+import com.finderfeed.fdlib.systems.music.data.FDMusicPartData;
+import com.finderfeed.fdlib.systems.music.music_areas.FDMusicArea;
+import com.finderfeed.fdlib.systems.music.music_areas.FDMusicAreasHandler;
+import com.finderfeed.fdlib.systems.music.music_areas.shapes.FDMusicAreaCylinder;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -34,6 +42,17 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
+            if (!player.isCrouching()){
+                var data = new FDMusicData(MalkuthEntity.BOSS_MUSIC_UUID, new FDMusicPartData(BossSounds.GEBURAH_THEME.get(),109.7f).setLooping(true))
+                        .fadeInTime(80)
+                        .inactiveDeleteTime(600);
+
+                FDMusicAreasHandler.addArea(MalkuthEntity.BOSS_MUSIC_UUID, new FDMusicArea(player.level().dimension(), player.position(), new FDMusicAreaCylinder(10,10),data));
+
+            }else{
+                FDMusicAreasHandler.removeArea(((ServerLevel)level).getServer(), MalkuthEntity.BOSS_MUSIC_UUID, 40);
+
+            }
 
 //            int height = 45 * 2;
 //            for (int i = 0; i < height; i++) {
@@ -51,7 +70,7 @@ public class DebugStick extends Item {
 //            createGeburahArenaCircleAtPos(level,player.getOnPos().below(), 60, 0.95f, 60);
 
 
-            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket(1));
+//            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket(1));
 
         }else{
 //            DistortionSphereEffectHandler.setDistortionSphereEffect(new DistortionSphereEffect(player.getEyePosition().add(player.getLookAngle().scale(50)),

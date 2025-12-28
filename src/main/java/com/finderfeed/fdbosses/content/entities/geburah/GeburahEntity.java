@@ -32,6 +32,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.sins.PlayerSinsHandler;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.ActivePlayerSinInstance;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSin;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSins;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.util.CylinderPlayerPositionsCollector;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.content.util.WorldBox;
@@ -54,6 +55,11 @@ import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
 import com.finderfeed.fdlib.systems.hud.bossbars.FDServerBossBar;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFramesPacket;
+import com.finderfeed.fdlib.systems.music.data.FDMusicData;
+import com.finderfeed.fdlib.systems.music.data.FDMusicPartData;
+import com.finderfeed.fdlib.systems.music.music_areas.FDMusicArea;
+import com.finderfeed.fdlib.systems.music.music_areas.FDMusicAreasHandler;
+import com.finderfeed.fdlib.systems.music.music_areas.shapes.FDMusicAreaCylinder;
 import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
@@ -301,6 +307,15 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         return CLIENT_MODEL;
     }
 
+    private FDMusicArea constructMusicArea(){
+        return new FDMusicArea(this.level().dimension(), this.position().add(0,-2,0), new FDMusicAreaCylinder(ARENA_RADIUS, ARENA_HEIGHT + 8), this.constructMusicData());
+    }
+
+    private FDMusicData constructMusicData(){
+        return new FDMusicData(MalkuthEntity.BOSS_MUSIC_UUID, new FDMusicPartData(BossSounds.GEBURAH_THEME.get(),109.7f).setLooping(true))
+                .fadeInTime(80)
+                .inactiveDeleteTime(600);
+    }
 
     @Override
     public void tick() {
@@ -341,9 +356,15 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                     this.throwSinCrystals();
                     this.tickTrapEntitiesSpawn();
                     this.tickJudgementBirdSpawn();
+
+                    if (!FDMusicAreasHandler.hasMusicArea(this.getUUID())){
+                        FDMusicAreasHandler.addArea(this.getUUID(), this.constructMusicArea());
+                    }
+
                     if (secondPhaseBossInitializer.isFinished()){
                         this.getEntityData().set(SECOND_PHASE, true);
                     }
+
                 } else {
                     if (!this.bossInitializer.isFinished()) {
                         this.bossInitializer.tick();
@@ -912,20 +933,20 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         if (attackInstance.tick == 0) {
             int currentDisplacement = this.getScalesController().getCurrentDisplacement();
             if (currentDisplacement >= 0){
-                this.getScalesController().setCurrentDisplacement(-GeburahScalesController.MAX_DISPLACEMENT, 80);
+                this.getScalesController().setCurrentDisplacement(-GeburahScalesController.MAX_DISPLACEMENT, 60);
             }else{
-                this.getScalesController().setCurrentDisplacement(GeburahScalesController.MAX_DISPLACEMENT, 80);
+                this.getScalesController().setCurrentDisplacement(GeburahScalesController.MAX_DISPLACEMENT, 60);
             }
         }
 
-        if (attackInstance.tick == 60){
+        if (attackInstance.tick == 30){
             for (var serverPlayer : FDTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level(), this.position().add(0,-0.1,0), 40, ARENA_RADIUS)){
                 PacketDistributor.sendToPlayer(serverPlayer, new StartGeburahDistortionEffectPacket(this));
             }
             level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.GEBURAH_SIN_CHANGE.get(), SoundSource.HOSTILE, 5f, 1f);
         }
 
-        return attackInstance.tick > 80;
+        return attackInstance.tick > 50;
     }
 
     @SerializableField
@@ -1845,6 +1866,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     @Override
     protected void tickDeath() {
         if (!level().isClientSide){
+
+            FDMusicAreasHandler.removeArea(((ServerLevel) level()).getServer(), this.getUUID(), 40);
 
             if (deathTime == 0){
                 var data = this.deathCutscene();

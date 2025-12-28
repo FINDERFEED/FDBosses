@@ -186,5 +186,13 @@
   },
   "geburah_helicopter": {
     "sounds": [ "fdbosses:helicopter" ]
+  },
+  "geburah_theme": {
+    "sounds": [
+      {
+        "name": "fdbosses:music/geburah_theme",
+        "stream": true
+      }
+    ]
   }
 }
