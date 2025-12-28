@@ -31,7 +31,7 @@ public class ExplosiveCrystalItem extends Item {
             item.setDamageValue(item.getDamageValue() + 1);
             if (item.getDamageValue() >= item.getMaxDamage()){
                 if (entity instanceof ServerPlayer player) {
-                    PlayerSinsHandler.sin(player, 10);
+                    PlayerSinsHandler.sin(player, 0);
                 }
                 item.setCount(0);
             }
