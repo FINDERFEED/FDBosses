@@ -142,7 +142,7 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
                     .translate(0, (float) corePos.y + 3 * FDEasings.easeOut(p), 0)
                     .size(FDEasings.easeOut(FDEasings.easeOut(p)) * 21)
                     .rotationDegrees(-haloRot + 20 - FDEasings.easeOut(p) * 20)
-                    .color(1f, 1f, 1f, p * 0.45f )
+                    .color(1f, 1f, 1f, p * 0.75f )
                     .renderBack()
                     .render();
 
@@ -153,7 +153,7 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
                     .translate(0, (float) corePos.y + 3, 0)
                     .size(21)
                     .rotationDegrees(-haloRot)
-                    .color(1f, 1f, 1f, 0.45f)
+                    .color(1f, 1f, 1f, 0.75f)
                     .renderBack()
                     .render();
         }

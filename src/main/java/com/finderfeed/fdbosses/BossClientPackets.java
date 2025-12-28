@@ -727,8 +727,8 @@ public class BossClientPackets {
             float ip = i / (maxParticleRows - 1f);
 
             float size = FDMathUtil.lerp(minParticleSize, maxParticleSize, 1 - ip);
-            int repetitionCount = Math.round(FDMathUtil.lerp(1,5,ip));
-            int directionsCount = Math.round(FDMathUtil.lerp(1,12,ip));
+            int repetitionCount = Math.round(FDMathUtil.lerp(1,3,ip));
+            int directionsCount = Math.round(FDMathUtil.lerp(1,7,ip));
 
             float r = FDMathUtil.lerp(1f,1f,ip);
             float gr = FDMathUtil.lerp(0.5f,1f,ip);
@@ -809,7 +809,7 @@ public class BossClientPackets {
         for (int i = 0; i < smokesCount; i++){
 
             float p = i / (float) (smokesCount - 1);
-            int count = Math.round(FDMathUtil.lerp(12,24,p));
+            int count = Math.round(FDMathUtil.lerp(12,15,p));
             float distance = 0.8f * i;
 
             for (var dir : new HorizontalCircleRandomDirections(level.random, count, 1f)){

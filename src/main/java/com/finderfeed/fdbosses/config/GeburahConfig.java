@@ -10,22 +10,22 @@ public class GeburahConfig {
     public float coreRayStrikeDamage = 40;
 
     @ConfigValue
-    public float rotatingLaserAttackDamage = 10;
+    public float rotatingLaserAttackDamage = 25;
 
     @ConfigValue
-    public float predictiveLaserAttackDamage = 50;
+    public float predictiveLaserAttackDamage = 40;
 
     @ConfigValue
     public float justiceHammerDamage = 40;
 
     @ConfigValue
-    public float judgementBirdDamage = 10;
+    public float judgementBirdDamage = 15;
 
     @ConfigValue
-    public float earthquakeDamage = 30;
+    public float earthquakeDamage = 40;
 
     @ConfigValue
-    public float cannonProjectileDamage = 10;
+    public float cannonProjectileDamage = 30;
 
     @ConfigValue
     public float ultimateMoveHealthPercentage = 50;

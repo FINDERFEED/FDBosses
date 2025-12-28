@@ -1234,7 +1234,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             tick = tick - ATTACK_START_DELAY;
         }
 
-        int attackDuration = 300;
+        int attackDuration = 150;
 
 
         if (tick < attackDuration){
@@ -1248,7 +1248,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             int md = 1;
             if (this.sinnedHalfTimes()){
                 md = rotatingLaserDirection ? -1 : 1;
-                if (tick % 100 == 0){
+                if (tick % 75 == 0){
                     rotatingLaserDirection = !rotatingLaserDirection;
                     for (var player : this.playerPositionsCollector.getPlayers()){
                         PacketDistributor.sendToPlayer((ServerPlayer) player, new PlaySoundInEarsPacket(BossSounds.ATTACK_DING.get(),1f,1f));
@@ -1258,8 +1258,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
             this.constantRotatingLaser(md * 0.5f);
 
-            if ((tick + 20) % 50 == 0){
-                this.getStompingController().stompFullCircle(20,true,1f,BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage);
+            if ((tick + 20) % 30 == 0){
+                this.getStompingController().stompFullCircle(10,true,1f,BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage);
             }
 
         }else{
