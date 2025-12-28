@@ -73,6 +73,8 @@ public class BossSounds {
     public static final Supplier<SoundEvent> GEBURAH_STOMP = SOUNDS.register("geburah_stomp",()->SoundEvent.createVariableRangeEvent(FDBosses.location("geburah_stomp")));
     public static final Supplier<SoundEvent> GEBURAH_DEATH = SOUNDS.register("geburah_death",()->SoundEvent.createVariableRangeEvent(FDBosses.location("geburah_death")));
     public static final Supplier<SoundEvent> GEBURAH_HELICOPTER = SOUNDS.register("geburah_helicopter",()->SoundEvent.createVariableRangeEvent(FDBosses.location("geburah_helicopter")));
+    public static final Supplier<SoundEvent> GEBURAH_FLOOR_OPENING = SOUNDS.register("geburah_floor_opening",()->SoundEvent.createVariableRangeEvent(FDBosses.location("geburah_floor_opening")));
+    public static final Supplier<SoundEvent> GEBURAH_RISE = SOUNDS.register("geburah_rise",()->SoundEvent.createVariableRangeEvent(FDBosses.location("geburah_rise")));
 
 
 }

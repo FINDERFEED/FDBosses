@@ -187,6 +187,12 @@
   "geburah_helicopter": {
     "sounds": [ "fdbosses:helicopter" ]
   },
+  "geburah_floor_opening": {
+    "sounds": [ "fdbosses:geburah_floor_opening" ]
+  },
+  "geburah_rise": {
+    "sounds": [ "fdbosses:geburah_rise" ]
+  },
   "geburah_theme": {
     "sounds": [
       {

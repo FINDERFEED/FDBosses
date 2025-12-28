@@ -2,11 +2,13 @@ package com.finderfeed.fdbosses.content.entities.geburah.geburah_opening_floor;
 
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticle;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
@@ -27,9 +29,14 @@ public class GeburahOpeningFloor extends Entity {
                 this.remove(RemovalReason.DISCARDED);
             }
 
+            if (tickCount == 17) {
+                level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.GEBURAH_FLOOR_OPENING.get(), SoundSource.AMBIENT, 3f, 1f);
+            }
 
         } else {
             if (tickCount == 17) {
+
+
                 for (int i = 0; i < 200;i ++){
 
                     float c = 0.3f + random.nextFloat() * 0.2f;

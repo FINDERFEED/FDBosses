@@ -82,6 +82,7 @@ public class GeburahBossInitializer extends BossInitializer<GeburahEntity> {
     public void onTick() {
 
 
+
         if (this.getTick() == BossAnims.GEBURAH_APPEAR.get().getAnimTime() + 1){
             FDLibCalls.sendImpactFrames((ServerLevel) this.getBoss().level(), this.getBoss().position(), 60,
                     new ImpactFrame().setDuration(2),
@@ -103,6 +104,9 @@ public class GeburahBossInitializer extends BossInitializer<GeburahEntity> {
             GeburahEntity geburah = this.getBoss();
             level.playSound(null, geburah.getX(), geburah.getY(), geburah.getZ(), BossSounds.GEBURAH_CORE_RAY_STRIKE.get(), SoundSource.HOSTILE, 5f, 0.8f);
             level.playSound(null, geburah.getX(), geburah.getY(), geburah.getZ(), BossSounds.CHESED_RAY.get(), SoundSource.HOSTILE, 5f, 1f);
+        }else if (this.getTick() == 100){
+
+            this.getBoss().level().playSound(null, this.getBoss().getX(), this.getBoss().getY(), this.getBoss().getZ(), BossSounds.GEBURAH_RISE.get(), SoundSource.AMBIENT, 3f, 1f);
         }
 
         if (this.getTick() > BossAnims.GEBURAH_APPEAR.get().getAnimTime() + 100){
