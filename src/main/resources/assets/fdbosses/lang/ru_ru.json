@@ -136,7 +136,7 @@
   "advancements.qliphoth_awakening.chesed.description": "Никакой пощади беспощадным",
   "advancements.qliphoth_awakening.malkuth.title": "Малхут",
   "advancements.qliphoth_awakening.malkuth.description": "Гневом поглощенный и обманутый жизнью, король наконец обрел вечный покой",
-  "advancements.qliphoth_awakening.geburah.description": "Divine construct, eternal judge, malicious tyrant has become",
+  "advancements.qliphoth_awakening.geburah.description": "Вечный судья ставший беспощадным тираном",
   "advancements.qliphoth_awakening.geburah.title": "Гебура",
   "fdbosses.word.tried_to_break_arena": "Зловещая сила не дает вам осквернять это место.",
   "fdbosses.tldr.chesed": "Урон Хеседа проходит сквозь броню и щиты.\n\nНанесение урона по Хеседу:\n\nПодождите атаки лучом-молнией и разрушьте кристалл чтобы получить эффект {{(fdbosses:effect)id=fdbosses:chesed_energized,level=1}}, потом подбегите к отражателю лучей и заставьте Хеседа его ударить. Когда на вас есть эффект {{(fdbosses:effect)id=fdbosses:chesed_energized}} вы неуязвимы к атаке лучом-молнией.\n\nУ Хеседа есть специальная атака, урон которой зависит от количества активных монолитов, если все монолиты активны - пережить атаку невозможно. Для деактиваци монолита необходимо его убить.",
