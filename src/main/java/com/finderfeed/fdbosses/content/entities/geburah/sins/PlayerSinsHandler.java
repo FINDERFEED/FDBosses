@@ -68,20 +68,20 @@ public class PlayerSinsHandler {
     }
 
     public static void sin(ServerPlayer player, int cooldown){
-        sin(player,cooldown,1);
+        sin(player,cooldown,1, 1);
     }
 
-    public static void sin(ServerPlayer player, int cooldown, float soundPitch){
+    public static void sin(ServerPlayer player, int cooldown, float soundPitch, int amount){
         PlayerSins playerSins = PlayerSins.getPlayerSins(player);
         if (!playerSins.isGainingSinsOnCooldown() && BossUtil.isPlayerInSurvival(player) && player.isAlive()) {
             PacketDistributor.sendToPlayer(player, new GeburahTriggerSinEffectPacket(soundPitch));
 
             int sinnedTimes = playerSins.getSinnedTimes();
 
-            if (sinnedTimes + 1 >= BossConfigs.BOSS_CONFIG.get().geburahConfig.maxPlayerSins){
+            if (sinnedTimes + amount >= BossConfigs.BOSS_CONFIG.get().geburahConfig.maxPlayerSins){
                 player.hurt(BossDamageSources.GEBURAH_SINNED_TOO_MUCH_SOURCE, Float.MAX_VALUE);
             }else {
-                playerSins.setSinnedTimes(sinnedTimes + 1);
+                playerSins.setSinnedTimes(sinnedTimes + amount);
                 playerSins.setSinGainCooldown(cooldown);
 
                 PlayerSins.setPlayerSins(player, playerSins);

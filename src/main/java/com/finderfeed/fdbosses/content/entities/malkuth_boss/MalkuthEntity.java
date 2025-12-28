@@ -423,8 +423,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                         this.checkTarget(target);
 
-                        if (lookAtTarget) {
-                            this.getLookControl().setLookAt(target);
+                        if (lookAtTarget && this.getTarget() != null) {
+                            this.getLookControl().setLookAt(this.getTarget());
                         }
 
                     } else {
@@ -2489,7 +2489,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             var oldTarget = this.getTarget();
             this.setTarget(combatants.get(random.nextInt(combatants.size())));
             var newTarget = this.getTarget();
-            if (oldTarget != newTarget){
+            if (newTarget != null && oldTarget != newTarget){
                 this.oldTargetPos = newTarget.position();
             }
         }

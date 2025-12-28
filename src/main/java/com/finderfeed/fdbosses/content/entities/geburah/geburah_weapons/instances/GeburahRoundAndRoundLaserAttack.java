@@ -118,6 +118,10 @@ public class GeburahRoundAndRoundLaserAttack extends GeburahWeaponAttack {
         allHitEntities.removeAll(birds);
 
         if (!geburah.isDeadOrDying()) {
+            if (geburah.getSinnedTimes() == 5 && geburah.invulnerableTime > 0){
+                return;
+            }
+
             boolean geburahWasHurt = false;
 
             for (var bird : birds) {

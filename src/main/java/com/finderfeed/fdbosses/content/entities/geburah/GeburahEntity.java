@@ -295,8 +295,6 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
 
 
-//        this.sinnedTimes = MAX_GEBURAH_SINS - 1;
-
     }
 
 
@@ -579,24 +577,27 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public void tickTrapEntitiesSpawn(){
         if (tickCount % 20 != 0) return;
 
-        int angles = 4;
+        int angles = this.sinnedHalfTimes() ? 8 : 4;
         float angle = FDMathUtil.FPI * 2 / angles;
 
         for (int i = 0; i < angles; i++){
 
-            float currentAngle = angle * i + FDMathUtil.FPI / 4 + (level().random.nextFloat() * 2 - 1) * FDMathUtil.FPI / 8;
+
+            float currentAngle = angle * i + FDMathUtil.FPI / 4 + (level().random.nextFloat() * 2 - 1) * (angle / 4);
             Vec3 direction = new Vec3(1,0,0).yRot(currentAngle);
 
             Vec3 checkDir = new Vec3(1,0,0).yRot(angle * i + FDMathUtil.FPI / 4);
 
             var entities = FDTargetFinder.getEntitiesInArc(Entity.class, level(), this.position().add(0,-5f,0),
-                    new Vec2((float) checkDir.x,(float) checkDir.z), FDMathUtil.FPI / 2, 35, ARENA_RADIUS, (entity) -> {
+                    new Vec2((float) checkDir.x,(float) checkDir.z), angle, 35, ARENA_RADIUS, (entity) -> {
                 return entity instanceof GeburahChainTrapEntity || entity instanceof ChainTrapSummonProjectile || entity instanceof GeburahChainTrapCastCircle;
             });
 
             if (entities.isEmpty()){
 
-                Vec3 offsetPos = direction.scale(MAX_LASERS_RADIUS / 2 + level().random.nextFloat() * 3 - 1.5 + 2);
+                double radiusToSpawnAt = MAX_LASERS_RADIUS / 2 + level().random.nextFloat() * 3 - 1.5 + 4;
+
+                Vec3 offsetPos = direction.scale(radiusToSpawnAt);
                 Vec3 targetPos = this.position().add(offsetPos);
                 Vec3 castCirclePos = this.position().add(direction.scale(3)).add(0,5,0);
 
@@ -759,7 +760,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                 if (sinnedTimes > 0) {
                     this.bossBar.broadcastEvent(GeburahBossBar.HIT_EVENT, sinnedTimes - 1);
                 }
-                this.level().playSound(null, this.getX(),this.getY(),this.getZ(), BossSounds.GEBURAH_SIN.get(), SoundSource.HOSTILE, 5f, 0.75f);
+                this.level().playSound(null, this.getX(),this.getY(),this.getZ(), BossSounds.GEBURAH_SIN.get(), SoundSource.HOSTILE, 3f, 0.75f);
             }
         }
 
@@ -864,7 +865,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                        }
                        entity.hurt(level().damageSources().generic(),0.1f);
 
-                        PlayerSinsHandler.sin((ServerPlayer) entity, 0, 1f);
+                        PlayerSinsHandler.sin((ServerPlayer) entity, 0, 1f,3);
                     }
 
                     //hehe asset reuse
@@ -1867,7 +1868,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     protected void tickDeath() {
         if (!level().isClientSide){
 
-            FDMusicAreasHandler.removeArea(((ServerLevel) level()).getServer(), this.getUUID(), 40);
+            FDMusicAreasHandler.removeArea(((ServerLevel) level()).getServer(), this.getUUID(), 100);
 
             if (deathTime == 0){
                 var data = this.deathCutscene();
