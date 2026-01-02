@@ -10,10 +10,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHand
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.SetClientMalkuthWeaknessAmountPacket;
 import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
-import com.finderfeed.fdbosses.init.BossConfigs;
-import com.finderfeed.fdbosses.init.BossDamageSources;
-import com.finderfeed.fdbosses.init.BossDataComponents;
-import com.finderfeed.fdbosses.init.BossEffects;
+import com.finderfeed.fdbosses.init.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -27,6 +24,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,6 +39,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityInvulnerabilityCheckEvent;
 import net.neoforged.neoforge.event.entity.living.*;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -284,6 +283,18 @@ public class BossEvents {
 
             }
 
+        }
+    }
+
+    @SubscribeEvent
+    public static void checkInvulnerability(EntityInvulnerabilityCheckEvent event){
+        if (event.getEntity() instanceof ServerPlayer serverPlayer){
+            if (serverPlayer.getUseItem().is(BossItems.CHESED_ITEM.get())){
+                DamageSource source = event.getSource();
+                if (source.is(DamageTypes.IN_WALL)){
+                    event.setInvulnerable(true);
+                }
+            }
         }
     }
 

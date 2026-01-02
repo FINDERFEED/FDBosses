@@ -20,7 +20,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -49,6 +52,7 @@ public class BossMixinHandler {
 
     public static void onChesedItemUse(Player player){
         if (!player.isPassenger()) {
+
             var item = player.getUseItem();
 
             String dataname = "chesed_item_data";
@@ -59,8 +63,13 @@ public class BossMixinHandler {
                     CompoundTag tag = new CompoundTag();
                     player.getAbilities().addSaveData(tag);
                     perdata.put(dataname, tag);
+
                 }
-                GameType.SPECTATOR.updatePlayerAbilities(player.getAbilities());
+                Abilities abilities = player.getAbilities();
+                abilities.setFlyingSpeed(0.15f);
+                abilities.mayfly = true;
+                abilities.instabuild = false;
+                abilities.flying = true;
                 player.noPhysics = true;
                 player.setOnGround(false);
             } else {
