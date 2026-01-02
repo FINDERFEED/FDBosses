@@ -4,6 +4,8 @@ import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
+import com.finderfeed.fdbosses.content.items.chesed.ChesedItem;
+import com.finderfeed.fdbosses.content.items.chesed.ChesedItemPacket;
 import com.finderfeed.fdbosses.content.structures.MalkuthArenaStructure;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossDataComponents;
@@ -12,6 +14,7 @@ import com.finderfeed.fdbosses.mixin.LivingEntityAccessor;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -26,11 +29,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.StructureManager;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Beardifier;
 import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -39,11 +40,63 @@ import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.TerrainAdjustment;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
 
 public class BossMixinHandler {
+
+    public static void onChesedItemUse(Player player){
+        if (!player.isPassenger()) {
+            var item = player.getUseItem();
+
+            String dataname = "chesed_item_data";
+
+            var perdata = player.getPersistentData();
+            if (item.getItem() instanceof ChesedItem && canContinueUsingChesedItem(player)) {
+                if (!perdata.contains(dataname)) {
+                    CompoundTag tag = new CompoundTag();
+                    player.getAbilities().addSaveData(tag);
+                    perdata.put(dataname, tag);
+                }
+                GameType.SPECTATOR.updatePlayerAbilities(player.getAbilities());
+                player.noPhysics = true;
+                player.setOnGround(false);
+            } else {
+                if (perdata.contains(dataname)) {
+                    if (player instanceof ServerPlayer serverPlayer) {
+                        CompoundTag tag = player.getPersistentData().getCompound(dataname);
+                        player.getAbilities().loadSaveData(tag);
+                        player.noPhysics = false;
+                        PacketDistributor.sendToPlayer(serverPlayer, new ChesedItemPacket(player));
+                        player.stopUsingItem();
+                        player.getCooldowns().addCooldown(BossItems.CHESED_ITEM.get(), 200);
+                    }
+                    perdata.remove(dataname);
+                }
+            }
+        }
+    }
+
+    public static boolean canContinueUsingChesedItem(Player player){
+
+        BlockPos pos = player.getOnPos();
+        Level level = player.level();
+
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 3; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    BlockPos p = pos.offset(x,y,z);
+                    BlockState blockState = level.getBlockState(pos);
+                    if (!blockState.isAir()){
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 
     public static void actuallyHurtPlayerMixin(DamageSource source, Player player){
         LivingEntityAccessor accessor = (LivingEntityAccessor) player;

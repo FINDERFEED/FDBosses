@@ -55,6 +55,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -79,7 +80,11 @@ public class BossClientPackets {
         particle.lifetime = lifetime;
     }
 
-
+    public static void chesedItemUse(CompoundTag update, boolean noPhysics){
+        var player = FDClientHelpers.getClientPlayer();
+        player.getAbilities().loadSaveData(update);
+        player.noPhysics = noPhysics;
+    }
 
     public static void geburahScalesControllerSetDisplacement(int entityId, int displacement, int displacementTime){
         if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){

@@ -34,4 +34,9 @@ public class PlayerMixin {
 
     }
 
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isSpectator()Z"))
+    public void tick(CallbackInfo ci){
+        BossMixinHandler.onChesedItemUse((Player) (Object) this);
+    }
+
 }

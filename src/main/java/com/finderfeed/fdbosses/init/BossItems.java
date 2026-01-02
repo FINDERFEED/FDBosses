@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.content.items.ArmorCoreItem;
 import com.finderfeed.fdbosses.content.items.LocatorEye;
 import com.finderfeed.fdbosses.content.items.CoreItem;
 import com.finderfeed.fdbosses.content.items.WeaponCoreItem;
+import com.finderfeed.fdbosses.content.items.chesed.ChesedItem;
 import com.finderfeed.fdbosses.debug.DebugStick;
 import com.finderfeed.fdbosses.FDBosses;
 import net.minecraft.ChatFormatting;
@@ -96,6 +97,10 @@ public class BossItems {
 
     public static final Supplier<Item> GEBURAH_EXPLOSIVE_CRYSTAL = ITEMS.register("geburah_explosive_crystal",
             ()->new ExplosiveCrystalItem(new Item.Properties()));
+
+
+    public static final Supplier<Item> CHESED_ITEM = ITEMS.register("chesed_item",
+            ()->new ChesedItem(new Item.Properties()));
 
 
 

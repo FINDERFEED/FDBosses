@@ -15,6 +15,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 public class BossClientMixinHandle {
 
+    public static void localPlayerAiStep(){
+
+    }
+
     public static void darknessCalculate(LivingEntity entity, float pticks, CallbackInfoReturnable<Float> cir){
 
         if (entity.hasEffect(BossEffects.CHESED_DARKEN) || entity.hasEffect(BossEffects.CHESED_GAZE)) {

@@ -71,6 +71,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crys
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairEntityRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
+import com.finderfeed.fdbosses.content.items.chesed.ChesedItemOverlay;
 import com.finderfeed.fdbosses.content.projectiles.renderers.MalkuthPlayerFireIceBallRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
 import com.finderfeed.fdbosses.content.tile_entities.GeburahTrophyBlockEntity;
@@ -303,6 +304,7 @@ public class BossClientModEvents {
     public static void registerOverlays(RegisterGuiLayersEvent event){
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("electrified"),new ElectrifiedOverlay());
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("malkuth_weakness"),new MalkuthWeaknessOverlay());
+        event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("chesed_item_overlay"),new ChesedItemOverlay());
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("geburah_sin_overlay"),new GeburahSinsOverlay());
     }
 
