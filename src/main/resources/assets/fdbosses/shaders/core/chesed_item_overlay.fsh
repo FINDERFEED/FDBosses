@@ -3,6 +3,7 @@
 
 uniform vec2 size;
 uniform float time;
+uniform float progress;
 
 in vec2 texCoord0;
 in vec4 vertexColor;
@@ -200,13 +201,16 @@ void main(){
         xOffset = -xOffset;
     }
 
+    float prOffset = (1 - progress) * 0.2;
+
     float realX = uv.x + xOffset;
     float dist = 0.5 - realX;
     if (uuv.x > 0.5){
         dist = -dist;
+        prOffset = prOffset;
     }
 
-    float alpha = dist / 0.25;
+    float alpha = (dist - prOffset) / 0.25;
     alpha = clamp(alpha,0,1);
     alpha *= alpha;
 
@@ -218,9 +222,9 @@ void main(){
     c2 = transformNoiseValue(c2, 0.65);
 
 
-    vec4 color1 = vec4(30/255.,74/255.,48/255.,alpha);
+    vec4 color1 = vec4(18/255.,74/255.,48/255.,alpha);
     color1 = srcOneSrcAlpha(color1,color1);
-    vec4 color2 = vec4(30/255.,92/255.,80/255.,alpha);
+    vec4 color2 = vec4(21/255.,92/255.,100/255.,alpha);
     color2 = srcOneSrcAlpha(color2,color2);
 
     vec4 col1 = color1 * c1;
@@ -230,6 +234,29 @@ void main(){
 
 
 
-    fragColor = vec4(resulting.x,resulting.y,resulting.z,alpha);
+    float flamesAlphaAtPos = perlinNoise3d(uv.x * 2.5,34.324,time,10) * 0.1 + 0.15;
+    float flamesAlpha = clamp(1 - (1 - uuv.y) / flamesAlphaAtPos,0,1) * progress;
+    float flamesAlphaAtPosUp = perlinNoise3d(uv.x * 2.5,534.324,time,10) * 0.1 + 0.15;
+    float flamesAlphaUp = clamp(1 - uuv.y / flamesAlphaAtPos,0,1) * progress;
+
+    float flamesNoiseOffset = perlinNoise3d(uv.x,uv.y,time / 2,6) * 0.05;
+    float flamesNoiseOffset2 = perlinNoise3d(uv.x + 543.3,uv.y,time / 2,6) * 0.05;
+    float c3 = perlinNoise(uv.x + flamesNoiseOffset,uv.y - time + 0.43,time,20, 5);
+    c3 = transformNoiseValue(c3, 0.8);
+    float c4 = perlinNoise(uv.x + flamesNoiseOffset2,uv.y + time + 0.43,time,20, 5);
+    c4 = transformNoiseValue(c4, 0.8);
+
+    vec4 flamesColorUp = vec4(18/255.,74/255.,48/255.,flamesAlphaUp);
+    flamesColorUp = srcOneSrcAlpha(flamesColorUp,flamesColorUp);
+    vec4 flamesColor = vec4(flamesColorUp.x,flamesColorUp.y,flamesColorUp.z,flamesAlpha);
+    flamesColor = srcOneSrcAlpha(flamesColor,flamesColor);
+
+    vec4 flamesResult = flamesColorUp * c3 + flamesColor * c4;
+
+    resulting = vec4(resulting.x,resulting.y,resulting.z,alpha);
+    resulting = resulting + flamesResult;
+    resulting.a *= progress;
+
+    fragColor = resulting;
 
 }
