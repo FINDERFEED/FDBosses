@@ -84,11 +84,11 @@ public class BossMixinHandler {
         BlockPos pos = player.getOnPos();
         Level level = player.level();
 
-        for (int x = -1; x <= 1; x++) {
-            for (int y = -1; y <= 3; y++) {
-                for (int z = -1; z <= 1; z++) {
+        for (int x = 0; x < 1; x++) {
+            for (int y = -1; y <= 2; y++) {
+                for (int z = 0; z < 1; z++) {
                     BlockPos p = pos.offset(x,y,z);
-                    BlockState blockState = level.getBlockState(pos);
+                    BlockState blockState = level.getBlockState(p);
                     if (!blockState.isAir()){
                         return true;
                     }
