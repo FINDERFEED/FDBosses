@@ -18,10 +18,9 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import org.lwjgl.opengl.GL11;
 
 @EventBusSubscriber(modid = FDBosses.MOD_ID, value = Dist.CLIENT)
-public class ChesedItemOverlay implements LayeredDraw.Layer {
+public class PhaseSphereOverlay implements LayeredDraw.Layer {
 
     private static Boolean smartCull;
 
@@ -44,7 +43,7 @@ public class ChesedItemOverlay implements LayeredDraw.Layer {
         float gametime = Minecraft.getInstance().level.getGameTime() % 2000000;
         float time = gametime + pticks;
 
-        float progress = FDMathUtil.lerp(progressO, ChesedItemOverlay.progress, pticks) / MAX_PROGRESS;
+        float progress = FDMathUtil.lerp(progressO, PhaseSphereOverlay.progress, pticks) / MAX_PROGRESS;
 
         FDShaderRenderer.start(graphics, shader)
                 .setShaderUniform("progress", FDEasings.easeOut(progress))
@@ -67,8 +66,8 @@ public class ChesedItemOverlay implements LayeredDraw.Layer {
                 smartCull = null;
             }
         }else{
-            if (ChesedItemOverlay.smartCull == null){
-                ChesedItemOverlay.smartCull = Minecraft.getInstance().smartCull;
+            if (PhaseSphereOverlay.smartCull == null){
+                PhaseSphereOverlay.smartCull = Minecraft.getInstance().smartCull;
             }
             Minecraft.getInstance().smartCull = false;
         }
@@ -80,7 +79,7 @@ public class ChesedItemOverlay implements LayeredDraw.Layer {
 
         progressO = progress;
 
-        if (player.getUseItem().is(BossItems.CHESED_ITEM.get())){
+        if (player.getUseItem().is(BossItems.PHASE_SPHERE.get())){
             progress = Mth.clamp(progress + 1, 0, MAX_PROGRESS);
         }else{
             progress = Mth.clamp(progress - 1, 0, MAX_PROGRESS);

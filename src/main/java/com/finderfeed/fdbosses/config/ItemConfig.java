@@ -19,9 +19,15 @@ public class ItemConfig {
     public float playerMalkuthFireballToolDamagePercent = 200;
 
     @ConfigValue
-    public int playerMalkuthFireballAbilityCooldown = 200;
+    public int playerMalkuthFireballAbilityCooldown = 100;
 
     @ConfigValue
     public int justiceCoreDamageReduction = 15;
+
+    @ConfigValue
+    public int phaseSphereUseDuration = 200;
+
+    @ConfigValue
+    public int phaseSphereCooldown = 100;
 
 }

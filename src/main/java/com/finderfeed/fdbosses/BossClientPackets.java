@@ -24,6 +24,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSi
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
+import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
@@ -80,10 +81,11 @@ public class BossClientPackets {
         particle.lifetime = lifetime;
     }
 
-    public static void chesedItemUse(CompoundTag update, boolean noPhysics){
+    public static void chesedItemUse(CompoundTag update, boolean noPhysics, boolean startedUsing){
         var player = FDClientHelpers.getClientPlayer();
         player.getAbilities().loadSaveData(update);
         player.noPhysics = noPhysics;
+        PhaseSphereHandler.isUsingChesedItem = startedUsing;
     }
 
     public static void geburahScalesControllerSetDisplacement(int entityId, int displacement, int displacementTime){

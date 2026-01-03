@@ -5,9 +5,7 @@ import com.finderfeed.fdbosses.content.entities.IEffectImmune;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.ChesedMiniRay;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
-import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
-import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.SetClientMalkuthWeaknessAmountPacket;
 import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
 import com.finderfeed.fdbosses.init.*;
@@ -289,7 +287,7 @@ public class BossEvents {
     @SubscribeEvent
     public static void checkInvulnerability(EntityInvulnerabilityCheckEvent event){
         if (event.getEntity() instanceof ServerPlayer serverPlayer){
-            if (serverPlayer.getUseItem().is(BossItems.CHESED_ITEM.get())){
+            if (serverPlayer.getUseItem().is(BossItems.PHASE_SPHERE.get())){
                 DamageSource source = event.getSource();
                 if (source.is(DamageTypes.IN_WALL)){
                     event.setInvulnerable(true);

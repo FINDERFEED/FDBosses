@@ -1,9 +1,8 @@
 package com.finderfeed.fdbosses.mixin;
 
-import com.finderfeed.fdbosses.content.items.chesed.ChesedItem;
+import com.finderfeed.fdbosses.init.BossItems;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -22,7 +21,7 @@ public abstract class LocalPlayerMixin {
     @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;canStartSprinting()Z", shift = At.Shift.BEFORE))
     public void aiStep(CallbackInfo ci){
         Player player = (Player) (Object) this;
-        if (player.getUseItem().getItem() instanceof ChesedItem){
+        if (player.getUseItem().is(BossItems.PHASE_SPHERE.get())){
             this.input.leftImpulse /= 0.2F;
             this.input.forwardImpulse /= 0.2F;
             this.sprintTriggerTime = 7;

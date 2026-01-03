@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.mixin;
 import com.finderfeed.fdbosses.BossMixinHandler;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
+import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -34,9 +35,9 @@ public class PlayerMixin {
 
     }
 
-    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isSpectator()Z"))
+    @Inject(method = "tick", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;isSpectator()Z", ordinal = 1))
     public void tick(CallbackInfo ci){
-        BossMixinHandler.onChesedItemUse((Player) (Object) this);
+        PhaseSphereHandler.onChesedItemUse((Player) (Object) this);
     }
 
 }

@@ -1,121 +1,32 @@
 package com.finderfeed.fdbosses;
 
-import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthDamageSource;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
-import com.finderfeed.fdbosses.content.items.chesed.ChesedItem;
-import com.finderfeed.fdbosses.content.items.chesed.ChesedItemPacket;
 import com.finderfeed.fdbosses.content.structures.MalkuthArenaStructure;
-import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossConfigs;
-import com.finderfeed.fdbosses.init.BossDataComponents;
-import com.finderfeed.fdbosses.init.BossItems;
 import com.finderfeed.fdbosses.mixin.LivingEntityAccessor;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDServerItemAnimations;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ai.attributes.AttributeInstance;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.CraftingContainer;
-import net.minecraft.world.inventory.ResultContainer;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingRecipe;
-import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.Beardifier;
-import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
 import net.minecraft.world.level.levelgen.structure.TerrainAdjustment;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.damagesource.DamageContainer;
-import net.neoforged.neoforge.network.PacketDistributor;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
 
 public class BossMixinHandler {
 
-    public static void onChesedItemUse(Player player){
-        if (!player.isPassenger()) {
 
-            var item = player.getUseItem();
-
-            String dataname = "chesed_item_data";
-
-            var perdata = player.getPersistentData();
-            if (item.getItem() instanceof ChesedItem && canContinueUsingChesedItem(player)) {
-                if (!perdata.contains(dataname)) {
-                    CompoundTag tag = new CompoundTag();
-                    player.getAbilities().addSaveData(tag);
-                    perdata.put(dataname, tag);
-
-                }
-                Abilities abilities = player.getAbilities();
-                abilities.setFlyingSpeed(0.15f);
-                abilities.mayfly = true;
-                abilities.instabuild = false;
-                abilities.flying = true;
-                player.noPhysics = true;
-                player.setOnGround(false);
-            } else {
-                if (perdata.contains(dataname)) {
-                    if (player instanceof ServerPlayer serverPlayer) {
-                        CompoundTag tag = player.getPersistentData().getCompound(dataname);
-                        player.getAbilities().loadSaveData(tag);
-                        player.noPhysics = false;
-                        PacketDistributor.sendToPlayer(serverPlayer, new ChesedItemPacket(player));
-
-
-                        FDServerItemAnimations.startItemAnimation(player, "USE", AnimationTicker.builder(BossAnims.CHESED_ITEM_USE)
-                                .setToNullTransitionTime(0)
-                                .reversed()
-                                .build(), player.getUsedItemHand());
-
-                        player.stopUsingItem();
-                        player.getCooldowns().addCooldown(BossItems.CHESED_ITEM.get(), 100);
-                    }
-                    perdata.remove(dataname);
-                }
-            }
-        }
-    }
-
-    public static boolean canContinueUsingChesedItem(Player player){
-
-        BlockPos pos = player.getOnPos();
-        Level level = player.level();
-
-        for (int x = 0; x < 1; x++) {
-            for (int y = -1; y <= 2; y++) {
-                for (int z = 0; z < 1; z++) {
-                    BlockPos p = pos.offset(x,y,z);
-                    BlockState blockState = level.getBlockState(p);
-                    if (!blockState.isAir()){
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
 
     public static void actuallyHurtPlayerMixin(DamageSource source, Player player){
         LivingEntityAccessor accessor = (LivingEntityAccessor) player;

@@ -32,7 +32,6 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.kinetic_field.Chesed
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.RayReflectorRenderer;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordRenderer;
-import com.finderfeed.fdbosses.content.entities.geburah.GeburahBossSpawner;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircleRenderer;
@@ -71,7 +70,8 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crys
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairEntityRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
-import com.finderfeed.fdbosses.content.items.chesed.ChesedItemOverlay;
+import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
+import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereOverlay;
 import com.finderfeed.fdbosses.content.projectiles.renderers.MalkuthPlayerFireIceBallRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
 import com.finderfeed.fdbosses.content.tile_entities.GeburahTrophyBlockEntity;
@@ -80,10 +80,12 @@ import com.finderfeed.fdbosses.content.tile_entities.TrophyBlockEntity;
 import com.finderfeed.fdbosses.ik_2d.InverseKinematics2BoneTransform;
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.content.projectiles.renderers.BlockProjectileRenderer;
+import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.head.HeadBoneTransformation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRenderLayerOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRendererBuilder;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityTransformation;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDItemModelOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDModelItemRenderer;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDModelItemRendererOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockEntityRendererBuilder;
@@ -106,6 +108,7 @@ import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.phys.AABB;
@@ -131,7 +134,27 @@ public class BossClientModEvents {
 
         event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
                 .addModel(BossModels.CHESED_ITEM, RenderType.entityCutoutNoCull(FDBosses.location("textures/item/chesed_item.png")))
-                .addModel(BossModels.CHESED_ITEM, RenderType.eyes(FDBosses.location("textures/item/chesed_item_emissive.png")))
+                .addModel(FDItemModelOptions.builder()
+                        .modelInfo(BossModels.CHESED_ITEM)
+                        .renderType(RenderType.eyes(FDBosses.location("textures/item/chesed_item_emissive.png")))
+                        .itemColor(((itemDisplayContext, itemStack) -> {
+
+                            Player player = FDClientHelpers.getClientPlayer();
+                            if (player.getUseItem().equals(itemStack)) {
+                                float pticks = FDRenderUtil.getPartialTickWithPause();
+                                int useTime = PhaseSphereHandler.clientsideChesedItemUseTick;
+                                if (useTime != -1) {
+                                    float maxTime = BossConfigs.BOSS_CONFIG.get().itemConfig.phaseSphereUseDuration;
+                                    float time = Mth.clamp(useTime + pticks, 0, maxTime);
+                                    float p = time / maxTime;
+                                    p = FDEasings.easeOut(p);
+                                    return new FDColor(1f, 1 - p, 1 - p, 1f);
+                                }
+                            }
+
+                            return new FDColor(1f,1f,1f,1f);
+                        }))
+                        .build())
                 .setScale((itemDisplayContext -> {
                     return 0.75f;
                 }))
@@ -141,7 +164,7 @@ public class BossClientModEvents {
                 .addTranslation((itemDisplayContext -> {
                     return new Vector3f();
                 }))
-        ), BossItems.CHESED_ITEM.get());
+        ), BossItems.PHASE_SPHERE.get());
 
         event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
                 .addModel(BossModels.CHESED,RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")))
@@ -319,7 +342,7 @@ public class BossClientModEvents {
     public static void registerOverlays(RegisterGuiLayersEvent event){
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("electrified"),new ElectrifiedOverlay());
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("malkuth_weakness"),new MalkuthWeaknessOverlay());
-        event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("chesed_item_overlay"),new ChesedItemOverlay());
+        event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("chesed_item_overlay"),new PhaseSphereOverlay());
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("geburah_sin_overlay"),new GeburahSinsOverlay());
     }
 

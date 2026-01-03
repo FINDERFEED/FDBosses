@@ -10,32 +10,36 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 @RegisterFDPacket("fdbosses:update_player_abilities_packet")
-public class ChesedItemPacket extends FDPacket {
+public class PhaseSpherePacket extends FDPacket {
 
     private CompoundTag abilities;
     private boolean noPhysics;
+    private boolean startedUsing;
 
-    public ChesedItemPacket(Player player){
+    public PhaseSpherePacket(Player player, boolean startedUsing){
         var tag = new CompoundTag();
         player.getAbilities().addSaveData(tag);
         this.abilities = tag;
         this.noPhysics = player.noPhysics;
+        this.startedUsing = startedUsing;
     }
 
-    public ChesedItemPacket(FriendlyByteBuf buf){
+    public PhaseSpherePacket(FriendlyByteBuf buf){
         this.abilities = buf.readNbt();
         this.noPhysics = buf.readBoolean();
+        this.startedUsing = buf.readBoolean();
     }
 
     @Override
     public void write(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
         registryFriendlyByteBuf.writeNbt(abilities);
         registryFriendlyByteBuf.writeBoolean(noPhysics);
+        registryFriendlyByteBuf.writeBoolean(startedUsing);
     }
 
     @Override
     public void clientAction(IPayloadContext iPayloadContext) {
-        BossClientPackets.chesedItemUse(abilities, noPhysics);
+        BossClientPackets.chesedItemUse(abilities, noPhysics, startedUsing);
     }
 
     @Override

@@ -5,20 +5,19 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.Animatio
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.AnimatedItemTickListener;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDItemAnimationHandler;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDServerItemAnimations;
-import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.PacketDistributor;
 
-public class ChesedItem extends Item implements AnimatedItemTickListener {
+public class PhaseSphere extends Item implements AnimatedItemTickListener {
 
-    public ChesedItem(Properties p_41383_) {
+    public PhaseSphere(Properties p_41383_) {
         super(p_41383_);
     }
 
@@ -29,6 +28,7 @@ public class ChesedItem extends Item implements AnimatedItemTickListener {
                             .setToNullTransitionTime(0)
                     .build(), hand);
             player.startUsingItem(hand);
+            level.playSound(null, player.getX(),player.getY(),player.getZ(), SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.PLAYERS, 1f, 0.9f);
             return InteractionResultHolder.consume(player.getItemInHand(hand));
         }
         return super.use(level, player, hand);
@@ -47,9 +47,10 @@ public class ChesedItem extends Item implements AnimatedItemTickListener {
 
     @Override
     public void onStopUsing(ItemStack stack, LivingEntity entity, int count) {
-
         super.onStopUsing(stack, entity, count);
-
+        if (!entity.level().isClientSide){
+            entity.level().playSound(null, entity.getX(),entity.getY(),entity.getZ(), SoundEvents.RESPAWN_ANCHOR_DEPLETE, SoundSource.PLAYERS, 1f, 0.75f);
+        }
     }
 
     @Override
