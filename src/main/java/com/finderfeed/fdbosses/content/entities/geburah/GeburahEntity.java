@@ -298,6 +298,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         this.laserAttackPreparator = new GeburahLaserAttackPreparator(this);
 
+//        this.sinnedTimes = 5;
 
     }
 
@@ -352,6 +353,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
             if (!this.isDeadOrDying()) {
                 if (this.bossInitializer.isFinished() && (!this.sinnedHalfTimes() || this.secondPhaseBossInitializer.isFinished() && this.sinnedHalfTimes())) {
+                    if (!FDMusicAreasHandler.hasMusicArea(this.getUUID())){
+                        FDMusicAreasHandler.addArea(this.getUUID(), this.constructMusicArea());
+                    }
                     this.bossDespawner.tick();
                     this.getEntityData().set(OPERATING, true);
                     this.mainAttackChain.tick();
@@ -359,9 +363,6 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                     this.tickTrapEntitiesSpawn();
                     this.tickJudgementBirdSpawn();
 
-                    if (!FDMusicAreasHandler.hasMusicArea(this.getUUID())){
-                        FDMusicAreasHandler.addArea(this.getUUID(), this.constructMusicArea());
-                    }
 
                     if (secondPhaseBossInitializer.isFinished()){
                         this.getEntityData().set(SECOND_PHASE, true);
@@ -2136,6 +2137,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     @Override
     public boolean onFDDespawn() {
         var spawner = this.getSpawner();
+        FDMusicAreasHandler.removeArea(((ServerLevel) level()).getServer(), this.getUUID(), 100);
         if (spawner != null){
             spawner.setActive(true);
             return true;

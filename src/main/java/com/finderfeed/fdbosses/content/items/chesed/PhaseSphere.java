@@ -27,13 +27,17 @@ public class PhaseSphere extends Item implements AnimatedItemTickListener {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        if (!level.isClientSide){
-            FDServerItemAnimations.startItemAnimation(player, "USE", AnimationTicker.builder(BossAnims.CHESED_ITEM_USE)
-                            .setToNullTransitionTime(0)
-                    .build(), hand);
-            player.startUsingItem(hand);
-            level.playSound(null, player.getX(),player.getY(),player.getZ(), SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.PLAYERS, 1f, 0.9f);
-            return InteractionResultHolder.consume(player.getItemInHand(hand));
+        if (!level.isClientSide) {
+            if (PhaseSphereHandler.canContinueUsingChesedItem(player)) {
+                FDServerItemAnimations.startItemAnimation(player, "USE", AnimationTicker.builder(BossAnims.CHESED_ITEM_USE)
+                        .setToNullTransitionTime(0)
+                        .build(), hand);
+                player.startUsingItem(hand);
+                level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.PLAYERS, 1f, 0.9f);
+                return InteractionResultHolder.consume(player.getItemInHand(hand));
+            }else{
+                return InteractionResultHolder.fail(player.getItemInHand(hand));
+            }
         }
         return super.use(level, player, hand);
     }
@@ -67,9 +71,9 @@ public class PhaseSphere extends Item implements AnimatedItemTickListener {
     @Override
     public void inventoryTick(ItemStack stack, Level p_41405_, Entity entity, int slot, boolean p_41408_) {
         super.inventoryTick(stack, p_41405_, entity, slot, p_41408_);
-        if (entity instanceof ServerPlayer serverPlayer){
-            serverPlayer.getInventory().setItem(slot, ItemStack.EMPTY);
-            serverPlayer.sendSystemMessage(Component.translatable("fdbosses.word.item_is_not_released_yet").withStyle(ChatFormatting.RED));
-        }
+//        if (entity instanceof ServerPlayer serverPlayer){
+//            serverPlayer.getInventory().setItem(slot, ItemStack.EMPTY);
+//            serverPlayer.sendSystemMessage(Component.translatable("fdbosses.word.item_is_not_released_yet").withStyle(ChatFormatting.RED));
+//        }
     }
 }
