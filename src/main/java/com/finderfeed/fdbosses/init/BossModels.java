@@ -53,5 +53,8 @@ public class BossModels {
     public static final Supplier<FDModelInfo> GEBURAH_BELL = INFOS.register("geburah_bell",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah_bell"),1f));
     public static final Supplier<FDModelInfo> JUSTITIA = INFOS.register("justitia",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"justitia"),1f));
 
+    //Items
+    public static final Supplier<FDModelInfo> CHESED_ITEM = INFOS.register("chesed_item",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_item"),1f));
+
 
 }

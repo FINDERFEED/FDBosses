@@ -128,6 +128,20 @@ public class BossClientModEvents {
 
     @SubscribeEvent
     public static void registerClientExtensions(RegisterClientExtensionsEvent event){
+
+        event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
+                .addModel(BossModels.CHESED_ITEM, RenderType.entityCutoutNoCull(FDBosses.location("textures/item/chesed_item.png")))
+                .setScale((itemDisplayContext -> {
+                    return 0.75f;
+                }))
+                .addRotation((itemDisplayContext -> {
+                    return 0f;
+                }))
+                .addTranslation((itemDisplayContext -> {
+                    return new Vector3f();
+                }))
+        ), BossItems.CHESED_ITEM.get());
+
         event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
                 .addModel(BossModels.CHESED,RenderType.entityCutout(FDBosses.location("textures/entities/chesed.png")))
                 .addModel(BossModels.CHESED_CRYSTAL_LAYER,RenderType.eyes(FDBosses.location("textures/entities/chesed_crystals.png")))

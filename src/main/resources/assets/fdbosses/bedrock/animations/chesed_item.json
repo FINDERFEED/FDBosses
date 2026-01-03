@@ -1,0 +1,44 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"chesed_item_idle": {
+			"loop": true,
+			"animation_length": 8,
+			"bones": {
+				"core": {
+					"rotation": ["-math.sin(query.anim_time * 90 + 45) * 5", "-math.sin(query.anim_time * 45 + 145) * 5", "math.sin(-query.anim_time * 90 + 85) * 5"],
+					"position": {
+						"0.0": {
+							"post": [0, -0.5, 0],
+							"lerp_mode": "catmullrom"
+						},
+						"2.0": {
+							"post": [0, 0.5, 0],
+							"lerp_mode": "catmullrom"
+						},
+						"4.0": {
+							"post": [0, -0.5, 0],
+							"lerp_mode": "catmullrom"
+						},
+						"6.0": {
+							"post": [0, 0.5, 0],
+							"lerp_mode": "catmullrom"
+						},
+						"8.0": {
+							"post": [0, -0.5, 0],
+							"lerp_mode": "catmullrom"
+						}
+					}
+				}
+			}
+		},
+		"chesed_item_use": {
+			"animation_length": 1,
+			"bones": {
+				"core": {
+					"rotation": [0, "-1 + math.pow(1 - query.anim_time / 1, 3) * 720", 0]
+				}
+			}
+		}
+	}
+}

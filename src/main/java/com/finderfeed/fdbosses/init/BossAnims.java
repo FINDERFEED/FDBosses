@@ -262,5 +262,14 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"));
     });
 
+    //ITEMS
+    public static DeferredHolder<Animation,Animation> CHESED_ITEM_IDLE = ANIMATIONS.register("chesed_item_idle", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_item"));
+    });
+
+    public static DeferredHolder<Animation,Animation> CHESED_ITEM_USE = ANIMATIONS.register("chesed_item_use", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_item"));
+    });
+
 
 }

@@ -80,7 +80,7 @@ public class BossMixinHandler {
                         player.noPhysics = false;
                         PacketDistributor.sendToPlayer(serverPlayer, new ChesedItemPacket(player));
                         player.stopUsingItem();
-                        player.getCooldowns().addCooldown(BossItems.CHESED_ITEM.get(), 200);
+                        player.getCooldowns().addCooldown(BossItems.CHESED_ITEM.get(), 5);
                     }
                     perdata.remove(dataname);
                 }
