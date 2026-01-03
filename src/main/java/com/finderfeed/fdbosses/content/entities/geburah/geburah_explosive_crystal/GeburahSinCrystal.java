@@ -68,7 +68,7 @@ public class GeburahSinCrystal extends FDEntity implements AutoSerializable {
     public void flyToTargetPlayer(){
 
         var player = this.getTargetPlayer();
-        if (player == null){
+        if (player == null || player.isDeadOrDying()){
             this.setRemoved(RemovalReason.DISCARDED);
         }
 

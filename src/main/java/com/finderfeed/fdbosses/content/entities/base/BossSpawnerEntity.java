@@ -84,7 +84,7 @@ public abstract class BossSpawnerEntity extends FDEntity {
 
     public abstract EntityType<? extends BossSpawnerContextAssignable> getBossEntityType();
 
-    public abstract Vec3 getPlayerItemsDropPosition(Vec3 deathPosition);
+    public abstract Vec3 getPlayerItemsDropPosition(ServerPlayer player, Vec3 deathPosition);
 
     @Override
     public boolean hurt(DamageSource src, float damage) {

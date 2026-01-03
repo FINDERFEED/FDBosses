@@ -20,7 +20,7 @@ import java.util.List;
 public class ExplosiveCrystalItem extends Item {
 
     public ExplosiveCrystalItem(Properties props) {
-        super(props.stacksTo(1).durability(350));
+        super(props.stacksTo(1).durability(500));
     }
 
     @Override
@@ -31,7 +31,7 @@ public class ExplosiveCrystalItem extends Item {
             item.setDamageValue(item.getDamageValue() + 1);
             if (item.getDamageValue() >= item.getMaxDamage()){
                 if (entity instanceof ServerPlayer player) {
-                    PlayerSinsHandler.sin(player, 0);
+                    PlayerSinsHandler.sin(player, 20);
                 }
                 item.setCount(0);
             }

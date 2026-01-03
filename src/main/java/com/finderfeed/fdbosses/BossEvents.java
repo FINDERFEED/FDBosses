@@ -270,7 +270,7 @@ public class BossEvents {
 
             for (var spawner : spawners){
 
-                Vec3 itemsPos = spawner.getPlayerItemsDropPosition(pos);
+                Vec3 itemsPos = spawner.getPlayerItemsDropPosition(serverPlayer, pos);
 
                 if (itemsPos != null){
                     for (ItemEntity itemEntity : event.getDrops()){

@@ -26,6 +26,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.geburah_weapons.instance
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
+import com.finderfeed.fdbosses.content.entities.geburah.respawn_point_setter_block.GeburahRespiteBlock;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahWeaponRotationController;
 import com.finderfeed.fdbosses.content.entities.geburah.scales_controller.GeburahScalesController;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.PlayerSinsHandler;
@@ -93,12 +94,15 @@ import net.minecraft.world.entity.Targeting;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerRespawnPositionEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
@@ -2142,6 +2146,53 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     @EventBusSubscriber(modid = FDBosses.MOD_ID)
     public static class Events {
+
+        @SubscribeEvent
+        public static void deathEvent(LivingDeathEvent event){
+            if (event.getEntity() instanceof ServerPlayer serverPlayer){
+                var respawnData = GeburahRespiteBlock.getRespawnData(serverPlayer);
+                if (respawnData != null){
+                    var spawners = FDTargetFinder.getEntitiesInCylinder(GeburahBossSpawner.class, serverPlayer.level(), serverPlayer.position().add(0,-10,0), ARENA_HEIGHT + 10, ARENA_RADIUS + 20);
+                    if (!spawners.isEmpty()){
+                        respawnData.putBoolean("diedToGeburah",true);
+                    }
+                }
+            }
+        }
+
+        @SubscribeEvent
+        public static void handleRespawnPosition(PlayerRespawnPositionEvent event){
+            if (event.getEntity() instanceof ServerPlayer serverPlayer){
+                var respawnPos = GeburahRespiteBlock.getSpecialRespawnPoint(serverPlayer);
+                if (respawnPos != null){
+
+                    var respawnData = GeburahRespiteBlock.getRespawnData(serverPlayer);
+                    if (respawnData.getBoolean("diedToGeburah")){
+                        event.setRespawnLevel(respawnPos.first);
+                        var transition = event.getDimensionTransition();
+                        DimensionTransition dimensionTransition = new DimensionTransition(
+                                transition.newLevel(), respawnPos.second.getCenter(), Vec3.ZERO, transition.yRot(), transition.xRot(), transition.missingRespawnBlock(), transition.postDimensionTransition()
+                        );
+                        event.setDimensionTransition(dimensionTransition);
+                        respawnData.remove("diedToGeburah");
+                    }
+
+                }
+            }
+        }
+
+        @SubscribeEvent
+        public static void onClone(PlayerEvent.Clone event){
+            if (!event.getOriginal().level().isClientSide) {
+                var original = event.getOriginal();
+                var clone = event.getEntity();
+                CompoundTag data = GeburahRespiteBlock.getRespawnData((ServerPlayer) original);
+                if (data != null){
+                    GeburahRespiteBlock.putRespawnData((ServerPlayer) clone, data);
+                }
+            }
+        }
+
 
         @SubscribeEvent
         public static void handleSinnerEffect(PlayerTickEvent.Pre event){

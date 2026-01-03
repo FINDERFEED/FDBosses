@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.content.entities.geburah;
 import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.respawn_point_setter_block.GeburahRespiteBlock;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
@@ -11,6 +12,7 @@ import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -49,7 +51,14 @@ public class GeburahBossSpawner extends BossSpawnerEntity {
     }
 
     @Override
-    public Vec3 getPlayerItemsDropPosition(Vec3 deathPosition) {
+    public Vec3 getPlayerItemsDropPosition(ServerPlayer serverPlayer, Vec3 deathPosition) {
+
+        var respawnData = GeburahRespiteBlock.getSpecialRespawnPoint(serverPlayer);
+        if (respawnData != null){
+            var pos = respawnData.second;
+            return pos.getCenter();
+        }
+
         return deathPosition;
     }
 

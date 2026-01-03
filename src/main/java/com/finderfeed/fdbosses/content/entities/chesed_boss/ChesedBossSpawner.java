@@ -14,6 +14,7 @@ import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -83,7 +84,7 @@ public class ChesedBossSpawner extends BossSpawnerEntity {
     }
 
     @Override
-    public Vec3 getPlayerItemsDropPosition(Vec3 deathPosition) {
+    public Vec3 getPlayerItemsDropPosition(ServerPlayer serverPlayer, Vec3 deathPosition) {
         if (BossTargetFinder.isPointInCylinder(deathPosition, this.position().add(0,-2,0), ChesedEntity.ARENA_HEIGHT, ChesedEntity.ARENA_RADIUS)){
             Vec3 offset = this.getForward().multiply(1,0,1)
                     .normalize()

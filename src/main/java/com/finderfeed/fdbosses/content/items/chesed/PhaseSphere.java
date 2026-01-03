@@ -5,10 +5,14 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.Animatio
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.AnimatedItemTickListener;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDItemAnimationHandler;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDServerItemAnimations;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -60,4 +64,12 @@ public class PhaseSphere extends Item implements AnimatedItemTickListener {
                 .build());
     }
 
+    @Override
+    public void inventoryTick(ItemStack stack, Level p_41405_, Entity entity, int slot, boolean p_41408_) {
+        super.inventoryTick(stack, p_41405_, entity, slot, p_41408_);
+        if (entity instanceof ServerPlayer serverPlayer){
+            serverPlayer.getInventory().setItem(slot, ItemStack.EMPTY);
+            serverPlayer.sendSystemMessage(Component.translatable("fdbosses.word.item_is_not_released_yet").withStyle(ChatFormatting.RED));
+        }
+    }
 }

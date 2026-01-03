@@ -229,7 +229,7 @@
   "fdbosses.skills.geburah.round_and_round_laser_description": "Emits constantly active lasers from its cannons, rotating them around with slow speed.",
   "fdbosses.skills.geburah.birds_of_justice": "Judgement Birds",
   "fdbosses.skills.geburah.birds_of_justice_stats": "Judgement Bird laser: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=geburahConfig, value=judgementBirdDamage}}",
-  "fdbosses.skills.geburah.birds_of_justice_description": "Summons 4 Judgement Birds on the battlefield. When a bird is killed, Geburah will respawn it after a certain time.\n\nJudgement birds have an ability to cast laser beams to attack combatants.",
+  "fdbosses.skills.geburah.birds_of_justice_description": "Summons 4 Judgement Birds on the battlefield. When a bird is killed, Geburah will respawn it after a certain time.\n\nJudgement birds have an ability to cast laser beams to attack combatants.\n\nEach bird has an area where it detects its targets, if no targets are found within the area, the bird flies back to its home point.",
   "fdbosses.skills.geburah.traps": "Immobilizing Traps",
   "fdbosses.skills.geburah.traps_description": "Geburah randomly throws around immobilizing traps. When an entity steps on or flies above it - the trap §ccatches the entity§r and disallows it to move for certain time.",
   "fdbosses.skills.geburah.sin_crystal_of_sin": "Crystals Of Sin",
@@ -239,9 +239,9 @@
   "fdbosses.skills.geburah.sin_kill_entity_sin": "Sin of Killing",
   "fdbosses.skills.geburah.sin_kill_entity_sin_description": "When this sin is active killing any entity is considered a sin. Since Geburah is not-so-fair judge, killing combatants doesn't count.",
   "fdbosses.skills.geburah.sin_move_clockwise_sin": "Sin of Movement",
-  "fdbosses.skills.geburah.sin_move_clockwise_sin_description": "When this sin is active moving in the opposite direction of arrows is considered a sin.\n\n§oOh, round and round we go-",
+  "fdbosses.skills.geburah.sin_move_clockwise_sin_description": "When this sin is active, moving §earound§r §eGeburah§r in the §copposite§r direction of arrows is considered a sin.\n\n§oOh, round and round we go-",
   "fdbosses.skills.geburah.sin_pressed_too_many_buttons": "Sin of Actions",
-  "fdbosses.skills.geburah.sin_pressed_too_many_buttons_description": "When this sin is active performing more than 5 actions is considered a sin.\n\n§oActions are any button press.",
+  "fdbosses.skills.geburah.sin_pressed_too_many_buttons_description": "When this sin is active performing more than 5 actions is considered a sin.\n\n§oActions are any button press. Pressing and holding the buttons is allowed.",
   "fdbosses.bosses.description.geburah": "{{(fdlib:item)item=minecraft:bow}} §cRanged weapon is recommended!§r\n\nEvery human is born in sin, hence, the judges are needed. To be a judge is to bear an unwavering sense of justice, the one that our hero had. But, like sins of people, hero's life was also fading away. The people needed him, so the hero devoted himself to eternal justice and thus Geburah was born. And so the people lived happily in the world without sin for many many years.\nAs centuries passed and generations changed, more and more people started complaining: “Was it really a good idea to make sinful being – an eternal judge?”\nAs years passed less and less people were complaining, until no one was left to complain.",
   "fdbosses.tldr.geburah": "Each combatant on the arena becomes a {{(fdbosses:effect)id=fdbosses:sinner}}. When attack pattern changes Geburah marks certain actions as sinful, committing too many sins causes immediate death.\n\nCurrent sins are displayed at Geburah's screens.\n\n§lGeburah is capable of commiting sins too.§r\n\n",
   "entity.fdbosses.geburah": "Geburah",
@@ -252,7 +252,7 @@
   "fdbosses.skills.geburah.justice_hammer_description": "Summons a magic justice hammer that strikes the ground after a small delay.",
   "fdbosses.skills.geburah.divine_judgement": "Divine Judgement",
   "fdbosses.skills.geburah.divine_judgement_stats": "Current HP damage percent: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=geburahConfig, value=ultimateMoveHealthPercentage}}%",
-  "fdbosses.skills.geburah.divine_judgement_description": "Ignites two flames on the scales and starts charging a powerful move.\n\nSummons bells around the arena, each bell, when hit, displaces the corresponding scale plate and disappears.\n\nIf the scales are balanced attack is §acanceled.§r If the scales are not balanced, Geburah §claunches the attack.§r\n\nEach combatant on the arena is damaged for the percentage of their current hp, accumulate 1 sin and have all their positive effects removed.",
+  "fdbosses.skills.geburah.divine_judgement_description": "Ignites two flames on the scales and starts charging a powerful move.\n\nSummons bells around the arena, each bell, when hit, displaces the corresponding scale plate and disappears. §aBells can be hit with ranged weapons.§r\n\nIf the scales are balanced attack is §acanceled.§r If the scales are not balanced, Geburah §claunches the attack.§r\n\nEach combatant on the arena is damaged for the percentage of their current hp, accumulate 3 sins and have all their positive effects removed.",
 
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.justice_core.info": "Geburah's Core.\n\nCan be applied to any armor in crafting table.\n\nGives players a buff: Incoming damage is reduced and is capped at the amount of the last damage taken (after all resistances).\n\nNot stackable.",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.justice_core.stats": "Damage reduction:\n{{(fdlib:image)path=fdbosses:boss_protection}}: {{(fdbosses:config_float) config=itemConfig, value=justiceCoreDamageReduction}}% incoming damage reduction.",
@@ -260,5 +260,7 @@
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.geburah_trophy.info": "A trophy of Geburah to showcase your heroic deeds",
   "fdbosses.word.cant_find_arena": "Cannot find the structure in this dimension",
   "fdbosses.skills.geburah.sin_stay_still_sin": "Sin of Stillness",
-  "fdbosses.skills.geburah.sin_stay_still_sin_description": "When this sin is active, standing still is forbidden for humans."
+  "fdbosses.skills.geburah.sin_stay_still_sin_description": "When this sin is active, standing still is forbidden for humans.",
+  "fdbosses.word.set_special_respawn_point": "Special respawn position set",
+  "fdbosses.word.item_is_not_released_yet": "This item is not released yet!"
 }
