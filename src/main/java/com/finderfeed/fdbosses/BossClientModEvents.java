@@ -131,6 +131,7 @@ public class BossClientModEvents {
 
         event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
                 .addModel(BossModels.CHESED_ITEM, RenderType.entityCutoutNoCull(FDBosses.location("textures/item/chesed_item.png")))
+                .addModel(BossModels.CHESED_ITEM, RenderType.eyes(FDBosses.location("textures/item/chesed_item_emissive.png")))
                 .setScale((itemDisplayContext -> {
                     return 0.75f;
                 }))

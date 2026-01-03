@@ -7,10 +7,13 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHand
 import com.finderfeed.fdbosses.content.items.chesed.ChesedItem;
 import com.finderfeed.fdbosses.content.items.chesed.ChesedItemPacket;
 import com.finderfeed.fdbosses.content.structures.MalkuthArenaStructure;
+import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossItems;
 import com.finderfeed.fdbosses.mixin.LivingEntityAccessor;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDServerItemAnimations;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import it.unimi.dsi.fastutil.objects.ObjectList;
 import net.minecraft.core.BlockPos;
@@ -79,8 +82,15 @@ public class BossMixinHandler {
                         player.getAbilities().loadSaveData(tag);
                         player.noPhysics = false;
                         PacketDistributor.sendToPlayer(serverPlayer, new ChesedItemPacket(player));
+
+
+                        FDServerItemAnimations.startItemAnimation(player, "USE", AnimationTicker.builder(BossAnims.CHESED_ITEM_USE)
+                                .setToNullTransitionTime(0)
+                                .reversed()
+                                .build(), player.getUsedItemHand());
+
                         player.stopUsingItem();
-                        player.getCooldowns().addCooldown(BossItems.CHESED_ITEM.get(), 5);
+                        player.getCooldowns().addCooldown(BossItems.CHESED_ITEM.get(), 100);
                     }
                     perdata.remove(dataname);
                 }
