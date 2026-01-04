@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.BossMixinHandler;
 import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_chain.MalkuthChainEntity;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
+import com.finderfeed.fdbosses.content.util.Undismountable;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -22,7 +23,7 @@ public class PlayerMixin {
 
         Entity vehicle = ((Player)(Object)this).getVehicle();
 
-        if (vehicle instanceof MalkuthChainEntity malkuthChainEntity || vehicle instanceof GeburahChainTrapEntity chainTrapEntity){
+        if (vehicle instanceof MalkuthChainEntity malkuthChainEntity || vehicle instanceof GeburahChainTrapEntity chainTrapEntity || vehicle instanceof Undismountable){
             cir.setReturnValue(false);
         }
     }

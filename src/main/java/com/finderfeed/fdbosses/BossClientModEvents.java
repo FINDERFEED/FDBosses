@@ -72,6 +72,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.Malku
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereOverlay;
+import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistChainRenderer;
 import com.finderfeed.fdbosses.content.projectiles.renderers.MalkuthPlayerFireIceBallRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
 import com.finderfeed.fdbosses.content.tile_entities.GeburahTrophyBlockEntity;
@@ -370,12 +371,12 @@ public class BossClientModEvents {
     public static void addRenderers(EntityRenderersEvent.RegisterRenderers event){
 
         event.registerBlockEntityRenderer(BossTileEntities.GEBURAH_RESPITE_BLOCK.get(), GeburahRespiteBlockEntityRenderer::new);
-
         event.registerEntityRenderer(BossEntities.GEBURAH_OPENING_FLOOR.get(), GeburahOpeningFloorRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_SIN_CRYSTAL.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_CHAIN_TRAP.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD.get(), GeburahCastingCircleRenderer::new);
+        event.registerEntityRenderer(BossEntities.MALKUTH_FIST_CHAIN.get(), MalkuthFistChainRenderer::new);
 
         event.registerEntityRenderer(BossEntities.GEBURAH_BOSS_SPAWNER.get(), FDEntityRendererBuilder.builder()
                 .addLayer(FDEntityRenderLayerOptions.builder()

@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.content.items.LocatorEye;
 import com.finderfeed.fdbosses.content.items.CoreItem;
 import com.finderfeed.fdbosses.content.items.WeaponCoreItem;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphere;
+import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFist;
 import com.finderfeed.fdbosses.debug.DebugStick;
 import com.finderfeed.fdbosses.FDBosses;
 import net.minecraft.ChatFormatting;
@@ -100,6 +101,9 @@ public class BossItems {
 
     public static final Supplier<Item> PHASE_SPHERE = ITEMS.register("phase_sphere",
             ()->new PhaseSphere(new Item.Properties().stacksTo(1)));
+
+    public static final Supplier<Item> MALKUTH_FIST = ITEMS.register("malkuth_fist",
+            ()->new MalkuthFist(new Item.Properties().stacksTo(1)));
 
 
 

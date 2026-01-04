@@ -91,7 +91,8 @@ dependencies {
 //    implementation "curse.maven:asyncparticles-1215753:6963092"
 //    implementation "curse.maven:placebo-283644:6446766"
 //    implementation "curse.maven:fastworkbench-288885:5670423"
-
+    implementation "curse.maven:mmmmmmmmmmmm-225738:7206981"
+    implementation "curse.maven:selene-499980:7396730"
 
 //    implementation "curse.maven:fdlib-1271749:7017013"
 

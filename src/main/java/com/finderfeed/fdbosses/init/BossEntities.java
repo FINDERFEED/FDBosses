@@ -52,6 +52,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crys
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
+import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistChain;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
 import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -409,6 +410,13 @@ public class BossEntities {
             )
             .sized(1f,2f)
             .build("geburah_boss_spawner"));
+
+    //ITEMS
+    public static final Supplier<EntityType<MalkuthFistChain>> MALKUTH_FIST_CHAIN = ENTITIES.register("malkuth_fist_chain",()->EntityType.Builder.of(
+                    MalkuthFistChain::new, MobCategory.MISC
+            )
+            .sized(0.25f,0.25f)
+            .build("malkuth_fist_chain"));
 
 
     @SubscribeEvent

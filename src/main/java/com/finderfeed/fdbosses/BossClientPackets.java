@@ -58,6 +58,8 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -74,6 +76,13 @@ import java.util.Random;
 public class BossClientPackets {
 
     private static Random random = new Random();
+
+    public static void forceAttackEntity(int entityId){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof LivingEntity livingEntity){
+            Minecraft.getInstance().gameMode.attack(Minecraft.getInstance().player, livingEntity);
+            FDClientHelpers.getClientPlayer().swing(InteractionHand.MAIN_HAND);
+        }
+    }
 
     public static void summonParticle(ParticleOptions particleOptions, double x,double y, double z,  double xd,double yd, double zd, int lifetime){
         var engine = Minecraft.getInstance().particleEngine;
