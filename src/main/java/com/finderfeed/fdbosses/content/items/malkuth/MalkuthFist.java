@@ -17,9 +17,9 @@ public class MalkuthFist extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         if (!level.isClientSide){
-            MalkuthFistChain.summon(player, true);
+            MalkuthFistChain.summon(player, hand == InteractionHand.OFF_HAND);
             player.startUsingItem(hand);
-            return InteractionResultHolder.pass(player.getItemInHand(hand));
+            return InteractionResultHolder.consume(player.getItemInHand(hand));
         }
         return super.use(level, player, hand);
     }

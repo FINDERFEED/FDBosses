@@ -1,20 +1,29 @@
 package com.finderfeed.fdbosses.content.items.malkuth;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBossesServerScheduler;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
+import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.util.Undismountable;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
+import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
+import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -44,6 +53,8 @@ public class MalkuthFistChain extends Entity implements Undismountable {
     private int pullingPlayerTicker = -1;
 
     private Vec3 vectorBetween;
+
+    private Direction cachedDirection;
 
 
     public static void summon(Player owner, boolean isHook){
@@ -80,10 +91,93 @@ public class MalkuthFistChain extends Entity implements Undismountable {
 
         if (this.isHook()) {
             this.tickHook();
+        }else{
+            this.tickPullToBlocks();
         }
 
         this.setPos(this.position().add(this.getDeltaMovement()));
         this.tickPullingTime();
+    }
+
+    public void tickPullToBlocks(){
+        if (!level().isClientSide) {
+            Vec3 deltaMovement = this.getDeltaMovement();
+            if (!deltaMovement.equals(Vec3.ZERO)) {
+                Vec3 start = this.position();
+                Vec3 end = start.add(deltaMovement.scale(2));
+                ClipContext clipContext = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+                var res = level().clip(clipContext);
+                if (res.getType() != HitResult.Type.MISS) {
+                    Vec3 location = res.getLocation();
+                    this.teleportTo(location.x, location.y, location.z);
+                    this.setDeltaMovement(Vec3.ZERO);
+                    cachedDirection = res.getDirection();
+                }
+            }else{
+                var owner = this.getOwner();
+                if (owner != null){
+                    if (owner.getVehicle() != this){
+                        if (!owner.startRiding(this,true)){
+                            this.setRemoved(RemovalReason.DISCARDED);
+                            this.onStopChaining();
+                        }
+                    }else{
+
+                        if ((this.pullingPlayerTickerTime != -1 && this.pullingPlayerTicker > this.pullingPlayerTickerTime + 1)){
+                            owner.stopRiding();
+                            this.setRemoved(RemovalReason.DISCARDED);
+                            this.onStopChaining();
+
+                            Direction direction = cachedDirection != null ? cachedDirection : Direction.UP;
+
+
+                            BossUtil.malkuthPlayerFireballExplosionParticles((ServerLevel) level(), this.position(), MalkuthAttackType.FIRE);
+                            PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                                    .frequency(50)
+                                    .amplitude(1.5f)
+                                    .inTime(0)
+                                    .stayTime(0)
+                                    .outTime(10)
+                                    .build(),this.position(),40);
+
+                            MalkuthCrushAttack.summon(level(), this.position(), 0, direction, MalkuthAttackType.FIRE);
+
+                            level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.MALKUTH_FIREBALL_EXPLOSION.get(), SoundSource.HOSTILE, 3f, 1f);
+                            level().playSound(null, this.position().x,this.position().y,this.position().z, BossSounds.ROCK_IMPACT.get(), SoundSource.PLAYERS, 3f, 0.8f);
+                            level().playSound(null, this.position().x,this.position().y,this.position().z, BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.PLAYERS, 3f, 0.8f);
+
+                            if (cachedDirection != null){
+
+                                Vec3 n = new Vec3(
+                                        cachedDirection.getStepX(),
+                                        cachedDirection.getStepY(),
+                                        cachedDirection.getStepZ()
+                                );
+
+                                double offs = n.dot(new Vec3(0,-1,0));
+                                offs = (offs + 1) / 2;
+
+                                Vec3 tppos = this.position().add(n.scale(offs));
+
+                                owner.teleportTo(tppos.x,tppos.y,tppos.z);
+
+                            }
+
+                            for (var entity : FDTargetFinder.getEntitiesInSphere(LivingEntity.class, level(), this.position(), 3)){
+                                if (entity == owner) continue;
+
+                                entity.setRemainingFireTicks(100);
+                                entity.hurt(level().damageSources().playerAttack(owner), 10);
+
+
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
     }
 
     public void tickHook(){
@@ -104,7 +198,8 @@ public class MalkuthFistChain extends Entity implements Undismountable {
                 if (!entities.isEmpty() && (entity = entities.get(0)) != null) {
                     hookFlyingTo = entity.getUUID();
                 }else{
-                    ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+
+                    ClipContext clipContext = new ClipContext(this.position(),end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
                     var res = level().clip(clipContext);
                     if (res.getType() != HitResult.Type.MISS){
                         this.setRemoved(RemovalReason.DISCARDED);
@@ -148,7 +243,7 @@ public class MalkuthFistChain extends Entity implements Undismountable {
                                         Vec3 between = vectorBetween;
                                         Vec3 movement = between.multiply(-1, 0, -1)
                                                 .normalize()
-                                                .add(0,0.5,0)
+                                                .add(0,1,0)
                                                 .scale(1.25);
                                         FDLibCalls.setServerPlayerSpeed((ServerPlayer) owner, movement);
                                         owner.hasImpulse = true;
@@ -220,7 +315,7 @@ public class MalkuthFistChain extends Entity implements Undismountable {
     }
 
     private void onStopChaining(){
-        System.out.println("Stopped chaining");
+
     }
 
 
@@ -237,7 +332,14 @@ public class MalkuthFistChain extends Entity implements Undismountable {
             this.pullingPlayerTicker = 0;
         }
 
-        Vec3 thisPos = this.position();
+        Entity vehicle = this.getVehicle();
+
+        Vec3 thisPos;
+        if (vehicle != null){
+            thisPos = this.position().add(0,-vehicle.getBbHeight() / 2,0);
+        }else{
+            thisPos = this.position();
+        }
 
         float p = Mth.clamp(this.pullingPlayerTicker / (float) this.pullingPlayerTickerTime,0,1);
 
@@ -255,7 +357,7 @@ public class MalkuthFistChain extends Entity implements Undismountable {
     @Override
     public Vec3 getVehicleAttachmentPoint(Entity entity) {
         var bbHeight = entity.getBbHeight();
-        return new Vec3(0,bbHeight - 0.1,0);
+        return new Vec3(0,bbHeight / 2,0);
     }
 
     @Override
