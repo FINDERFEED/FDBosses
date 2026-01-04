@@ -123,6 +123,7 @@ public class BossItems {
                 event.accept(CHESED_TROPHY.get());
                 event.accept(PHASE_SPHERE.get());
                 event.accept(MALKUTH_TROPHY.get());
+                event.accept(MALKUTH_FIST.get());
                 event.accept(GEBURAH_TROPHY.get());
                 event.accept(JUSTICESTONE_BRICKS.get());
                 event.accept(CHISELED_JUSTICESTONE_BRICKS.get());

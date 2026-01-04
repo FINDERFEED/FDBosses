@@ -2,18 +2,18 @@ package com.finderfeed.fdbosses.content.items.malkuth;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBossesServerScheduler;
-import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.util.Undismountable;
+import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossItems;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDTargetFinder;
-import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.Direction;
@@ -29,10 +29,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -63,7 +61,7 @@ public class MalkuthFistChain extends Entity implements Undismountable {
         malkuthFistChain.setPos(owner.getEyePosition());
         malkuthFistChain.getEntityData().set(IS_HOOK, isHook);
         malkuthFistChain.ownerPlayer = owner.getUUID();
-        malkuthFistChain.setDeltaMovement(owner.getLookAngle().scale(2));
+        malkuthFistChain.setDeltaMovement(owner.getLookAngle().scale(3));
         owner.level().addFreshEntity(malkuthFistChain);
 
     }
@@ -81,7 +79,7 @@ public class MalkuthFistChain extends Entity implements Undismountable {
                 this.onStopChaining();
                 return;
             }
-            this.checkDistanceToOwner();
+            this.checkOwnerValidity();
 
             var owner = this.getOwner();
             if (owner != null){
@@ -125,6 +123,9 @@ public class MalkuthFistChain extends Entity implements Undismountable {
 
                         if ((this.pullingPlayerTickerTime != -1 && this.pullingPlayerTicker > this.pullingPlayerTickerTime + 1)){
                             owner.stopRiding();
+
+                            owner.getCooldowns().addCooldown(BossItems.MALKUTH_FIST.get(), 60);
+
                             this.setRemoved(RemovalReason.DISCARDED);
                             this.onStopChaining();
 
@@ -140,7 +141,7 @@ public class MalkuthFistChain extends Entity implements Undismountable {
                                     .outTime(10)
                                     .build(),this.position(),40);
 
-                            MalkuthCrushAttack.summon(level(), this.position(), 0, direction, MalkuthAttackType.FIRE);
+                            MalkuthCrushAttack.summon(level(), this.position(), 0, direction, null);
 
                             level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.MALKUTH_FIREBALL_EXPLOSION.get(), SoundSource.HOSTILE, 3f, 1f);
                             level().playSound(null, this.position().x,this.position().y,this.position().z, BossSounds.ROCK_IMPACT.get(), SoundSource.PLAYERS, 3f, 0.8f);
@@ -252,6 +253,14 @@ public class MalkuthFistChain extends Entity implements Undismountable {
                                     }
                                 });
 
+                                var item = owner.getUseItem();
+                                if (owner.getUseItem().is(BossItems.MALKUTH_FIST.get())){
+                                    var data = item.get(BossDataComponents.MALKUTH_FIST_COMPONENT);
+                                    data.setCanSkipCooldown(true);
+                                    data.setCanUseChain(true);
+                                    item.set(BossDataComponents.MALKUTH_FIST_COMPONENT, data);
+                                }
+                                owner.getCooldowns().addCooldown(BossItems.MALKUTH_FIST.get(),60);
 
                                 this.setRemoved(RemovalReason.DISCARDED);
                                 this.onStopChaining();
@@ -286,9 +295,9 @@ public class MalkuthFistChain extends Entity implements Undismountable {
         }
     }
 
-    private void checkDistanceToOwner(){
+    private void checkOwnerValidity(){
         var owner = this.getOwner();
-        if (this.getPassengers().isEmpty() && owner == null || this.distanceTo(owner) > 30){
+        if (owner == null || this.distanceTo(owner) > 30 || !owner.getUseItem().is(BossItems.MALKUTH_FIST.get())){
             this.setRemoved(RemovalReason.DISCARDED);
             this.onStopChaining();
         }
@@ -315,7 +324,12 @@ public class MalkuthFistChain extends Entity implements Undismountable {
     }
 
     private void onStopChaining(){
-
+        var owner = this.getOwner();
+        if (owner != null){
+            if (owner.getUseItem().is(BossItems.MALKUTH_FIST.get())){
+                owner.stopUsingItem();
+            }
+        }
     }
 
 
