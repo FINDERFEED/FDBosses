@@ -62,6 +62,8 @@ public abstract class BossSpawnerEntity extends FDEntity {
 
             entity.setPos(this.position());
 
+            entity.setSpawnPosition(this.position());
+
             level().addFreshEntity(entity);
 
             this.setActive(false);

@@ -2640,6 +2640,16 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     }
 
+    @Override
+    protected boolean canRide(Entity p_20339_) {
+        return false;
+    }
+
+    @Override
+    public boolean startRiding(Entity p_21396_, boolean p_21397_) {
+        return false;
+    }
+
     private void deattachFireSword(){
         ModelSystem modelSystem = this.getModelSystem();
         modelSystem.removeAttachment(FIRE_SWORD_UUID);
@@ -2755,6 +2765,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public boolean onFDDespawn() {
         BossSpawnerEntity spawner = this.getSpawner();
         if (spawner != null){
+            if (level() instanceof ServerLevel serverLevel){
+                FDMusicAreasHandler.removeArea(serverLevel.getServer(), this.getUUID(), 40);
+            }
             spawner.setActive(true);
             return true;
         }

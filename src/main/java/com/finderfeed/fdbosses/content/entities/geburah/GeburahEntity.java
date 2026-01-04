@@ -194,6 +194,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     public int clientSecondPhaseTicker = -1;
 
     @SerializableField
+    private Vec3 spawnPosition;
+
+    @SerializableField
     private GeburahBossInitializer bossInitializer;
 
     @SerializableField
@@ -346,6 +349,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             this.laserAttackPreparator.tick();
             this.tickLaserVisualDisappearance();
         }else{
+
+            this.tickTeleportHome();
 
             this.pushAwayCombatants();
 
@@ -2069,6 +2074,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     }
 
+    public void tickTeleportHome(){
+        if (this.spawnPosition != null && this.position().distanceTo(spawnPosition) > 10){
+            this.teleportTo(spawnPosition.x,spawnPosition.y,spawnPosition.z);
+        }
+    }
+
     @Override
     public boolean shouldRenderAtSqrDistance(double p_19883_) {
         return true;
@@ -2094,6 +2105,15 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     }
 
+    @Override
+    protected boolean canRide(Entity p_20339_) {
+        return false;
+    }
+
+    @Override
+    public boolean startRiding(Entity p_21396_, boolean p_21397_) {
+        return false;
+    }
 
 
     public GeburahScalesController getScalesController() {
@@ -2112,7 +2132,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     @Override
     public void setSpawnPosition(Vec3 spawnPosition) {
-
+        this.spawnPosition = spawnPosition;
     }
 
     @Override

@@ -37,6 +37,8 @@ import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDScreenEffects;
+import com.finderfeed.fdlib.nbt.AutoSerializable;
+import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.network.lib_packets.PlaySoundInEarsPacket;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
@@ -120,7 +122,7 @@ import java.util.function.Function;
 import static com.finderfeed.fdbosses.init.BossAnims.CHESED_ATTACK;
 import static com.finderfeed.fdbosses.init.BossAnims.*;
 
-public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerContextAssignable, IEffectImmune, FDDespawnable {
+public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerContextAssignable, IEffectImmune, FDDespawnable, AutoSerializable {
 
     public static final String ROCKFALL_TICKER = "ROCKFALL";
 
@@ -192,6 +194,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     private int skipAttackTimes = 0;
 
     private BossDespawner<ChesedEntity> bossDespawner;
+
+    @SerializableField
+    private Vec3 spawnPosition;
 
     public ChesedEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
@@ -313,6 +318,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         system.setVariable("variable.appear_height",400);
         system.setVariable("variable.angle",360);
         if (!this.level().isClientSide){
+
+            this.tickTeleportHome();
 
             this.passiveEntityPullInArena();
 
@@ -2766,6 +2773,16 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     }
 
     @Override
+    protected boolean canRide(Entity p_20339_) {
+        return false;
+    }
+
+    @Override
+    public boolean startRiding(Entity p_21396_, boolean p_21397_) {
+        return false;
+    }
+
+    @Override
     public void die(DamageSource p_21014_) {
         this.dropLoot = false;
         super.die(p_21014_);
@@ -3094,6 +3111,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         tag.putBoolean("alreadySpawned",alreadySpawned);
         tag.putInt("secondPhaseTicker",this.secondPhaseTicker);
         tag.putBoolean("secondPhaseBegun",this.secondPhaseAnimPlayed);
+        this.autoSave(tag);
         super.addAdditionalSaveData(tag);
     }
 
@@ -3119,6 +3137,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         }else{
             this.remainingHits = this.getBossMaxHits();
         }
+        this.autoLoad(tag);
         super.readAdditionalSaveData(tag);
     }
 
@@ -3201,7 +3220,13 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     @Override
     public void setSpawnPosition(Vec3 spawnPosition) {
+        this.spawnPosition = spawnPosition;
+    }
 
+    public void tickTeleportHome(){
+        if (this.spawnPosition != null && this.position().distanceTo(spawnPosition) > 5){
+            this.teleportTo(spawnPosition.x,spawnPosition.y,spawnPosition.z);
+        }
     }
 
     @Override
