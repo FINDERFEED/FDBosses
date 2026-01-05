@@ -93,6 +93,9 @@ dependencies {
 //    implementation "curse.maven:fastworkbench-288885:5670423"
     implementation "curse.maven:mmmmmmmmmmmm-225738:7206981"
     implementation "curse.maven:selene-499980:7396730"
+    implementation "curse.maven:lionfish-api-1001614:6168249"
+    implementation "curse.maven:lendercataclysm-551586:6906997"
+    implementation "curse.maven:curios-309927:6529130"
 
 //    implementation "curse.maven:fdlib-1271749:7017013"
 

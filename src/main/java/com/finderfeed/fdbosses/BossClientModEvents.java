@@ -134,6 +134,36 @@ public class BossClientModEvents {
     public static void registerClientExtensions(RegisterClientExtensionsEvent event){
 
         event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
+                .addModel(BossModels.MALKUTH_FIST, RenderType.entityCutoutNoCull(FDBosses.location("textures/item/malkuth_fist_item.png")))
+                .addModel(FDItemModelOptions.builder()
+                        .modelInfo(BossModels.MALKUTH_FIST)
+                        .renderType(RenderType.eyes(FDBosses.location("textures/item/malkuth_fist_item_emissive.png")))
+                        .build())
+                .setScale((ctx -> {
+                    if (ctx == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || ctx == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND){
+                        return 0.75f;
+                    }
+                    return 1f;
+                }))
+                .addRotation3((itemDisplayContext -> {
+                    if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND){
+                        return new Vector3f(30,0,0);
+                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND){
+                        return new Vector3f(-30,0,180);
+                    }
+                    return new Vector3f();
+                }))
+                .addTranslation((itemDisplayContext -> {
+                    if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND){
+                        return new Vector3f(0.15f,0.25f,-0.1f);
+                    }else if (itemDisplayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND){
+                        return new Vector3f(0.2f,-0.325f,0.05f);
+                    }
+                    return new Vector3f();
+                }))
+        ), BossItems.MALKUTH_FIST.get());
+
+        event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
                 .addModel(BossModels.CHESED_ITEM, RenderType.entityCutoutNoCull(FDBosses.location("textures/item/chesed_item.png")))
                 .addModel(FDItemModelOptions.builder()
                         .modelInfo(BossModels.CHESED_ITEM)
