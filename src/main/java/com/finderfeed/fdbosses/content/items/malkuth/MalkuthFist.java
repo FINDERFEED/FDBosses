@@ -2,8 +2,14 @@ package com.finderfeed.fdbosses.content.items.malkuth;
 
 import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossItems;
+import com.finderfeed.fdbosses.init.BossSounds;
+import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDLibCalls;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
@@ -13,8 +19,10 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class MalkuthFist extends Item {
 
@@ -39,6 +47,32 @@ public class MalkuthFist extends Item {
                     return InteractionResultHolder.consume(item);
                 }else {
                     if (player.onGround()) {
+
+                        level.playSound(null,player.getX(),player.getY(),player.getZ(), BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.PLAYERS, 1f, 1f);
+
+
+                        SlamParticlesPacket packet = new SlamParticlesPacket(
+                                new SlamParticlesPacket.SlamData(player.getOnPos(),player.position().add(0,0.1f,0),new Vec3(1,0,0))
+                                        .maxAngle(FDMathUtil.FPI * 2)
+                                        .maxSpeed(0.3f)
+                                        .collectRadius(2)
+                                        .maxParticleLifetime(30)
+                                        .count(20)
+                                        .maxVerticalSpeedEdges(0.15f)
+                                        .maxVerticalSpeedCenter(0.15f)
+                        );
+                        PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, new ChunkPos(player.getOnPos()),packet);
+
+                        BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                                .size(7f)
+                                .scalingOptions(1,0,1)
+                                .color(1f,0.6f,0.2f)
+                                .brightness(2)
+                                .build();
+
+                        ((ServerLevel)level).sendParticles(ballParticleOptions, player.getX(),player.getY(),player.getZ(),1,0,0,0,0);
+
+
 
                         Vec3 lookAngle = player.getLookAngle().multiply(1,0,1);
                         if (!lookAngle.equals(Vec3.ZERO)){

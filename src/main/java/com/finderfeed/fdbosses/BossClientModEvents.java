@@ -455,6 +455,7 @@ public class BossClientModEvents {
                         .light(LightTexture.FULL_BRIGHT)
                         .transformation(malkuthFistTransform)
                         .build())
+                        .freeRender(new MalkuthFistChainRenderer())
                 .build());
 
         event.registerEntityRenderer(BossEntities.GEBURAH_BOSS_SPAWNER.get(), FDEntityRendererBuilder.builder()

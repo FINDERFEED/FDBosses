@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.items.malkuth;
 
 import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.FDBossesServerScheduler;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
@@ -33,6 +34,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.UUID;
@@ -41,6 +45,7 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
 
     public static final EntityDataAccessor<Boolean> IS_HOOK = SynchedEntityData.defineId(MalkuthFistChain.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Integer> OWNER_ID = SynchedEntityData.defineId(MalkuthFistChain.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> HOOKED_TO = SynchedEntityData.defineId(MalkuthFistChain.class, EntityDataSerializers.INT);
 
     private UUID ownerPlayer;
     private UUID hookFlyingTo;
@@ -87,6 +92,12 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
             if (owner != null){
                 this.getEntityData().set(OWNER_ID, owner.getId());
             }
+
+            var hookedTo = this.getHookedTo();
+            if (hookedTo != null){
+                this.getEntityData().set(HOOKED_TO, hookedTo.getId());
+            }
+
         }
 
         if (this.isHook()) {
@@ -95,8 +106,32 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
             this.tickPullToBlocks();
         }
 
-        this.setPos(this.position().add(this.getDeltaMovement()));
+        var hookedTo = this.getHookedTo();
+        if (hookedTo == null) {
+            this.setPos(this.position().add(this.getDeltaMovement()));
+        }else{
+            Vec3 pos = this.getHookedToPos(hookedTo);
+            this.setPos(pos.x,pos.y,pos.z);
+        }
         this.tickPullingTime();
+    }
+
+    public Vec3 getHookedToPos(LivingEntity hookedTo){
+        return hookedTo.getBoundingBox().getCenter();
+    }
+
+    public LivingEntity getHookedTo(){
+        if (level() instanceof ServerLevel serverLevel){
+            if (hookFlyingTo != null && serverLevel.getEntity(hookFlyingTo) instanceof LivingEntity livingEntity){
+                return livingEntity;
+            }
+        }else{
+            if (level().getEntity(this.getEntityData().get(HOOKED_TO)) instanceof LivingEntity livingEntity){
+                return livingEntity;
+            }
+
+        }
+        return null;
     }
 
     @Override
@@ -111,6 +146,11 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
         if (!level().isClientSide) {
             Vec3 deltaMovement = this.getDeltaMovement();
             if (!deltaMovement.equals(Vec3.ZERO)) {
+
+                if (tickCount > 2) {
+                    level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.MALKUTH_CHAIN_PULL.get(), SoundSource.HOSTILE, 4f, 0.85f);
+                }
+
                 Vec3 start = this.position();
                 Vec3 end = start.add(deltaMovement.scale(2));
                 ClipContext clipContext = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
@@ -123,6 +163,9 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
                     this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.MALKUTH_FIST_GRAB).build());
                 }
             }else{
+
+
+                level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.MALKUTH_CHAIN_PULL.get(), SoundSource.HOSTILE, 4f, 0.9f);
 
                 this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.MALKUTH_FIST_GRAB).build());
 
@@ -199,6 +242,10 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
         if (!level().isClientSide){
 
             if (hookFlyingTo == null) {
+
+                if (tickCount > 2) {
+                    level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.MALKUTH_CHAIN_PULL.get(), SoundSource.HOSTILE, 4f, 0.85f);
+                }
                 Vec3 deltaMovement = this.getDeltaMovement();
                 Vec3 start = this.position().add(deltaMovement.reverse());
                 Vec3 end = start.add(deltaMovement.scale(2));
@@ -212,6 +259,7 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
 
                 if (!entities.isEmpty() && (entity = entities.get(0)) != null) {
                     hookFlyingTo = entity.getUUID();
+                    this.getEntityData().set(HOOKED_TO, entity.getId());
                 }else{
 
                     ClipContext clipContext = new ClipContext(this.position(),end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
@@ -229,23 +277,17 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
                 var owner = this.getOwner();
                 if (owner != null && entity != null && !entity.isDeadOrDying()) {
                     this.setDeltaMovement(Vec3.ZERO);
-                    if (!this.isPassenger()) {
+                    if (owner.getVehicle() == null) {
 
-                        if (!this.startRiding(entity, true)){
+                        if (!owner.startRiding(this, true)){
                             this.setRemoved(RemovalReason.DISCARDED);
                             this.onStopChaining();
-                        }
-
-                        if (owner.getVehicle() != this){
-                            if (!owner.startRiding(this, true)){
-                                this.setRemoved(RemovalReason.DISCARDED);
-                                this.onStopChaining();
-                            }
                         }
 
                     }else{
                         if (owner.getVehicle() == this) {
 
+                            level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.MALKUTH_CHAIN_PULL.get(), SoundSource.HOSTILE, 4f, 0.9f);
 
                             if (this.pullingPlayerTicker <= pullingPlayerTickerTime / 2){
                                 vectorBetween = entity.position().subtract(owner.position());
@@ -269,6 +311,9 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
                                         owner.currentImpulseImpactPos = owner.position();
                                     }
                                 });
+
+
+                                level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.HOSTILE, 2f, 1f);
 
                                 var item = owner.getUseItem();
                                 if (owner.getUseItem().is(BossItems.MALKUTH_FIST.get())){
@@ -402,6 +447,7 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(IS_HOOK, true);
         builder.define(OWNER_ID, -1);
+        builder.define(HOOKED_TO, -1);
     }
 
     @Override
@@ -424,6 +470,26 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
             tag.putUUID("hookFlyingTo", this.hookFlyingTo);
         }
         tag.putBoolean("isHook", this.getEntityData().get(IS_HOOK));
+    }
+
+    @EventBusSubscriber(modid = FDBosses.MOD_ID)
+    public static class Events {
+
+        @SubscribeEvent
+        public static void hurtEvent(LivingIncomingDamageEvent event){
+            var entity = event.getEntity();
+            if (entity instanceof ServerPlayer serverPlayer){
+                var source = event.getSource().getEntity();
+                if (source != null && serverPlayer.getVehicle() instanceof MalkuthFistChain malkuthFistChain && malkuthFistChain.isHook()) {
+                    var sourceBB = source.getBoundingBox().inflate(2);
+                    if (sourceBB.intersects(serverPlayer.getBoundingBox())){
+                        event.setCanceled(true);
+                        event.setInvulnerabilityTicks(20);
+                    }
+                }
+            }
+        }
+
     }
 
 }
