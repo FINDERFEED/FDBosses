@@ -89,6 +89,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.r
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDItemModelOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDModelItemRenderer;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDModelItemRendererOptions;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.interfaces.FDItemRenderType;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockEntityRendererBuilder;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockEntityTransformation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockRenderLayerOptions;
@@ -133,11 +134,39 @@ public class BossClientModEvents {
     @SubscribeEvent
     public static void registerClientExtensions(RegisterClientExtensionsEvent event){
 
+
+
         event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
-                .addModel(BossModels.MALKUTH_FIST, RenderType.entityCutoutNoCull(FDBosses.location("textures/item/malkuth_fist_item.png")))
                 .addModel(FDItemModelOptions.builder()
                         .modelInfo(BossModels.MALKUTH_FIST)
-                        .renderType(RenderType.eyes(FDBosses.location("textures/item/malkuth_fist_item_emissive.png")))
+                        .renderType((ctx,item)->{
+                            if (ctx != ItemDisplayContext.FIRST_PERSON_LEFT_HAND && ctx != ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+                                return RenderType.entityCutoutNoCull(FDBosses.location("textures/item/malkuth_fist_item.png"));
+                            }else{
+                                return RenderType.entityCutoutNoCull(FDBosses.location("textures/item/malkuth_fist_item_offhand.png"));
+                            }
+                        })
+                        .build())
+
+                .addModel(FDItemModelOptions.builder()
+                        .modelInfo(BossModels.MALKUTH_FIST_LAYER)
+                        .renderType((ctx,item)->{
+                            if (ctx != ItemDisplayContext.FIRST_PERSON_LEFT_HAND && ctx != ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+                                return RenderType.entityCutoutNoCull(FDBosses.location("textures/item/malkuth_fist_item_layer.png"));
+                            }else{
+                                return RenderType.entityCutoutNoCull(FDBosses.location("textures/item/malkuth_fist_item_offhand_layer.png"));
+                            }
+                        })
+                        .build())
+                .addModel(FDItemModelOptions.builder()
+                        .modelInfo(BossModels.MALKUTH_FIST)
+                        .renderType((ctx,item)->{
+                            if (ctx != ItemDisplayContext.FIRST_PERSON_LEFT_HAND && ctx != ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+                                return RenderType.eyes(FDBosses.location("textures/item/malkuth_fist_item_emissive.png"));
+                            }else{
+                                return RenderType.eyes(FDBosses.location("textures/item/malkuth_fist_item_offhand_emissive.png"));
+                            }
+                        })
                         .build())
                 .setScale((ctx -> {
                     if (ctx == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || ctx == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND){
@@ -149,15 +178,17 @@ public class BossClientModEvents {
                     if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND){
                         return new Vector3f(30,0,0);
                     }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND){
-                        return new Vector3f(-30,0,180);
+                        return new Vector3f(30,0,0);
                     }
                     return new Vector3f();
                 }))
                 .addTranslation((itemDisplayContext -> {
                     if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND){
-                        return new Vector3f(0.15f,0.25f,-0.1f);
+                        return new Vector3f(0.05f,0.0f,0.0f);
                     }else if (itemDisplayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND){
                         return new Vector3f(0.2f,-0.325f,0.05f);
+                    }else if (itemDisplayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+                        return new Vector3f(0.2f,-0.325f,-0.05f);
                     }
                     return new Vector3f();
                 }))

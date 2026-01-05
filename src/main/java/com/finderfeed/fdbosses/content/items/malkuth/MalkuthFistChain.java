@@ -141,7 +141,7 @@ public class MalkuthFistChain extends Entity implements Undismountable {
                                     .outTime(10)
                                     .build(),this.position(),40);
 
-                            MalkuthCrushAttack.summon(level(), this.position(), 0, direction, null);
+                            MalkuthCrushAttack.summon(level(), this.position().add(direction.getStepX() * 0.1f, direction.getStepY() * 0.1f, direction.getStepZ() * 0.1f), 0, direction, null);
 
                             level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.MALKUTH_FIREBALL_EXPLOSION.get(), SoundSource.HOSTILE, 3f, 1f);
                             level().playSound(null, this.position().x,this.position().y,this.position().z, BossSounds.ROCK_IMPACT.get(), SoundSource.PLAYERS, 3f, 0.8f);
