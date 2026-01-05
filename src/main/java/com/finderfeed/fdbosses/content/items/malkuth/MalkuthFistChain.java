@@ -183,7 +183,9 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
                         if ((this.pullingPlayerTickerTime != -1 && this.pullingPlayerTicker > this.pullingPlayerTickerTime + 1)){
                             owner.stopRiding();
 
-                            owner.getCooldowns().addCooldown(BossItems.MALKUTH_FIST.get(), 60);
+
+                            int cooldownIKnowYouAreLookingHereToChangeThisField = BossConfigs.BOSS_CONFIG.get().itemConfig.iceFireGauntletCooldown;
+                            owner.getCooldowns().addCooldown(BossItems.MALKUTH_FIST.get(), cooldownIKnowYouAreLookingHereToChangeThisField);
 
                             this.setRemoved(RemovalReason.DISCARDED);
                             this.onStopChaining();
@@ -223,12 +225,25 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
 
                             }
 
+
+                            float damage = BossConfigs.BOSS_CONFIG.get().itemConfig.iceFireGauntletCrushDamage;
+
                             for (var entity : FDTargetFinder.getEntitiesInSphere(LivingEntity.class, level(), this.position(), 3)){
                                 if (entity == owner) continue;
 
                                 entity.setRemainingFireTicks(100);
-                                entity.hurt(level().damageSources().playerAttack(owner), 10);
+                                entity.hurt(level().damageSources().playerAttack(owner), damage);
 
+                                Vec3 between = entity.position().subtract(this.position());
+
+                                Vec3 speed = between.normalize().scale(0.5).add(0,0.25,0);
+
+                                if (entity instanceof ServerPlayer serverPlayer){
+                                    FDLibCalls.setServerPlayerSpeed(serverPlayer, speed);
+                                    serverPlayer.hasImpulse = true;
+                                }else{
+                                    entity.setDeltaMovement(speed);
+                                }
 
                             }
 
@@ -345,13 +360,19 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
 
                                 level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.HOSTILE, 2f, 1f);
 
+                                int cooldown = BossConfigs.BOSS_CONFIG.get().itemConfig.iceFireGauntletCooldown;
+
                                 var item = owner.getUseItem();
                                 if (owner.getUseItem().is(BossItems.MALKUTH_FIST.get())){
                                     var data = item.get(BossDataComponents.MALKUTH_FIST_COMPONENT);
                                     data.setCanSkipCooldown(true);
+                                    data.setEntityHookCooldown(cooldown);
                                     item.set(BossDataComponents.MALKUTH_FIST_COMPONENT, data);
                                 }
-                                owner.getCooldowns().addCooldown(BossItems.MALKUTH_FIST.get(),60);
+
+
+
+                                owner.getCooldowns().addCooldown(BossItems.MALKUTH_FIST.get(),cooldown);
 
                                 this.setRemoved(RemovalReason.DISCARDED);
                                 this.onStopChaining();
@@ -388,7 +409,8 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
 
     private void checkOwnerValidity(){
         var owner = this.getOwner();
-        if (owner == null || this.distanceTo(owner) > 30 || !owner.getUseItem().is(BossItems.MALKUTH_FIST.get())){
+        double checkDistance = this.getHookedTo() != null || this.getDeltaMovement().equals(Vec3.ZERO) ? 40 : 30;
+        if (owner == null || this.distanceTo(owner) > checkDistance || !owner.getUseItem().is(BossItems.MALKUTH_FIST.get())){
             this.setRemoved(RemovalReason.DISCARDED);
             this.onStopChaining();
         }

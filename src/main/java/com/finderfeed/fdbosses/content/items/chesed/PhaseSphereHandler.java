@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.items.chesed;
 
+import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossItems;
@@ -13,8 +14,13 @@ import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+@EventBusSubscriber(modid = FDBosses.MOD_ID)
 public class PhaseSphereHandler {
 
     public static final String CHESED_ITEM_DATANAME = "phase_sphere_data";
@@ -140,6 +146,16 @@ public class PhaseSphereHandler {
         }
 
         return useTime > 20 ? nonAirBlocks >= 10 : nonAirBlocks > 0;
+    }
+
+    @SubscribeEvent
+    public static void deathEvent(PlayerEvent.Clone event){
+        Player original = event.getOriginal();
+        Player copy = event.getEntity();
+        var data = original.getPersistentData();
+        if (data.contains(CHESED_ITEM_DATANAME)) {
+            copy.getPersistentData().put(CHESED_ITEM_DATANAME, data.getCompound(CHESED_ITEM_DATANAME));
+        }
     }
 
 }

@@ -158,8 +158,8 @@ public class MalkuthFist extends Item {
 
             var data = stack.get(BossDataComponents.MALKUTH_FIST_COMPONENT);
 
+            var cooldowns = serverPlayer.getCooldowns();
             if (data.canSkipCooldown()){
-                var cooldowns = serverPlayer.getCooldowns();
                 if (cooldowns.isOnCooldown(stack.getItem())){
                     if (slot != Inventory.SLOT_OFFHAND) {
                         data.setCanSkipCooldown(false);
@@ -170,6 +170,17 @@ public class MalkuthFist extends Item {
                     data.setCanSkipCooldown(false);
                     stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT,data);
                 }
+            }
+
+            if (!cooldowns.isOnCooldown(BossItems.MALKUTH_FIST.get()) && slot == Inventory.SLOT_OFFHAND){
+                if (data.getEntityHookCooldown() > 0){
+                    cooldowns.addCooldown(BossItems.MALKUTH_FIST.get(), data.getEntityHookCooldown());
+                }
+            }
+
+            if (data.getEntityHookCooldown() > 0){
+                data.setEntityHookCooldown(data.getEntityHookCooldown() - 1);
+                stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT.get(), data);
             }
 
 

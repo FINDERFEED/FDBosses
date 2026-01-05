@@ -30,4 +30,10 @@ public class ItemConfig {
     @ConfigValue
     public int phaseSphereCooldown = 100;
 
+    @ConfigValue
+    public int iceFireGauntletCooldown = 60;
+
+    @ConfigValue
+    public int iceFireGauntletCrushDamage = 15;
+
 }

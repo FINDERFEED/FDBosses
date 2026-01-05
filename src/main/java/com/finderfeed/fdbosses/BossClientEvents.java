@@ -5,8 +5,10 @@ import com.finderfeed.fdbosses.content.entities.geburah.sins.HandleButtonPressSi
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSins;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
+import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.util.GainLoseValue;
 import com.finderfeed.fdbosses.init.*;
+import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -37,6 +39,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.*;
 
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix4f;
@@ -541,6 +544,15 @@ public class BossClientEvents {
         vertexConsumer.addVertex(m, boxRadius,-boxRadius,boxRadius).setColor(r,g,b,a).setUv(0.5f,.75f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
         vertexConsumer.addVertex(m, boxRadius,-boxRadius,-boxRadius).setColor(r,g,b,a).setUv(.5f,.5f).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY);
 
+    }
+
+
+    @SubscribeEvent
+    public static void deathEvent(LivingDeathEvent event){
+        if (event.getEntity() instanceof Player player && player == FDClientHelpers.getClientPlayer()){
+            PhaseSphereHandler.isUsingChesedItem = false;
+            System.out.println("you died");
+        }
     }
 
 }
