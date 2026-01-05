@@ -271,5 +271,13 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_item"));
     });
 
+    public static DeferredHolder<Animation,Animation> MALKUTH_FIST_FLYING = ANIMATIONS.register("malkuth_fist_flying", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_fist"));
+    });
+
+    public static DeferredHolder<Animation,Animation> MALKUTH_FIST_GRAB = ANIMATIONS.register("malkuth_fist_grab", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_fist"));
+    });
+
 
 }

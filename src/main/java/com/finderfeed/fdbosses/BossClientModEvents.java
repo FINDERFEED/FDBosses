@@ -72,6 +72,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.Malku
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereOverlay;
+import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistChain;
 import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistChainRenderer;
 import com.finderfeed.fdbosses.content.projectiles.renderers.MalkuthPlayerFireIceBallRenderer;
 import com.finderfeed.fdbosses.content.tile_entities.ChesedTrophyTileEntity;
@@ -437,7 +438,24 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_CHAIN_TRAP.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD.get(), GeburahCastingCircleRenderer::new);
-        event.registerEntityRenderer(BossEntities.MALKUTH_FIST_CHAIN.get(), MalkuthFistChainRenderer::new);
+
+        FDEntityTransformation<MalkuthFistChain> malkuthFistTransform = ((entity, poseStack, pticks) -> {
+            FDRenderUtil.applyMovementMatrixRotations(poseStack,entity.cachedDeltaMovement);
+        });
+
+        event.registerEntityRenderer(BossEntities.MALKUTH_FIST_CHAIN.get(), FDEntityRendererBuilder.<MalkuthFistChain>builder()
+                .addLayer(FDEntityRenderLayerOptions.<MalkuthFistChain>builder()
+                        .model(BossModels.MALKUTH_FIST_FLYING)
+                        .renderType(RenderType.entityCutoutNoCull(FDBosses.location("textures/entities/malkuth/malkuth_fist_flying.png")))
+                        .transformation(malkuthFistTransform)
+                        .build())
+                .addLayer(FDEntityRenderLayerOptions.<MalkuthFistChain>builder()
+                        .model(BossModels.MALKUTH_FIST_FLYING)
+                        .renderType(RenderType.eyes(FDBosses.location("textures/entities/malkuth/malkuth_fist_flying_emissive.png")))
+                        .light(LightTexture.FULL_BRIGHT)
+                        .transformation(malkuthFistTransform)
+                        .build())
+                .build());
 
         event.registerEntityRenderer(BossEntities.GEBURAH_BOSS_SPAWNER.get(), FDEntityRendererBuilder.builder()
                 .addLayer(FDEntityRenderLayerOptions.builder()

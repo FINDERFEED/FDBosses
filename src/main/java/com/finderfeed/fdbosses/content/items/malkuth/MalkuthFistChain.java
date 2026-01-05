@@ -5,12 +5,11 @@ import com.finderfeed.fdbosses.FDBossesServerScheduler;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
 import com.finderfeed.fdbosses.content.util.Undismountable;
-import com.finderfeed.fdbosses.init.BossDataComponents;
-import com.finderfeed.fdbosses.init.BossEntities;
-import com.finderfeed.fdbosses.init.BossItems;
-import com.finderfeed.fdbosses.init.BossSounds;
+import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDTargetFinder;
@@ -38,7 +37,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.UUID;
 
-public class MalkuthFistChain extends Entity implements Undismountable {
+public class MalkuthFistChain extends FDEntity implements Undismountable {
 
     public static final EntityDataAccessor<Boolean> IS_HOOK = SynchedEntityData.defineId(MalkuthFistChain.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Integer> OWNER_ID = SynchedEntityData.defineId(MalkuthFistChain.class, EntityDataSerializers.INT);
@@ -54,6 +53,8 @@ public class MalkuthFistChain extends Entity implements Undismountable {
 
     private Direction cachedDirection;
 
+    public Vec3 cachedDeltaMovement;
+
 
     public static void summon(Player owner, boolean isHook){
 
@@ -68,6 +69,7 @@ public class MalkuthFistChain extends Entity implements Undismountable {
 
     public MalkuthFistChain(EntityType<?> type, Level level) {
         super(type, level);
+        this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.MALKUTH_FIST_FLYING).build());
     }
 
     @Override
@@ -97,6 +99,14 @@ public class MalkuthFistChain extends Entity implements Undismountable {
         this.tickPullingTime();
     }
 
+    @Override
+    public void setDeltaMovement(Vec3 vec) {
+        super.setDeltaMovement(vec);
+        if (!vec.equals(Vec3.ZERO)) {
+            this.cachedDeltaMovement = vec;
+        }
+    }
+
     public void tickPullToBlocks(){
         if (!level().isClientSide) {
             Vec3 deltaMovement = this.getDeltaMovement();
@@ -110,8 +120,12 @@ public class MalkuthFistChain extends Entity implements Undismountable {
                     this.teleportTo(location.x, location.y, location.z);
                     this.setDeltaMovement(Vec3.ZERO);
                     cachedDirection = res.getDirection();
+                    this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.MALKUTH_FIST_GRAB).build());
                 }
             }else{
+
+                this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.MALKUTH_FIST_GRAB).build());
+
                 var owner = this.getOwner();
                 if (owner != null){
                     if (owner.getVehicle() != this){
@@ -208,6 +222,9 @@ public class MalkuthFistChain extends Entity implements Undismountable {
                     }
                 }
             }else{
+
+                this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.MALKUTH_FIST_GRAB).build());
+
                 var entity = this.getEntityOnHook();
                 var owner = this.getOwner();
                 if (owner != null && entity != null && !entity.isDeadOrDying()) {
