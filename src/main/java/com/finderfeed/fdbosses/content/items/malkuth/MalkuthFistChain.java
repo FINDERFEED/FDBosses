@@ -14,6 +14,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.F
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDTargetFinder;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.Direction;
@@ -25,6 +26,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -213,7 +215,7 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
                                 );
 
                                 double offs = n.dot(new Vec3(0,-1,0));
-                                offs = (offs + 1) / 2;
+                                offs = (offs + 1);
 
                                 Vec3 tppos = this.position().add(n.scale(offs));
 
@@ -298,6 +300,34 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
 
                                 PacketDistributor.sendToPlayer((ServerPlayer) owner, new PlayerForceAttackEntityPacket(entity));
 
+                                BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                                        .size(5f)
+                                        .scalingOptions(1,0,2)
+                                        .color(1f,0.6f,0.2f)
+                                        .brightness(2)
+                                        .build();
+                                ((ServerLevel)level()).sendParticles(ballParticleOptions, entity.getX(),entity.getY() + entity.getBbHeight() / 2, entity.getZ(),1,0,0,0,0);
+
+                                BallParticleOptions ballParticleOptions2 = BallParticleOptions.builder()
+                                        .size(0.5f)
+                                        .friction(0.9f)
+                                        .scalingOptions(0,0,10)
+                                        .color(1f,0.6f,0.2f)
+                                        .brightness(2)
+                                        .build();
+                                BallParticleOptions ballParticleOptions3 = BallParticleOptions.builder()
+                                        .size(0.5f)
+                                        .friction(0.9f)
+                                        .scalingOptions(0,0,10)
+                                        .color(0.2f,0.6f,1f)
+                                        .brightness(2)
+                                        .build();
+                                ((ServerLevel)level()).sendParticles(ballParticleOptions2, entity.getX(),entity.getY() + entity.getBbHeight() / 2, entity.getZ(),20,0.1,0.1,0.1,0.25);
+                                ((ServerLevel)level()).sendParticles(ballParticleOptions3, entity.getX(),entity.getY() + entity.getBbHeight() / 2, entity.getZ(),20,0.1,0.1,0.1,0.25);
+
+
+
+
                                 FDBossesServerScheduler.addDelayedAction(2,(server)->{
                                     if (vectorBetween != null) {
                                         Vec3 between = vectorBetween;
@@ -319,7 +349,6 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
                                 if (owner.getUseItem().is(BossItems.MALKUTH_FIST.get())){
                                     var data = item.get(BossDataComponents.MALKUTH_FIST_COMPONENT);
                                     data.setCanSkipCooldown(true);
-                                    data.setCanUseChain(true);
                                     item.set(BossDataComponents.MALKUTH_FIST_COMPONENT, data);
                                 }
                                 owner.getCooldowns().addCooldown(BossItems.MALKUTH_FIST.get(),60);
@@ -479,12 +508,18 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
         public static void hurtEvent(LivingIncomingDamageEvent event){
             var entity = event.getEntity();
             if (entity instanceof ServerPlayer serverPlayer){
-                var source = event.getSource().getEntity();
-                if (source != null && serverPlayer.getVehicle() instanceof MalkuthFistChain malkuthFistChain && malkuthFistChain.isHook()) {
-                    var sourceBB = source.getBoundingBox().inflate(2);
-                    if (sourceBB.intersects(serverPlayer.getBoundingBox())){
-                        event.setCanceled(true);
-                        event.setInvulnerabilityTicks(20);
+                if (serverPlayer.getVehicle() instanceof MalkuthFistChain malkuthFistChain) {
+                    var source = event.getSource().getEntity();
+                    if (source != null) {
+                        var sourceBB = source.getBoundingBox().inflate(2);
+                        if (sourceBB.intersects(serverPlayer.getBoundingBox())) {
+                            event.setCanceled(true);
+                            event.setInvulnerabilityTicks(20);
+                        }
+                    }else{
+                        if (event.getSource().is(DamageTypes.IN_WALL)){
+                            event.setCanceled(true);
+                        }
                     }
                 }
             }

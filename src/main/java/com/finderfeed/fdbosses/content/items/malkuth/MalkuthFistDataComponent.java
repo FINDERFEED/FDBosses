@@ -13,18 +13,15 @@ public class MalkuthFistDataComponent {
 
     public static final Codec<MalkuthFistDataComponent> CODEC =
             RecordCodecBuilder.create(instance -> instance.group(
-                    Codec.BOOL.fieldOf("can_use_chain").forGetter(MalkuthFistDataComponent::canUseChain),
                     Codec.BOOL.fieldOf("can_skip_cooldown").forGetter(MalkuthFistDataComponent::canSkipCooldown)
             ).apply(instance, MalkuthFistDataComponent::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, MalkuthFistDataComponent> STREAM_CODEC =
             StreamCodec.composite(
-                    ByteBufCodecs.BOOL, MalkuthFistDataComponent::canUseChain,
                     ByteBufCodecs.BOOL, MalkuthFistDataComponent::canSkipCooldown,
                     MalkuthFistDataComponent::new
             );
 
-    private boolean canUseChain = false;
     private boolean canSkipCooldown = false;
 
 
@@ -32,8 +29,7 @@ public class MalkuthFistDataComponent {
 
     }
 
-    public MalkuthFistDataComponent(boolean canUseChain, boolean canSkipCooldown) {
-        this.canUseChain = canUseChain;
+    public MalkuthFistDataComponent(boolean canSkipCooldown) {
         this.canSkipCooldown = canSkipCooldown;
     }
 
@@ -41,16 +37,8 @@ public class MalkuthFistDataComponent {
         this.canSkipCooldown = canSkipCooldown;
     }
 
-    public void setCanUseChain(boolean canUseChain) {
-        this.canUseChain = canUseChain;
-    }
-
     public boolean canSkipCooldown() {
         return canSkipCooldown;
-    }
-
-    public boolean canUseChain() {
-        return canUseChain;
     }
 
     @Override
@@ -58,12 +46,12 @@ public class MalkuthFistDataComponent {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         MalkuthFistDataComponent that = (MalkuthFistDataComponent) o;
-        return canUseChain == that.canUseChain && canSkipCooldown == that.canSkipCooldown;
+        return canSkipCooldown == that.canSkipCooldown;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(canUseChain, canSkipCooldown);
+        return Objects.hashCode(canSkipCooldown);
     }
 
 }

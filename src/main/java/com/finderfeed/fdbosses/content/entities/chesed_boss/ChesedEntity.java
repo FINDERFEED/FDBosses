@@ -3224,7 +3224,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     }
 
     public void tickTeleportHome(){
-        if (this.spawnPosition != null && this.position().distanceTo(spawnPosition) > 5){
+        if (this.spawnPosition != null && this.position().distanceTo(spawnPosition) > 2.5){
             this.teleportTo(spawnPosition.x,spawnPosition.y,spawnPosition.z);
         }
     }

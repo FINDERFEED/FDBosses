@@ -2075,7 +2075,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     }
 
     public void tickTeleportHome(){
-        if (this.spawnPosition != null && this.position().distanceTo(spawnPosition) > 10){
+        if (this.spawnPosition != null && this.position().distanceTo(spawnPosition) > 2.5){
             this.teleportTo(spawnPosition.x,spawnPosition.y,spawnPosition.z);
         }
     }
