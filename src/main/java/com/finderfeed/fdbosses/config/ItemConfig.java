@@ -51,4 +51,7 @@ public class ItemConfig {
     @ConfigValue
     public int divineGearChargeReplenishTime = 500;
 
+    @ConfigValue
+    public float divineGearAttackRadius = 25;
+
 }

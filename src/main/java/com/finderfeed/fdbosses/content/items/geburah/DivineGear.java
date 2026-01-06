@@ -193,7 +193,7 @@ public class DivineGear extends FDEntity implements AutoSerializable {
     }
 
     private LivingEntity getTarget() {
-        var entities = FDTargetFinder.getEntitiesInSphere(Mob.class, level(), this.getCorePos(), 20f, (living) -> {
+        var entities = FDTargetFinder.getEntitiesInSphere(Mob.class, level(), this.getCorePos(), BossConfigs.BOSS_CONFIG.get().itemConfig.divineGearAttackRadius, (living) -> {
             return true;
         });
 

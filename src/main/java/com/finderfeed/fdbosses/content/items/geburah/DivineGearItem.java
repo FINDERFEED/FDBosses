@@ -10,6 +10,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.ani
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
@@ -29,7 +30,7 @@ public class DivineGearItem extends Item implements AnimatedItem {
     public InteractionResult useOn(UseOnContext ctx) {
 
         var player = ctx.getPlayer();
-        if (player instanceof ServerPlayer serverPlayer){
+        if (player instanceof ServerPlayer serverPlayer && ctx.getHand() == InteractionHand.MAIN_HAND){
 
             Direction direction = ctx.getClickedFace();
             var item = ctx.getItemInHand();

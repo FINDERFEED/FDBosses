@@ -290,7 +290,8 @@ public class BossClientEvents {
         Player player = FDClientHelpers.getClientPlayer();
 
         if (player == null) return;
-        if (!player.getMainHandItem().is(BossItems.DIVINE_GEAR.get()) || player.getCooldowns().isOnCooldown(BossItems.DIVINE_GEAR.get())) return;
+        ItemStack stack = player.getMainHandItem();
+        if (!stack.is(BossItems.DIVINE_GEAR.get()) || player.getCooldowns().isOnCooldown(BossItems.DIVINE_GEAR.get())) return;
 
         var hitResult = Minecraft.getInstance().hitResult;
         if (hitResult.getType() != HitResult.Type.BLOCK) return;
@@ -307,6 +308,10 @@ public class BossClientEvents {
 
         if (!DivineGearItem.canPlaceOn(Minecraft.getInstance().level, blockPos, direction)) return;
 
+        var data = stack.get(BossDataComponents.DIVINE_GEAR_COMPONENT);
+        if (data == null || data.getCharge() == 0){
+            return;
+        }
 
         Vec3 worldRenderPos = DivineGearItem.getSpawnPlace(blockPos, direction);
         Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
