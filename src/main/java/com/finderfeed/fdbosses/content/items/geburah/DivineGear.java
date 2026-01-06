@@ -26,6 +26,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -120,8 +121,8 @@ public class DivineGear extends FDEntity implements AutoSerializable {
                                     .build(), targetLocation, 40);
                             level().playSound(null, corePos.x,corePos.y,corePos.z, BossSounds.GEBURAH_CORE_RAY_STRIKE.get(), SoundSource.HOSTILE, 4f, 1f);
 
-                            target.hurt(level().damageSources().playerAttack(owner), BossConfigs.BOSS_CONFIG.get().itemConfig.divineGearDamage);
                             target.invulnerableTime = 0;
+                            target.hurt(level().damageSources().playerAttack(owner), BossConfigs.BOSS_CONFIG.get().itemConfig.divineGearDamage);
                             attackTime = -1;
                             this.setOnCooldown();
                         }
@@ -190,8 +191,8 @@ public class DivineGear extends FDEntity implements AutoSerializable {
     }
 
     private LivingEntity getTarget() {
-        var entities = FDTargetFinder.getEntitiesInSphere(LivingEntity.class, level(), this.getCorePos(), 20f, (living) -> {
-            return !(living instanceof Player player);
+        var entities = FDTargetFinder.getEntitiesInSphere(Mob.class, level(), this.getCorePos(), 20f, (living) -> {
+            return true;
         });
 
         entities = new ArrayList<>(entities.stream().filter(living -> {

@@ -133,7 +133,7 @@ import org.joml.Vector3f;
 @EventBusSubscriber(value = Dist.CLIENT,modid = FDBosses.MOD_ID)
 public class BossClientModEvents {
 
-    public static final ResourceLocation DIVINE_GEAR = FDBosses.location("textures/entities/geburah/divine_gear_toxic.png");
+    public static final ResourceLocation DIVINE_GEAR = FDBosses.location("textures/entities/geburah/divine_gear.png");
 
     @SubscribeEvent
     public static void registerClientExtensions(RegisterClientExtensionsEvent event){

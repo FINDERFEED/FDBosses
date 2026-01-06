@@ -289,7 +289,7 @@ public class BossClientEvents {
         Player player = FDClientHelpers.getClientPlayer();
 
         if (player == null) return;
-        if (!player.getMainHandItem().is(BossItems.DIVINE_GEAR.get()) && !player.getCooldowns().isOnCooldown(BossItems.DIVINE_GEAR.get())) return;
+        if (!player.getMainHandItem().is(BossItems.DIVINE_GEAR.get()) || player.getCooldowns().isOnCooldown(BossItems.DIVINE_GEAR.get())) return;
 
         var hitResult = Minecraft.getInstance().hitResult;
         if (hitResult.getType() != HitResult.Type.BLOCK) return;
