@@ -279,5 +279,21 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_fist"));
     });
 
+    public static DeferredHolder<Animation,Animation> DIVINE_GEAR_IDLE = ANIMATIONS.register("divine_gear_idle", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"divine_gear"));
+    });
+
+    public static DeferredHolder<Animation,Animation> DIVINE_GEAR_SUMMON = ANIMATIONS.register("divine_gear_summon", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"divine_gear"));
+    });
+
+    public static DeferredHolder<Animation,Animation> DIVINE_GEAR_DEATH = ANIMATIONS.register("divine_gear_death", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"divine_gear"));
+    });
+
+    public static DeferredHolder<Animation,Animation> DIVINE_GEAR_ITEM_IDLE = ANIMATIONS.register("divine_gear_item_idle", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"divine_gear"));
+    });
+
 
 }

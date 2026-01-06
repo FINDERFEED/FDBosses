@@ -9,6 +9,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBell
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.GeburahTriggerSinEffectPacket;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.content.items.geburah.DivineGear;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.systems.music.data.FDMusicData;
 import com.finderfeed.fdlib.systems.music.data.FDMusicPartData;
@@ -42,39 +43,9 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            if (!player.isCrouching()){
-                var data = new FDMusicData(MalkuthEntity.BOSS_MUSIC_UUID, new FDMusicPartData(BossSounds.GEBURAH_THEME.get(),109.7f).setLooping(true))
-                        .fadeInTime(80)
-                        .inactiveDeleteTime(600);
-
-                FDMusicAreasHandler.addArea(MalkuthEntity.BOSS_MUSIC_UUID, new FDMusicArea(player.level().dimension(), player.position(), new FDMusicAreaCylinder(10,10),data));
-
-            }else{
-                FDMusicAreasHandler.removeArea(((ServerLevel)level).getServer(), MalkuthEntity.BOSS_MUSIC_UUID, 40);
-
-            }
-
-//            int height = 45 * 2;
-//            for (int i = 0; i < height; i++) {
-//                BlockPos pos = player.getOnPos().offset(0,-i,0);
-//
-//                float p = i / (height - 1f);
-//
-//                int radius = (int) Math.ceil(FDEasings.easeIn(1 - p) * 60);
-//
-//                float percent = FDMathUtil.lerp(0.2f,0.95f,FDEasings.easeOut(1 - p));
-//
-//                createGeburahArenaCircleAtPos(level, pos, radius,percent, 60);
-//            }
-
-//            createGeburahArenaCircleAtPos(level,player.getOnPos().below(), 60, 0.95f, 60);
-
-
-//            PacketDistributor.sendToPlayer((ServerPlayer) player, new GeburahTriggerSinEffectPacket(1));
+            DivineGear.summon(player, player.position());
 
         }else{
-//            DistortionSphereEffectHandler.setDistortionSphereEffect(new DistortionSphereEffect(player.getEyePosition().add(player.getLookAngle().scale(50)),
-//                    80,80,1, (float) -100));
         }
 
         return super.use(level, player, hand);

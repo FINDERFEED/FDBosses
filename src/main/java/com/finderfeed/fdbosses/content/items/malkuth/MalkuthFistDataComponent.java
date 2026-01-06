@@ -32,6 +32,11 @@ public class MalkuthFistDataComponent {
 
     }
 
+    public MalkuthFistDataComponent(MalkuthFistDataComponent dataComponent){
+        this.canSkipCooldown = dataComponent.canSkipCooldown;
+        this.entityHookCooldown = dataComponent.entityHookCooldown;
+    }
+
     public MalkuthFistDataComponent(boolean canSkipCooldown, int entityHookCooldown) {
         this.canSkipCooldown = canSkipCooldown;
         this.entityHookCooldown = entityHookCooldown;

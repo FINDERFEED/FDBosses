@@ -367,12 +367,12 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
                                     var data = item.get(BossDataComponents.MALKUTH_FIST_COMPONENT);
                                     data.setCanSkipCooldown(true);
                                     data.setEntityHookCooldown(cooldown);
-                                    item.set(BossDataComponents.MALKUTH_FIST_COMPONENT, data);
+                                    item.set(BossDataComponents.MALKUTH_FIST_COMPONENT, new MalkuthFistDataComponent(data));
                                 }
 
 
-
                                 owner.getCooldowns().addCooldown(BossItems.MALKUTH_FIST.get(),cooldown);
+
 
                                 this.setRemoved(RemovalReason.DISCARDED);
                                 this.onStopChaining();

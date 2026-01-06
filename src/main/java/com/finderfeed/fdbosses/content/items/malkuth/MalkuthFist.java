@@ -34,7 +34,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 public class MalkuthFist extends Item {
 
     public MalkuthFist(Properties properties) {
-        super(properties.component(BossDataComponents.MALKUTH_FIST_COMPONENT, new MalkuthFistDataComponent()));
+        super(properties);
     }
 
     @Override
@@ -42,6 +42,10 @@ public class MalkuthFist extends Item {
         if (!level.isClientSide){
 
             ItemStack item = player.getItemInHand(hand);
+
+            if (!item.has(BossDataComponents.MALKUTH_FIST_COMPONENT)){
+                item.set(BossDataComponents.MALKUTH_FIST_COMPONENT, new MalkuthFistDataComponent());
+            }
 
             if (hand == InteractionHand.MAIN_HAND){
 
@@ -156,6 +160,11 @@ public class MalkuthFist extends Item {
         super.inventoryTick(stack, level, entity, slot, p_41408_);
         if (entity instanceof ServerPlayer serverPlayer){
 
+
+            if (!stack.has(BossDataComponents.MALKUTH_FIST_COMPONENT)){
+                stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT, new MalkuthFistDataComponent());
+            }
+
             var data = stack.get(BossDataComponents.MALKUTH_FIST_COMPONENT);
 
             var cooldowns = serverPlayer.getCooldowns();
@@ -163,12 +172,12 @@ public class MalkuthFist extends Item {
                 if (cooldowns.isOnCooldown(stack.getItem())){
                     if (slot != Inventory.SLOT_OFFHAND) {
                         data.setCanSkipCooldown(false);
-                        stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT,data);
+                        stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT, new MalkuthFistDataComponent(data));
                         cooldowns.removeCooldown(stack.getItem());
                     }
                 }else{
                     data.setCanSkipCooldown(false);
-                    stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT,data);
+                    stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT,new MalkuthFistDataComponent(data));
                 }
             }
 
@@ -180,7 +189,7 @@ public class MalkuthFist extends Item {
 
             if (data.getEntityHookCooldown() > 0){
                 data.setEntityHookCooldown(data.getEntityHookCooldown() - 1);
-                stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT.get(), data);
+                stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT.get(), new MalkuthFistDataComponent(data));
             }
 
 
@@ -192,8 +201,14 @@ public class MalkuthFist extends Item {
         if (!entity.level().isClientSide){
             var data = stack.get(BossDataComponents.MALKUTH_FIST_COMPONENT);
             data.setCanSkipCooldown(false);
-            stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT,data);
+            stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT,new MalkuthFistDataComponent(data));
         }
         return super.onEntityItemUpdate(stack, entity);
     }
+
+    @Override
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return slotChanged;
+    }
+
 }

@@ -72,6 +72,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.Malku
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereOverlay;
+import com.finderfeed.fdbosses.content.items.geburah.DivineGear;
 import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistChain;
 import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistChainRenderer;
 import com.finderfeed.fdbosses.content.projectiles.renderers.MalkuthPlayerFireIceBallRenderer;
@@ -110,6 +111,7 @@ import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -131,11 +133,29 @@ import org.joml.Vector3f;
 @EventBusSubscriber(value = Dist.CLIENT,modid = FDBosses.MOD_ID)
 public class BossClientModEvents {
 
+    public static final ResourceLocation DIVINE_GEAR = FDBosses.location("textures/entities/geburah/divine_gear_toxic.png");
 
     @SubscribeEvent
     public static void registerClientExtensions(RegisterClientExtensionsEvent event){
 
+        event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
+                .addModel(FDItemModelOptions.builder()
+                        .modelInfo(BossModels.DIVINE_GEAR)
+                        .renderType((ctx,item)->{
+                            return RenderType.entityCutout(DIVINE_GEAR);
+                        })
+                        .build())
 
+                .setScale((ctx -> {
+                    return 0.25f;
+                }))
+                .addRotation3((itemDisplayContext -> {
+                    return new Vector3f();
+                }))
+                .addTranslation((itemDisplayContext -> {
+                    return new Vector3f(0,-0.1f,0);
+                }))
+        ), BossItems.DIVINE_GEAR.get());
 
         event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
                 .addModel(FDItemModelOptions.builder()
@@ -438,6 +458,16 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_CHAIN_TRAP.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD.get(), GeburahCastingCircleRenderer::new);
+
+        event.registerEntityRenderer(BossEntities.DIVINE_GEAR.get(), FDEntityRendererBuilder.<DivineGear>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<DivineGear>builder()
+                                .model(BossModels.DIVINE_GEAR)
+                                .renderType(((divineGear, v) -> {
+                                    return RenderType.entityCutout(DIVINE_GEAR);
+                                }))
+                                .light(LightTexture.FULL_BRIGHT)
+                                .build())
+                .build());
 
         FDEntityTransformation<MalkuthFistChain> malkuthFistTransform = ((entity, poseStack, pticks) -> {
             FDRenderUtil.applyMovementMatrixRotations(poseStack,entity.cachedDeltaMovement);

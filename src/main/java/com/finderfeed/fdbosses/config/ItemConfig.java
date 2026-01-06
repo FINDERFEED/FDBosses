@@ -36,4 +36,13 @@ public class ItemConfig {
     @ConfigValue
     public int iceFireGauntletCrushDamage = 15;
 
+    @ConfigValue
+    public int divineGearAttackCooldown = 60;
+
+    @ConfigValue
+    public int divineGearDamage = 20;
+
+    @ConfigValue
+    public int divineGearLifetime = 500;
+
 }

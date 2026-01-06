@@ -75,6 +75,7 @@ public class BossUtil {
     public static final int TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_IMPACT = 19;
     public static final int GEBURAH_PREPARE_RAYS = 20;
     public static final int GEBURAH_PREPARE_RAYS_FRAMES = 21;
+    public static final int DIVINE_GEAR_RAY_PARTICLES = 22;
 
     public static Vec3 matTransformDirectionVec3(Matrix4f mat, Vec3 v){
         Vector3f v1 = mat.transformDirection(
@@ -368,6 +369,10 @@ public class BossUtil {
 
     public static void geburahRayParticles(ServerLevel serverLevel, Vec3 pos, double radius, Vec3 direction){
         posEvent(serverLevel, pos, GEBURAH_RAY_PARTICLES, FDUtil.encodeDirection(direction), radius);
+    }
+
+    public static void divineGearRayParticles(ServerLevel serverLevel, Vec3 pos, double radius, Vec3 direction){
+        posEvent(serverLevel, pos, DIVINE_GEAR_RAY_PARTICLES, FDUtil.encodeDirection(direction), radius);
     }
 
     public static void malkuthSwordsInsertParticles(ServerLevel serverLevel, Vec3 pos, double radius, int malkuthEntityId){

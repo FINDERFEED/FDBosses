@@ -9,6 +9,8 @@ import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.util.GainLoseValue;
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdlib.systems.bedrock.animations.AnimationContext;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationSystem;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -22,7 +24,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
@@ -33,6 +37,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -128,20 +134,6 @@ public class BossClientEvents {
 
     }
 
-    @SubscribeEvent
-    public static void renderGuiEventTest(RenderGuiEvent.Post event){
-        if (Minecraft.getInstance().player != null) {
-            var graphics = event.getGuiGraphics();
-
-            var playerSins = PlayerSins.getPlayerSins(Minecraft.getInstance().player);
-
-            int sinnedTimes =  playerSins.getSinnedTimes();
-
-//            FDRenderUtil.renderScaledText(graphics, Component.literal("Sinned times: " + sinnedTimes + " / " + PlayerSins.MAX_SIN_TIMES),20, 20,1.5f,false,0xffffff);
-        }
-    }
-
-
 
     @SubscribeEvent
     public static void collectTooltips(ItemTooltipEvent event){
@@ -162,7 +154,13 @@ public class BossClientEvents {
             tickChesedGaze(player);
             tickChesedDarken(player);
             lowerGammaWhenAnyDarkenEffect(player);
+            if (!Minecraft.getInstance().isPaused()) {
+                divineGearAnimTime++;
+            }
+        }else{
+            divineGearAnimTime = 0;
         }
+
         tickHellscapeSky();
     }
 
@@ -273,17 +271,73 @@ public class BossClientEvents {
         return p;
     }
 
-
-
-
-
     @SubscribeEvent
     public static void renderLevelStageEvent(RenderLevelStageEvent event){
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_LEVEL){
             renderHellscapeSkybox(event);
         }else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS){
             renderMalkuthCowardExecution(event);
+            renderDivineGearPlacement(event);
         }
+    }
+
+    private static FDModel DIVINE_GEAR_MODEL;
+    private static float divineGearAnimTime = 0;
+
+    private static void renderDivineGearPlacement(RenderLevelStageEvent event){
+
+        Player player = FDClientHelpers.getClientPlayer();
+
+        if (player == null) return;
+        if (!player.getMainHandItem().is(BossItems.DIVINE_GEAR.get()) && !player.getCooldowns().isOnCooldown(BossItems.DIVINE_GEAR.get())) return;
+
+        var hitResult = Minecraft.getInstance().hitResult;
+        if (hitResult.getType() != HitResult.Type.BLOCK) return;
+
+        BlockHitResult blockHitResult = (BlockHitResult) hitResult;
+
+        var blockPos = blockHitResult.getBlockPos();
+        var direction = blockHitResult.getDirection();
+
+        if (direction != Direction.UP) return;
+
+        if (DIVINE_GEAR_MODEL == null){
+            DIVINE_GEAR_MODEL = new FDModel(BossModels.DIVINE_GEAR.get());
+        }
+
+        Vec3 worldRenderPos = new Vec3(blockPos.getX() + 0.5, blockPos.getY() + 1, blockPos.getZ() + 0.5f);
+        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+        Vec3 offset = worldRenderPos.subtract(cameraPos);
+
+        var matrices = event.getPoseStack();
+        matrices.pushPose();
+
+        matrices.translate(offset.x,offset.y,offset.z);
+
+        var location = BossClientModEvents.DIVINE_GEAR;
+        DIVINE_GEAR_MODEL.resetTransformations();
+
+
+        float time = divineGearAnimTime + event.getPartialTick().getGameTimeDeltaPartialTick(false);
+
+        var anim = BossAnims.DIVINE_GEAR_ITEM_IDLE.get();
+
+        anim.applyAnimation(new AnimationContext(),DIVINE_GEAR_MODEL, time % anim.getAnimTime());
+
+        var vertex = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        FDRenderUtil.bindTexture(location);
+        RenderSystem.enableDepthTest();
+        RenderSystem.enableBlend();
+
+        DIVINE_GEAR_MODEL.render(matrices, vertex, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 0.25f);
+
+        BufferUploader.drawWithShader(vertex.build());
+
+        matrices.popPose();
+
+        RenderSystem.disableDepthTest();
+
     }
 
     private static FDModel SWORD_MODEL;
@@ -551,7 +605,6 @@ public class BossClientEvents {
     public static void deathEvent(LivingDeathEvent event){
         if (event.getEntity() instanceof Player player && player == FDClientHelpers.getClientPlayer()){
             PhaseSphereHandler.isUsingChesedItem = false;
-            System.out.println("you died");
         }
     }
 

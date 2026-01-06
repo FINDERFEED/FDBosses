@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.content.items.LocatorEye;
 import com.finderfeed.fdbosses.content.items.CoreItem;
 import com.finderfeed.fdbosses.content.items.WeaponCoreItem;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphere;
+import com.finderfeed.fdbosses.content.items.geburah.DivineGearItem;
 import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFist;
 import com.finderfeed.fdbosses.debug.DebugStick;
 import com.finderfeed.fdbosses.FDBosses;
@@ -105,6 +106,9 @@ public class BossItems {
     public static final Supplier<Item> MALKUTH_FIST = ITEMS.register("malkuth_fist",
             ()->new MalkuthFist(new Item.Properties().stacksTo(1)));
 
+    public static final Supplier<Item> DIVINE_GEAR = ITEMS.register("divine_gear",
+            ()->new DivineGearItem(new Item.Properties().stacksTo(1)));
+
 
 
     @EventBusSubscriber(modid = FDBosses.MOD_ID)
@@ -125,6 +129,7 @@ public class BossItems {
                 event.accept(MALKUTH_TROPHY.get());
                 event.accept(MALKUTH_FIST.get());
                 event.accept(GEBURAH_TROPHY.get());
+                event.accept(DIVINE_GEAR.get());
                 event.accept(JUSTICESTONE_BRICKS.get());
                 event.accept(CHISELED_JUSTICESTONE_BRICKS.get());
                 event.accept(JUSTICESTONE_BEAM.get());

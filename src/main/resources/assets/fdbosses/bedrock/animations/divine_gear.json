@@ -1,0 +1,57 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"divine_gear_idle": {
+			"loop": true,
+			"animation_length": 4,
+			"bones": {
+				"outer_gear": {
+					"rotation": ["-query.anim_time * 180 - 90", 0, "-query.anim_time * 180"]
+				},
+				"inner_gear": {
+					"rotation": ["-query.anim_time * 180 - 180", 0, "query.anim_time * 180 + 180"]
+				}
+			}
+		},
+		"divine_gear_summon": {
+			"animation_length": 1,
+			"bones": {
+				"outer_gear": {
+					"scale": "1 - math.pow(1 - query.anim_time, 3)"
+				},
+				"inner_gear": {
+					"scale": "1 - math.pow(1 - query.anim_time, 3)"
+				}
+			}
+		},
+		"divine_gear_death": {
+			"animation_length": 1,
+			"bones": {
+				"outer_gear": {
+					"scale": "math.pow(1 - query.anim_time, 3)"
+				},
+				"inner_gear": {
+					"scale": "math.pow(1 - query.anim_time, 3)"
+				}
+			}
+		},
+		"divine_gear_item_idle": {
+			"loop": true,
+			"animation_length": 2,
+			"bones": {
+				"outer_gear": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [0, 360, 0]
+					}
+				},
+				"inner_gear": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"2.0": [0, -360, 0]
+					}
+				}
+			}
+		}
+	}
+}
