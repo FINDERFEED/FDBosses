@@ -2,9 +2,10 @@ package com.finderfeed.fdbosses.content.items.chesed;
 
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.AnimatedItemTickListener;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.AnimatedItem;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDItemAnimationHandler;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDServerItemAnimations;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.animated_item.AnimatedItemStackContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -19,7 +20,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-public class PhaseSphere extends Item implements AnimatedItemTickListener {
+public class PhaseSphere extends Item implements AnimatedItem {
 
     public PhaseSphere(Properties p_41383_) {
         super(p_41383_);
@@ -61,12 +62,6 @@ public class PhaseSphere extends Item implements AnimatedItemTickListener {
         }
     }
 
-    @Override
-    public void animatedItemTick(ItemStack itemStack) {
-        var animSystem = FDItemAnimationHandler.getItemAnimationSystem(itemStack);
-        animSystem.startAnimation("IDLE", AnimationTicker.builder(BossAnims.CHESED_ITEM_IDLE.get())
-                .build());
-    }
 
     @Override
     public void inventoryTick(ItemStack stack, Level p_41405_, Entity entity, int slot, boolean p_41408_) {
@@ -75,5 +70,14 @@ public class PhaseSphere extends Item implements AnimatedItemTickListener {
 //            serverPlayer.getInventory().setItem(slot, ItemStack.EMPTY);
 //            serverPlayer.sendSystemMessage(Component.translatable("fdbosses.word.item_is_not_released_yet").withStyle(ChatFormatting.RED));
 //        }
+    }
+
+    @Override
+    public void animatedItemTick(AnimatedItemStackContext ctx) {
+        var animSystem = FDItemAnimationHandler.getItemAnimationSystem(ctx);
+        if (animSystem != null) {
+            animSystem.startAnimation("IDLE", AnimationTicker.builder(BossAnims.CHESED_ITEM_IDLE.get())
+                    .build());
+        }
     }
 }

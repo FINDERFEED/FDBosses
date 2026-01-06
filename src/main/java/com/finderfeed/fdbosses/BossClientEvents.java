@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSi
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
+import com.finderfeed.fdbosses.content.items.geburah.DivineGearItem;
 import com.finderfeed.fdbosses.content.util.GainLoseValue;
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdlib.FDClientHelpers;
@@ -299,14 +300,17 @@ public class BossClientEvents {
         var blockPos = blockHitResult.getBlockPos();
         var direction = blockHitResult.getDirection();
 
-        if (direction != Direction.UP) return;
 
         if (DIVINE_GEAR_MODEL == null){
             DIVINE_GEAR_MODEL = new FDModel(BossModels.DIVINE_GEAR.get());
         }
 
-        Vec3 worldRenderPos = new Vec3(blockPos.getX() + 0.5, blockPos.getY() + 1, blockPos.getZ() + 0.5f);
+        if (!DivineGearItem.canPlaceOn(Minecraft.getInstance().level, blockPos, direction)) return;
+
+
+        Vec3 worldRenderPos = DivineGearItem.getSpawnPlace(blockPos, direction);
         Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+
         Vec3 offset = worldRenderPos.subtract(cameraPos);
 
         var matrices = event.getPoseStack();

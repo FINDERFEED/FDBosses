@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.init;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
+import com.finderfeed.fdbosses.content.items.geburah.DivineGearComponent;
 import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistDataComponent;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -21,6 +22,11 @@ public class BossDataComponents {
     public static final Supplier<DataComponentType<MalkuthFistDataComponent>> MALKUTH_FIST_COMPONENT = DATA_COMPONENTS.register("malkuth_fist", ()-> DataComponentType.<MalkuthFistDataComponent>builder()
             .networkSynchronized(MalkuthFistDataComponent.STREAM_CODEC)
             .persistent(MalkuthFistDataComponent.CODEC)
+            .build());
+
+    public static final Supplier<DataComponentType<DivineGearComponent>> DIVINE_GEAR_COMPONENT = DATA_COMPONENTS.register("divine_gear_component", ()-> DataComponentType.<DivineGearComponent>builder()
+            .networkSynchronized(DivineGearComponent.STREAM_CODEC)
+            .persistent(DivineGearComponent.CODEC)
             .build());
 
 }

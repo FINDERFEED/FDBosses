@@ -73,6 +73,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.Mal
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereOverlay;
 import com.finderfeed.fdbosses.content.items.geburah.DivineGear;
+import com.finderfeed.fdbosses.content.items.geburah.DivineGearItemRenderer;
 import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistChain;
 import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistChainRenderer;
 import com.finderfeed.fdbosses.content.projectiles.renderers.MalkuthPlayerFireIceBallRenderer;
@@ -155,6 +156,7 @@ public class BossClientModEvents {
                 .addTranslation((itemDisplayContext -> {
                     return new Vector3f(0,-0.1f,0);
                 }))
+                .freeRender(new DivineGearItemRenderer())
         ), BossItems.DIVINE_GEAR.get());
 
         event.registerItem(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()

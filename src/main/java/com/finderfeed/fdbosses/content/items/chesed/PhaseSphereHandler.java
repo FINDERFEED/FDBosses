@@ -107,7 +107,7 @@ public class PhaseSphereHandler {
                 player.getAbilities().loadSaveData(tag);
                 player.noPhysics = false;
                 PacketDistributor.sendToPlayer(serverPlayer, new PhaseSpherePacket(player, false));
-                FDServerItemAnimations.startItemAnimation(player, "USE", AnimationTicker.builder(BossAnims.CHESED_ITEM_USE)
+                FDServerItemAnimations.startItemAnimation(player, "STOP_USE", AnimationTicker.builder(BossAnims.CHESED_ITEM_USE)
                         .setToNullTransitionTime(0)
                         .reversed()
                         .build(), player.getUsedItemHand());

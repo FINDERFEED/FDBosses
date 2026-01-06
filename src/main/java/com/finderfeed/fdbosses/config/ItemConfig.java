@@ -40,9 +40,15 @@ public class ItemConfig {
     public int divineGearAttackCooldown = 60;
 
     @ConfigValue
-    public int divineGearDamage = 20;
+    public int divineGearDamage = 15;
 
     @ConfigValue
     public int divineGearLifetime = 500;
+
+    @ConfigValue
+    public int divineGearCharges = 3;
+
+    @ConfigValue
+    public int divineGearChargeReplenishTime = 500;
 
 }

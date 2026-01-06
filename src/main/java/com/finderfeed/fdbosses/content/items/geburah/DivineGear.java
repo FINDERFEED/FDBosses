@@ -96,8 +96,8 @@ public class DivineGear extends FDEntity implements AutoSerializable {
                     var target = this.getTarget();
                     if (target != null){
                         if (attackTime == 0){
-                            this.sendChargeParticles(20);
-                        }else if (attackTime > 20){
+                            this.sendChargeParticles(10);
+                        }else if (attackTime > 10){
 
 
                             Vec3 targetLocation = target.getBoundingBox().getCenter();
@@ -132,6 +132,8 @@ public class DivineGear extends FDEntity implements AutoSerializable {
                     }
                 }
 
+            }else if (age == lifetime){
+                this.sendChargeParticles(10);
             }
 
             int animTime = BossAnims.DIVINE_GEAR_DEATH.get().getAnimTime() - 10;
@@ -196,6 +198,9 @@ public class DivineGear extends FDEntity implements AutoSerializable {
         });
 
         entities = new ArrayList<>(entities.stream().filter(living -> {
+            if (living.isDeadOrDying()){
+                return false;
+            }
             ClipContext clipContext = new ClipContext(this.getCorePos(), living.getBoundingBox().getCenter(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
             var res = level().clip(clipContext);
             return res.getType() == HitResult.Type.MISS;
@@ -221,9 +226,10 @@ public class DivineGear extends FDEntity implements AutoSerializable {
         for (int i = 0; i < 3; i++) {
             StripeParticleOptions stripeParticleOptions = StripeParticleOptions.createHorizontalCircling(
                     new FDColor(1f, 0.3f, 0.2f, 1f), new FDColor(1f, 0.6f, 0.2f, 1f),
-                    new Vec3(0, 1, 0), i / 3f * FDMathUtil.FPI * 2, 0.2f, prepareTime, 60, 0, 3, 0.5f,
+                    new Vec3(0, 1, 0), i / 3f * FDMathUtil.FPI * 2, 0.1f, prepareTime, 40, 0, 3, 0.5f,
                     0.75f, true, true
             );
+
 
             FDLibCalls.sendParticles((ServerLevel) level(), stripeParticleOptions, this.getCorePos(), 120);
         }
