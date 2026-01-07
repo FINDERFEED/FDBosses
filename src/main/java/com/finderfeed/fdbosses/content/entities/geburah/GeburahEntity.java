@@ -2057,9 +2057,10 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         CompoundTag mainAttackChain = new CompoundTag();
         this.mainAttackChain.save(mainAttackChain);
-        tag.put("mainAttackChain",mainAttackChain);
-
-        tag.putUUID("spawnerId", this.geburahSpawnerUUID);
+        tag.put("mainAttackChain", mainAttackChain);
+        if (this.geburahSpawnerUUID != null) {
+            tag.putUUID("spawnerId", this.geburahSpawnerUUID);
+        }
     }
 
     @Override
