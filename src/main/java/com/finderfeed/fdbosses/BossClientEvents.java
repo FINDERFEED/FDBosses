@@ -301,6 +301,9 @@ public class BossClientEvents {
         var blockPos = blockHitResult.getBlockPos();
         var direction = blockHitResult.getDirection();
 
+        var posAndDir = DivineGearItem.getPosAndDirection(Minecraft.getInstance().level, blockPos, direction);
+        blockPos = posAndDir.first;
+        direction = posAndDir.second;
 
         if (DIVINE_GEAR_MODEL == null){
             DIVINE_GEAR_MODEL = new FDModel(BossModels.DIVINE_GEAR.get());

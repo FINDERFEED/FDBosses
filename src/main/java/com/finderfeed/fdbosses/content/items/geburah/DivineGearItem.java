@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.content.items.geburah;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossDataComponents;
+import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.AnimatedItem;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDItemAnimationHandler;
@@ -44,6 +45,12 @@ public class DivineGearItem extends Item implements AnimatedItem {
 
             if (charges > 0 || player.isCreative()) {
                 BlockPos pos = ctx.getClickedPos();
+
+                var posAndDir = getPosAndDirection(ctx.getLevel(), pos, direction);
+
+                pos = posAndDir.first;
+                direction = posAndDir.second;
+
                 if (canPlaceOn(ctx.getLevel(), pos, direction)) {
                     Vec3 place = getSpawnPlace(pos, direction);
 
@@ -63,6 +70,21 @@ public class DivineGearItem extends Item implements AnimatedItem {
         }
 
         return super.useOn(ctx);
+    }
+
+    public static Pair<BlockPos, Direction> getPosAndDirection(Level level, BlockPos clickedPos, Direction direction){
+        var state = level.getBlockState(clickedPos);
+        if (state.getCollisionShape(level,clickedPos).isEmpty()){
+            for (var dir : Direction.values()){
+                BlockPos offs = clickedPos.offset(dir.getNormal());
+                if (level.getBlockState(offs).getCollisionShape(level,offs).isEmpty()){
+                    return new Pair<>(clickedPos.offset(dir.getOpposite().getNormal()), dir);
+                }
+            }
+            return new Pair<>(clickedPos.below(), direction);
+        }else{
+            return new Pair<>(clickedPos, direction);
+        }
     }
 
     public static Vec3 getSpawnPlace(BlockPos pos, Direction direction){

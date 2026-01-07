@@ -83,7 +83,7 @@ public class DivineGear extends FDEntity implements AutoSerializable {
             }
 
             if (cooldown == -1){
-                this.setOnCooldown();
+                this.cooldown = 20;
             }
 
             int lifetime = BossConfigs.BOSS_CONFIG.get().itemConfig.divineGearLifetime;
