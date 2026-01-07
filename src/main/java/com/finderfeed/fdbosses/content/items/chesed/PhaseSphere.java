@@ -18,7 +18,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+
+import java.util.List;
 
 public class PhaseSphere extends Item implements AnimatedItem {
 
@@ -79,5 +82,11 @@ public class PhaseSphere extends Item implements AnimatedItem {
             animSystem.startAnimation("IDLE", AnimationTicker.builder(BossAnims.CHESED_ITEM_IDLE.get())
                     .build());
         }
+    }
+
+    @Override
+    public void appendHoverText(ItemStack p_41421_, TooltipContext p_339594_, List<Component> components, TooltipFlag p_41424_) {
+        super.appendHoverText(p_41421_, p_339594_, components, p_41424_);
+        components.add(Component.translatable("fdbosses.word.phase_sphere_description").withStyle(ChatFormatting.AQUA));
     }
 }

@@ -11,6 +11,8 @@ import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -23,6 +25,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -30,6 +33,8 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.network.PacketDistributor;
+
+import java.util.List;
 
 public class MalkuthFist extends Item {
 
@@ -198,10 +203,12 @@ public class MalkuthFist extends Item {
 
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
-        if (!entity.level().isClientSide){
+        if (!entity.level().isClientSide) {
             var data = stack.get(BossDataComponents.MALKUTH_FIST_COMPONENT);
-            data.setCanSkipCooldown(false);
-            stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT,new MalkuthFistDataComponent(data));
+            if (data != null) {
+                data.setCanSkipCooldown(false);
+                stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT, new MalkuthFistDataComponent(data));
+            }
         }
         return super.onEntityItemUpdate(stack, entity);
     }
@@ -211,4 +218,9 @@ public class MalkuthFist extends Item {
         return slotChanged;
     }
 
+    @Override
+    public void appendHoverText(ItemStack p_41421_, TooltipContext p_339594_, List<Component> components, TooltipFlag p_41424_) {
+        super.appendHoverText(p_41421_, p_339594_, components, p_41424_);
+        components.add(Component.translatable("fdbosses.word.malkuth_fist_description").withStyle(ChatFormatting.GOLD));
+    }
 }

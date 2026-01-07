@@ -101,13 +101,13 @@ public class BossItems {
             ()->new ExplosiveCrystalItem(new Item.Properties()));
 
     public static final Supplier<Item> PHASE_SPHERE = ITEMS.register("phase_sphere",
-            ()->new PhaseSphere(new Item.Properties().stacksTo(1)));
+            ()->new PhaseSphere(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
 
     public static final Supplier<Item> MALKUTH_FIST = ITEMS.register("malkuth_fist",
-            ()->new MalkuthFist(new Item.Properties().stacksTo(1)));
+            ()->new MalkuthFist(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
 
     public static final Supplier<Item> DIVINE_GEAR = ITEMS.register("divine_gear",
-            ()->new DivineGearItem(new Item.Properties().stacksTo(1)));
+            ()->new DivineGearItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
 
 
 

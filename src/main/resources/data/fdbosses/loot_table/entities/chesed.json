@@ -18,6 +18,17 @@
         {
           "type": "minecraft:item",
           "functions": [],
+          "name": "fdbosses:phase_sphere"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [],
           "name": "fdbosses:chesed_trophy"
         }
       ],

@@ -24,7 +24,7 @@
   "item.fdbosses.malkuth_fire_warrior_spawn_egg": "Malkuth Warrior Spawn Egg (Fire)",
   "item.fdbosses.malkuth_ice_warrior_spawn_egg": "Malkuth Warrior Spawn Egg (Ice)",
   "item.fdbosses.phase_sphere": "Phase Sphere",
-  "item.fdbosses.malkuth_fist": "IceFire Gauntlet",
+  "item.fdbosses.malkuth_fist": "Emberfrost Gauntlet",
   "item.fdbosses.divine_gear": "Divine Gear",
 
   "death.attack.geburah_judgement_ball": "%s caught a stray sin in his face",
@@ -202,6 +202,9 @@
   "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.fire_and_ice_core.stats": "Damage:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballToolDamagePercent}}% of tool damage.\n\nItem ability cooldown:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballAbilityCooldown}} ticks",
   "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.fire_and_ice_core.info": "The core of Malkuth.\n\nCan be attached to any item that has damage to be able to summon Malkuth fireballs.\n\nUse an item to release a fireball that will deal a percentage of item damage and ignite the targets.\n\nCrouch while using an item to release an iceball that will slow the targets instead.",
   "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.malkuth_trophy.info": "A trophy of Malkuth to showcase your heroic deeds",
+  "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.malkuth_fist.stats": "Crush Damage:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=iceFireGauntletCrushDamage}}.\n\nCooldown:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=iceFireGauntletCooldown}} ticks",
+  "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.malkuth_fist.info": "§6In right hand:§r\n\nActs as grappling hook for blocks. Casts Malkuths crush attack at grapple position.\nIf used on ground while facing downwards propels the user up into the air.\n\n§6In left hand:§r\n\nActs as a grappling hook for entities. Makes user automatically attack the target, then knocks user back from the target.\n\n§6Combo:§r\n\nUsing an item in the left hand and then moving it back to the right hand resets its cooldown.",
+
 
   "fdbosses.tldr.malkuth": "Cannot be attacked directly.\n\nWhen player is weak to §cFire§r it receives decreased §bIce§r damage, and other way around if player is weak to §bIce§r, it receives decreased §cFire§r damage.\n\nCurrent weakness can be seen on the crosshair.\n\nUse cannons on the arena to attack Malkuth, you can only use the cannon of type you are currently weak to.",
   "fdbosses.word.patrons": "Patrons",
@@ -260,9 +263,17 @@
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.justice_core.stats": "Damage reduction:\n{{(fdlib:image)path=fdbosses:boss_protection}}: {{(fdbosses:config_float) config=itemConfig, value=justiceCoreDamageReduction}}% incoming damage reduction.",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.polished_justicestone.info": "A whole lot of Justicestone.",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.geburah_trophy.info": "A trophy of Geburah to showcase your heroic deeds",
+  "fdbosses.boss_drop.fdbosses.geburah.fdbosses.divine_gear.stats": "Damage:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearDamage}}.\n\nStrike interval:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearAttackCooldown}} ticks.\n\nLifetime:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearLifetime}} ticks.\n\nCharge replenish time:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearChargeReplenishTime}} ticks.\n\nAttack radius:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearAttackRadius}} blocks.",
+  "fdbosses.boss_drop.fdbosses.geburah.fdbosses.divine_gear.info": "Allows to place down a turret that will attack §cANY§r mob around it.\n\nPrioritizes attacking the last entity you have attacked.\n\nHolds up to  {{(fdbosses:config_float) config=itemConfig, value=divineGearCharges}} charges.",
+
+
+
   "fdbosses.word.cant_find_arena": "Cannot find the structure in this dimension",
   "fdbosses.skills.geburah.sin_stay_still_sin": "Sin of Stillness",
   "fdbosses.skills.geburah.sin_stay_still_sin_description": "When this sin is active, standing still is forbidden for humans.",
   "fdbosses.word.set_special_respawn_point": "Special respawn position set",
-  "fdbosses.word.item_is_not_released_yet": "This item is not released yet!"
+  "fdbosses.word.item_is_not_released_yet": "This item is not released yet!",
+  "fdbosses.word.malkuth_fist_description": "Acts as grappling hook for blocks in right hand, for entities in left hand. Using item in left hand, then moving it to the right hand resets its cooldown.",
+  "fdbosses.word.phase_sphere_description": "When used allows to phase through blocks for a limited time.",
+  "fdbosses.word.divine_gear_description": "Right click on the block to place down a turret that will attack any mob around it."
 }
