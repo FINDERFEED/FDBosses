@@ -2782,7 +2782,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             LivingEntity livingEntity = event.getEntity();
 
-            if (!livingEntity.level().isClientSide && event.getSource() == BossDamageSources.MALKUTH_COWARDICE_SOURCE){
+            if (!livingEntity.level().isClientSide && (event.getSource() == BossDamageSources.MALKUTH_COWARDICE_SOURCE || event.getSource() == BossDamageSources.GEBURAH_SINNED_TOO_MUCH_SOURCE)){
                 event.setCanceled(true);
             }
 
