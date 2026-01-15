@@ -175,11 +175,12 @@ public class MalkuthFist extends Item {
         if (entity instanceof ServerPlayer serverPlayer){
 
             int hookCooldown = getHookCooldown(stack);
+            var offhand = serverPlayer.getOffhandItem();
 
             var cooldowns = serverPlayer.getCooldowns();
             if (canSkipCooldown(stack)){
                 if (cooldowns.isOnCooldown(stack.getItem())){
-                    if (slot != Inventory.SLOT_OFFHAND) {
+                    if (stack != offhand) {
                         setCanSkipCooldown(stack,false);
                         cooldowns.removeCooldown(stack.getItem());
                     }
@@ -188,7 +189,7 @@ public class MalkuthFist extends Item {
                 }
             }
 
-            if (!cooldowns.isOnCooldown(BossItems.MALKUTH_FIST.get()) && slot == Inventory.SLOT_OFFHAND){
+            if (!cooldowns.isOnCooldown(BossItems.MALKUTH_FIST.get()) && stack == offhand){
                 if (hookCooldown > 0){
                     cooldowns.addCooldown(BossItems.MALKUTH_FIST.get(),hookCooldown);
                 }

@@ -177,16 +177,16 @@ public class GeburahChainTrapRenderer extends EntityRenderer<GeburahChainTrapEnt
         matrices.mulPose(Axis.YP.rotationDegrees(90));
         m = matrices.last().pose();
 
-        vertex.vertex(m,xSize,0,0).color(1f,1f,1f,1f).uv(1,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1);
-        vertex.vertex(m,xSize,length,0).color(1f,1f,1f,1f).uv(1,v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1);
-        vertex.vertex(m,-xSize,length,0).color(1f,1f,1f,1f).uv(0,v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1);
-        vertex.vertex(m,-xSize,0,0).color(1f,1f,1f,1f).uv(0,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1);
+        vertex.vertex(m,xSize,0,0).color(1f,1f,1f,1f).uv(1,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1).endVertex();
+        vertex.vertex(m,xSize,length,0).color(1f,1f,1f,1f).uv(1,v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1).endVertex();
+        vertex.vertex(m,-xSize,length,0).color(1f,1f,1f,1f).uv(0,v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1).endVertex();
+        vertex.vertex(m,-xSize,0,0).color(1f,1f,1f,1f).uv(0,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1).endVertex();
 
 
-        vertex.vertex(m,-xSize,0,0).color(1f,1f,1f,1f).uv(0,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1);
-        vertex.vertex(m,-xSize,length,0).color(1f,1f,1f,1f).uv(0,v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1);
-        vertex.vertex(m,xSize,length,0).color(1f,1f,1f,1f).uv(1,v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1);
-        vertex.vertex(m,xSize,0,0).color(1f,1f,1f,1f).uv(1,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1);
+        vertex.vertex(m,-xSize,0,0).color(1f,1f,1f,1f).uv(0,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1).endVertex();
+        vertex.vertex(m,-xSize,length,0).color(1f,1f,1f,1f).uv(0,v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1).endVertex();
+        vertex.vertex(m,xSize,length,0).color(1f,1f,1f,1f).uv(1,v).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1).endVertex();
+        vertex.vertex(m,xSize,0,0).color(1f,1f,1f,1f).uv(1,0).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(LightTexture.FULL_BRIGHT).normal(matrices.last().normal(), 0,0,1).endVertex();
 
 
         matrices.popPose();

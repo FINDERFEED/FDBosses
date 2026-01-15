@@ -37,6 +37,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
@@ -447,10 +448,9 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
 
     @Override
     protected void positionRider(Entity entity, MoveFunction function) {
-        super.positionRider(entity, function);
 
         if (currentPlayerHookPos == null){
-            currentPlayerHookPos = entity.position().add(0,entity.getBbHeight() /2,0);
+            currentPlayerHookPos = entity.position().add(0,entity.getBbHeight() /2  * 0.5,0);
             double distance = currentPlayerHookPos.distanceTo(this.position());
             this.pullingPlayerTickerTime = (int) Math.ceil(distance/2);
             if (this.pullingPlayerTickerTime <= 0){
@@ -557,7 +557,7 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
     public static class Events {
 
         @SubscribeEvent
-        public static void hurtEvent(LivingDamageEvent event){
+        public static void hurtEvent(LivingHurtEvent event){
             var entity = event.getEntity();
             if (entity instanceof ServerPlayer serverPlayer){
                 if (serverPlayer.getVehicle() instanceof MalkuthFistChain malkuthFistChain) {
@@ -566,10 +566,12 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
                         var sourceBB = source.getBoundingBox().inflate(2);
                         if (sourceBB.intersects(serverPlayer.getBoundingBox())) {
                             event.setCanceled(true);
+                            serverPlayer.invulnerableTime = 20;
                         }
                     }else{
                         if (event.getSource().is(DamageTypes.IN_WALL)){
                             event.setCanceled(true);
+                            serverPlayer.invulnerableTime = 20;
                         }
                     }
                 }

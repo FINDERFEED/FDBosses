@@ -7,7 +7,7 @@
         {
           "type": "minecraft:item",
           "functions": [],
-          "name": "fdbosses:lightning_core"
+          "name": "fdbosses:justice_core"
         }
       ],
       "rolls": 1.0
@@ -18,7 +18,7 @@
         {
           "type": "minecraft:item",
           "functions": [],
-          "name": "fdbosses:phase_sphere"
+          "name": "fdbosses:divine_gear"
         }
       ],
       "rolls": 1.0
@@ -29,11 +29,27 @@
         {
           "type": "minecraft:item",
           "functions": [],
-          "name": "fdbosses:chesed_trophy"
+          "name": "fdbosses:geburah_trophy"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [
+            {
+              "function": "minecraft:set_count",
+              "count": 512
+            }
+          ],
+          "name": "fdbosses:polished_justicestone"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "fdbosses:entities/chesed"
+  "random_sequence": "fdbosses:entities/geburah"
 }

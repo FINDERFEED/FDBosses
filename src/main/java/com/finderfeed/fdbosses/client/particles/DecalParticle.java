@@ -71,10 +71,10 @@ public abstract class DecalParticle extends Particle {
 
         int light = this.getLightColor(pticks);
 
-        vertex.vertex(mat, size,0,size).color(1f,1f,1f,alpha).uv(0,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        vertex.vertex(mat, size,0,-size).color(1f,1f,1f,alpha).uv(0,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        vertex.vertex(mat, -size,0,-size).color(1f,1f,1f,alpha).uv(1,1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
-        vertex.vertex(mat, -size,0,size).color(1f,1f,1f,alpha).uv(1,0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+        vertex.vertex(mat, size,0,size).uv(0,0).color(1f,1f,1f,alpha).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        vertex.vertex(mat, size,0,-size).uv(0,1).color(1f,1f,1f,alpha).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        vertex.vertex(mat, -size,0,-size).uv(1,1).color(1f,1f,1f,alpha).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
+        vertex.vertex(mat, -size,0,size).uv(1,0).color(1f,1f,1f,alpha).overlayCoords(OverlayTexture.NO_OVERLAY).uv2(light).endVertex();
 
     }
 

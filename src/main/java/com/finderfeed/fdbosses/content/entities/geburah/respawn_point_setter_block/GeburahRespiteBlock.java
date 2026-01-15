@@ -30,7 +30,7 @@ public class GeburahRespiteBlock extends GlazedTerracottaBlock implements Entity
 
     @Override
     public InteractionResult use(BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult p_60508_) {
-        if (player instanceof ServerPlayer serverPlayer){
+        if (player instanceof ServerPlayer serverPlayer && hand == InteractionHand.MAIN_HAND){
             putSpecialRespawnPoint(serverPlayer, serverPlayer.level().dimension(), serverPlayer.getOnPos().above());
             serverPlayer.sendSystemMessage(Component.translatable("fdbosses.word.set_special_respawn_point"));
             serverPlayer.swing(InteractionHand.MAIN_HAND);

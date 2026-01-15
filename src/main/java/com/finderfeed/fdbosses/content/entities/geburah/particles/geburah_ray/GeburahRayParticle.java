@@ -198,7 +198,8 @@ public class GeburahRayParticle extends Particle {
 
         @Override
         public void end(Tesselator p_107438_) {
-
+            p_107438_.end();
+            RenderSystem.setShader(GameRenderer::getParticleShader);
         }
 
         public String toString() {

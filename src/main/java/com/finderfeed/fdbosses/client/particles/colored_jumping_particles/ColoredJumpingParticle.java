@@ -231,15 +231,13 @@ public class ColoredJumpingParticle extends Particle {
         return RENDER_TYPE;
     }
 
-    public static final ParticleRenderType RENDER_TYPE = new FDParticleRenderType() {
+    public static final ParticleRenderType RENDER_TYPE = new ParticleRenderType() {
 
-        @Override
-        public void end() {
 
-        }
 
         @Override
         public void end(Tesselator tesselator) {
+            tesselator.end();
             RenderSystem.setShader(GameRenderer::getParticleShader);
             RenderSystem.disableBlend();
         }

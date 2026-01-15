@@ -1,8 +1,10 @@
 package com.finderfeed.fdbosses.init;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.content.structures.GeburahArenaStructure;
 import com.finderfeed.fdbosses.content.structures.MalkuthArenaStructure;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.levelgen.structure.StructureType;
@@ -19,6 +21,13 @@ public class BossStructures {
         @Override
         public Codec<MalkuthArenaStructure> codec() {
             return MalkuthArenaStructure.CODEC;
+        }
+    });
+
+    public static final Supplier<StructureType<GeburahArenaStructure>> GEBURAH_ARENA = STRUCTURES.register("geburah_arena",()-> new StructureType<>() {
+        @Override
+        public Codec<GeburahArenaStructure> codec() {
+            return GeburahArenaStructure.CODEC;
         }
     });
 

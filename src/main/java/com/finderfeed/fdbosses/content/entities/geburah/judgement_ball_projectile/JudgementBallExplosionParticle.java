@@ -92,13 +92,14 @@ public class JudgementBallExplosionParticle extends Particle {
             RenderSystem.depthMask(true);
             RenderSystem.enableBlend();
             RenderSystem.setShaderTexture(0, FDBosses.location("textures/entities/geburah/judgement_ball_3.png"));
-            RenderSystem.setShader(()->GameRenderer.getParticleShader());
-            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
+            RenderSystem.setShader(()->GameRenderer.getPositionColorTexLightmapShader());
+            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP);
         }
 
         @Override
         public void end(Tesselator p_107438_) {
-
+            p_107438_.end();
+            RenderSystem.setShader(()->GameRenderer.getParticleShader());
         }
 
 

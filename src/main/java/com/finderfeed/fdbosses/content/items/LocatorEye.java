@@ -2,7 +2,9 @@ package com.finderfeed.fdbosses.content.items;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.content.entities.EyeOfChesedEntity;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -59,6 +61,8 @@ public class LocatorEye<T extends EyeOfEnder> extends Item {
                 player.awardStat(Stats.ITEM_USED.get(this));
                 player.swing(hand, true);
                 return InteractionResultHolder.success(itemstack);
+            }else{
+                player.sendSystemMessage(Component.translatable("fdbosses.word.cant_find_arena").withStyle(ChatFormatting.RED));
             }
         }
         return InteractionResultHolder.consume(itemstack);

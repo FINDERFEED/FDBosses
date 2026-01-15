@@ -61,6 +61,7 @@ public class GeburahRayStrikeDecalParticle extends DecalParticle {
 
         @Override
         public void end(Tesselator p_107438_) {
+            p_107438_.end();
             if (Minecraft.useShaderTransparency()) {
                 Minecraft.getInstance().levelRenderer.getParticlesTarget().copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
                 Minecraft.getInstance().levelRenderer.getParticlesTarget().bindWrite(false);

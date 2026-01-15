@@ -62,6 +62,8 @@ public class PlayerSinsHandler {
             }
         }
 
+        PlayerSins.setPlayerSins(player, playerSins, false);
+
     }
 
     public static void setActiveSins(ServerPlayer player, List<ActivePlayerSinInstance> instances){

@@ -9,24 +9,27 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.SetClientMalkuthWeaknessAmountPacket;
+import com.finderfeed.fdbosses.content.items.CoreItem;
 import com.finderfeed.fdbosses.content.items.WeaponCoreItem;
 import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
-import com.finderfeed.fdbosses.init.BossConfigs;
-import com.finderfeed.fdbosses.init.BossDamageSources;
-import com.finderfeed.fdbosses.init.BossDataComponents;
-import com.finderfeed.fdbosses.init.BossEffects;
+import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdlib.network.FDPacketHandler;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -290,6 +293,75 @@ public class BossEvents {
             }
 
         }
+    }
+
+
+//    @SubscribeEvent
+//    public static void checkInvulnerability(EntityInvulnerabilityCheckEvent event){
+//        if (event.getEntity() instanceof ServerPlayer serverPlayer){
+//            if (serverPlayer.getUseItem().is(BossItems.PHASE_SPHERE.get())){
+//                DamageSource source = event.getSource();
+//                if (source.is(DamageTypes.IN_WALL)){
+//                    event.setInvulnerable(true);
+//                }
+//            }
+//        }
+//    }
+
+    private static final EquipmentSlot[] EQUIPMENT_SLOTS = {
+            EquipmentSlot.FEET,
+            EquipmentSlot.CHEST,
+            EquipmentSlot.LEGS,
+            EquipmentSlot.HEAD,
+    };
+
+    @SubscribeEvent
+    public static void justiceCore(LivingDamageEvent event){
+
+        LivingEntity livingEntity = event.getEntity();
+        if (!livingEntity.level().isClientSide){
+            var source = event.getSource();
+            if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)){
+                return;
+            }
+            for (var slot : EQUIPMENT_SLOTS){
+
+                ItemStack itemStack = livingEntity.getItemBySlot(slot);
+                if (itemStack == null) continue;
+
+
+                if (CoreItem.hasCore(itemStack)){
+                    var core = CoreItem.getItemCore(itemStack);
+
+                    if (core == ItemCoreDataComponent.CoreType.JUSTICE_CORE){
+
+                        var amount = event.getAmount();
+
+                        CompoundTag data = livingEntity.getPersistentData();
+                        if (data.contains("fdbosses_last_damage_received")){
+                            float damage = data.getFloat("fdbosses_last_damage_received");
+                            data.putFloat("fdbosses_last_damage_received", amount);
+                            amount = FDMathUtil.clamp(amount,0, damage);
+                        }else{
+                            data.putFloat("fdbosses_last_damage_received", amount);
+                        }
+
+                        int reduction = BossConfigs.BOSS_CONFIG.get().itemConfig.justiceCoreDamageReduction;
+                        float p = 1 - reduction / 100f;
+
+                        amount *= p;
+
+                        event.setAmount(amount);
+
+                        break;
+
+                    }
+
+                }
+
+            }
+        }
+
     }
 
     @SubscribeEvent

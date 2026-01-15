@@ -26,6 +26,7 @@ public class FDBosses {
 
         BossItems.ITEMS.register(bus);
         BossModels.INFOS.register(bus);
+        GeburahSins.SINS.register(bus);
         BossBlocks.BLOCKS.register(bus);
         BossSounds.SOUNDS.register(bus);
         BossBars.BOSS_BARS.register(bus);

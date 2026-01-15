@@ -71,12 +71,16 @@ import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOpti
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
@@ -100,6 +104,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerSetSpawnEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
@@ -2172,9 +2177,46 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                     var spawners = FDTargetFinder.getEntitiesInCylinder(GeburahBossSpawner.class, serverPlayer.level(), serverPlayer.position().add(0,-10,0), ARENA_HEIGHT + 10, ARENA_RADIUS + 20);
                     if (!spawners.isEmpty()){
                         respawnData.putBoolean("diedToGeburah",true);
+                    }else{
+                        respawnData.putBoolean("diedToGeburah",false);
                     }
                 }
             }
+        }
+
+        @SubscribeEvent
+        public static void playerSetRespawnPos(PlayerSetSpawnEvent event){
+
+            if (event.getEntity() instanceof ServerPlayer serverPlayer){
+                var respawnData = GeburahRespiteBlock.getRespawnData(serverPlayer);
+                if (respawnData != null){
+                    if (respawnData.getBoolean("shouldCancelSpawnSet")){
+                        respawnData.remove("shouldCancelSpawnSet");
+
+                        if (respawnData.contains("tempRespawningDimension")){
+                            ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(respawnData.getString("tempRespawningDimension")));
+
+                            BlockPos pos = new BlockPos(
+                                    respawnData.getInt("tempRespawningPosX"),
+                                    respawnData.getInt("tempRespawningPosY"),
+                                    respawnData.getInt("tempRespawningPosZ")
+                            );
+
+                            serverPlayer.setRespawnPosition(dimension, pos, respawnData.getFloat("tempRespawningAngle"), true, false);
+
+                            respawnData.remove("tempRespawningDimension");
+                            respawnData.remove("tempRespawningPosX");
+                            respawnData.remove("tempRespawningPosY");
+                            respawnData.remove("tempRespawningPosZ");
+                            respawnData.remove("tempRespawningAngle");
+                        }
+
+                        event.setCanceled(true);
+                    }
+                }
+            }
+
+
         }
 
         //PlayerListMixin

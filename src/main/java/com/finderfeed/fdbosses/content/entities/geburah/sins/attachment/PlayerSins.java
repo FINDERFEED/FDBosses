@@ -60,21 +60,28 @@ public class PlayerSins {
 
     public static PlayerSins getPlayerSins(Player player){
         var playerTag = getPlayerSinsTag(player);
+        if (!playerTag.contains("playerSins")){
+            setPlayerSins(player, new PlayerSins(), true);
+        }
         var tag = playerTag.get("playerSins");
         PlayerSins sins = CODEC.decode(NbtOps.INSTANCE, tag).get().left().get().getFirst();
         return sins;
     }
 
-    public static void setPlayerSins(Player player, PlayerSins playerSins){
+    public static void setPlayerSins(Player player, PlayerSins playerSins, boolean sendUpdate){
         var t = CODEC.encodeStart(NbtOps.INSTANCE, playerSins);
         var tag = t.get().left().get();
         var playerTag = getPlayerSinsTag(player);
         playerTag.put("playerSins", tag);
 
-        if (player instanceof ServerPlayer serverPlayer){
+        if (player instanceof ServerPlayer serverPlayer && sendUpdate){
             FDPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(()->serverPlayer), new SyncPlayerSinsPacket(playerSins));
         }
 
+    }
+
+    public static void setPlayerSins(Player player, PlayerSins playerSins){
+        setPlayerSins(player,playerSins,true);
     }
 
     public static CompoundTag getPlayerSinsTag(Player player){
