@@ -1,10 +1,13 @@
 package com.finderfeed.fdbosses.client;
 
+import com.finderfeed.fdbosses.client.particles.DecalParticleOptions;
+import com.finderfeed.fdbosses.client.particles.DecalParticleType;
 import com.finderfeed.fdbosses.client.particles.GravityOptionsParticleType;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningOptions;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
+import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticleOptions;
 import com.finderfeed.fdbosses.client.particles.malkuth_slash.MalkuthHorizontalSlashOptions;
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
@@ -12,7 +15,10 @@ import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOpti
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallExplosionParticleOptions;
+import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.particles.ParticleType;
 import java.util.function.Supplier;
 import net.minecraftforge.registries.DeferredRegister;
@@ -94,6 +100,32 @@ public class BossParticles {
     public static final Supplier<ParticleType<GravityParticleOptions>> ICE_CHUNK = PARTICLES.register("ice_chunk",()->new GravityOptionsParticleType(true));
 
 
+    public static final Supplier<ParticleType<GeburahRayOptions>> GEBURAH_RAY_ATTACK = PARTICLES.register("geburah_ray",()->new ParticleType<GeburahRayOptions>(true, GeburahRayOptions.DESERIALIZER) {
+        @Override
+        public Codec<GeburahRayOptions> codec() {
+            return GeburahRayOptions.CODEC;
+        }
 
+    });
+
+
+    public static final Supplier<ParticleType<JudgementBallExplosionParticleOptions>> JUDGEMENT_BALL_EXPLOSION = PARTICLES.register("judgement_ball_explosion",()->new ParticleType<JudgementBallExplosionParticleOptions>(true, JudgementBallExplosionParticleOptions.DESERIALIZER) {
+        @Override
+        public Codec<JudgementBallExplosionParticleOptions> codec() {
+            return JudgementBallExplosionParticleOptions.MAP_CODEC;
+        }
+
+    });
+
+    public static final Supplier<ParticleType<DecalParticleOptions>> GEBURAH_RAY_DECAL = PARTICLES.register("geburah_ray_decal", () ->new DecalParticleType(true));
+
+    public static final Supplier<ParticleType<ColoredJumpingParticleOptions>> COLORED_JUMPING_PARTICLE = PARTICLES.register("colored_jumping_particles", () -> new ParticleType<ColoredJumpingParticleOptions>(true, ColoredJumpingParticleOptions.DESERIALIZER) {
+        @Override
+        public Codec<ColoredJumpingParticleOptions> codec() {
+            return ColoredJumpingParticleOptions.MAP_CODEC;
+        }
+
+
+    });
 
 }

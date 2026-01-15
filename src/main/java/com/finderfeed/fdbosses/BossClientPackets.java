@@ -5,15 +5,20 @@ import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.boss_screen.BaseBossScreen;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreens;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
+import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
+import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
+import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDClientHelpers;
@@ -40,7 +45,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -58,6 +66,38 @@ import java.util.Vector;
 public class BossClientPackets {
 
     private static Random random = new Random();
+
+    public static void forceAttackEntity(int entityId){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof LivingEntity livingEntity){
+            Minecraft.getInstance().gameMode.attack(Minecraft.getInstance().player, livingEntity);
+            FDClientHelpers.getClientPlayer().swing(InteractionHand.MAIN_HAND);
+        }
+    }
+
+    public static void summonParticle(ParticleOptions particleOptions, double x,double y, double z,  double xd,double yd, double zd, int lifetime){
+        var engine = Minecraft.getInstance().particleEngine;
+        var particle = engine.createParticle(particleOptions,x,y,z,xd,yd,zd);
+        particle.lifetime = lifetime;
+    }
+
+    public static void chesedItemUse(CompoundTag update, boolean noPhysics, boolean startedUsing){
+        var player = FDClientHelpers.getClientPlayer();
+        player.getAbilities().loadSaveData(update);
+        player.noPhysics = noPhysics;
+        PhaseSphereHandler.isUsingChesedItem = startedUsing;
+    }
+
+    public static void geburahScalesControllerSetDisplacement(int entityId, int displacement, int displacementTime){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
+            geburah.getScalesController().setCurrentDisplacement(displacement, displacementTime);
+        }
+    }
+
+    public static void geburahSinnedPacket(int entityId){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
+            geburah.sinnedTicks = GeburahEntity.SINNED_CLIENT_ANIM_DURATION;
+        }
+    }
 
     public static void setPlayerMalkuthWeaknessAmount(int amount) {
         if (FDClientHelpers.getClientPlayer() != null) {
@@ -206,7 +246,857 @@ public class BossClientPackets {
             case BossUtil.CHESED_ADD_ROCKFALL_PARTICLE_EMITTER -> {
                 chesedAddEmitter(pos,data);
             }
+            case BossUtil.GEBURAH_RAY_PARTICLES -> {
+                geburahRayParticles(pos, data);
+            }
+            case BossUtil.GEBURAH_RAY_CHARGE_PARTICLES -> {
+                geburahRayChargeParticles(pos, data);
+            }
+            case BossUtil.GEBURAH_WEAPONS_START_LASER -> {
+                geburahWeaponsStartLaser(pos, data);
+            }
+            case BossUtil.JUDGEMENT_BIRD_RAY_PARTICLES -> {
+                judgementBirdRayParticles(pos, data);
+            }
+            case BossUtil.TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_EFFECT -> {
+                geburahTriggerSinPunishmentAttackEffect(pos, data);
+            }
+            case BossUtil.TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_IMPACT -> {
+                sinPunishmentParticles(pos, data);
+            }
+            case BossUtil.GEBURAH_PREPARE_RAYS -> {
+                geburahPrepareParticles(pos, data);
+            }
+            case BossUtil.GEBURAH_PREPARE_RAYS_FRAMES -> {
+                geburahPrepareRoundAndRoundRays(pos, data);
+            }
+            case BossUtil.DIVINE_GEAR_RAY_PARTICLES -> {
+                divineGearRayParticles(pos,data);
+            }
         }
+    }
+
+    public static void divineGearRayParticles(Vec3 pos, int data){
+
+
+        //1f,0.8f,0.2f
+        Level level = FDClientHelpers.getClientLevel();
+
+        BallParticleOptions flash = BallParticleOptions.builder()
+                .color(1f,0.8f,0.2f)
+                .scalingOptions(1,0,2)
+                .brightness(2)
+                .size(7f)
+                .build();
+
+        level.addParticle(flash,true,pos.x,pos.y,pos.z,0,0,0);
+
+
+        Vec3 direction = FDUtil.decodeDirection(data);
+
+        Matrix4f mat = new Matrix4f();
+        FDRenderUtil.applyMovementMatrixRotations(mat, direction);
+
+
+        float maxParticleSize = 1.5f;
+        float minParticleSize = 0.1f;
+        float particleFriction = 0.7f;
+        int maxParticleRows = 10;
+
+        int particleTravelTime = 100;
+
+        float cumulativeSize = 0;
+
+        float travelDistWindow = 0.75f;
+        float randomXZSpread = 0.15f;
+
+
+        //MAIN
+        for (int i = 0; i < maxParticleRows;i++) {
+
+            float ip = i / (maxParticleRows - 1f);
+
+            float size = FDMathUtil.lerp(minParticleSize, maxParticleSize, 1 - ip);
+            int repetitionCount = Math.round(FDMathUtil.lerp(1,3,ip));
+            int directionsCount = Math.round(FDMathUtil.lerp(1,7,ip));
+
+            float r = FDMathUtil.lerp(1f,1f,ip);
+            float gr = FDMathUtil.lerp(0.5f,1f,ip);
+            float b = FDMathUtil.lerp(0.0f,1f,ip * ip);
+
+            for (int g = 0; g < repetitionCount; g++) {
+                for (var dir : new HorizontalCircleRandomDirections(level.random, directionsCount, 1f)) {
+
+                    //---------------------------RAY-----------------------------
+
+                    float travelDistance = cumulativeSize + travelDistWindow * random.nextFloat();
+
+                    float particleSpeed = calculateParticleSpeed(travelDistance, particleFriction, particleTravelTime);
+
+                    Vec3 speed = BossUtil.matTransformDirectionVec3(mat, new Vec3(
+                            dir.x * 0.5 + random.nextFloat() * randomXZSpread * 2 - randomXZSpread,
+                            3 - random.nextFloat() * 0.5f,
+                            dir.z * 0.5 + random.nextFloat() * randomXZSpread * 2 - randomXZSpread
+                    ).normalize().multiply(particleSpeed, particleSpeed, particleSpeed));
+
+                    Vec3 spawnOffset = BossUtil.matTransformDirectionVec3(mat, dir.multiply(0.5f, 0.5f, 0.5f));
+
+                    BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                            .brightness(2)
+                            .size(size)
+                            .color(r, gr, b, 1f)
+                            .friction(particleFriction)
+                            .scalingOptions(0, 0, 20 + random.nextInt(10))
+                            .build();
+
+                    level.addParticle(ballParticleOptions, true, pos.x + spawnOffset.x, pos.y + spawnOffset.y, pos.z + spawnOffset.z, speed.x, speed.y, speed.z);
+
+
+                }
+            }
+
+            cumulativeSize += travelDistWindow;
+
+        }
+
+
+
+        //STRIPES
+        for (var dir : new HorizontalCircleRandomDirections(level.random, 12, 0)){
+
+            float randomOffset = FDMathUtil.FPI / 8 + FDMathUtil.FPI / 8 * level.random.nextFloat();
+            randomOffset *= level.random.nextBoolean() ? 1 : -1;
+
+            float offset1 = 0.5f;
+            float offset2 = 1.5f;
+
+            Vec3 p1 = Vec3.ZERO;
+            Vec3 p2 = BossUtil.matTransformDirectionVec3(mat, dir.yRot(randomOffset).add(dir.x * offset1,3,dir.z * offset1)
+                    .add(
+                            random.nextFloat() * 0.5 - 0.25f,
+                            random.nextFloat() * 2 - 1,
+                            random.nextFloat() * 0.5 - 0.25f
+                    ));
+            Vec3 p3 = BossUtil.matTransformDirectionVec3(mat, dir.yRot(-randomOffset).add(dir.x * offset2,7,dir.z * offset2)
+                    .add(
+                            random.nextFloat() * 0.5 - 0.25f,
+                            random.nextFloat() * 2 - 1,
+                            random.nextFloat() * 0.5 - 0.25f
+                    ));
+
+            StripeParticleOptions options = StripeParticleOptions.builder()
+                    .startColor(new FDColor(1f,0.4f,0.1f,1f))
+                    .endColor(new FDColor(1f,0.8f,0.8f,1f))
+                    .lifetime(10 + random.nextInt(5))
+                    .lod(25)
+                    .scale(0.1f)
+                    .stripePercentLength(0.5f)
+                    .endOutPercent(0.1f)
+                    .startInPercent(0.1f)
+                    .offsets(p1,p2,p3)
+                    .build();
+
+            level.addParticle(options, true, pos.x, pos.y,pos.z,0,0,0);
+
+        }
+
+    }
+
+    public static void geburahPrepareRoundAndRoundRays(Vec3 p, int data){
+        if (FDClientHelpers.getClientLevel().getEntity(data) instanceof GeburahEntity geburah){
+            geburah.triggerRaysShotPreparationEffect();
+        }
+    }
+
+    public static void geburahPrepareParticles(Vec3 p, int data){
+
+        Level level = FDClientHelpers.getClientLevel();
+        if (!(level.getEntity(data) instanceof GeburahEntity geburah)) return;
+
+        var positionsAndDirections = geburah.getCannonsPositionAndDirection();
+
+        for (var posAndDir : positionsAndDirections) {
+
+            Vec3 pos = posAndDir.first;
+            Vec3 direction = posAndDir.second;
+
+            Matrix4f mat = new Matrix4f();
+            FDRenderUtil.applyMovementMatrixRotations(mat, direction);
+
+            for (var dir : new HorizontalCircleRandomDirections(level.random, 6, 1f)) {
+
+                dir = BossUtil.matTransformDirectionVec3(mat, dir);
+
+                Vec3 startPos = pos.add(dir.scale(1.5)).add(direction.reverse().scale(2));
+
+                Vec3 speed = direction.scale(2).add(dir.reverse()).scale(0.3f);
+
+                BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                        .color(0.2f, 0.5f, 1f)
+                        .brightness(2)
+                        .friction(0.8f)
+                        .size(0.25f)
+                        .in(10)
+                        .out(1)
+                        .build();
+                level.addParticle(ballParticleOptions, true, startPos.x, startPos.y, startPos.z, speed.x,speed.y,speed.z);
+
+            }
+        }
+
+    }
+
+    public static void sinPunishmentParticles(Vec3 pos, int radius){
+
+        Level level = FDClientHelpers.getClientLevel();
+
+        float length = FDMathUtil.FPI * 2 * radius;
+        float step = 300 / length;
+        float smokeDirStep = FDMathUtil.FPI / 8;
+
+        float minSmokeSize = 3f;
+        float maxSmokeSize = 5f;
+        float smokeFriction = 0.7f;
+
+
+
+        for (float i = 0; i < length; i+=step){
+
+            float p = i / length;
+
+            Vec3 direction = new Vec3(1,0,0).yRot(FDMathUtil.FPI * 2 * p + random.nextFloat() * FDMathUtil.FPI / 16);
+            Vec3 between = direction.scale(radius);
+            Vec3 reversedDir = direction.reverse();
+            Vec3 ppos = pos.add(between);
+
+            //SMOKE
+            float smokeTravelDistance = 0.5f;
+            int smokeCount = 3;
+            for (int c = 0; c < smokeCount; c++) {
+                float smokeP = c / (smokeCount - 1f);
+                float particleSize = FDMathUtil.lerp(minSmokeSize, maxSmokeSize, 1 - smokeP);
+                for (int dirswitch = -1; dirswitch <= 1; dirswitch += 2) {
+                    for (int k = -4; k < 4; k++) {
+
+                        Vec3 smokeDir = direction.scale(dirswitch).yRot(k * smokeDirStep);
+                        float smokeSpeed = calculateParticleSpeed(smokeTravelDistance + random.nextFloat() * particleSize, smokeFriction, 40);
+                        Vec3 speed = smokeDir.scale(smokeSpeed);
+                        float color = random.nextFloat() * 0.2f + 0.2f;
+
+                        BigSmokeParticleOptions options = BigSmokeParticleOptions.builder()
+                                .color(color,color,color)
+                                .friction(smokeFriction)
+                                .minSpeed(0.01f)
+                                .size(particleSize)
+                                .lifetime(0,2,100 + random.nextInt(60))
+                                .build();
+
+                        level.addParticle(options, ppos.x,ppos.y,ppos.z, speed.x,random.nextFloat() * (1 - p) * 1f,speed.z);
+
+                    }
+                }
+                smokeTravelDistance += particleSize;
+            }
+
+            //BALLS (not that balls, no, NO!)
+
+            for (int count = 0; count < 10; count++){
+
+                for (int dirswitch = -1; dirswitch <= 1; dirswitch += 2){
+
+                    Vec3 randomOffset = direction.scale(dirswitch * random.nextFloat() * radius / 2)
+                            .yRot(FDMathUtil.FPI / 4 * random.nextFloat());
+                    float len = (float) randomOffset.length();
+                    float pb = len / (radius / 2f);
+                    float ballSize = FDMathUtil.lerp(1f,1.5f,1 - pb);
+                    float ballYSpeed = FDMathUtil.lerp(
+                            0.1f + random.nextFloat() * 0.2f,
+                            0.3f + random.nextFloat() * 0.6f,FDEasings.easeOut(1 - pb));
+
+
+                    Vec3 actualppos = ppos.add(randomOffset);
+
+
+                    BallParticleOptions options = BallParticleOptions.builder()
+                            .color(0.3f + random.nextFloat() * 0.1f,0.8f, 1f)
+                            .brightness(2)
+                            .size(ballSize)
+                            .friction(0.6f + random.nextFloat() * 0.2f)
+                            .scalingOptions(2,0,20 + random.nextInt(40))
+                            .build();
+
+                    Vec3 vspeed = direction.scale(dirswitch).scale(FDEasings.easeIn(pb));
+
+                    level.addParticle(options, actualppos.x,actualppos.y,actualppos.z,vspeed.x,ballYSpeed, vspeed.z);
+
+                }
+
+            }
+
+        }
+
+        //JUMPING PARTICLES
+
+        int hammersCount = GeburahRenderer.HAMMER_AMOUNT;
+        float angle = FDMathUtil.FPI * 2 / hammersCount;
+        for (int i = 0; i < hammersCount; i++){
+
+            Vec3 hammerOffset = new Vec3(1,0,0).yRot(angle * i);
+
+            Vec3 hammerImpactPos = pos.add(hammerOffset.scale(radius));
+
+            for (var dir : new HorizontalCircleRandomDirections(level.random, 24, 0.5f)){
+
+                ColoredJumpingParticleOptions options = ColoredJumpingParticleOptions.builder()
+                        .colorStart(new FDColor(0.5f,0.8f,1f,1f))
+                        .colorEnd(new FDColor(1f,1f,1f,1f))
+                        .maxJumpAmount(1)
+                        .maxPointsInTrail(3)
+                        .reflectionStrength(0.5f)
+                        .size(0.05f)
+                        .gravity(2)
+                        .lifetime(-1)
+                        .build();
+
+                float randomXZSpeed = random.nextFloat() * 0.3f + 0.3f;
+
+                Vec3 speed = new Vec3(dir.x * randomXZSpeed,0.4f + random.nextFloat() * 0.2f, dir.z * randomXZSpeed);
+
+                level.addParticle(options, hammerImpactPos.x + dir.x,hammerImpactPos.y,hammerImpactPos.z + dir.z,
+                        speed.x,speed.y,speed.z);
+
+            }
+
+        }
+
+
+    }
+
+    public static void geburahTriggerSinPunishmentAttackEffect(Vec3 pos, int data){
+        if (!(FDClientHelpers.getClientLevel().getEntity(data) instanceof GeburahEntity geburah)) return;
+        geburah.sinPunishmentAttackTicker = GeburahEntity.SIN_PUNISHMENT_ATTACK_DURATION;
+    }
+
+    public static void judgementBirdRayParticles(Vec3 pos, int data){
+
+        Level level = FDClientHelpers.getClientLevel();
+
+        BallParticleOptions flash = BallParticleOptions.builder()
+                .color(0.5f,0.8f,1f)
+                .scalingOptions(1,0,2)
+                .brightness(4)
+                .size(8f)
+                .build();
+
+        level.addParticle(flash,true,pos.x,pos.y,pos.z,0,0,0);
+
+
+        Vec3 direction = FDUtil.decodeDirection(data);
+        Vec3 horizontalReversedDirection = direction.multiply(-1,0,-1).normalize();
+
+        Matrix4f mat = new Matrix4f();
+        FDRenderUtil.applyMovementMatrixRotations(mat, direction);
+
+
+        float maxParticleSize = 0.5f;
+        float minParticleSize = 0.1f;
+        float particleFriction = 0.7f;
+        int maxParticleRows = 6;
+
+        int particleTravelTime = 100;
+
+        float cumulativeSize = 0;
+        float cumulativeSize2 = 0;
+
+        float travelDistWindow = 0.5f;
+        float travelDistWindow2 = 0.5f;
+        float randomXZSpread = 0.1f;
+
+        float angleSlamEarth = FDMathUtil.FPI / 4;
+
+        //MAIN
+        for (int i = 0; i < maxParticleRows;i++) {
+
+            float ip = i / (maxParticleRows - 1f);
+
+            float size = FDMathUtil.lerp(minParticleSize, maxParticleSize, 1 - ip);
+            int repetitionCount = Math.round(FDMathUtil.lerp(1,5,ip));
+            int directionsCount = Math.round(FDMathUtil.lerp(1,6,ip));
+
+            float r = FDMathUtil.lerp(0.0f,1f,ip * ip);
+            float gr = FDMathUtil.lerp(0.5f,1f,ip);
+            float b = FDMathUtil.lerp(1f,1f,ip);
+            //FDMathUtil.lerp(0.0f,1f,ip * ip);
+
+            for (int g = 0; g < repetitionCount; g++) {
+                for (var dir : new HorizontalCircleRandomDirections(level.random, directionsCount, 1f)) {
+
+                    //---------------------------RAY-----------------------------
+
+                    float travelDistance = cumulativeSize + travelDistWindow * random.nextFloat();
+
+                    float particleSpeed = calculateParticleSpeed(travelDistance, particleFriction, particleTravelTime);
+                    particleSpeed = particleSpeed + random.nextFloat() * 0.05f;
+
+                    Vec3 speed = BossUtil.matTransformDirectionVec3(mat, new Vec3(
+                            dir.x + random.nextFloat() * randomXZSpread * 2 - randomXZSpread,
+                            3 - random.nextFloat() * 0.5f,
+                            dir.z + random.nextFloat() * randomXZSpread * 2 - randomXZSpread
+                    ).normalize().multiply(particleSpeed, particleSpeed, particleSpeed));
+
+                    Vec3 spawnOffset = BossUtil.matTransformDirectionVec3(mat, dir.multiply(0.5f, 0.5f, 0.5f));
+
+                    BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                            .brightness(2)
+                            .size(size)
+                            .color(r, gr, b, 1f)
+                            .friction(particleFriction)
+                            .scalingOptions(0, 0, 20 + random.nextInt(10))
+                            .build();
+
+                    level.addParticle(ballParticleOptions, true, pos.x + spawnOffset.x, pos.y + spawnOffset.y, pos.z + spawnOffset.z, speed.x, speed.y, speed.z);
+
+
+                    //--------------------------------------EARTH SLAM---------------------------------------------
+
+                    double angleBetween = FDMathUtil.angleBetweenVectors(horizontalReversedDirection, dir);
+
+                    if (angleBetween > angleSlamEarth) continue;
+
+                    BallParticleOptions ballParticleOptions2 = BallParticleOptions.builder()
+                            .brightness(2)
+                            .size(size * 2)
+                            .color(r,gr,b, 1f)
+                            .friction(particleFriction)
+                            .scalingOptions(0, 0, 20 + random.nextInt(10))
+                            .build();
+
+                    float travelDistance2 = cumulativeSize2 + travelDistWindow2 * random.nextFloat();
+
+                    float particleSpeed2 = calculateParticleSpeed(travelDistance2,particleFriction,particleTravelTime);
+
+
+                    Vec3 speed2 = new Vec3(
+                            dir.x + random.nextFloat() * randomXZSpread * 2 - randomXZSpread,
+                            0.1f + random.nextFloat() * 0.5f,
+                            dir.z + random.nextFloat() * randomXZSpread * 2 - randomXZSpread
+                    ).normalize().scale(particleSpeed2);
+
+                    Vec3 spawnPos2 = pos.add(new Vec3(1,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat()));
+
+
+                    level.addParticle(ballParticleOptions2, true, spawnPos2.x,spawnPos2.y,spawnPos2.z, speed2.x, speed2.y, speed2.z);
+
+                }
+            }
+
+            cumulativeSize += travelDistWindow;
+            cumulativeSize2 += travelDistWindow2;
+
+        }
+
+
+
+        //SMOKE
+        int smokesCount = 10;
+        float smokesFriction = 0.7f;
+        int smokesTravelTime = 20;
+
+        for (int i = 0; i < smokesCount; i++){
+
+            float p = i / (float) (smokesCount - 1);
+            int count = Math.round(FDMathUtil.lerp(6,12,p));
+            float distance = 0.3f * i;
+
+            for (var dir : new HorizontalCircleRandomDirections(level.random, count, 1f)){
+
+                float particleSpeed = (distance * (1 - smokesFriction) / (1 - (float) Math.pow(smokesFriction, smokesTravelTime)));
+
+                Vec3 pspeed = dir.multiply(particleSpeed,0,particleSpeed);
+
+                float col = 0.2f + random.nextFloat() * 0.2f;
+
+                BigSmokeParticleOptions options = BigSmokeParticleOptions.builder()
+                        .color(col,col,col)
+                        .friction(smokesFriction)
+                        .size(1f)
+                        .minSpeed(0.025f)
+                        .lifetime(0,0,30)
+                        .build();
+
+                level.addParticle(options, true, pos.x,pos.y,pos.z,pspeed.x,pspeed.y,pspeed.z);
+
+
+            }
+
+        }
+
+
+        //JUMPING PARTICLES
+        for (var dir : new HorizontalCircleRandomDirections(level.random, 12, 1f)){
+
+            ColoredJumpingParticleOptions options = new ColoredJumpingParticleOptions.Builder()
+                    .colorStart(new FDColor(1f, 1f, 1f, 1f))
+                    .colorEnd(new FDColor(0.3f, 0.8f, 1f, 1f))
+                    .maxPointsInTrail(5)
+                    .reflectionStrength(0.33f)
+                    .gravity(1.5f)
+                    .lifetime(-1)
+                    .maxJumpAmount(1)
+                    .size(0.03f)
+                    .build();
+
+            float horizontalSpeed = random.nextFloat() * 0.25f + 0.1f;
+
+            float verticalSpeed = random.nextFloat() * 0.1f + 0.25f;
+
+            dir = dir.subtract(direction.scale(0.75));
+
+            level.addParticle(options,pos.x,pos.y,pos.z,dir.x * horizontalSpeed, verticalSpeed,dir.z * horizontalSpeed);
+        }
+
+        //MAIN 2
+
+
+
+
+
+    }
+
+    public static void geburahWeaponsStartLaser(Vec3 pos, int data){
+
+        Level level = FDClientHelpers.getClientLevel();
+
+        if (level.getEntity(data) instanceof GeburahEntity geburah){
+
+            float particleFriction = 0.8f;
+
+            float r = 0.3f;
+            float g = 0.7f;
+            float b = 1f;
+
+            float rowWidth = 0.5f;
+
+            for (var cannon : geburah.getCannonsPositionAndDirection()){
+
+                Vec3 cannonPos = cannon.first;
+                Vec3 cannonDirection = cannon.second;
+
+                Matrix4f mat = new Matrix4f();
+
+                FDRenderUtil.applyMovementMatrixRotations(mat, cannonDirection);
+
+                int rowCount = 5;
+
+                float offs = 0;
+
+                for (int i = 0; i < rowCount; i++) {
+
+                    for (var dir : new HorizontalCircleRandomDirections(geburah.getRandom(), 12, 1f)) {
+
+                        float pspeed = calculateParticleSpeed(offs + random.nextFloat() * rowWidth, particleFriction, 10);
+                        Vec3 desiredSpeed = new Vec3(
+                                dir.x + random.nextFloat() * 0.8 - 0.4,
+                                3,
+                                dir.z + random.nextFloat() * 0.8 - 0.4
+                        ).normalize().scale(pspeed);
+
+                        Vec3 sppos = BossUtil.matTransformDirectionVec3(mat, dir.scale(0.25));
+
+                        desiredSpeed = BossUtil.matTransformDirectionVec3(mat, desiredSpeed);
+
+                        BallParticleOptions options = BallParticleOptions.builder()
+                                .friction(particleFriction)
+                                .size(0.5f)
+                                .brightness(2)
+                                .scalingOptions(0,0,10)
+                                .color(r,g,b)
+                                .build();
+
+
+                        level.addParticle(options, true, cannonPos.x + sppos.x,cannonPos.y + sppos.y,cannonPos.z + sppos.z, desiredSpeed.x,desiredSpeed.y, desiredSpeed.z);
+
+                    }
+
+                    offs += rowWidth;
+                }
+
+            }
+
+        }
+    }
+
+
+    public static void geburahRayChargeParticles(Vec3 pos, int data){
+
+        if (FDClientHelpers.getClientLevel().getEntity(data) instanceof GeburahEntity geburah) {
+
+            pos = geburah.getCorePosition();
+            int count = 3;
+
+            float randomYRot = random.nextFloat() * FDMathUtil.FPI * 2;
+            float randomXRot = random.nextFloat() * FDMathUtil.FPI * 2;
+
+            float r = 1f;
+            float gr = 0.49f;
+            float b = 0.2f;
+
+            Level level = FDClientHelpers.getClientLevel();
+
+            for (int x = -count; x <= count; x++) {
+                for (int y = -count; y <= count; y++) {
+                    for (int z = -count; z <= count; z++) {
+
+                        if (random.nextFloat() > 0.05f) continue;
+
+                        Vec3 v = new Vec3(x, y, z).normalize()
+                                .yRot(randomYRot).xRot(randomXRot);
+
+                        BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                                .brightness(2)
+                                .size(0.5f)
+                                .color(r, gr, b, 1f)
+                                .friction(1.4f)
+                                .scalingOptions(10, 0, 0)
+                                .build();
+
+                        Vec3 ppos = pos.add(v.scale(2));
+
+                        float speed = 0.05f;
+
+                        level.addParticle(ballParticleOptions, true, ppos.x, ppos.y, ppos.z, -v.x * speed, -v.y * speed, -v.z * speed);
+
+                    }
+                }
+            }
+        }
+    }
+
+    private static float calculateParticleSpeed(float travelDistance, float particleFriction, int particleTravelTime){
+        return (travelDistance * (1 - particleFriction) / (1 - (float) Math.pow(particleFriction, particleTravelTime)));
+    }
+
+    public static void geburahRayParticles(Vec3 pos, int data){
+
+
+        //1f,0.8f,0.2f
+        Level level = FDClientHelpers.getClientLevel();
+
+        BallParticleOptions flash = BallParticleOptions.builder()
+                .color(1f,0.8f,0.2f)
+                .scalingOptions(1,0,2)
+                .brightness(4)
+                .size(15f)
+                .build();
+
+        level.addParticle(flash,true,pos.x,pos.y,pos.z,0,0,0);
+
+
+        Vec3 direction = FDUtil.decodeDirection(data);
+        Vec3 horizontalReversedDirection = direction.multiply(-1,0,-1).normalize();
+
+        Matrix4f mat = new Matrix4f();
+        FDRenderUtil.applyMovementMatrixRotations(mat, direction);
+
+
+        float maxParticleSize = 2f;
+        float minParticleSize = 0.1f;
+        float particleFriction = 0.7f;
+        int maxParticleRows = 10;
+
+        int particleTravelTime = 100;
+
+        float cumulativeSize = 0;
+        float cumulativeSize2 = 0;
+
+        float travelDistWindow = 1f;
+        float travelDistWindow2 = 1f;
+        float randomXZSpread = 0.25f;
+
+        float angleSlamEarth = FDMathUtil.FPI / 4;
+
+        //MAIN
+        for (int i = 0; i < maxParticleRows;i++) {
+
+            float ip = i / (maxParticleRows - 1f);
+
+            float size = FDMathUtil.lerp(minParticleSize, maxParticleSize, 1 - ip);
+            int repetitionCount = Math.round(FDMathUtil.lerp(1,3,ip));
+            int directionsCount = Math.round(FDMathUtil.lerp(1,7,ip));
+
+            float r = FDMathUtil.lerp(1f,1f,ip);
+            float gr = FDMathUtil.lerp(0.5f,1f,ip);
+            float b = FDMathUtil.lerp(0.0f,1f,ip * ip);
+
+            for (int g = 0; g < repetitionCount; g++) {
+                for (var dir : new HorizontalCircleRandomDirections(level.random, directionsCount, 1f)) {
+
+                    //---------------------------RAY-----------------------------
+
+                    float travelDistance = cumulativeSize + travelDistWindow * random.nextFloat();
+
+                    float particleSpeed = calculateParticleSpeed(travelDistance, particleFriction, particleTravelTime);
+
+                    Vec3 speed = BossUtil.matTransformDirectionVec3(mat, new Vec3(
+                            dir.x + random.nextFloat() * randomXZSpread * 2 - randomXZSpread,
+                            3 - random.nextFloat() * 0.5f,
+                            dir.z + random.nextFloat() * randomXZSpread * 2 - randomXZSpread
+                    ).normalize().multiply(particleSpeed, particleSpeed, particleSpeed));
+
+                    Vec3 spawnOffset = BossUtil.matTransformDirectionVec3(mat, dir.multiply(0.5f, 0.5f, 0.5f));
+
+                    BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
+                            .brightness(2)
+                            .size(size)
+                            .color(r, gr, b, 1f)
+                            .friction(particleFriction)
+                            .scalingOptions(0, 0, 20 + random.nextInt(10))
+                            .build();
+
+                    level.addParticle(ballParticleOptions, true, pos.x + spawnOffset.x, pos.y + spawnOffset.y, pos.z + spawnOffset.z, speed.x, speed.y, speed.z);
+
+
+                    //--------------------------------------EARTH SLAM---------------------------------------------
+
+                    double angleBetween = FDMathUtil.angleBetweenVectors(horizontalReversedDirection, dir);
+
+                    if (angleBetween > angleSlamEarth) continue;
+
+                    BallParticleOptions ballParticleOptions2 = BallParticleOptions.builder()
+                            .brightness(2)
+                            .size(size * 2)
+                            .color(r,gr,b, 1f)
+                            .friction(particleFriction)
+                            .scalingOptions(0, 0, 20 + random.nextInt(10))
+                            .build();
+
+                    float travelDistance2 = cumulativeSize2 + travelDistWindow2 * random.nextFloat();
+
+                    float particleSpeed2 = calculateParticleSpeed(travelDistance2,particleFriction,particleTravelTime);
+
+
+                    Vec3 speed2 = new Vec3(
+                            dir.x + random.nextFloat() * randomXZSpread * 2 - randomXZSpread,
+                            0.1f + random.nextFloat() * 0.5f,
+                            dir.z + random.nextFloat() * randomXZSpread * 2 - randomXZSpread
+                    ).normalize().scale(particleSpeed2);
+
+                    Vec3 spawnPos2 = pos.add(new Vec3(1,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat()));
+
+
+                    level.addParticle(ballParticleOptions2, true, spawnPos2.x,spawnPos2.y,spawnPos2.z, speed2.x, speed2.y, speed2.z);
+
+                }
+            }
+
+            cumulativeSize += travelDistWindow;
+            cumulativeSize2 += travelDistWindow2;
+
+        }
+
+
+        //SMOKE
+        int smokesCount = 10;
+        float smokesFriction = 0.8f;
+        int smokesTravelTime = 20;
+
+        for (int i = 0; i < smokesCount; i++){
+
+            float p = i / (float) (smokesCount - 1);
+            int count = Math.round(FDMathUtil.lerp(12,15,p));
+            float distance = 0.8f * i;
+
+            for (var dir : new HorizontalCircleRandomDirections(level.random, count, 1f)){
+
+                float particleSpeed = (distance * (1 - smokesFriction) / (1 - (float) Math.pow(smokesFriction, smokesTravelTime)));
+
+                Vec3 pspeed = dir.multiply(particleSpeed,0,particleSpeed);
+
+                float col = 0.2f + random.nextFloat() * 0.2f;
+
+                BigSmokeParticleOptions options = BigSmokeParticleOptions.builder()
+                        .color(col,col,col)
+                        .friction(smokesFriction)
+                        .size(4f)
+                        .minSpeed(0.025f)
+                        .lifetime(0,0,30)
+                        .build();
+
+                level.addParticle(options, true, pos.x,pos.y,pos.z,pspeed.x,pspeed.y,pspeed.z);
+
+
+            }
+
+        }
+
+        //STRIPES
+        for (var dir : new HorizontalCircleRandomDirections(level.random, 12, 0)){
+
+            float randomOffset = FDMathUtil.FPI / 8 + FDMathUtil.FPI / 8 * level.random.nextFloat();
+            randomOffset *= level.random.nextBoolean() ? 1 : -1;
+
+            float offset1 = 2;
+            float offset2 = 3;
+
+            Vec3 p1 = Vec3.ZERO;
+            Vec3 p2 = BossUtil.matTransformDirectionVec3(mat, dir.yRot(randomOffset).add(dir.x * offset1,5,dir.z * offset1)
+                    .add(
+                            random.nextFloat() * 0.5 - 0.25f,
+                            random.nextFloat() * 2 - 1,
+                            random.nextFloat() * 0.5 - 0.25f
+                    ));
+            Vec3 p3 = BossUtil.matTransformDirectionVec3(mat, dir.yRot(-randomOffset).add(dir.x * offset2,10,dir.z * offset2)
+                    .add(
+                            random.nextFloat() * 0.5 - 0.25f,
+                            random.nextFloat() * 2 - 1,
+                            random.nextFloat() * 0.5 - 0.25f
+                    ));
+
+            StripeParticleOptions options = StripeParticleOptions.builder()
+                    .startColor(new FDColor(1f,0.4f,0.1f,1f))
+                    .endColor(new FDColor(1f,0.8f,0.8f,1f))
+                    .lifetime(10 + random.nextInt(5))
+                    .lod(25)
+                    .scale(0.1f)
+                    .stripePercentLength(0.5f)
+                    .endOutPercent(0.1f)
+                    .startInPercent(0.1f)
+                    .offsets(p1,p2,p3)
+                    .build();
+
+            level.addParticle(options, true, pos.x, pos.y,pos.z,0,0,0);
+
+        }
+
+        //JUMPING PARTICLES
+        for (var dir : new HorizontalCircleRandomDirections(level.random, 13, 1f)){
+
+            ColoredJumpingParticleOptions options = new ColoredJumpingParticleOptions.Builder()
+                    .colorStart(new FDColor(1f, 1f, 1f, 1f))
+                    .colorEnd(new FDColor(1f, 0.8f, 0.3f, 1f))
+                    .maxPointsInTrail(5)
+                    .reflectionStrength(0.33f)
+                    .gravity(1.5f)
+                    .lifetime(-1)
+                    .maxJumpAmount(1)
+                    .size(0.03f)
+                    .build();
+
+            float horizontalSpeed = random.nextFloat() * 0.5f + 0.2f;
+
+            float verticalSpeed = random.nextFloat() * 0.3f + 0.3f;
+
+            dir = dir.subtract(direction.scale(0.75));
+
+            level.addParticle(options,pos.x,pos.y,pos.z,dir.x * horizontalSpeed, verticalSpeed,dir.z * horizontalSpeed);
+        }
+
+        //MAIN 2
+
+
+
+
+
     }
 
     public static void chesedAddEmitter(Vec3 pos, int entityId){

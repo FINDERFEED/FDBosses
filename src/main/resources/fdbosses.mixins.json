@@ -8,7 +8,9 @@
     "CraftingMenuMixin",
     "EntityMixin",
     "JigsawPlacementMixin",
-    "PlayerMixin"
+    "PlayerListMixin",
+    "PlayerMixin",
+    "ServerPlayerMixin"
   ],
   "minVersion": "0.8",
   "client": [

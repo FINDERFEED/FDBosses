@@ -2,13 +2,15 @@ package com.finderfeed.fdbosses.content.entities;
 
 import com.finderfeed.fdbosses.init.BossConfigs;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.Targeting;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
 import java.util.List;
 
-public class BossDespawner<T extends Mob> {
+public class BossDespawner<T extends LivingEntity & Targeting> {
 
     private T boss;
     private AABB bossEntitiesDespawnBox;
@@ -55,7 +57,7 @@ public class BossDespawner<T extends Mob> {
 
         var list = level.getEntitiesOfClass(Entity.class, box, (entity)->{
             var clazz = entity.getClass();
-            return entityTypesToDelete.stream().anyMatch(clazz::isAssignableFrom);
+            return entityTypesToDelete.stream().anyMatch(e -> e.isAssignableFrom(clazz));
         });
 
         for (var entity : list){

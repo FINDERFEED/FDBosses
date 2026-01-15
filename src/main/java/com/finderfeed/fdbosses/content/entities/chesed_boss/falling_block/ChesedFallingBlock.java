@@ -36,6 +36,8 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
 
     public static final EntityDataAccessor<BlockState> STATE = SynchedEntityData.defineId(ChesedFallingBlock.class, EntityDataSerializers.BLOCK_STATE);
 
+    public static final EntityDataAccessor<Float> GRAVITY = SynchedEntityData.defineId(ChesedFallingBlock.class, EntityDataSerializers.FLOAT);
+
     @SerializableField
     public float damage;
 
@@ -45,11 +47,12 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
         super(type, level);
     }
 
-    public static ChesedFallingBlock summon(Level level,BlockState state,Vec3 pos,Vec3 speed, float damage){
+    public static ChesedFallingBlock summon(Level level,BlockState state,Vec3 pos,Vec3 speed, float damage, float gravity){
         ChesedFallingBlock block = new ChesedFallingBlock(BossEntities.CHESED_FALLING_BLOCK.get(),level);
         block.setPos(pos);
         block.setDeltaMovement(speed);
         block.setBlockState(state);
+        block.getEntityData().set(GRAVITY, gravity);
         level.addFreshEntity(block);
         block.damage = damage;
         return block;
@@ -58,12 +61,16 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
         return summon(level,state,pos,Vec3.ZERO,damage);
     }
 
+    public static ChesedFallingBlock summon(Level level,BlockState state,Vec3 pos,Vec3 speed, float damage){
+        return summon(level, state,pos,speed,damage,0.025f);
+    }
+
     @Override
     public void tick() {
         super.tick();
-        if (!level().isClientSide){
+        //if (!level().isClientSide){
             this.setDeltaMovement(this.getDeltaMovement().add(0,-this.getDefaultGravity(),0));
-        }
+        //}
     }
 
     @Override
@@ -126,6 +133,7 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
     @Override
     protected void defineSynchedData() {
         this.entityData.define(STATE, Blocks.STONE.defaultBlockState());
+        this.entityData.define(GRAVITY, 0.025f);
     }
 
     @Override
@@ -145,7 +153,7 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
 
 
     protected double getDefaultGravity() {
-        return 0.025;
+        return this.getEntityData().get(GRAVITY);
     }
 
     @Override

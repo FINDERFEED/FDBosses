@@ -19,6 +19,22 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.flying_block_entity.
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ray_reflector.ChesedRayReflector;
 import com.finderfeed.fdbosses.content.entities.chesed_sword_buff.FlyingSwordEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.EyeOfGeburah;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahBossSpawner;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahCastingCircleJudgementBird;
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahChainTrapCastCircle;
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahRayCastingCircle;
+import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahSinCrystalCastCircle;
+import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.ChainTrapSummonProjectile;
+import com.finderfeed.fdbosses.content.entities.geburah.chain_trap.GeburahChainTrapEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBell;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_explosive_crystal.GeburahSinCrystal;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_opening_floor.GeburahOpeningFloor;
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallProjectile;
+import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.justice_hammer.JusticeHammerAttack;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
@@ -36,6 +52,8 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crys
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
+import com.finderfeed.fdbosses.content.items.geburah.DivineGear;
+import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistChain;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
 import com.finderfeed.fdbosses.content.projectiles.MalkuthPlayerFireIceBall;
 import net.minecraft.world.entity.EntityType;
@@ -117,6 +135,12 @@ public class BossEntities {
             EyeOfMalkuthEntity::new, MobCategory.MISC
     )
             .sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(4).build("eye_of_chesed"));
+
+    public static final Supplier<EntityType<EyeOfGeburah>> EYE_OF_GEBURAH = ENTITIES.register("eye_of_geburah",()->EntityType.Builder.<EyeOfGeburah>of(
+                    EyeOfGeburah::new, MobCategory.MISC
+            )
+            .sized(0.25F, 0.25F).clientTrackingRange(4).updateInterval(4).build("eye_of_geburah"));
+
 
     public static final Supplier<EntityType<ChesedCrystalEntity>> CHESED_CRYSTAL = ENTITIES.register("chesed_crystal",()->EntityType.Builder.of(
             ChesedCrystalEntity::new, MobCategory.MISC
@@ -298,8 +322,120 @@ public class BossEntities {
             .build("ice_malkuth_warrior"));
 
 
+    //GEBURAH
+
+    public static final Supplier<EntityType<GeburahEntity>> GEBURAH = ENTITIES.register("geburah",()->EntityType.Builder.of(
+                    GeburahEntity::new, MobCategory.MISC
+            )
+            .sized(2f,2f)
+            .build("geburah"));
+
+    public static final Supplier<EntityType<GeburahChainTrapEntity>> GEBURAH_CHAIN_TRAP = ENTITIES.register("geburah_chain_trap",()->EntityType.Builder.of(
+                    GeburahChainTrapEntity::new, MobCategory.MISC
+            )
+            .sized(0.5f,0.5f)
+            .build("geburah_chain_trap"));
+
+    public static final Supplier<EntityType<GeburahEarthquake>> GEBURAH_EARTHQUAKE = ENTITIES.register("geburah_earthquake",()->EntityType.Builder.of(
+                    GeburahEarthquake::new, MobCategory.MISC
+            )
+            .sized(0.2f,0.2f)
+            .build("geburah_earthquake"));
+
+    public static final Supplier<EntityType<JudgementBallProjectile>> GEBURAH_JUDGEMENT_BALL = ENTITIES.register("geburah_judgement_ball",()->EntityType.Builder.of(
+                    JudgementBallProjectile::new, MobCategory.MISC
+            )
+            .sized(0.5f,0.5f)
+            .build("geburah_judgement_ball"));
+
+    public static final Supplier<EntityType<JusticeHammerAttack>> JUSTICE_HAMMER = ENTITIES.register("justice_hammer",()->EntityType.Builder.of(
+                    JusticeHammerAttack::new, MobCategory.MISC
+            )
+            .sized(0.2f,0.2f)
+            .build("justice_hammer"));
+
+    public static final Supplier<EntityType<GeburahSinCrystal>> GEBURAH_SIN_CRYSTAL = ENTITIES.register("geburah_sin_crystal",()->EntityType.Builder.of(
+                    GeburahSinCrystal::new, MobCategory.MISC
+            )
+            .updateInterval(1)
+            .sized(0.2f,0.2f)
+            .build("geburah_sin_crystal"));
+
+    public static final Supplier<EntityType<GeburahSinCrystalCastCircle>> GEBURAH_CASTING_CIRCLE_SIN_CRYSTAL = ENTITIES.register("geburah_casting_circle_sin_crystal",()->EntityType.Builder.of(
+                    GeburahSinCrystalCastCircle::new, MobCategory.MISC
+            )
+            .sized(0.2f,0.2f)
+            .build("geburah_casting_circle_sin_crystal"));
+
+    public static final Supplier<EntityType<GeburahChainTrapCastCircle>> GEBURAH_CASTING_CIRCLE_CHAIN_TRAP = ENTITIES.register("geburah_casting_circle_chain_trap",()->EntityType.Builder.of(
+                    GeburahChainTrapCastCircle::new, MobCategory.MISC
+            )
+            .sized(0.2f,0.2f)
+            .build("geburah_casting_circle_chain_trap"));
+
+    public static final Supplier<EntityType<GeburahRayCastingCircle>> GEBURAH_CASTING_CIRCLE_RAY = ENTITIES.register("geburah_casting_circle_ray",()->EntityType.Builder.of(
+                    GeburahRayCastingCircle::new, MobCategory.MISC
+            )
+            .sized(0.2f,0.2f)
+            .build("geburah_casting_circle_ray"));
+
+    public static final Supplier<EntityType<GeburahCastingCircleJudgementBird>> GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD = ENTITIES.register("geburah_casting_circle_judgement_bird",()->EntityType.Builder.of(
+                    GeburahCastingCircleJudgementBird::new, MobCategory.MISC
+            )
+            .sized(0.2f,0.2f)
+            .build("geburah_casting_circle_judgement_bird"));
+
+    public static final Supplier<EntityType<ChainTrapSummonProjectile>> GEBURAH_CHAIN_TRAP_SUMMON_PROJECTILE = ENTITIES.register("geburah_chain_trap_summon_projectile",()->EntityType.Builder.of(
+                    ChainTrapSummonProjectile::new, MobCategory.MISC
+            )
+            .sized(0.2f,0.2f)
+            .build("geburah_chain_trap_summon_projectile"));
+
+    public static final Supplier<EntityType<JudgementBirdEntity>> JUDGEMENT_BIRD = ENTITIES.register("judgement_bird",()->EntityType.Builder.of(
+                    JudgementBirdEntity::new, MobCategory.CREATURE
+            )
+            .sized(0.5f,1f)
+            .build("judgement_bird"));
+
+    public static final Supplier<EntityType<GeburahBell>> GEBURAH_BELL = ENTITIES.register("geburah_bell",()->EntityType.Builder.of(
+                    GeburahBell::new, MobCategory.CREATURE
+            )
+            .sized(1f,1f)
+            .build("geburah_bell"));
+
+    public static final Supplier<EntityType<GeburahOpeningFloor>> GEBURAH_OPENING_FLOOR = ENTITIES.register("geburah_opening_floor",()->EntityType.Builder.of(
+                    GeburahOpeningFloor::new, MobCategory.MISC
+            )
+            .sized(1f,1f)
+            .build("geburah_opening_floor"));
+
+    public static final Supplier<EntityType<GeburahBossSpawner>> GEBURAH_BOSS_SPAWNER = ENTITIES.register("geburah_boss_spawner",()->EntityType.Builder.of(
+                    GeburahBossSpawner::new, MobCategory.MISC
+            )
+            .sized(1f,2f)
+            .build("geburah_boss_spawner"));
+
+
+    //ITEMS
+    public static final Supplier<EntityType<MalkuthFistChain>> MALKUTH_FIST_CHAIN = ENTITIES.register("malkuth_fist_chain",()->EntityType.Builder.of(
+                    MalkuthFistChain::new, MobCategory.MISC
+            )
+            .sized(0.25f,0.25f)
+            .build("malkuth_fist_chain"));
+
+    public static final Supplier<EntityType<DivineGear>> DIVINE_GEAR = ENTITIES.register("divine_gear",()->EntityType.Builder.of(
+                    DivineGear::new, MobCategory.MISC
+            )
+            .sized(2f,3f)
+            .build("divine_gear"));
+
+
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event){
+        event.put(GEBURAH_BELL.get(), LivingEntity.createLivingAttributes()
+                .add(Attributes.MAX_HEALTH, 2)
+                .build());
+
         event.put(CHESED.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,10).build());
         event.put(CHESED_ELECTRIC_SPHERE.get(), LivingEntity.createLivingAttributes().build());
         event.put(CHESED_VERTICAL_RAY_ATTACK.get(), LivingEntity.createLivingAttributes().build());
@@ -310,16 +446,24 @@ public class BossEntities {
         event.put(MALKUTH.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,20).build());
         event.put(MALKUTH_CANNON.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
 
+
+        event.put(GEBURAH.get(), LivingEntity.createLivingAttributes().add(Attributes.MAX_HEALTH,20).build());
+
+        event.put(JUDGEMENT_BIRD.get(), Mob.createMobAttributes()
+                .add(Attributes.FOLLOW_RANGE, 32)
+                .add(Attributes.MOVEMENT_SPEED, 0.35f)
+                .build());
+
         event.put(FIRE_MALKUTH_WARRIOR.get(), Mob.createMobAttributes()
-                        .add(Attributes.MAX_HEALTH,60)
-                        .add(Attributes.MOVEMENT_SPEED, 0.23f)
-                        .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
+                .add(Attributes.MAX_HEALTH,60)
+                .add(Attributes.MOVEMENT_SPEED, 0.23f)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
                 .build());
 
         event.put(ICE_MALKUTH_WARRIOR.get(), Mob.createMobAttributes()
-                        .add(Attributes.MAX_HEALTH,60)
-                        .add(Attributes.MOVEMENT_SPEED, 0.23f)
-                        .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
+                .add(Attributes.MAX_HEALTH,60)
+                .add(Attributes.MOVEMENT_SPEED, 0.23f)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
                 .build());
     }
 

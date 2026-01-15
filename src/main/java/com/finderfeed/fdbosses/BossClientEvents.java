@@ -1,13 +1,17 @@
 package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.HandleButtonPressSinPacket;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSins;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_boss_spawner.MalkuthBossSpawner;
 import com.finderfeed.fdbosses.content.items.WeaponCoreItem;
+import com.finderfeed.fdbosses.content.items.geburah.DivineGearItem;
 import com.finderfeed.fdbosses.content.util.GainLoseValue;
-import com.finderfeed.fdbosses.init.BossDataComponents;
-import com.finderfeed.fdbosses.init.BossEffects;
-import com.finderfeed.fdbosses.init.BossModels;
+import com.finderfeed.fdbosses.init.*;
+import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdlib.network.FDPacketHandler;
+import com.finderfeed.fdlib.systems.bedrock.animations.AnimationContext;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -31,8 +35,11 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.ViewportEvent;
 import net.minecraftforge.event.TickEvent;
@@ -41,7 +48,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import org.joml.Matrix4f;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
+
+import java.util.List;
 
 
 @Mod.EventBusSubscriber(modid = FDBosses.MOD_ID,bus = Mod.EventBusSubscriber.Bus.FORGE,value = Dist.CLIENT)
@@ -59,6 +69,72 @@ public class BossClientEvents {
 
     private static GainLoseValue hellscapeSkyValue = new GainLoseValue(0,100);
 
+
+    private static final List<Integer> ALLOWED_TO_USE_BUTTONS = List.of(
+            GLFW.GLFW_KEY_ESCAPE
+    );
+
+    @SubscribeEvent
+    public static void handleButtonPressSin(InputEvent.Key event){
+        Level level = Minecraft.getInstance().level;
+        Player player = Minecraft.getInstance().player;
+
+        if (Minecraft.getInstance().isPaused()) return;
+
+        if (player != null && level != null && event.getAction() == GLFW.GLFW_PRESS && !ALLOWED_TO_USE_BUTTONS.contains(event.getKey()) && !player.isDeadOrDying()){
+            FDPacketHandler.INSTANCE.sendToServer(new HandleButtonPressSinPacket());
+        }
+
+    }
+
+    @SubscribeEvent
+    public static void handleButtonPressSinMouse(InputEvent.MouseButton.Post event){
+
+        Level level = Minecraft.getInstance().level;
+        Player player = Minecraft.getInstance().player;
+
+        if (Minecraft.getInstance().isPaused()) return;
+
+        if (player != null && level != null && event.getAction() == GLFW.GLFW_PRESS && !player.isDeadOrDying()){
+            FDPacketHandler.INSTANCE.sendToServer(new HandleButtonPressSinPacket());
+        }
+
+    }
+
+    public static boolean hasPlayerJumpedUnderSinEffect = false;
+    @SubscribeEvent
+    public static void postClientTick(TickEvent.ClientTickEvent event){
+
+        if (event.phase != TickEvent.Phase.END) return;
+
+        var player = Minecraft.getInstance().player;
+
+        if (player == null || !BossUtil.isPlayerInSurvival(player)) {
+            hasPlayerJumpedUnderSinEffect = false;
+            return;
+        }
+
+        PlayerSins playerSins = PlayerSins.getPlayerSins(player);
+
+        if (playerSins.hasSinActive(GeburahSins.PRESSED_TOO_MANY_BUTTONS_SIN.get())) {
+
+            var key = Minecraft.getInstance().options.keyJump;
+
+            if (key.isDown()) {
+                if (player.input.jumping) {
+                    hasPlayerJumpedUnderSinEffect = true;
+                    player.setJumping(false);
+                }
+            }else{
+                hasPlayerJumpedUnderSinEffect = false;
+            }
+
+        }else{
+            hasPlayerJumpedUnderSinEffect = false;
+        }
+
+
+    }
 
     @SubscribeEvent
     public static void collectTooltips(ItemTooltipEvent event){
@@ -81,6 +157,11 @@ public class BossClientEvents {
             tickChesedGaze(player);
             tickChesedDarken(player);
             lowerGammaWhenAnyDarkenEffect(player);
+            if (!Minecraft.getInstance().isPaused()) {
+                divineGearAnimTime++;
+            }
+        }else{
+            divineGearAnimTime = 0;
         }
         tickHellscapeSky();
     }
@@ -202,8 +283,83 @@ public class BossClientEvents {
             renderHellscapeSkybox(event);
         }else if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS){
             renderMalkuthCowardExecution(event, event.getPartialTick());
+            renderDivineGearPlacement(event);
         }
     }
+
+
+
+    private static FDModel DIVINE_GEAR_MODEL;
+    private static float divineGearAnimTime = 0;
+
+    private static void renderDivineGearPlacement(RenderLevelStageEvent event){
+
+        Player player = FDClientHelpers.getClientPlayer();
+
+        if (player == null) return;
+        ItemStack stack = player.getMainHandItem();
+        if (!stack.is(BossItems.DIVINE_GEAR.get()) || player.getCooldowns().isOnCooldown(BossItems.DIVINE_GEAR.get())) return;
+
+        var hitResult = Minecraft.getInstance().hitResult;
+        if (hitResult.getType() != HitResult.Type.BLOCK) return;
+
+        BlockHitResult blockHitResult = (BlockHitResult) hitResult;
+
+        var blockPos = blockHitResult.getBlockPos();
+        var direction = blockHitResult.getDirection();
+
+        var posAndDir = DivineGearItem.getPosAndDirection(Minecraft.getInstance().level, blockPos, direction);
+        blockPos = posAndDir.first;
+        direction = posAndDir.second;
+
+        if (DIVINE_GEAR_MODEL == null){
+            DIVINE_GEAR_MODEL = new FDModel(BossModels.DIVINE_GEAR.get());
+        }
+
+        if (!DivineGearItem.canPlaceOn(Minecraft.getInstance().level, blockPos, direction)) return;
+
+        var data = stack.get(BossDataComponents.DIVINE_GEAR_COMPONENT);
+        if (data == null || data.getCharge() == 0){
+            return;
+        }
+
+        Vec3 worldRenderPos = DivineGearItem.getSpawnPlace(blockPos, direction);
+        Vec3 cameraPos = Minecraft.getInstance().gameRenderer.getMainCamera().getPosition();
+
+        Vec3 offset = worldRenderPos.subtract(cameraPos);
+
+        var matrices = event.getPoseStack();
+        matrices.pushPose();
+
+        matrices.translate(offset.x,offset.y,offset.z);
+
+        var location = DivineGearItem.DIVINE_GEAR;
+        DIVINE_GEAR_MODEL.resetTransformations();
+
+
+        float time = divineGearAnimTime + event.getPartialTick();
+
+        var anim = BossAnims.DIVINE_GEAR_ITEM_IDLE.get();
+
+        anim.applyAnimation(new AnimationContext(),DIVINE_GEAR_MODEL, time % anim.getAnimTime());
+
+        var vertex = Tesselator.getInstance().getBuilder();
+        vertex.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+        FDRenderUtil.bindTexture(location);
+        RenderSystem.enableDepthTest();
+        RenderSystem.enableBlend();
+
+        DIVINE_GEAR_MODEL.render(matrices, vertex, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, 1f, 1f, 1f, 0.25f);
+
+        BufferUploader.drawWithShader(vertex.end());
+
+        matrices.popPose();
+
+        RenderSystem.disableDepthTest();
+
+    }
+
 
     private static FDModel SWORD_MODEL;
     public static final ResourceLocation MALKUTH_FIRE_SWORD = FDBosses.location("textures/item/malkuth_sword_fire.png");

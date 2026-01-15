@@ -21,4 +21,37 @@ public class ItemConfig {
     @ConfigValue
     public int playerMalkuthFireballAbilityCooldown = 200;
 
+    @ConfigValue
+    public int justiceCoreDamageReduction = 15;
+
+    @ConfigValue
+    public int phaseSphereUseDuration = 200;
+
+    @ConfigValue
+    public int phaseSphereCooldown = 100;
+
+    @ConfigValue
+    public int iceFireGauntletCooldown = 60;
+
+    @ConfigValue
+    public int iceFireGauntletCrushDamage = 15;
+
+    @ConfigValue
+    public int divineGearAttackCooldown = 60;
+
+    @ConfigValue
+    public int divineGearDamage = 25;
+
+    @ConfigValue
+    public int divineGearLifetime = 500;
+
+    @ConfigValue
+    public int divineGearCharges = 3;
+
+    @ConfigValue
+    public int divineGearChargeReplenishTime = 500;
+
+    @ConfigValue
+    public float divineGearAttackRadius = 25;
+
 }

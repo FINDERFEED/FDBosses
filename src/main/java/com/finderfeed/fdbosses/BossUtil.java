@@ -1,11 +1,19 @@
 package com.finderfeed.fdbosses;
 
+import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.network.FDPacketHandler;
+import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
+import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.BoundToEntityProcessor;
 import com.finderfeed.fdlib.util.FDUtil;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
@@ -27,6 +35,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
@@ -41,6 +50,7 @@ import java.util.function.Predicate;
 
 public class BossUtil {
 
+    public static final Random random = new Random();
 
     public static final TargetingConditions ALL = TargetingConditions.forNonCombat().selector(p->true).ignoreLineOfSight().ignoreInvisibilityTesting();
 
@@ -57,7 +67,20 @@ public class BossUtil {
     public static final int MALKUTH_VOLCANO_ERRUPTION = 11;
     public static final int MALKUTH_SWORD_INSERT_PARTICLES = 12;
     public static final int MALKUTH_PLAYER_FIREBALL_EXPLODE = 13;
-    public static final int CHESED_ADD_ROCKFALL_PARTICLE_EMITTER = 14;
+    public static final int GEBURAH_RAY_PARTICLES = 14;
+    public static final int GEBURAH_RAY_CHARGE_PARTICLES = 15;
+    public static final int GEBURAH_WEAPONS_START_LASER = 16;
+    public static final int JUDGEMENT_BIRD_RAY_PARTICLES = 17;
+    public static final int TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_EFFECT = 18;
+    public static final int TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_IMPACT = 19;
+    public static final int GEBURAH_PREPARE_RAYS = 20;
+    public static final int GEBURAH_PREPARE_RAYS_FRAMES = 21;
+    public static final int DIVINE_GEAR_RAY_PARTICLES = 22;
+    public static final int CHESED_ADD_ROCKFALL_PARTICLE_EMITTER = 23;
+
+    public static boolean isPlayerInSurvival(Player player){
+        return !player.isCreative() && !player.isSpectator();
+    }
 
     public static CompoundTag getOrCreateTag(CompoundTag main, String name){
         if (!main.contains(name)){
@@ -80,6 +103,90 @@ public class BossUtil {
         );
 
         return new Vec3(v1.x,v1.y,v1.z);
+    }
+
+    public static int randomPlusMinus(){
+        return random.nextBoolean() ? -1 : 1;
+    }
+
+    public static void createOnEarthBlockExplosionEffect(Level level, Vec3 position, Vec3 attackDirection, int intensity, BlockState fallback){
+
+        attackDirection = attackDirection.normalize();
+
+        Vec3 explosionVec = new Vec3(attackDirection.x,attackDirection.y,attackDirection.z);
+
+        var states = collectStates(level, position, 1);
+        if (states.isEmpty() && fallback != null){
+            states.add(fallback);
+        }
+
+        if (states.isEmpty()) return;
+
+        for (int i = 0; i < intensity; i++){
+
+            Vec3 direction = new Vec3(0.05f + level.random.nextFloat() * 0.6f,0,0).yRot(FDMathUtil.FPI * 2 * level.random.nextFloat());
+
+            float randomYSpeed = 0.25f + level.random.nextFloat() * 0.6f;
+
+            Vec3 speed = new Vec3(direction.x,randomYSpeed,direction.z);
+
+            float explosionVecContribution = 0.7f;
+
+            speed = speed.add(
+                    explosionVec.x * explosionVecContribution,
+                    0,
+                    explosionVec.z * explosionVecContribution
+            );
+
+            float rndOffs = level.random.nextFloat();
+            Vec3 spawnOffset = position.add(direction.normalize().multiply(rndOffs,rndOffs,rndOffs));
+
+            ChesedFallingBlock fallingBlock = ChesedFallingBlock.summon(level, states.get(level.random.nextInt(states.size())), spawnOffset, speed, 0, 0.05f);
+
+
+            float rnd = level.random.nextFloat() * 0.05f;
+            FDLibCalls.addParticleEmitter(level, 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+                            .color(0.35f - rnd, 0.35f - rnd, 0.35f - rnd)
+                            .lifetime(0, 0, 25)
+                            .size(1.5f)
+                            .build())
+                    .lifetime(200)
+                    .processor(new BoundToEntityProcessor(fallingBlock.getId(), Vec3.ZERO))
+                    .position(spawnOffset)
+                    .build());
+
+        }
+
+    }
+
+    private static List<BlockState> collectStates(Level level, Vec3 pos, int radius){
+
+        BlockPos blockPos = new BlockPos(
+                (int) Math.floor(pos.x),
+                (int) Math.floor(pos.y),
+                (int) Math.floor(pos.z)
+        );
+
+        List<BlockState> blockStates = new ArrayList<>();
+
+
+        for (int x = -radius; x <= radius; x++){
+            for (int y = -radius; y <= radius; y++){
+                for (int z = -radius; z <= radius; z++){
+
+                    BlockPos offset = blockPos.offset(x,y,z);
+
+                    BlockState blockState = level.getBlockState(offset);
+
+                    if (!blockState.isAir() && blockState.isCollisionShapeFullBlock(level, offset)){
+                        blockStates.add(blockState);
+                    }
+
+                }
+            }
+        }
+
+        return blockStates;
     }
 
     /**
@@ -191,6 +298,42 @@ public class BossUtil {
         };
     }
 
+    public static void geburahPrepareRoundAndRoundLasers(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){
+        posEvent(serverLevel, pos, GEBURAH_PREPARE_RAYS_FRAMES, geburah.getId(), radius);
+    }
+
+    public static void geburahChargeConstantLaserParticles(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){
+        posEvent(serverLevel, pos, GEBURAH_PREPARE_RAYS, geburah.getId(), radius);
+    }
+
+    public static void geburahTriggerSinPunishmentAttackImpactEffect(ServerLevel serverLevel, Vec3 pos, double radius, int attackRadius){
+        posEvent(serverLevel, pos, TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_IMPACT, attackRadius, radius);
+    }
+
+    public static void geburahTriggerSinPunishmentAttack(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){
+        posEvent(serverLevel, pos, TRIGGER_GEBURAH_SIN_PUNISHMENT_ATTACK_EFFECT, geburah.getId(), radius);
+    }
+
+    public static void geburahWeaponsStartLaser(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){
+        posEvent(serverLevel, pos, GEBURAH_WEAPONS_START_LASER, geburah.getId(), radius);
+    }
+
+    public static void judgementBirdRayParticles(ServerLevel serverLevel, Vec3 pos, double radius, Vec3 direction){
+        posEvent(serverLevel, pos, JUDGEMENT_BIRD_RAY_PARTICLES, FDUtil.encodeDirection(direction), radius);
+    }
+
+    public static void geburahRayChargeParticles(ServerLevel serverLevel, Vec3 pos, double radius, GeburahEntity geburah){
+        posEvent(serverLevel, pos, GEBURAH_RAY_CHARGE_PARTICLES, geburah.getId(), radius);
+    }
+
+    public static void geburahRayParticles(ServerLevel serverLevel, Vec3 pos, double radius, Vec3 direction){
+        posEvent(serverLevel, pos, GEBURAH_RAY_PARTICLES, FDUtil.encodeDirection(direction), radius);
+    }
+
+    public static void divineGearRayParticles(ServerLevel serverLevel, Vec3 pos, double radius, Vec3 direction){
+        posEvent(serverLevel, pos, DIVINE_GEAR_RAY_PARTICLES, FDUtil.encodeDirection(direction), radius);
+    }
+
     public static void chesedRockfallEmitter(ServerLevel level, Vec3 pos, double radius, int chesedEntityId){
         posEvent(level, pos, CHESED_ADD_ROCKFALL_PARTICLE_EMITTER, chesedEntityId, radius);
     }
@@ -213,6 +356,61 @@ public class BossUtil {
 
     public static void malkuthFloatParticles(ServerLevel serverLevel, MalkuthEntity malkuthEntity){
         posEvent(serverLevel, malkuthEntity.position(), MALKUTH_FLOAT_PARTICLES, malkuthEntity.getId(), 60);
+    }
+
+    public static void geburahSinPunishmentAttackServerEffect(Level level, Vec3 pos, float radius, BlockState state){
+
+        float length = FDMathUtil.FPI * 2 * radius;
+        float step = 500 / length;
+        float stonesDirStep = FDMathUtil.FPI / 8;
+
+        for (float i = 0; i < length; i+=step){
+
+            float p = i / length;
+
+            Vec3 direction = new Vec3(1,0,0).yRot(FDMathUtil.FPI * 2 * p + random.nextFloat() * FDMathUtil.FPI / 16);
+            Vec3 between = direction.scale(radius);
+            Vec3 reversedDir = direction.reverse();
+            Vec3 ppos = pos.add(between);
+
+
+            int stonesCount = 2;
+            for (int c = 0; c < stonesCount; c++) {
+                float stonesP = c / (stonesCount - 1f);
+                for (int dirswitch = -1; dirswitch <= 1; dirswitch += 2) {
+                    for (int k = -1; k < 1; k++) {
+                        Vec3 stoneDir = direction.scale(dirswitch).yRot(k * stonesDirStep);
+
+                        Vec3 speed = stoneDir.scale(1.5 * (0.1f + random.nextFloat() * 0.5f) ).add(0,(0.25f + random.nextFloat() * 0.3f) * 1.25, 0);
+
+                        float speedScale = random.nextFloat() * 0.8f + 0.1f;
+                        speed = speed.multiply(speedScale,1,speedScale);
+
+                        ChesedFallingBlock block = ChesedFallingBlock.summon(level, state, ppos.add(
+                                random.nextFloat() * 2 - 1,
+                                0,
+                                random.nextFloat() * 2 - 1
+                        ), speed,0);
+
+                        block.softerSound = true;
+
+                        float rnd = random.nextFloat() * 0.05f;
+                        FDLibCalls.addParticleEmitter(level, 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+                                        .color(0.35f - rnd, 0.35f - rnd, 0.35f - rnd)
+                                        .lifetime(0, 0, 10)
+                                        .size(1.5f)
+                                        .build())
+                                .lifetime(200)
+                                .processor(new BoundToEntityProcessor(block.getId(), Vec3.ZERO))
+                                .position(pos)
+                                .build());
+
+                    }
+                }
+            }
+
+        }
+
     }
 
     public static void malkuthCannonShoot(ServerLevel serverLevel, MalkuthAttackType malkuthAttackType, Vec3 pos, Vec3 direction, double radius){
@@ -310,6 +508,7 @@ public class BossUtil {
 
         public static final TagKey<Structure> EYE_OF_CHESED_LOCATED = create("eye_of_chesed_located");
         public static final TagKey<Structure> EYE_OF_MALKUTH_LOCATED = create("eye_of_malkuth_located");
+        public static final TagKey<Structure> EYE_OF_GEBURAH_LOCATED = create("eye_of_geburah_located");
 
         private static TagKey<Structure> create(String id) {
             return TagKey.create(Registries.STRUCTURE, FDBosses.location(id));

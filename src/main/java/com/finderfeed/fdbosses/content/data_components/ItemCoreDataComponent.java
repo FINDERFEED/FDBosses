@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.data_components;
 
+import com.finderfeed.fdbosses.content.items.CoreItem;
 import com.finderfeed.fdbosses.content.items.WeaponCoreItem;
 import com.finderfeed.fdbosses.init.BossItems;
 import com.mojang.serialization.Codec;
@@ -49,14 +50,15 @@ public class ItemCoreDataComponent {
 
     public enum CoreType {
         LIGHTNING(BossItems.LIGHTNING_CORE,0x11ffff),
-        FIRE_AND_ICE(BossItems.FIRE_AND_ICE_CORE, 0xffaa11)
+        FIRE_AND_ICE(BossItems.FIRE_AND_ICE_CORE, 0xffaa11),
+        JUSTICE_CORE(BossItems.JUSTICE_CORE, 0x11aaff)
 
         ;
 
-        private Supplier<WeaponCoreItem> item;
+        private Supplier<CoreItem> item;
         private int textColor;
 
-        CoreType(Supplier<WeaponCoreItem> item, int textColor){
+        CoreType(Supplier<CoreItem> item, int textColor){
             this.item = item;
             this.textColor = textColor;
         }
@@ -65,7 +67,7 @@ public class ItemCoreDataComponent {
             return textColor;
         }
 
-        public WeaponCoreItem getItem() {
+        public CoreItem getItem() {
             return item.get();
         }
 

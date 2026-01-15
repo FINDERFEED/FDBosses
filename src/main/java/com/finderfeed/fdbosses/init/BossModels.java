@@ -41,4 +41,23 @@ public class BossModels {
 
     public static final Supplier<FDModelInfo> MALKUTH_WARRIOR = INFOS.register("malkuth_warrior",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_warrior"),1f));
 
+    //Geburah
+    public static final Supplier<FDModelInfo> GEBURAH = INFOS.register("geburah",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"),1f));
+    public static final Supplier<FDModelInfo> GEBURAH_LAYER = INFOS.register("geburah_layer",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah_no_core"),1.01f));
+    public static final Supplier<FDModelInfo> JUDGEMENT_BALL = INFOS.register("judgement_ball",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_ball"),1f));
+    public static final Supplier<FDModelInfo> JUDGEMENT_BALL_LAYER = INFOS.register("judgement_ball_layer",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_ball"),1.05f));
+    public static final Supplier<FDModelInfo> JUSTICE_HAMMER = INFOS.register("justice_hammer",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"justice_hammer"),1.0f));
+    public static final Supplier<FDModelInfo> JUDGEMENT_BIRD = INFOS.register("judgement_bird",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_bird"),1.0f));
+    public static final Supplier<FDModelInfo> JUDGEMENT_BIRD_LAYER = INFOS.register("judgement_bird_layer",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_bird"),1.05f));
+    public static final Supplier<FDModelInfo> GEBURAH_BELL = INFOS.register("geburah_bell",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah_bell"),1f));
+    public static final Supplier<FDModelInfo> JUSTITIA = INFOS.register("justitia",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"justitia"),1f));
+
+    //Items
+    public static final Supplier<FDModelInfo> CHESED_ITEM = INFOS.register("chesed_item",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_item"),1f));
+    public static final Supplier<FDModelInfo> MALKUTH_FIST = INFOS.register("malkuth_fist",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_fist"),1f));
+    public static final Supplier<FDModelInfo> MALKUTH_FIST_LAYER = INFOS.register("malkuth_fist_layer",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_fist"),1.1f));
+    public static final Supplier<FDModelInfo> MALKUTH_FIST_FLYING = INFOS.register("malkuth_fist_flying",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_fist_flying"),1.0f));
+    public static final Supplier<FDModelInfo> DIVINE_GEAR = INFOS.register("divine_gear",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"divine_gear"),1.0f));
+
+
 }

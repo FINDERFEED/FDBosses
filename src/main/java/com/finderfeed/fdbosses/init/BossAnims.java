@@ -225,4 +225,74 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth"));
     });
 
+    //GEBURAH
+    public static RegistryObject<Animation> GEBURAH_STOMP = ANIMATIONS.register("geburah_stomp", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"));
+    });
+
+    public static RegistryObject<Animation> GEBURAH_FIRE_CANNONS = ANIMATIONS.register("geburah_fire_all_cannons", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"));
+    });
+
+    public static RegistryObject<Animation> JUSTICE_HAMMER_SMACK = ANIMATIONS.register("justice_hammer_smack", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"justice_hammer"));
+    });
+
+    public static RegistryObject<Animation> GEBURAH_TILT_LEFT = ANIMATIONS.register("geburah_tilt_left", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"));
+    });
+
+    public static RegistryObject<Animation> GEBURAH_TILT_RIGHT = ANIMATIONS.register("geburah_tilt_right", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"));
+    });
+
+    public static RegistryObject<Animation> JUDGEMENT_BIRD_FLY = ANIMATIONS.register("judgement_bird_fly", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_bird"));
+    });
+
+    public static RegistryObject<Animation> JUDGEMENT_BIRD_CAST = ANIMATIONS.register("judgement_bird_cast", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"judgement_bird"));
+    });
+
+    public static RegistryObject<Animation> GEBURAH_BELL_RING = ANIMATIONS.register("geburah_bell_ring", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah_bell"));
+    });
+
+    public static RegistryObject<Animation> GEBURAH_APPEAR = ANIMATIONS.register("geburah_appear", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"geburah"));
+    });
+
+    //ITEMS
+    public static RegistryObject<Animation> CHESED_ITEM_IDLE = ANIMATIONS.register("chesed_item_idle", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_item"));
+    });
+
+    public static RegistryObject<Animation> CHESED_ITEM_USE = ANIMATIONS.register("chesed_item_use", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"chesed_item"));
+    });
+
+    public static RegistryObject<Animation> MALKUTH_FIST_FLYING = ANIMATIONS.register("malkuth_fist_flying", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_fist"));
+    });
+
+    public static RegistryObject<Animation> MALKUTH_FIST_GRAB = ANIMATIONS.register("malkuth_fist_grab", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"malkuth_fist"));
+    });
+
+    public static RegistryObject<Animation> DIVINE_GEAR_IDLE = ANIMATIONS.register("divine_gear_idle", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"divine_gear"));
+    });
+
+    public static RegistryObject<Animation> DIVINE_GEAR_SUMMON = ANIMATIONS.register("divine_gear_summon", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"divine_gear"));
+    });
+
+    public static RegistryObject<Animation> DIVINE_GEAR_DEATH = ANIMATIONS.register("divine_gear_death", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"divine_gear"));
+    });
+
+    public static RegistryObject<Animation> DIVINE_GEAR_ITEM_IDLE = ANIMATIONS.register("divine_gear_item_idle", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"divine_gear"));
+    });
+
 }
