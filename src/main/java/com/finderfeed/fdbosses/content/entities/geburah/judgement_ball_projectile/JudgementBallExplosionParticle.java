@@ -85,19 +85,22 @@ public class JudgementBallExplosionParticle extends Particle {
     }
 
     public static final ParticleRenderType RENDER_TYPE = new ParticleRenderType() {
+
+
         @Override
-        public BufferBuilder begin(Tesselator p_351047_, TextureManager p_107463_) {
+        public void begin(BufferBuilder buffer, TextureManager p_107437_) {
             RenderSystem.depthMask(true);
             RenderSystem.enableBlend();
             RenderSystem.setShaderTexture(0, FDBosses.location("textures/entities/geburah/judgement_ball_3.png"));
             RenderSystem.setShader(()->GameRenderer.getParticleShader());
-            return p_351047_.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
+            buffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
         }
 
         @Override
-        public boolean isTranslucent() {
-            return true;
+        public void end(Tesselator p_107438_) {
+
         }
+
 
         @Override
         public String toString() {

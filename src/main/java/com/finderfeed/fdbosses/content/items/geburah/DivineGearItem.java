@@ -4,14 +4,16 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossDataComponents;
+import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.AnimatedItem;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDItemAnimationHandler;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.*;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.animated_item.AnimatedItemStackContext;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,8 +27,11 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import org.joml.Vector3f;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class DivineGearItem extends Item implements AnimatedItem {
 
@@ -47,8 +52,7 @@ public class DivineGearItem extends Item implements AnimatedItem {
 
             Direction direction = ctx.getClickedFace();
             var item = ctx.getItemInHand();
-            var data = getComponent(item);
-            int charges = data.getCharge();
+            int charges = getCharge(item);
 
             if (charges > 0 || player.isCreative()) {
                 BlockPos pos = ctx.getClickedPos();
@@ -63,10 +67,9 @@ public class DivineGearItem extends Item implements AnimatedItem {
 
                     DivineGear.summon(player, place);
                     if (!player.isCreative()) {
-                        data.setCooldown();
-                        data.setCharge(charges - 1);
+                        setOnCooldown(item);
+                        setCharge(item, charges - 1);
                     }
-                    item.set(BossDataComponents.DIVINE_GEAR_COMPONENT.get(), new DivineGearComponent(data));
                     return InteractionResult.SUCCESS;
                 }else{
                     return InteractionResult.FAIL;
@@ -125,36 +128,29 @@ public class DivineGearItem extends Item implements AnimatedItem {
                 level.getEntitiesOfClass(DivineGear.class, checkAABB).isEmpty();
     }
 
-    public static DivineGearComponent getComponent(ItemStack itemStack){
-        if (!itemStack.has(BossDataComponents.DIVINE_GEAR_COMPONENT)) {
-            itemStack.set(BossDataComponents.DIVINE_GEAR_COMPONENT, new DivineGearComponent());
-        }
-        return itemStack.get(BossDataComponents.DIVINE_GEAR_COMPONENT);
-    }
-
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int p_41407_, boolean p_41408_) {
         super.inventoryTick(stack, level, entity, p_41407_, p_41408_);
         if (entity instanceof ServerPlayer serverPlayer){
-            var data = getComponent(stack);
-            int charges = data.getCharge();
+
+            int charges = getCharge(stack);
 
             if (charges < BossConfigs.BOSS_CONFIG.get().itemConfig.divineGearCharges){
-                int cooldown = data.getCooldown();
+                int cooldown = getCooldown(stack);
                 if (cooldown > 0){
-                    data.setCooldown(data.getCooldown() - 1);
+                    setCooldown(stack, cooldown - 1);
                 }else{
-                    data.setCharge(charges + 1);
-                    data.setCooldown();
+                    setOnCooldown(stack);
+                    setCharge(stack, charges + 1);
                 }
-
-                stack.set(BossDataComponents.DIVINE_GEAR_COMPONENT, new DivineGearComponent(data));
             }
 
         }else{
 
         }
     }
+
+
 
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
@@ -171,8 +167,66 @@ public class DivineGearItem extends Item implements AnimatedItem {
     }
 
     @Override
-    public void appendHoverText(ItemStack p_41421_, TooltipContext p_339594_, List<Component> components, TooltipFlag p_41424_) {
-        super.appendHoverText(p_41421_, p_339594_, components, p_41424_);
+    public void appendHoverText(ItemStack p_41421_, Level level, List<Component> components, TooltipFlag p_41424_) {
+        super.appendHoverText(p_41421_, level, components, p_41424_);
         components.add(Component.translatable("fdbosses.word.divine_gear_description").withStyle(ChatFormatting.GOLD));
+    }
+
+    public static CompoundTag getData(ItemStack itemStack){
+
+        var tag = itemStack.getOrCreateTagElement("divineGearData");
+        if (!tag.contains("charge")){
+            tag.putInt("charge", BossConfigs.BOSS_CONFIG.get().itemConfig.divineGearCharges);
+        }
+
+        return tag;
+    }
+
+    public static int getCooldown(ItemStack itemStack){
+        var tag = getData(itemStack);
+        return tag.getInt("cooldown");
+    }
+
+    public static int getCharge(ItemStack itemStack){
+        var tag = getData(itemStack);
+        return tag.getInt("charge");
+    }
+
+    public static void setCooldown(ItemStack itemStack, int cooldown){
+        var tag = getData(itemStack);
+        tag.putInt("cooldown", cooldown);
+    }
+
+    public static void setCharge(ItemStack itemStack, int charge){
+        var tag = getData(itemStack);
+        tag.putInt("charge", charge);
+    }
+
+    public static void setOnCooldown(ItemStack itemStack){
+        setCooldown(itemStack, BossConfigs.BOSS_CONFIG.get().itemConfig.divineGearChargeReplenishTime);
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        super.initializeClient(consumer);
+        consumer.accept(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
+                .addModel(FDItemModelOptions.builder()
+                        .modelInfo(BossModels.DIVINE_GEAR)
+                        .renderType((ctx,item)->{
+                            return RenderType.entityCutout(DIVINE_GEAR);
+                        })
+                        .build())
+
+                .setScale((ctx -> {
+                    return 0.25f;
+                }))
+                .addRotation3((itemDisplayContext -> {
+                    return new Vector3f();
+                }))
+                .addTranslation((itemDisplayContext -> {
+                    return new Vector3f(0,-0.1f,0);
+                }))
+                .freeRender(new DivineGearItemRenderer())
+        ));
     }
 }

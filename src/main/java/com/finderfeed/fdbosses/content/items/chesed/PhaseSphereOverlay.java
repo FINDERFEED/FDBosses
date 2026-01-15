@@ -8,19 +8,19 @@ import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDShaderRenderer;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID, value = Dist.CLIENT)
-public class PhaseSphereOverlay implements LayeredDraw.Layer {
+@Mod.EventBusSubscriber(modid = FDBosses.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
+public class PhaseSphereOverlay implements IGuiOverlay {
 
     private static Boolean smartCull;
 
@@ -29,7 +29,7 @@ public class PhaseSphereOverlay implements LayeredDraw.Layer {
     private static int progressO;
 
     @Override
-    public void render(GuiGraphics graphics, DeltaTracker tracker) {
+    public void render(ForgeGui gui, GuiGraphics guiGraphics, float partialTick, int screenWidth, int screenHeight) {
 
         if (Minecraft.getInstance().level == null || progress == 0) return;
 
@@ -39,13 +39,13 @@ public class PhaseSphereOverlay implements LayeredDraw.Layer {
         float width = window.getGuiScaledWidth();
         float height = window.getGuiScaledHeight();
 
-        float pticks = tracker.getGameTimeDeltaPartialTick(false);
+        float pticks = partialTick;
         float gametime = Minecraft.getInstance().level.getGameTime() % 2000000;
         float time = gametime + pticks;
 
         float progress = FDMathUtil.lerp(progressO, PhaseSphereOverlay.progress, pticks) / MAX_PROGRESS;
 
-        FDShaderRenderer.start(graphics, shader)
+        FDShaderRenderer.start(guiGraphics, shader)
                 .setShaderUniform("progress", FDEasings.easeOut(progress))
                 .setShaderUniform("size", width, height)
                 .setShaderUniform("time",time / 200)
@@ -56,7 +56,9 @@ public class PhaseSphereOverlay implements LayeredDraw.Layer {
     }
 
     @SubscribeEvent
-    public static void tickClient(ClientTickEvent.Post event){
+    public static void tickClient(TickEvent.ClientTickEvent event){
+
+        if (event.phase != TickEvent.Phase.END) return;
 
         Player player = Minecraft.getInstance().player;
 

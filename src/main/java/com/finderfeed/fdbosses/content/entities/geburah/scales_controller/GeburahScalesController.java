@@ -3,12 +3,13 @@ package com.finderfeed.fdbosses.content.entities.geburah.scales_controller;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 
 public class GeburahScalesController implements AutoSerializable {
 
@@ -74,7 +75,7 @@ public class GeburahScalesController implements AutoSerializable {
 
         if (!geburah.level().isClientSide) {
             if (this.currentDisplacement != currentDisplacement) {
-                PacketDistributor.sendToPlayersTrackingEntity(this.geburah, new GeburahScalesControllerSetDisplacement(geburah, currentDisplacement, displacementTime));
+                FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->this.geburah), new GeburahScalesControllerSetDisplacement(geburah, currentDisplacement, displacementTime));
             }
         }else {
             if (this.displacementMaxTime != -1 || this.displacementTime != -1) {
@@ -91,7 +92,7 @@ public class GeburahScalesController implements AutoSerializable {
     }
 
     public void syncToPlayer(ServerPlayer serverPlayer){
-        PacketDistributor.sendToPlayer(serverPlayer, new GeburahScalesControllerSetDisplacement(geburah, currentDisplacement, 100));
+        FDPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(()->serverPlayer), new GeburahScalesControllerSetDisplacement(geburah, currentDisplacement, 100));
     }
 
 

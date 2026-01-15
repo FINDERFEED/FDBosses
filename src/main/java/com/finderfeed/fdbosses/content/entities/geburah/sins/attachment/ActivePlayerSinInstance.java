@@ -2,24 +2,22 @@ package com.finderfeed.fdbosses.content.entities.geburah.sins.attachment;
 
 import com.finderfeed.fdbosses.content.util.WorldBox;
 import com.finderfeed.fdbosses.init.BossRegistries;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 public class ActivePlayerSinInstance {
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ActivePlayerSinInstance> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.registry(BossRegistries.PLAYER_SIN),v->v.sin,
+    public static final NetworkCodec<ActivePlayerSinInstance> STREAM_CODEC = NetworkCodec.composite(
+            NetworkCodec.registry(()->BossRegistries.PLAYER_SINS.get()),v->v.sin,
             WorldBox.STREAM_CODEC,v->v.sinActiveBox,
-            ByteBufCodecs.INT,v->v.activeSinTime,
-            ByteBufCodecs.INT,v->v.customData,
+            NetworkCodec.INT,v->v.activeSinTime,
+            NetworkCodec.INT,v->v.customData,
             ActivePlayerSinInstance::new
     );
 
     public static final Codec<ActivePlayerSinInstance> CODEC = RecordCodecBuilder.create(p->p.group(
-            BossRegistries.PLAYER_SINS.byNameCodec().fieldOf("sin").forGetter(v->v.sin),
+            BossRegistries.PLAYER_SINS.get().getCodec().fieldOf("sin").forGetter(v->v.sin),
             WorldBox.CODEC.fieldOf("worldBox").forGetter(v->v.sinActiveBox),
             Codec.INT.fieldOf("activeSinTime").fieldOf("activeSinTime").forGetter(v->v.activeSinTime),
             Codec.INT.fieldOf("customData").forGetter(v->v.customData)

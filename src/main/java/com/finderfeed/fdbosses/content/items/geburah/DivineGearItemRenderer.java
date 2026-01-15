@@ -18,18 +18,16 @@ public class DivineGearItemRenderer implements FDFreeItemRenderer {
     @Override
     public void render(ItemStack itemStack, ItemDisplayContext itemDisplayContext, PoseStack matrices, MultiBufferSource multiBufferSource, int i, int i1) {
 
-        var data = itemStack.get(BossDataComponents.DIVINE_GEAR_COMPONENT);
+        if (FDClientHelpers.getClientLevel() == null) return;
 
-        if (data == null || FDClientHelpers.getClientLevel() == null) return;
-
-        int charge = data.getCharge();
+        int charge = DivineGearItem.getCharge(itemStack);
         int color = charge == 0 ? 0xff1111 : 0x00aaff;
         String s = String.valueOf(charge);
         Font font = Minecraft.getInstance().font;
 
         if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) {
 
-            float pticks = FDRenderUtil.getPartialTickWithPause();
+            float pticks = FDRenderUtil.tryGetPartialTickIgnorePause();
             float time = FDClientHelpers.getClientLevel().getGameTime() + pticks;
             float sin = (float) Math.sin(time / 10) * 0.01f;
 

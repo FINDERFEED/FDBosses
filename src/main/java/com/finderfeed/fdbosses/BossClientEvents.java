@@ -318,8 +318,9 @@ public class BossClientEvents {
 
         if (!DivineGearItem.canPlaceOn(Minecraft.getInstance().level, blockPos, direction)) return;
 
-        var data = stack.get(BossDataComponents.DIVINE_GEAR_COMPONENT);
-        if (data == null || data.getCharge() == 0){
+        int charges = DivineGearItem.getCharge(stack);
+
+        if (charges == 0){
             return;
         }
 

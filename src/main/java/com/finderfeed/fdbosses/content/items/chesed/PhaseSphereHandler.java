@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossItems;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDServerItemAnimations;
 import net.minecraft.core.BlockPos;
@@ -14,12 +15,12 @@ import net.minecraft.world.entity.player.Abilities;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID)
+@Mod.EventBusSubscriber(modid = FDBosses.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PhaseSphereHandler {
 
     public static final String CHESED_ITEM_DATANAME = "phase_sphere_data";
@@ -80,7 +81,7 @@ public class PhaseSphereHandler {
 
 
         if (sendPacket){
-            PacketDistributor.sendToPlayer((ServerPlayer) player, new PhaseSpherePacket(player, true));
+            FDPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(()->((ServerPlayer) player)), new PhaseSpherePacket(player, true));
         }
 
         var compound = perdata.getCompound(CHESED_ITEM_DATANAME);
@@ -105,7 +106,7 @@ public class PhaseSphereHandler {
                 CompoundTag tag = perdata.getCompound(dataname);
                 player.getAbilities().loadSaveData(tag);
                 player.noPhysics = false;
-                PacketDistributor.sendToPlayer(serverPlayer, new PhaseSpherePacket(player, false));
+                FDPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(()-> serverPlayer), new PhaseSpherePacket(player, false));
                 FDServerItemAnimations.startItemAnimation(player, "STOP_USE", AnimationTicker.builder(BossAnims.CHESED_ITEM_USE)
                         .setToNullTransitionTime(0)
                         .reversed()

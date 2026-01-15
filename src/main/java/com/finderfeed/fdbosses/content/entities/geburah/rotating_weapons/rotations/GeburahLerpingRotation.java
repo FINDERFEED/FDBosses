@@ -1,17 +1,15 @@
 package com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations;
 
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahWeaponRotationController;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 public class GeburahLerpingRotation extends GeburahWeaponRotation {
 
-    public static final StreamCodec<FriendlyByteBuf, GeburahLerpingRotation> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.FLOAT, v->v.rotationSnapshot,
-            ByteBufCodecs.FLOAT, v->v.maxSpeed,
-            ByteBufCodecs.FLOAT, v->v.angle,
+    public static final NetworkCodec<GeburahLerpingRotation> STREAM_CODEC = NetworkCodec.composite(
+            NetworkCodec.FLOAT, v->v.rotationSnapshot,
+            NetworkCodec.FLOAT, v->v.maxSpeed,
+            NetworkCodec.FLOAT, v->v.angle,
             (rotationSnapshot,maxspeed,angle)->{
                 GeburahLerpingRotation lerpingRotation = new GeburahLerpingRotation(null, maxspeed, angle);
                 lerpingRotation.rotationSnapshot = rotationSnapshot;

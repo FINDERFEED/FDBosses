@@ -42,19 +42,9 @@ public class GeburahRayStrikeDecalParticle extends DecalParticle {
     }
 
 
-    public static final ParticleRenderType RENDER_TYPE = new FDParticleRenderType() {
+    public static final ParticleRenderType RENDER_TYPE = new ParticleRenderType() {
         @Override
-        public void end() {
-            if (Minecraft.useShaderTransparency()) {
-                Minecraft.getInstance().levelRenderer.getParticlesTarget().copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
-                Minecraft.getInstance().levelRenderer.getParticlesTarget().bindWrite(false);
-            }
-            RenderSystem.disableBlend();
-        }
-
-        @Nullable
-        @Override
-        public BufferBuilder begin(Tesselator tesselator, TextureManager manager) {
+        public void begin(BufferBuilder tesselator, TextureManager p_107437_) {
 
             if (Minecraft.useShaderTransparency()){
                 Minecraft.getInstance().getMainRenderTarget().bindWrite(false);
@@ -66,7 +56,16 @@ public class GeburahRayStrikeDecalParticle extends DecalParticle {
 
             RenderSystem.setShader(GameRenderer::getParticleShader);
             FDRenderUtil.bindTexture(LOCATION);
-            return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
+            tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
+        }
+
+        @Override
+        public void end(Tesselator p_107438_) {
+            if (Minecraft.useShaderTransparency()) {
+                Minecraft.getInstance().levelRenderer.getParticlesTarget().copyDepthFrom(Minecraft.getInstance().getMainRenderTarget());
+                Minecraft.getInstance().levelRenderer.getParticlesTarget().bindWrite(false);
+            }
+            RenderSystem.disableBlend();
         }
 
     };

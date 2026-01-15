@@ -5,8 +5,9 @@ import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.RegisterFDPacket;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraftforge.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 @RegisterFDPacket("fdbosses:start_geburah_distortion_effect")
 public class StartGeburahDistortionEffectPacket extends FDPacket {
@@ -22,18 +23,20 @@ public class StartGeburahDistortionEffectPacket extends FDPacket {
     }
 
     @Override
-    public void write(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
+    public void write(FriendlyByteBuf registryFriendlyByteBuf) {
         registryFriendlyByteBuf.writeInt(entityId);
     }
 
+
     @Override
-    public void clientAction(IPayloadContext iPayloadContext) {
+    public void clientAction(Supplier<NetworkEvent.Context> supplier) {
         BossClientPackets.startGeburahDistortionEffect(entityId);
     }
 
     @Override
-    public void serverAction(IPayloadContext iPayloadContext) {
+    public void serverAction(Supplier<NetworkEvent.Context> supplier) {
 
     }
+
 
 }

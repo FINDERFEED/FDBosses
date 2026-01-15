@@ -38,6 +38,7 @@ import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDScreenEffects;
+import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.network.lib_packets.PlaySoundInEarsPacket;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
@@ -194,6 +195,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     private BossDespawner<ChesedEntity> bossDespawner;
 
+    @SerializableField
+    private Vec3 spawnPosition;
+
     public ChesedEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
         if (serverModel == null) {
@@ -314,6 +318,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         system.setVariable("variable.appear_height",400);
         system.setVariable("variable.angle",360);
         if (!this.level().isClientSide){
+
+            this.tickTeleportHome();
 
             this.passiveEntityPullInArena();
 
@@ -3037,6 +3043,26 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     }
 
+    public void tickTeleportHome(){
+        if (this.spawnPosition != null && this.position().distanceTo(spawnPosition) > 2.5){
+            this.teleportTo(spawnPosition.x,spawnPosition.y,spawnPosition.z);
+        }
+    }
+
+    @Override
+    protected boolean canRide(Entity p_20339_) {
+        return false;
+    }
+
+    @Override
+    public boolean startRiding(Entity p_21396_, boolean p_21397_) {
+        return false;
+    }
+
+    @Override
+    public boolean startRiding(Entity p_20330_) {
+        return false;
+    }
 
     private Vec3 getCenter(){
         return this.position().add(0,1.3,0);
@@ -3194,7 +3220,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
     @Override
     public void setSpawnPosition(Vec3 spawnPosition) {
-
+        this.spawnPosition = spawnPosition;
     }
 
     @Override

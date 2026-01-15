@@ -42,15 +42,15 @@ public class MalkuthFistChainRenderer implements FDFreeEntityRenderer<MalkuthFis
 
         float ratio = 7/4f * 2;
 
-        vertex.addVertex(mat,-segmentWidth,0,0).setColor(1f,1f,1f,1f).setUv(0,0).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 0,0,1);
-        vertex.addVertex(mat,-segmentWidth, length,0).setColor(1f,1f,1f,1f).setUv(0,ratio * length).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 0,0,1);
-        vertex.addVertex(mat,segmentWidth,length,0).setColor(1f,1f,1f,1f).setUv(1,ratio * length).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 0,0,1);
-        vertex.addVertex(mat,segmentWidth,0,0).setColor(1f,1f,1f,1f).setUv(1,0).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 0,0,1);
+        vertex.vertex(mat,-segmentWidth,0,0).color(1f,1f,1f,1f).uv(0,0).uv2(i).overlayCoords(OverlayTexture.NO_OVERLAY).normal(matrices.last().normal(), 0,0,1).endVertex();
+        vertex.vertex(mat,-segmentWidth, length,0).color(1f,1f,1f,1f).uv(0,ratio * length).uv2(i).overlayCoords(OverlayTexture.NO_OVERLAY).normal(matrices.last().normal(), 0,0,1).endVertex();
+        vertex.vertex(mat,segmentWidth,length,0).color(1f,1f,1f,1f).uv(1,ratio * length).uv2(i).overlayCoords(OverlayTexture.NO_OVERLAY).normal(matrices.last().normal(), 0,0,1).endVertex();
+        vertex.vertex(mat,segmentWidth,0,0).color(1f,1f,1f,1f).uv(1,0).uv2(i).overlayCoords(OverlayTexture.NO_OVERLAY).normal(matrices.last().normal(), 0,0,1).endVertex();
 
-        vertex.addVertex(mat,0,0,-segmentWidth).setColor(1f,1f,1f,1f).setUv(0,0).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 1,0,0);
-        vertex.addVertex(mat,0, length,-segmentWidth).setColor(1f,1f,1f,1f).setUv(0,ratio * length).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 1,0,0);
-        vertex.addVertex(mat,0,length,segmentWidth).setColor(1f,1f,1f,1f).setUv(1,ratio * length).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 1,0,0);
-        vertex.addVertex(mat,0,0,segmentWidth).setColor(1f,1f,1f,1f).setUv(1,0).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 1,0,0);
+        vertex.vertex(mat,0,0,-segmentWidth).color(1f,1f,1f,1f).uv(0,0).uv2(i).overlayCoords(OverlayTexture.NO_OVERLAY).normal(matrices.last().normal(), 1,0,0).endVertex();
+        vertex.vertex(mat,0, length,-segmentWidth).color(1f,1f,1f,1f).uv(0,ratio * length).uv2(i).overlayCoords(OverlayTexture.NO_OVERLAY).normal(matrices.last().normal(), 1,0,0).endVertex();
+        vertex.vertex(mat,0,length,segmentWidth).color(1f,1f,1f,1f).uv(1,ratio * length).uv2(i).overlayCoords(OverlayTexture.NO_OVERLAY).normal(matrices.last().normal(), 1,0,0).endVertex();
+        vertex.vertex(mat,0,0,segmentWidth).color(1f,1f,1f,1f).uv(1,0).uv2(i).overlayCoords(OverlayTexture.NO_OVERLAY).normal(matrices.last().normal(), 1,0,0).endVertex();
 
 
 

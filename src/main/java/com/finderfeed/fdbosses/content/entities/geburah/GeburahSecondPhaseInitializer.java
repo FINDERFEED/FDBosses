@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.content.entities.BossInitializer;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDScreenEffects;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
 import com.finderfeed.fdlib.systems.cutscenes.EasingType;
@@ -21,7 +22,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 
 public class GeburahSecondPhaseInitializer extends BossInitializer<GeburahEntity> {
 
@@ -102,7 +103,7 @@ public class GeburahSecondPhaseInitializer extends BossInitializer<GeburahEntity
                 geburah.level().playSound(null, geburah.getX(), geburah.getY(), geburah.getZ(), BossSounds.CHESED_RAY.get(), SoundSource.HOSTILE, 5f, 1f);
 
                 for (var entity : BossTargetFinder.getEntitiesInCylinder(ServerPlayer.class, geburah.level(), geburah.position().add(0,-1,0), GeburahEntity.ARENA_HEIGHT, GeburahEntity.ARENA_RADIUS + 10)) {
-                    PacketDistributor.sendToPlayer(entity, new DefaultShakePacket(FDShakeData.builder()
+                    FDPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(()->entity), new DefaultShakePacket(FDShakeData.builder()
                             .outTime(20)
                             .amplitude(2)
                             .build()));

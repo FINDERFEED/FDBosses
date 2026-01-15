@@ -5,8 +5,9 @@ import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.RegisterFDPacket;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraftforge.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 @RegisterFDPacket("fdbosses:geburah_scales_controller_set_displacement")
 public class GeburahScalesControllerSetDisplacement extends FDPacket {
@@ -28,19 +29,20 @@ public class GeburahScalesControllerSetDisplacement extends FDPacket {
     }
 
     @Override
-    public void write(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
+    public void write(FriendlyByteBuf registryFriendlyByteBuf) {
         registryFriendlyByteBuf.writeInt(this.entityId);
         registryFriendlyByteBuf.writeInt(displacement);
         registryFriendlyByteBuf.writeInt(displacementTime);
     }
 
     @Override
-    public void clientAction(IPayloadContext iPayloadContext) {
+    public void clientAction(Supplier<NetworkEvent.Context> supplier) {
         BossClientPackets.geburahScalesControllerSetDisplacement(entityId, displacement, displacementTime);
     }
 
     @Override
-    public void serverAction(IPayloadContext iPayloadContext) {
+    public void serverAction(Supplier<NetworkEvent.Context> supplier) {
 
     }
+
 }

@@ -49,11 +49,11 @@ public class ChainTrapSummonProjectile extends FDEntity {
             trail.tick(this);
         }
         this.setPos(this.position().add(this.getDeltaMovement()));
-        this.applyGravity();
+        BossUtil.applyGravity(this, this.getDefaultGravity());
     }
 
     private void tickAndSummonTrap(){
-        ClipContext clipContext = new ClipContext(this.position(),this.position().add(this.getDeltaMovement()), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+        ClipContext clipContext = new ClipContext(this.position(),this.position().add(this.getDeltaMovement()), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
         var result = level().clip(clipContext);
 
         if (result.getType() != HitResult.Type.MISS){
@@ -75,13 +75,13 @@ public class ChainTrapSummonProjectile extends FDEntity {
         }
     }
 
-    @Override
     protected double getDefaultGravity() {
         return GRAVITY;
     }
 
+
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder p_326003_) {
+    protected void defineSynchedData() {
 
     }
 

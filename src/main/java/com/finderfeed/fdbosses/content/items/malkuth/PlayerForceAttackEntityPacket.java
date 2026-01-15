@@ -4,9 +4,10 @@ import com.finderfeed.fdbosses.BossClientPackets;
 import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.RegisterFDPacket;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.LivingEntity;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraftforge.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 @RegisterFDPacket("fdbosses:player_force_attack_entity_packet")
 public class PlayerForceAttackEntityPacket extends FDPacket {
@@ -22,17 +23,18 @@ public class PlayerForceAttackEntityPacket extends FDPacket {
     }
 
     @Override
-    public void write(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
+    public void write(FriendlyByteBuf registryFriendlyByteBuf) {
         registryFriendlyByteBuf.writeInt(entityId);
     }
 
     @Override
-    public void clientAction(IPayloadContext iPayloadContext) {
+    public void clientAction(Supplier<NetworkEvent.Context> supplier) {
         BossClientPackets.forceAttackEntity(entityId);
     }
 
     @Override
-    public void serverAction(IPayloadContext iPayloadContext) {
+    public void serverAction(Supplier<NetworkEvent.Context> supplier) {
 
     }
+
 }

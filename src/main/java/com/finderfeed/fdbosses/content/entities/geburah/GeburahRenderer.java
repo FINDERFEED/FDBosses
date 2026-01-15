@@ -288,16 +288,16 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
                 Matrix4f mat = matrices.last().pose();
 
-                vertex.addVertex(mat, -wsize, l2, 0).setColor(0.3f, 0.5f, 1f, 0.25f * alpha);
-                vertex.addVertex(mat, -wsize, l, 0).setColor(0.3f, 0.5f, 1f, 0.25f * alpha);
-                vertex.addVertex(mat, wsize, l, 0).setColor(0.3f, 0.5f, 1f, 0.25f * alpha);
-                vertex.addVertex(mat, wsize, l2, 0).setColor(0.3f, 0.5f, 1f, 0.25f * alpha);
+                vertex.vertex(mat, -wsize, l2, 0).color(0.3f, 0.5f, 1f, 0.25f * alpha).endVertex();
+                vertex.vertex(mat, -wsize, l, 0).color(0.3f, 0.5f, 1f, 0.25f * alpha).endVertex();
+                vertex.vertex(mat, wsize, l, 0).color(0.3f, 0.5f, 1f, 0.25f * alpha).endVertex();
+                vertex.vertex(mat, wsize, l2, 0).color(0.3f, 0.5f, 1f, 0.25f * alpha).endVertex();
 
 
-                vertex.addVertex(mat, -wsize, 0, 0).setColor(0.3f, 1f, 1f, 0.5f * alpha);
-                vertex.addVertex(mat, -wsize, l2, 0).setColor(0.3f, 1f, 1f, 0.5f * alpha);
-                vertex.addVertex(mat, wsize, l2, 0).setColor(0.3f, 1f, 1f, 0.5f * alpha);
-                vertex.addVertex(mat, wsize, 0, 0).setColor(0.5f, 1f, 1f, 0.5f * alpha);
+                vertex.vertex(mat, -wsize, 0, 0).color(0.3f, 1f, 1f, 0.5f * alpha).endVertex();
+                vertex.vertex(mat, -wsize, l2, 0).color(0.3f, 1f, 1f, 0.5f * alpha).endVertex();
+                vertex.vertex(mat, wsize, l2, 0).color(0.3f, 1f, 1f, 0.5f * alpha).endVertex();
+                vertex.vertex(mat, wsize, 0, 0).color(0.5f, 1f, 1f, 0.5f * alpha).endVertex();
 
                 matrices.popPose();
             }
@@ -344,7 +344,7 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
 
         Matrix4f tv_1 = geburah.getModelPartTransformation("tv_1_"+screenId,GeburahEntity.getClientModel(), pticks);
-        matrices.mulPose(tv_1);
+        matrices.mulPoseMatrix(tv_1);
 
         VertexConsumer vrtx;
 
@@ -380,7 +380,7 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
             for (int i = 0; i < size; i++) {
                 var sin = sins.get(i);
 
-                var key = BossRegistries.PLAYER_SINS.getKey(sin);
+                var key = BossRegistries.PLAYER_SINS.get().getKey(sin);
                 var idStart = key.getPath();
                 QuadRenderer.start(src.getBuffer(RenderType.entityCutout(FDBosses.location("textures/entities/geburah/screen_sin/sin_" + idStart + ".png"))))
                         .pose(matrices)
@@ -430,7 +430,7 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
             Vec3 posEnd = pos.add(dir.scale(GeburahEntity.MAX_LASERS_RADIUS - 5));
 
-            ClipContext clipContext = new ClipContext(pos,posEnd, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+            ClipContext clipContext = new ClipContext(pos,posEnd, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
             var res = geburah.level().clip(clipContext);
             Vec3 location = res.getLocation();
 
@@ -474,28 +474,28 @@ public class GeburahRenderer implements FDFreeEntityRenderer<GeburahEntity> {
 
             Matrix4f mat = matrices.last().pose();
 
-            vertex.addVertex(mat, 0, 0, 0).setColor(r, g, b, alpha);
-            vertex.addVertex(mat, w, 0, 0).setColor(r, g, b, 0f);
-            vertex.addVertex(mat, w, (float) len, 0).setColor(r, g, b, 0f);
-            vertex.addVertex(mat, 0, (float) len, 0).setColor(r, g, b, alpha);
+            vertex.vertex(mat, 0, 0, 0).color(r, g, b, alpha).endVertex();
+            vertex.vertex(mat, w, 0, 0).color(r, g, b, 0f).endVertex();
+            vertex.vertex(mat, w, (float) len, 0).color(r, g, b, 0f).endVertex();
+            vertex.vertex(mat, 0, (float) len, 0).color(r, g, b, alpha).endVertex();
 
-            vertex.addVertex(mat, 0, (float) len, 0).setColor(r, g, b, alpha);
-            vertex.addVertex(mat, -w, (float) len, 0).setColor(r, g, b, 0f);
-            vertex.addVertex(mat, -w, 0, 0).setColor(r, g, b, 0f);
-            vertex.addVertex(mat, 0, 0, 0).setColor(r, g, b, alpha);
+            vertex.vertex(mat, 0, (float) len, 0).color(r, g, b, alpha).endVertex();
+            vertex.vertex(mat, -w, (float) len, 0).color(r, g, b, 0f).endVertex();
+            vertex.vertex(mat, -w, 0, 0).color(r, g, b, 0f).endVertex();
+            vertex.vertex(mat, 0, 0, 0).color(r, g, b, alpha).endVertex();
 
 
             matrices.translate(0,0,0.005f);
 
-            vertex.addVertex(mat,0,0,0f).setColor(1f,1f,1f,alpha);
-            vertex.addVertex(mat,w * 0.15f,0,0f).setColor(1f,1f,1f,0f);
-            vertex.addVertex(mat,w * 0.15f,(float)len,0f).setColor(1f,1f,1f,0f);
-            vertex.addVertex(mat,0,(float)len,0f).setColor(1f,1f,1f,alpha);
+            vertex.vertex(mat,0,0,0f).color(1f,1f,1f,alpha).endVertex();
+            vertex.vertex(mat,w * 0.15f,0,0f).color(1f,1f,1f,0f).endVertex();
+            vertex.vertex(mat,w * 0.15f,(float)len,0f).color(1f,1f,1f,0f).endVertex();
+            vertex.vertex(mat,0,(float)len,0f).color(1f,1f,1f,alpha).endVertex();
 
-            vertex.addVertex(mat,0,(float)len,0f).setColor(1f,1f,1f,alpha);
-            vertex.addVertex(mat,-w * 0.15f,(float)len,0f).setColor(1f,1f,1f,0f);
-            vertex.addVertex(mat,-w * 0.15f,0,0f).setColor(1f,1f,1f,0f);
-            vertex.addVertex(mat,0,0,0f).setColor(1f,1f,1f,alpha);
+            vertex.vertex(mat,0,(float)len,0f).color(1f,1f,1f,alpha).endVertex();
+            vertex.vertex(mat,-w * 0.15f,(float)len,0f).color(1f,1f,1f,0f).endVertex();
+            vertex.vertex(mat,-w * 0.15f,0,0f).color(1f,1f,1f,0f).endVertex();
+            vertex.vertex(mat,0,0,0f).color(1f,1f,1f,alpha).endVertex();
 
             matrices.popPose();
         }

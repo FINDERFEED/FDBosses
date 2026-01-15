@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -20,7 +21,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -147,11 +148,9 @@ public class GeburahEarthquake  extends Entity implements AutoSerializable {
             entity.hurt(BossDamageSources.GEBURAH_EARTHQUAKE_SOURCE,this.damage);
         }
 
-        PacketDistributor.sendToPlayersNear((ServerLevel) level(), null, this.getX(),this.getY(),this.getZ(), Math.max(endRadius * 2,120), new SpawnRadialEarthquakeOnRadiusPacket(
+        FDPacketHandler.INSTANCE.send(PacketDistributor.NEAR.with(PacketDistributor.TargetPoint.p(this.getX(),this.getY(),this.getZ(), Math.max(endRadius * 2,120), this.level().dimension())), new SpawnRadialEarthquakeOnRadiusPacket(
                 this,rad,direction,angle
         ));
-
-
 
     }
 
@@ -204,8 +203,8 @@ public class GeburahEarthquake  extends Entity implements AutoSerializable {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder p_326003_) {
-        p_326003_.define(RADIUS, 10);
+    protected void defineSynchedData() {
+        this.getEntityData().define(RADIUS, 10);
     }
 
 

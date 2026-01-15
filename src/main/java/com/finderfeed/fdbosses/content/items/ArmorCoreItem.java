@@ -6,6 +6,7 @@ import net.minecraft.world.item.Equipable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
 
 import java.util.List;
 import java.util.function.Supplier;
@@ -17,7 +18,7 @@ public class ArmorCoreItem extends CoreItem{
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext p_339594_, List<Component> components, TooltipFlag p_41424_) {
+    public void appendHoverText(ItemStack stack, Level p_339594_, List<Component> components, TooltipFlag p_41424_) {
         super.appendHoverText(stack, p_339594_, components, p_41424_);
     }
 

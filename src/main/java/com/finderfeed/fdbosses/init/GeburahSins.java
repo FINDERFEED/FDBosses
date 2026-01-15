@@ -4,7 +4,6 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSin;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.instances.*;
 import net.minecraftforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 

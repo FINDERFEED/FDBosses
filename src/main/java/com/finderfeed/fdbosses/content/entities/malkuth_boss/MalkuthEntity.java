@@ -426,8 +426,8 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                         this.checkTarget(target);
 
-                        if (lookAtTarget) {
-                            this.getLookControl().setLookAt(target);
+                        if (lookAtTarget && this.getTarget() != null) {
+                            this.getLookControl().setLookAt(this.getTarget());
                         }
 
                     } else {
@@ -2433,6 +2433,20 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
     //=============================================================================OTHER================================================================================================
 
+    @Override
+    protected boolean canRide(Entity p_20339_) {
+        return false;
+    }
+
+    @Override
+    public boolean startRiding(Entity p_21396_, boolean p_21397_) {
+        return false;
+    }
+
+    @Override
+    public boolean startRiding(Entity p_20330_) {
+        return false;
+    }
 
     private boolean isBelowHalfHP(){
         return this.hits <= maxHits / 2;

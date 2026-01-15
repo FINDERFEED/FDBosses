@@ -1,10 +1,8 @@
 package com.finderfeed.fdbosses.content.items.malkuth;
 
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 
 import java.util.Objects;
 
@@ -16,10 +14,10 @@ public class MalkuthFistDataComponent {
                     Codec.INT.fieldOf("entityHookCooldown").forGetter(MalkuthFistDataComponent::getEntityHookCooldown)
             ).apply(instance, MalkuthFistDataComponent::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, MalkuthFistDataComponent> STREAM_CODEC =
-            StreamCodec.composite(
-                    ByteBufCodecs.BOOL, MalkuthFistDataComponent::canSkipCooldown,
-                    ByteBufCodecs.INT, MalkuthFistDataComponent::getEntityHookCooldown,
+    public static final NetworkCodec<MalkuthFistDataComponent> STREAM_CODEC =
+            NetworkCodec.composite(
+                    NetworkCodec.BOOL, MalkuthFistDataComponent::canSkipCooldown,
+                    NetworkCodec.INT, MalkuthFistDataComponent::getEntityHookCooldown,
                     MalkuthFistDataComponent::new
             );
 

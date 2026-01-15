@@ -62,6 +62,8 @@ public abstract class BossSpawnerEntity extends FDEntity {
 
             entity.setPos(this.position());
 
+            entity.setSpawnPosition(this.position());
+
             level().addFreshEntity(entity);
 
             this.setActive(false);
@@ -84,7 +86,7 @@ public abstract class BossSpawnerEntity extends FDEntity {
 
     public abstract EntityType<? extends BossSpawnerContextAssignable> getBossEntityType();
 
-    public abstract Vec3 getPlayerItemsDropPosition(Vec3 deathPosition);
+    public abstract Vec3 getPlayerItemsDropPosition(ServerPlayer serverPlayer, Vec3 deathPosition);
 
     @Override
     public boolean hurt(DamageSource src, float damage) {

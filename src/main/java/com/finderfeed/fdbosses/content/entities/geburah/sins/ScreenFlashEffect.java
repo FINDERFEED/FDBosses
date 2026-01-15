@@ -5,7 +5,6 @@ import com.finderfeed.fdlib.util.math.ComplexEasingFunction;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphics;
 
 public class ScreenFlashEffect extends ScreenEffect<ScreenFlashEffectData> {
@@ -22,9 +21,8 @@ public class ScreenFlashEffect extends ScreenEffect<ScreenFlashEffectData> {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, DeltaTracker deltaTracker, int currentTick, float screenWidth, float screenHeight) {
+    public void render(GuiGraphics guiGraphics, float pticks, int currentTick, float screenWidth, float screenHeight) {
 
-        float pticks = deltaTracker.getGameTimeDeltaPartialTick(false);
         float p = complexEasingFunction.apply(currentTick + pticks);
 
         var data = this.getData();

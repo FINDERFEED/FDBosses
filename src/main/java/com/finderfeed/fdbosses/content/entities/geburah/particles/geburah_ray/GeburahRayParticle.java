@@ -121,27 +121,27 @@ public class GeburahRayParticle extends Particle {
 
         float w = options.rayWidth * p;
         for (int zh = 0; zh < 2; zh++) {
-            vertex.addVertex(mat, 0, 0, 0).setColor(options.color.r, options.color.g, options.color.b, alpha);
-            vertex.addVertex(mat, w, 0, 0).setColor(options.color.r, options.color.g, options.color.b, 0f);
-            vertex.addVertex(mat, w, (float) len, 0).setColor(options.color.r, options.color.g, options.color.b, 0f);
-            vertex.addVertex(mat, 0, (float) len, 0).setColor(options.color.r, options.color.g, options.color.b, alpha);
+            vertex.vertex(mat, 0, 0, 0).color(options.color.r, options.color.g, options.color.b, alpha).endVertex();
+            vertex.vertex(mat, w, 0, 0).color(options.color.r, options.color.g, options.color.b, 0f).endVertex();
+            vertex.vertex(mat, w, (float) len, 0).color(options.color.r, options.color.g, options.color.b, 0f).endVertex();
+            vertex.vertex(mat, 0, (float) len, 0).color(options.color.r, options.color.g, options.color.b, alpha).endVertex();
 
-            vertex.addVertex(mat, 0, 0, 0).setColor(options.color.r, options.color.g, options.color.b, alpha);
-            vertex.addVertex(mat, -w, 0, 0).setColor(options.color.r, options.color.g, options.color.b, 0f);
-            vertex.addVertex(mat, -w, (float) len, 0).setColor(options.color.r, options.color.g, options.color.b, 0f);
-            vertex.addVertex(mat, 0, (float) len, 0).setColor(options.color.r, options.color.g, options.color.b, alpha);
+            vertex.vertex(mat, 0, 0, 0).color(options.color.r, options.color.g, options.color.b, alpha).endVertex();
+            vertex.vertex(mat, -w, 0, 0).color(options.color.r, options.color.g, options.color.b, 0f).endVertex();
+            vertex.vertex(mat, -w, (float) len, 0).color(options.color.r, options.color.g, options.color.b, 0f).endVertex();
+            vertex.vertex(mat, 0, (float) len, 0).color(options.color.r, options.color.g, options.color.b, alpha).endVertex();
         }
 
         mat.translate(0,0,0.01f);
-        vertex.addVertex(mat,0,0,0f).setColor(1f,1f,1f,alpha);
-        vertex.addVertex(mat,w * 0.15f,0,0f).setColor(1f,1f,1f,0f);
-        vertex.addVertex(mat,w * 0.15f,(float)len,0f).setColor(1f,1f,1f,0f);
-        vertex.addVertex(mat,0,(float)len,0f).setColor(1f,1f,1f,alpha);
+        vertex.vertex(mat,0,0,0f).color(1f,1f,1f,alpha).endVertex();
+        vertex.vertex(mat,w * 0.15f,0,0f).color(1f,1f,1f,0f).endVertex();
+        vertex.vertex(mat,w * 0.15f,(float)len,0f).color(1f,1f,1f,0f).endVertex();
+        vertex.vertex(mat,0,(float)len,0f).color(1f,1f,1f,alpha).endVertex();
 
-        vertex.addVertex(mat,0,0,0f).setColor(1f,1f,1f,alpha);
-        vertex.addVertex(mat,-w * 0.15f,0,0f).setColor(1f,1f,1f,0f);
-        vertex.addVertex(mat,-w * 0.15f,(float)len,0f).setColor(1f,1f,1f,0f);
-        vertex.addVertex(mat,0,(float)len,0f).setColor(1f,1f,1f,alpha);
+        vertex.vertex(mat,0,0,0f).color(1f,1f,1f,alpha).endVertex();
+        vertex.vertex(mat,-w * 0.15f,0,0f).color(1f,1f,1f,0f).endVertex();
+        vertex.vertex(mat,-w * 0.15f,(float)len,0f).color(1f,1f,1f,0f).endVertex();
+        vertex.vertex(mat,0,(float)len,0f).color(1f,1f,1f,alpha).endVertex();
 
         mat.translate(0,0,0.01f);
         this.renderInitialEffect(vertex, mat, 0,pticks, 4, (float) len, this.options.rayWidth * 0.15f);
@@ -158,7 +158,7 @@ public class GeburahRayParticle extends Particle {
             return;
         }
 
-        float effectP = Math.clamp(this.age - ageDelay + pticks, 0, effectLength) / effectLength;
+        float effectP = FDMathUtil.clamp(this.age - ageDelay + pticks, 0, effectLength) / effectLength;
 
         effectP = FDEasings.easeIn(effectP);
 
@@ -167,15 +167,15 @@ public class GeburahRayParticle extends Particle {
         float currentXStartPos = Math.max(0,(maxXBorder + effectWidth) * effectP - effectWidth);
         float currentXEndPos = Math.min(maxXBorder * effectP + effectWidth,maxXBorder);
 
-        vertex.addVertex(mat,currentXStartPos,0,0f).setColor(1f,1f,1f,1f);
-        vertex.addVertex(mat,currentXEndPos,0,0f).setColor(1f,1f,1f,1f);
-        vertex.addVertex(mat,currentXEndPos,(float)rayLength,0f).setColor(1f,1f,1f,1f);
-        vertex.addVertex(mat,currentXStartPos,(float)rayLength,0f).setColor(1f,1f,1f,1f);
+        vertex.vertex(mat,currentXStartPos,0,0f).color(1f,1f,1f,1f).endVertex();
+        vertex.vertex(mat,currentXEndPos,0,0f).color(1f,1f,1f,1f).endVertex();
+        vertex.vertex(mat,currentXEndPos,(float)rayLength,0f).color(1f,1f,1f,1f).endVertex();
+        vertex.vertex(mat,currentXStartPos,(float)rayLength,0f).color(1f,1f,1f,1f).endVertex();
 
-        vertex.addVertex(mat,-currentXStartPos,0,0f).setColor(1f,1f,1f,1f);
-        vertex.addVertex(mat,-currentXEndPos,0,0f).setColor(1f,1f,1f,1f);
-        vertex.addVertex(mat,-currentXEndPos,(float)rayLength,0f).setColor(1f,1f,1f,1f);
-        vertex.addVertex(mat,-currentXStartPos,(float)rayLength,0f).setColor(1f,1f,1f,1f);
+        vertex.vertex(mat,-currentXStartPos,0,0f).color(1f,1f,1f,1f).endVertex();
+        vertex.vertex(mat,-currentXEndPos,0,0f).color(1f,1f,1f,1f).endVertex();
+        vertex.vertex(mat,-currentXEndPos,(float)rayLength,0f).color(1f,1f,1f,1f).endVertex();
+        vertex.vertex(mat,-currentXStartPos,(float)rayLength,0f).color(1f,1f,1f,1f).endVertex();
 
     }
 
@@ -185,18 +185,19 @@ public class GeburahRayParticle extends Particle {
     }
 
 
-    public static final ParticleRenderType ADDITIVE_TRANSLUCENT = new FDParticleRenderType() {
-        public @Nullable BufferBuilder begin(Tesselator tesselator, TextureManager textureManager) {
+    public static final ParticleRenderType ADDITIVE_TRANSLUCENT = new ParticleRenderType() {
+        @Override
+        public void begin(BufferBuilder tesselator, TextureManager p_107437_) {
             RenderSystem.depthMask(true);
             RenderSystem.enableBlend();
             RenderSystem.disableCull();
             RenderSystem.setShader(GameRenderer::getRendertypeLightningShader);
             RenderSystem.blendFunc(GL11.GL_SRC_ALPHA,GL11.GL_ONE);
-
-            return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+            tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         }
 
-        public void end() {
+        @Override
+        public void end(Tesselator p_107438_) {
 
         }
 

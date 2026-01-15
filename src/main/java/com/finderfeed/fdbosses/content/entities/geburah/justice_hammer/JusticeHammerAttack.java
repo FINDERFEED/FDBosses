@@ -169,7 +169,7 @@ public class JusticeHammerAttack extends FDEntity {
 
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder p_326003_) {
+    protected void defineSynchedData() {
 
     }
 

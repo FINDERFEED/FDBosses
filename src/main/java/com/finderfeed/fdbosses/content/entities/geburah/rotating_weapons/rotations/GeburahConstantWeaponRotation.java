@@ -1,13 +1,11 @@
 package com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations;
 
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 
 public class GeburahConstantWeaponRotation extends GeburahWeaponRotation {
 
-    public static final StreamCodec<FriendlyByteBuf, GeburahConstantWeaponRotation> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.FLOAT, v->v.rotationSpeed,
+    public static final NetworkCodec<GeburahConstantWeaponRotation> STREAM_CODEC = NetworkCodec.composite(
+            NetworkCodec.FLOAT, v->v.rotationSpeed,
             (speed)->{
                 GeburahConstantWeaponRotation geburahConstantWeaponRotation = new GeburahConstantWeaponRotation(speed);
                 return geburahConstantWeaponRotation;

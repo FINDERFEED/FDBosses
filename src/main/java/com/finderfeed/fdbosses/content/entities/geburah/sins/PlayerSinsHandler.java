@@ -8,26 +8,30 @@ import com.finderfeed.fdbosses.content.util.WorldBox;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossDamageSources;
 import com.finderfeed.fdbosses.init.GeburahSins;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingEvent;
-import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.Iterator;
 import java.util.List;
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID)
+@Mod.EventBusSubscriber(modid = FDBosses.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class PlayerSinsHandler {
 
     @SubscribeEvent
-    public static void tickPlayer(PlayerTickEvent.Pre event){
-        Player player = event.getEntity();
+    public static void tickPlayer(TickEvent.PlayerTickEvent event){
+
+        if (event.phase != TickEvent.Phase.START) return;
+
+        Player player = event.player;
         Level level = player.level();
 
         if (!level.isClientSide) {
@@ -73,7 +77,8 @@ public class PlayerSinsHandler {
     public static void sin(ServerPlayer player, int cooldown, float soundPitch, int amount){
         PlayerSins playerSins = PlayerSins.getPlayerSins(player);
         if (!playerSins.isGainingSinsOnCooldown() && BossUtil.isPlayerInSurvival(player) && player.isAlive()) {
-            PacketDistributor.sendToPlayer(player, new GeburahTriggerSinEffectPacket(soundPitch));
+
+            FDPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(()->player), new GeburahTriggerSinEffectPacket(soundPitch));
 
             int sinnedTimes = playerSins.getSinnedTimes();
 

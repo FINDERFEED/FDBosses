@@ -184,9 +184,9 @@ public class GeburahBell extends FDLivingEntity {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
-        builder.define(IS_RED, true);
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.getEntityData().define(IS_RED, true);
     }
 
     @Override
@@ -196,11 +196,6 @@ public class GeburahBell extends FDLivingEntity {
 
     @Override
     public void push(double p_20286_, double p_20287_, double p_20288_) {
-
-    }
-
-    @Override
-    public void push(Vec3 p_347665_) {
 
     }
 

@@ -165,15 +165,13 @@ public class GeburahChainTrapEntity extends Entity implements AutoSerializable, 
         return null;
     }
 
-
-
     @Override
-    public Vec3 getPassengerRidingPosition(Entity entity) {
+    protected void positionRider(Entity entity, MoveFunction moveFunction) {
 
-        Vec3 height = entity.getVehicleAttachmentPoint(this);
+        float height = entity.getBbHeight() / 2;
 
         if (this.lastKnownTargetPos == null){
-            this.lastKnownTargetPos = entity.position().add(height);
+            this.lastKnownTargetPos = entity.position().add(0, height, 0);
         }
 
         if (pullingTime == -1){
@@ -182,7 +180,7 @@ public class GeburahChainTrapEntity extends Entity implements AutoSerializable, 
 
         float p = 1 - (pullingTime / (float) PULL_TIME);
 
-        Vec3 target = this.position().add(height);
+        Vec3 target = this.position().add(0, height, 0);
 
         Vec3 pos = FDMathUtil.interpolateVectors(lastKnownTargetPos, target, p);
 
@@ -190,12 +188,8 @@ public class GeburahChainTrapEntity extends Entity implements AutoSerializable, 
             pos = pos.add(0,1f,0);
         }
 
-        return pos;
-    }
+        moveFunction.accept(entity, pos.x, pos.y, pos.z);
 
-    @Override
-    public Vec3 getVehicleAttachmentPoint(Entity p_316322_) {
-        return Vec3.ZERO;
     }
 
     @Override
@@ -206,8 +200,6 @@ public class GeburahChainTrapEntity extends Entity implements AutoSerializable, 
     public int getCatchingTime() {
         return catchingTime;
     }
-
-
 
     @Override
     protected void defineSynchedData() {

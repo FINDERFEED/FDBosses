@@ -6,10 +6,11 @@ import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotatio
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahWeaponsRotateTo;
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.StartGeburahWeaponRotationPacket;
 import com.finderfeed.fdbosses.init.BossSounds;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 
 public class GeburahWeaponRotationController {
 
@@ -57,7 +58,7 @@ public class GeburahWeaponRotationController {
             if (this.weaponRotation != null){
                 this.trySendRotationSyncPacket();
             }
-            PacketDistributor.sendToPlayersTrackingEntity(geburah, new StartGeburahWeaponRotationPacket(this.geburah, geburahWeaponRotation));
+            FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->geburah), new StartGeburahWeaponRotationPacket(this.geburah, geburahWeaponRotation));
         }
         this.weaponRotation = geburahWeaponRotation;
     }
@@ -85,7 +86,8 @@ public class GeburahWeaponRotationController {
     public void stopRotation(){
         this.weaponRotation = null;
         if (!geburah.level().isClientSide) {
-            PacketDistributor.sendToPlayersTrackingEntity(geburah, new StopGeburahWeaponRotationPacket(geburah));
+
+            FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->geburah), new StopGeburahWeaponRotationPacket(geburah));
             this.trySendRotationSyncPacket();
         }
     }
@@ -119,17 +121,19 @@ public class GeburahWeaponRotationController {
 
     public void onStartSeeingGeburah(ServerPlayer serverPlayer){
         GeburahWeaponRotationSyncPacket syncPacket = new GeburahWeaponRotationSyncPacket(geburah);
-        PacketDistributor.sendToPlayer(serverPlayer, syncPacket);
+
+        FDPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(()->serverPlayer), syncPacket);
 
         if (this.weaponRotation != null){
             StartGeburahWeaponRotationPacket geburahWeaponRotationPacket = new StartGeburahWeaponRotationPacket(geburah, this.weaponRotation);
-            PacketDistributor.sendToPlayer(serverPlayer, geburahWeaponRotationPacket);
+            FDPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(()->serverPlayer), geburahWeaponRotationPacket);
         }
     }
 
     private void trySendRotationSyncPacket(){
         if (!geburah.level().isClientSide){
-            PacketDistributor.sendToPlayersTrackingEntity(geburah, new GeburahWeaponRotationSyncPacket(geburah));
+
+            FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->geburah), new GeburahWeaponRotationSyncPacket(geburah));
         }
     }
 

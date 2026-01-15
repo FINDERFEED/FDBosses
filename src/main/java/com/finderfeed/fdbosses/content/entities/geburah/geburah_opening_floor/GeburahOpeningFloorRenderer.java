@@ -56,48 +56,48 @@ public class GeburahOpeningFloorRenderer extends EntityRenderer<GeburahOpeningFl
             Matrix4f mat = matrices.last().pose();
 
             float openess1 = 5.5f - openess;
-            vertex.addVertex(mat, 2.5f, 0.25f, openess1 + openess).setColor(1f, 1f, 1f, 1f).setUv(0, md * openess1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, 2.5f, 0.25f, openess).setColor(1f, 1f, 1f, 1f).setUv(0, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -2.5f, 0.25f, openess).setColor(1f, 1f, 1f, 1f).setUv(5 * md, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -2.5f, 0.25f, openess1 + openess).setColor(1f, 1f, 1f, 1f).setUv(5 * md, md * openess1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
+            vertex.vertex(mat, 2.5f, 0.25f, openess1 + openess).color(1f, 1f, 1f, 1f).uv(0, md * openess1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, 2.5f, 0.25f, openess).color(1f, 1f, 1f, 1f).uv(0, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -2.5f, 0.25f, openess).color(1f, 1f, 1f, 1f).uv(5 * md, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -2.5f, 0.25f, openess1 + openess).color(1f, 1f, 1f, 1f).uv(5 * md, md * openess1).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
 
 
             float openess2 = Mth.clamp(4.5f - openess, 0, 4.5f);
             float offs2 = 3f;
-            vertex.addVertex(mat, 0.5f + offs2, 0.25f, openess2 + openess).setColor(1f, 1f, 1f, 1f).setUv(0, md * openess2).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, 0.5f + offs2, 0.25f, openess).setColor(1f, 1f, 1f, 1f).setUv(0, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -0.5f + offs2, 0.25f, openess).setColor(1f, 1f, 1f, 1f).setUv(md, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -0.5f + offs2, 0.25f, openess2 + openess).setColor(1f, 1f, 1f, 1f).setUv(md, md * openess2).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
+            vertex.vertex(mat, 0.5f + offs2, 0.25f, openess2 + openess).color(1f, 1f, 1f, 1f).uv(0, md * openess2).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, 0.5f + offs2, 0.25f, openess).color(1f, 1f, 1f, 1f).uv(0, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -0.5f + offs2, 0.25f, openess).color(1f, 1f, 1f, 1f).uv(md, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -0.5f + offs2, 0.25f, openess2 + openess).color(1f, 1f, 1f, 1f).uv(md, md * openess2).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
 
-            vertex.addVertex(mat, 0.5f - offs2, 0.25f, openess2 + openess).setColor(1f, 1f, 1f, 1f).setUv(0, md * openess2).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, 0.5f - offs2, 0.25f, openess).setColor(1f, 1f, 1f, 1f).setUv(0, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -0.5f - offs2, 0.25f, openess).setColor(1f, 1f, 1f, 1f).setUv(md, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -0.5f - offs2, 0.25f, openess2 + openess).setColor(1f, 1f, 1f, 1f).setUv(md, md * openess2).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
+            vertex.vertex(mat, 0.5f - offs2, 0.25f, openess2 + openess).color(1f, 1f, 1f, 1f).uv(0, md * openess2).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, 0.5f - offs2, 0.25f, openess).color(1f, 1f, 1f, 1f).uv(0, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -0.5f - offs2, 0.25f, openess).color(1f, 1f, 1f, 1f).uv(md, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -0.5f - offs2, 0.25f, openess2 + openess).color(1f, 1f, 1f, 1f).uv(md, md * openess2).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
 
 
             float openess3 = Mth.clamp(3.5f - openess, 0, 3.5f);
             float offs3 = 4f;
-            vertex.addVertex(mat, 0.5f + offs3, 0.25f, openess3 + openess).setColor(1f, 1f, 1f, 1f).setUv(0, md * openess3).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, 0.5f + offs3, 0.25f, openess).setColor(1f, 1f, 1f, 1f).setUv(0, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -0.5f + offs3, 0.25f, openess).setColor(1f, 1f, 1f, 1f).setUv(md, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -0.5f + offs3, 0.25f, openess3 + openess).setColor(1f, 1f, 1f, 1f).setUv(md, md * openess3).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
+            vertex.vertex(mat, 0.5f + offs3, 0.25f, openess3 + openess).color(1f, 1f, 1f, 1f).uv(0, md * openess3).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, 0.5f + offs3, 0.25f, openess).color(1f, 1f, 1f, 1f).uv(0, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -0.5f + offs3, 0.25f, openess).color(1f, 1f, 1f, 1f).uv(md, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -0.5f + offs3, 0.25f, openess3 + openess).color(1f, 1f, 1f, 1f).uv(md, md * openess3).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
 
-            vertex.addVertex(mat, 0.5f - offs3, 0.25f, openess3 + openess).setColor(1f, 1f, 1f, 1f).setUv(0, md * openess3).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, 0.5f - offs3, 0.25f, openess).setColor(1f, 1f, 1f, 1f).setUv(0, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -0.5f - offs3, 0.25f, openess).setColor(1f, 1f, 1f, 1f).setUv(md, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -0.5f - offs3, 0.25f, openess3 + openess).setColor(1f, 1f, 1f, 1f).setUv(md, md * openess3).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
+            vertex.vertex(mat, 0.5f - offs3, 0.25f, openess3 + openess).color(1f, 1f, 1f, 1f).uv(0, md * openess3).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, 0.5f - offs3, 0.25f, openess).color(1f, 1f, 1f, 1f).uv(0, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -0.5f - offs3, 0.25f, openess).color(1f, 1f, 1f, 1f).uv(md, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -0.5f - offs3, 0.25f, openess3 + openess).color(1f, 1f, 1f, 1f).uv(md, md * openess3).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
 
             float openess4 = Mth.clamp(2.5f - openess, 0, 2.5f);
             float offs4 = 5f;
-            vertex.addVertex(mat, 0.5f + offs4, 0.25f, openess4 + openess).setColor(1f, 1f, 1f, 1f).setUv(0, md * openess4).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, 0.5f + offs4, 0.25f, 0 + openess).setColor(1f, 1f, 1f, 1f).setUv(0, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -0.5f + offs4, 0.25f, 0 + openess).setColor(1f, 1f, 1f, 1f).setUv(md, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -0.5f + offs4, 0.25f, openess4 + openess).setColor(1f, 1f, 1f, 1f).setUv(md, md * openess4).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
+            vertex.vertex(mat, 0.5f + offs4, 0.25f, openess4 + openess).color(1f, 1f, 1f, 1f).uv(0, md * openess4).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, 0.5f + offs4, 0.25f, 0 + openess).color(1f, 1f, 1f, 1f).uv(0, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -0.5f + offs4, 0.25f, 0 + openess).color(1f, 1f, 1f, 1f).uv(md, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -0.5f + offs4, 0.25f, openess4 + openess).color(1f, 1f, 1f, 1f).uv(md, md * openess4).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
 
-            vertex.addVertex(mat, 0.5f - offs4, 0.25f, openess4 + openess).setColor(1f, 1f, 1f, 1f).setUv(0, md * openess4).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, 0.5f - offs4, 0.25f, 0 + openess).setColor(1f, 1f, 1f, 1f).setUv(0, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -0.5f - offs4, 0.25f, 0 + openess).setColor(1f, 1f, 1f, 1f).setUv(md, 0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
-            vertex.addVertex(mat, -0.5f - offs4, 0.25f, openess4 + openess).setColor(1f, 1f, 1f, 1f).setUv(md, md * openess4).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY);
+            vertex.vertex(mat, 0.5f - offs4, 0.25f, openess4 + openess).color(1f, 1f, 1f, 1f).uv(0, md * openess4).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, 0.5f - offs4, 0.25f, 0 + openess).color(1f, 1f, 1f, 1f).uv(0, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -0.5f - offs4, 0.25f, 0 + openess).color(1f, 1f, 1f, 1f).uv(md, 0).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
+            vertex.vertex(mat, -0.5f - offs4, 0.25f, openess4 + openess).color(1f, 1f, 1f, 1f).uv(md, md * openess4).uv2(light).overlayCoords(OverlayTexture.NO_OVERLAY).endVertex();
 
             matrices.popPose();
 

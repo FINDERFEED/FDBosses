@@ -201,7 +201,7 @@ public class DivineGear extends FDEntity implements AutoSerializable {
             if (living.isDeadOrDying()){
                 return false;
             }
-            ClipContext clipContext = new ClipContext(this.getCorePos(), living.getBoundingBox().getCenter(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+            ClipContext clipContext = new ClipContext(this.getCorePos(), living.getBoundingBox().getCenter(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
             var res = level().clip(clipContext);
             return res.getType() == HitResult.Type.MISS;
         }).toList());
@@ -236,7 +236,7 @@ public class DivineGear extends FDEntity implements AutoSerializable {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder p_326003_) {
+    protected void defineSynchedData() {
 
     }
 
@@ -257,5 +257,7 @@ public class DivineGear extends FDEntity implements AutoSerializable {
             tag.putUUID("playerOwner", owner);
         }
     }
+
+
 
 }

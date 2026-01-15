@@ -1,21 +1,19 @@
 package com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations;
 
 import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahWeaponRotationController;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 
 public class GeburahWeaponsRotateTo extends GeburahWeaponRotation {
 
-    public static final StreamCodec<FriendlyByteBuf, GeburahWeaponsRotateTo> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.FLOAT, v->v.rotationSnapshot,
-            ByteBufCodecs.FLOAT, v->v.rotationTarget,
-            ByteBufCodecs.INT, v->v.rotationTime,
-            ByteBufCodecs.INT, v->v.currentRotationTime,
-            ByteBufCodecs.BOOL, v->v.easeInOut,
+    public static final NetworkCodec<GeburahWeaponsRotateTo> STREAM_CODEC = NetworkCodec.composite(
+            NetworkCodec.FLOAT, v->v.rotationSnapshot,
+            NetworkCodec.FLOAT, v->v.rotationTarget,
+            NetworkCodec.INT, v->v.rotationTime,
+            NetworkCodec.INT, v->v.currentRotationTime,
+            NetworkCodec.BOOL, v->v.easeInOut,
             ((aFloat, aFloat2, integer, integer2, easeInOut) -> {
                 GeburahWeaponsRotateTo rotateTo = new GeburahWeaponsRotateTo(null, aFloat2, integer, easeInOut);
                 rotateTo.currentRotationTime = integer2;

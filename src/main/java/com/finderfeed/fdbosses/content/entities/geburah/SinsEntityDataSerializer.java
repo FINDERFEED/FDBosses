@@ -2,9 +2,8 @@ package com.finderfeed.fdbosses.content.entities.geburah;
 
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSin;
 import com.finderfeed.fdbosses.init.BossRegistries;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataSerializer;
 
 import java.util.ArrayList;
@@ -12,16 +11,22 @@ import java.util.List;
 
 public class SinsEntityDataSerializer implements EntityDataSerializer<List<PlayerSin>> {
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, List<PlayerSin>> STREAM_CODEC = ByteBufCodecs.registry(BossRegistries.PLAYER_SIN).apply(ByteBufCodecs.list());
+    public static final NetworkCodec<List<PlayerSin>> STREAM_CODEC = NetworkCodec.listOf(NetworkCodec.registry(()->BossRegistries.PLAYER_SINS.get()));
+
 
     @Override
-    public StreamCodec<? super RegistryFriendlyByteBuf, List<PlayerSin>> codec() {
-        return STREAM_CODEC;
+    public void write(FriendlyByteBuf buf, List<PlayerSin> players) {
+        STREAM_CODEC.toNetwork(buf, players);
     }
 
     @Override
-    public List<PlayerSin> copy(List<PlayerSin> p_135023_) {
-        return new ArrayList<>(p_135023_);
+    public List<PlayerSin> read(FriendlyByteBuf buf) {
+        return STREAM_CODEC.fromNetwork(buf);
+    }
+
+    @Override
+    public List<PlayerSin> copy(List<PlayerSin> sins) {
+        return new ArrayList<>(sins);
     }
 
 }

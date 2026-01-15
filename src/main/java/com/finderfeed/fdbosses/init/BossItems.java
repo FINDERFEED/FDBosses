@@ -56,9 +56,8 @@ public class BossItems {
     public static final Supplier<Item> MALKUTH_TROPHY = ITEMS.register("malkuth_trophy",
             ()->new MalkuthTrophyItem(BossBlocks.MALKUTH_TROPHY.get(), new Item.Properties().stacksTo(1)));
 
-
     public static final Supplier<Item> GEBURAH_TROPHY = ITEMS.register("geburah_trophy",
-            ()->new BlockItem(BossBlocks.GEBURAH_TROPHY.get(), new Item.Properties().stacksTo(1)));
+            ()->new GeburahTrophyItem(BossBlocks.GEBURAH_TROPHY.get(), new Item.Properties().stacksTo(1)));
 
     public static final Supplier<Item> JUSTICESTONE_BRICKS = ITEMS.register("justicestone_bricks",
             ()->new BlockItem(BossBlocks.JUSTICESTONE_BRICKS.get(), new Item.Properties()));

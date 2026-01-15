@@ -9,6 +9,7 @@ import com.finderfeed.fdbosses.content.util.Undismountable;
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
@@ -35,11 +36,10 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.UUID;
 
@@ -155,7 +155,7 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
 
                 Vec3 start = this.position();
                 Vec3 end = start.add(deltaMovement.scale(2));
-                ClipContext clipContext = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+                ClipContext clipContext = new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
                 var res = level().clip(clipContext);
                 if (res.getType() != HitResult.Type.MISS) {
                     Vec3 location = res.getLocation();
@@ -279,7 +279,7 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
                     this.getEntityData().set(HOOKED_TO, entity.getId());
                 }else{
 
-                    ClipContext clipContext = new ClipContext(this.position(),end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+                    ClipContext clipContext = new ClipContext(this.position(),end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
                     var res = level().clip(clipContext);
                     if (res.getType() != HitResult.Type.MISS){
                         this.setRemoved(RemovalReason.DISCARDED);
@@ -313,7 +313,8 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
                             if ((this.pullingPlayerTickerTime != -1 && this.pullingPlayerTicker > this.pullingPlayerTickerTime + 1)) {
                                 owner.stopRiding();
 
-                                PacketDistributor.sendToPlayer((ServerPlayer) owner, new PlayerForceAttackEntityPacket(entity));
+                                FDPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(()->(ServerPlayer) owner), new PlayerForceAttackEntityPacket(entity));
+
 
                                 BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
                                         .size(5f)
@@ -352,8 +353,8 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
                                                 .scale(1.25);
                                         FDLibCalls.setServerPlayerSpeed((ServerPlayer) owner, movement);
                                         owner.hasImpulse = true;
-                                        owner.setIgnoreFallDamageFromCurrentImpulse(true);
-                                        owner.currentImpulseImpactPos = owner.position();
+//                                        owner.setIgnoreFallDamageFromCurrentImpulse(true);
+//                                        owner.currentImpulseImpactPos = owner.position();
                                     }
                                 });
 
@@ -364,10 +365,8 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
 
                                 var item = owner.getUseItem();
                                 if (owner.getUseItem().is(BossItems.MALKUTH_FIST.get())){
-                                    var data = item.get(BossDataComponents.MALKUTH_FIST_COMPONENT);
-                                    data.setCanSkipCooldown(true);
-                                    data.setEntityHookCooldown(cooldown);
-                                    item.set(BossDataComponents.MALKUTH_FIST_COMPONENT, new MalkuthFistDataComponent(data));
+                                    MalkuthFist.setCanSkipCooldown(item, true);
+                                    MalkuthFist.setHookCooldown(item, cooldown);
                                 }
 
 
@@ -447,7 +446,8 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
 
 
     @Override
-    public Vec3 getPassengerRidingPosition(Entity entity) {
+    protected void positionRider(Entity entity, MoveFunction function) {
+        super.positionRider(entity, function);
 
         if (currentPlayerHookPos == null){
             currentPlayerHookPos = entity.position().add(0,entity.getBbHeight() /2,0);
@@ -472,20 +472,50 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
 
         Vec3 interpolated = FDMathUtil.interpolateVectors(currentPlayerHookPos, thisPos, FDEasings.easeIn(p));
 
-        return interpolated;
+        function.accept(entity, interpolated.x, interpolated.y, interpolated.z);
+
     }
 
+//    @Override
+//    public Vec3 getPassengerRidingPosition(Entity entity) {
+//
+//        if (currentPlayerHookPos == null){
+//            currentPlayerHookPos = entity.position().add(0,entity.getBbHeight() /2,0);
+//            double distance = currentPlayerHookPos.distanceTo(this.position());
+//            this.pullingPlayerTickerTime = (int) Math.ceil(distance/2);
+//            if (this.pullingPlayerTickerTime <= 0){
+//                this.pullingPlayerTickerTime = 1;
+//            }
+//            this.pullingPlayerTicker = 0;
+//        }
+//
+//        Entity vehicle = this.getVehicle();
+//
+//        Vec3 thisPos;
+//        if (vehicle != null){
+//            thisPos = this.position().add(0,-vehicle.getBbHeight() / 2,0);
+//        }else{
+//            thisPos = this.position();
+//        }
+//
+//        float p = Mth.clamp(this.pullingPlayerTicker / (float) this.pullingPlayerTickerTime,0,1);
+//
+//        Vec3 interpolated = FDMathUtil.interpolateVectors(currentPlayerHookPos, thisPos, FDEasings.easeIn(p));
+//
+//        return interpolated;
+//    }
+//
     private void tickPullingTime(){
         if (this.pullingPlayerTickerTime != -1){
             this.pullingPlayerTicker++;
         }
     }
-
-    @Override
-    public Vec3 getVehicleAttachmentPoint(Entity entity) {
-        var bbHeight = entity.getBbHeight();
-        return new Vec3(0,bbHeight / 2,0);
-    }
+//
+//    @Override
+//    public Vec3 getVehicleAttachmentPoint(Entity entity) {
+//        var bbHeight = entity.getBbHeight();
+//        return new Vec3(0,bbHeight / 2,0);
+//    }
 
     @Override
     public boolean shouldRiderSit() {
@@ -495,10 +525,10 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
 
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(IS_HOOK, true);
-        builder.define(OWNER_ID, -1);
-        builder.define(HOOKED_TO, -1);
+    protected void defineSynchedData() {
+        this.getEntityData().define(IS_HOOK, true);
+        this.getEntityData().define(OWNER_ID, -1);
+        this.getEntityData().define(HOOKED_TO, -1);
     }
 
     @Override
@@ -523,11 +553,11 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
         tag.putBoolean("isHook", this.getEntityData().get(IS_HOOK));
     }
 
-    @EventBusSubscriber(modid = FDBosses.MOD_ID)
+    @Mod.EventBusSubscriber(modid = FDBosses.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
     public static class Events {
 
         @SubscribeEvent
-        public static void hurtEvent(LivingIncomingDamageEvent event){
+        public static void hurtEvent(LivingDamageEvent event){
             var entity = event.getEntity();
             if (entity instanceof ServerPlayer serverPlayer){
                 if (serverPlayer.getVehicle() instanceof MalkuthFistChain malkuthFistChain) {
@@ -536,7 +566,6 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
                         var sourceBB = source.getBoundingBox().inflate(2);
                         if (sourceBB.intersects(serverPlayer.getBoundingBox())) {
                             event.setCanceled(true);
-                            event.setInvulnerabilityTicks(20);
                         }
                     }else{
                         if (event.getSource().is(DamageTypes.IN_WALL)){

@@ -1,24 +1,26 @@
 package com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.post_shaders.FDPostShaderInitializeEvent;
 import com.finderfeed.fdlib.systems.post_shaders.FDRenderPostShaderEvent;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
+import net.minecraftforge.client.event.RenderLevelStageEvent;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.io.IOException;
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID, value = Dist.CLIENT)
+@Mod.EventBusSubscriber(modid = FDBosses.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class DistortionSphereEffectHandler {
 
     private static PostChain sphericalDistortionEffect;
@@ -39,7 +41,10 @@ public class DistortionSphereEffectHandler {
     }
 
     @SubscribeEvent
-    public static void clientTickEvent(ClientTickEvent.Pre event){
+    public static void clientTickEvent(TickEvent.ClientTickEvent event){
+
+        if (event.phase != TickEvent.Phase.START) return;
+
         if (currentEffect != null && !Minecraft.getInstance().isPaused()){
             if (currentEffect.tick()){
                 currentEffect = null;
@@ -79,10 +84,11 @@ public class DistortionSphereEffectHandler {
         Vec3 spherePos = currentEffect.position;
         Vector3f relativeSpherePos = spherePos.subtract(camPos).toVector3f();
 
-        Matrix4f mat = new Matrix4f(event.getModelViewMatrix());
+
+        Matrix4f mat = new Matrix4f(RenderSystem.getModelViewMatrix());
         Matrix4f projection = new Matrix4f(event.getProjectionMatrix());
 
-        float pticks = event.getPartialTick().getGameTimeDeltaPartialTick(false);
+        float pticks = event.getPartialTick();
 
         float radius = currentEffect.getSphereRadius(pticks);
         float innerRadius = currentEffect.getInnerSphereRadius(pticks);
@@ -93,6 +99,7 @@ public class DistortionSphereEffectHandler {
 
         Matrix4f invertedProjection = projection.invert(new Matrix4f());
         Matrix4f invertedModelview = mat.invert(new Matrix4f());
+;
 
         for (var pass : sphericalDistortionEffect.passes){
             var effect = pass.getEffect();
@@ -122,7 +129,7 @@ public class DistortionSphereEffectHandler {
 
             if (camPos.distanceTo(position) < renderDistance) {
                 event.doDefaultShaderBeforeShaderStuff();
-                sphericalDistortionEffect.process(event.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+                sphericalDistortionEffect.process(event.getPartialTicks());
             }
 
         }

@@ -16,6 +16,7 @@ import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -110,7 +111,7 @@ public class MalkuthBossSpawner extends BossSpawnerEntity {
     }
 
     @Override
-    public Vec3 getPlayerItemsDropPosition(Vec3 deathPosition) {
+    public Vec3 getPlayerItemsDropPosition(ServerPlayer serverPlayer, Vec3 deathPosition) {
         if (BossTargetFinder.isPointInCylinder(deathPosition, this.position().add(0,-2,0), MalkuthEntity.ENRAGE_HEIGHT + 2, MalkuthEntity.ENRAGE_RADIUS)){
             return this.position().add(0,3,-MalkuthEntity.ENRAGE_RADIUS - 5);
         }

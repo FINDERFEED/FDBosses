@@ -50,7 +50,7 @@ public class GeburahRayCastingCircle extends GeburahCastingCircle {
 
         Vec3 end = this.position().add(this.getCastDirection().scale(20));
 
-        ClipContext clipContext = new ClipContext(this.position(), end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+        ClipContext clipContext = new ClipContext(this.position(), end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
         var res = level().clip(clipContext);
         end = res.getLocation();
         level().playSound(null, end.x,end.y,end.z, BossSounds.GEBURAH_RAY_SHOT.get(), SoundSource.HOSTILE, 2f, 1f);

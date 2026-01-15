@@ -109,7 +109,7 @@ public class GeburahRayController {
 
         between = between.normalize();
 
-        ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+        ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
         BlockHitResult result = level.clip(clipContext);
         Vec3 location = result.getLocation();
 

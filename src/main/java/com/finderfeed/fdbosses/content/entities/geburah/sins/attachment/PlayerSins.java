@@ -1,14 +1,19 @@
 package com.finderfeed.fdbosses.content.entities.geburah.sins.attachment;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.init.BossDataAttachments;
+import com.finderfeed.fdlib.network.FDPacketHandler;
+import com.finderfeed.fdlib.systems.stream_codecs.NetworkCodec;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.network.PacketDistributor;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,10 +27,10 @@ public class PlayerSins {
     ).apply(p, PlayerSins::new));
 
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, PlayerSins> STREAM_CODEC = StreamCodec.composite(
-            ActivePlayerSinInstance.STREAM_CODEC.apply(ByteBufCodecs.list()),v->v.activeSins,
-            ByteBufCodecs.INT,v -> v.sinnedTimes,
-            ByteBufCodecs.INT, v->v.sinGainCooldown,
+    public static final NetworkCodec<PlayerSins> STREAM_CODEC = NetworkCodec.composite(
+            NetworkCodec.listOf(ActivePlayerSinInstance.STREAM_CODEC),v->v.activeSins,
+            NetworkCodec.INT,v -> v.sinnedTimes,
+            NetworkCodec.INT, v->v.sinGainCooldown,
             PlayerSins::new
     );
 
@@ -54,12 +59,30 @@ public class PlayerSins {
     }
 
     public static PlayerSins getPlayerSins(Player player){
-        return player.getData(BossDataAttachments.PLAYER_SINS);
+        var playerTag = getPlayerSinsTag(player);
+        var tag = playerTag.get("playerSins");
+        PlayerSins sins = CODEC.decode(NbtOps.INSTANCE, tag).get().left().get().getFirst();
+        return sins;
     }
 
     public static void setPlayerSins(Player player, PlayerSins playerSins){
-        player.setData(BossDataAttachments.PLAYER_SINS, playerSins);
+        var t = CODEC.encodeStart(NbtOps.INSTANCE, playerSins);
+        var tag = t.get().left().get();
+        var playerTag = getPlayerSinsTag(player);
+        playerTag.put("playerSins", tag);
+
+        if (player instanceof ServerPlayer serverPlayer){
+            FDPacketHandler.INSTANCE.send(PacketDistributor.PLAYER.with(()->serverPlayer), new SyncPlayerSinsPacket(playerSins));
+        }
+
     }
+
+    public static CompoundTag getPlayerSinsTag(Player player){
+        var playerSins = BossUtil.getOrCreateTag(BossUtil.getPlayerTag(player), "player_sins");
+        return playerSins;
+    }
+
+
 
     public boolean hasSinActive(PlayerSin playerSin){
         return activeSins.stream().anyMatch(inst -> inst.getSin() == playerSin);

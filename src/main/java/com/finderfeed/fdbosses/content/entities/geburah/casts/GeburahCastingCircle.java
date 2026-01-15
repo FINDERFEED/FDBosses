@@ -65,10 +65,10 @@ public abstract class GeburahCastingCircle extends Entity {
     }
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(DURATION, 20);
-        builder.define(COLOR, 0xffffffff);
-        builder.define(DIRECTION, new Vec3(0,1,0));
+    protected void defineSynchedData() {
+        this.getEntityData().define(DURATION, 20);
+        this.getEntityData().define(COLOR, 0xffffffff);
+        this.getEntityData().define(DIRECTION, new Vec3(0,1,0));
     }
 
     @Override

@@ -3,8 +3,10 @@ package com.finderfeed.fdbosses.content.entities.geburah.sins.attachment;
 import com.finderfeed.fdbosses.BossClientPackets;
 import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.RegisterFDPacket;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 @RegisterFDPacket("fdbosses:sync_player_sins_packet")
 public class SyncPlayerSinsPacket extends FDPacket {
@@ -15,22 +17,22 @@ public class SyncPlayerSinsPacket extends FDPacket {
         this.playerSins = new PlayerSins(playerSins);
     }
 
-    public SyncPlayerSinsPacket(RegistryFriendlyByteBuf friendlyByteBuf){
-        this.playerSins = PlayerSins.STREAM_CODEC.decode(friendlyByteBuf);
+    public SyncPlayerSinsPacket(FriendlyByteBuf friendlyByteBuf){
+        this.playerSins = PlayerSins.STREAM_CODEC.fromNetwork(friendlyByteBuf);
     }
 
     @Override
-    public void write(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
-        PlayerSins.STREAM_CODEC.encode(registryFriendlyByteBuf, playerSins);
+    public void write(FriendlyByteBuf registryFriendlyByteBuf) {
+        PlayerSins.STREAM_CODEC.toNetwork(registryFriendlyByteBuf, playerSins);
     }
 
     @Override
-    public void clientAction(IPayloadContext iPayloadContext) {
+    public void clientAction(Supplier<NetworkEvent.Context> supplier) {
         BossClientPackets.syncPlayerSinsPacket(playerSins);
     }
 
     @Override
-    public void serverAction(IPayloadContext iPayloadContext) {
+    public void serverAction(Supplier<NetworkEvent.Context> supplier) {
 
     }
 

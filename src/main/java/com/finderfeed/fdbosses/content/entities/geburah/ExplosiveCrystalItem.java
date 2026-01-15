@@ -65,7 +65,7 @@ public class ExplosiveCrystalItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack p_41421_, TooltipContext p_339594_, List<Component> text, TooltipFlag p_41424_) {
+    public void appendHoverText(ItemStack p_41421_, Level p_339594_, List<Component> text, TooltipFlag p_41424_) {
         super.appendHoverText(p_41421_, p_339594_, text, p_41424_);
 
     }

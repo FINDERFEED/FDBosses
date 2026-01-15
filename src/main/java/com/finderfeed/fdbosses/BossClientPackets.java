@@ -14,21 +14,36 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
+import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
+import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffectHandler;
+import com.finderfeed.fdbosses.content.entities.geburah.geburah_earthquake.GeburahEarthquake;
+import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.GeburahWeaponRotationController;
+import com.finderfeed.fdbosses.content.entities.geburah.rotating_weapons.rotations.GeburahWeaponRotation;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.ScreenFlashEffect;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.ScreenFlashEffectData;
+import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSins;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
+import com.finderfeed.fdlib.ClientMixinHandler;
 import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.systems.broken_screen_effect.ShatteredScreenEffectHandler;
+import com.finderfeed.fdlib.systems.broken_screen_effect.ShatteredScreenSettings;
 import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterHandler;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.CircleSpawnProcessor;
+import com.finderfeed.fdlib.systems.screen.screen_effect.ScreenEffectOverlay;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
+import com.finderfeed.fdlib.systems.shake.DefaultShake;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.client.particles.FDBlockParticleOptions;
@@ -41,11 +56,14 @@ import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -108,6 +126,77 @@ public class BossClientPackets {
     public static void closeDossierScreen(){
         if (Minecraft.getInstance().screen instanceof BaseBossScreen baseBossScreen){
             Minecraft.getInstance().setScreen(null);
+        }
+    }
+
+    public static void syncPlayerSinsPacket(PlayerSins playerSins){
+        PlayerSins.setPlayerSins(FDClientHelpers.getClientPlayer(), playerSins);
+    }
+
+    public static void launchGeburahLaserPrepare(int geburah, int timeUntilAttack){
+        if (FDClientHelpers.getClientLevel().getEntity(geburah) instanceof GeburahEntity geburah1){
+            geburah1.laserAttackPreparator.launchPreparation(timeUntilAttack);
+        }
+    }
+
+    public static void triggerSinEffect(float soundPitch){
+
+        SoundManager soundManager = Minecraft.getInstance().getSoundManager();
+        soundManager.play(SimpleSoundInstance.forUI(BossSounds.GEBURAH_SIN.get(),soundPitch * (0.95f + random.nextFloat() * 0.1f),0.5f));
+        ClientMixinHandler.addShake(new DefaultShake(FDShakeData.builder()
+                .amplitude(0.5f)
+                .outTime(10)
+                .inTime(0)
+                .stayTime(0)
+                .build()));
+
+        ResourceLocation data = ShatteredScreenSettings.DATA_1_GLASSY;
+
+        ShatteredScreenEffectHandler.setCurrentEffect(new ShatteredScreenSettings(
+                data,
+                0,0,40,0.1f,0.05f,true
+        ));
+
+        ScreenEffectOverlay.addScreenEffect(new ScreenFlashEffect(
+                new ScreenFlashEffectData(new FDColor(1f,1f,1f,0.5f),0.3f),1,0,20
+        ));
+
+    }
+
+    public static void stopWeaponRotation(int entityId){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
+            geburah.getWeaponRotationController().stopRotation();
+        }
+    }
+
+    public static void startGeburahWeaponRotation(int entityId, GeburahWeaponRotation geburahWeaponRotation){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
+            var handler = geburah.getWeaponRotationController();
+            geburahWeaponRotation.setRotatingWeaponsHandler(handler);
+            handler.rotateWeapons(geburahWeaponRotation);
+        }
+    }
+
+    public static void handleGeburahWeaponRotationSync(int entityId, float currentRotation){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
+            GeburahWeaponRotationController rotationWeapons = geburah.getWeaponRotationController();
+            float rot = rotationWeapons.getCurrentRotation();
+            if (Math.abs(rot - currentRotation) > 0.1f) {
+                rotationWeapons.setRotation(currentRotation);
+            }
+        }
+    }
+
+    public static void startGeburahDistortionEffect(int entityId){
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEntity geburah){
+
+            Vec3 corePos = geburah.getCorePosition();
+            Vec3 pos = geburah.position();
+
+            DistortionSphereEffectHandler.setDistortionSphereEffect(new DistortionSphereEffect(
+                    corePos, 60, GeburahEntity.ARENA_RADIUS * 2,2, (float)pos.y
+            ));
+
         }
     }
 
@@ -201,6 +290,68 @@ public class BossClientPackets {
 
         }
     }
+
+
+    public static void geburahEarthquakeSpawnEarthshatters(int entityId,Vec3 direction, int radius, float angle){
+
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof GeburahEarthquake geburahEarthquake){
+            geburahEarthquake.spawnEarthShattersOnRadius(radius,direction,angle);
+            geburahEarthquakeParticles(geburahEarthquake.position(),radius, direction, angle);
+        }
+
+    }
+
+
+    public static void geburahEarthquakeParticles(Vec3 tpos,int rad, Vec3 direction, float arcAngle){
+        Vec3 b = new Vec3(rad,0,0);
+        float angle;
+        if (rad != 0){
+            angle = 3f / rad;
+        }else{
+            angle = FDMathUtil.FPI * 2;
+        }
+        Level level = Minecraft.getInstance().level;
+
+        BlockPos prevPos = null;
+        for (float i = 0; i < FDMathUtil.FPI * 2;i += angle){
+
+            Vec3 vec = b.yRot(i);
+
+            if (FDMathUtil.angleBetweenVectors(vec, direction) > arcAngle) continue;
+
+            Vec3 pos = tpos.add(vec);
+
+            BlockPos ppos = FDMathUtil.vec3ToBlockPos(pos);
+            if (!ppos.equals(prevPos)){
+                Vec3 c = ppos.getCenter();
+                Vec3 dir = tpos.subtract(c).multiply(1,0,1).normalize();
+
+                BlockState state = level.getBlockState(ppos);
+                if (state.isAir()) continue;
+
+
+                Vec3 sppos = new Vec3(
+                        c.x + random.nextFloat() * 2 - 1 - dir.x,
+                        c.y + 0.1 + random.nextFloat() * 0.19,
+                        c.z + random.nextFloat() * 2 - 1 - dir.z
+                );
+
+                Vec3 speed = dir.yRot(FDMathUtil.FPI / 4 * (random.nextFloat() * 2 - 1)).multiply(0.075,0.,0.075).add(0,0.25f + random.nextFloat() * 0.2f,0);
+
+                FDBlockParticleOptions options = FDBlockParticleOptions.builder()
+                        .lifetime(10 + random.nextInt(5))
+                        .state(state)
+                        .quadSizeMultiplier(1 + random.nextFloat() * 0.2f)
+                        .build();
+
+                level.addParticle(options,sppos.x,sppos.y,sppos.z,speed.x,speed.y,speed.z);
+
+//                }
+            }
+            prevPos = ppos;
+        }
+    }
+
 
     public static void posEvent(Vec3 pos,int event,int data){
         switch (event) {

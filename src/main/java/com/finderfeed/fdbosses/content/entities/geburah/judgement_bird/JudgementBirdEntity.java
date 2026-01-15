@@ -76,7 +76,6 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable, Gebu
         if (level.isClientSide && MODEL == null){
             MODEL = new FDModel(BossModels.JUDGEMENT_BIRD.get());
         }
-
         this.setNoGravity(true);
     }
 
@@ -220,10 +219,6 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable, Gebu
         return null;
     }
 
-    @Override
-    protected double getDefaultGravity() {
-        return 0;
-    }
 
     @Override
     public boolean isNoGravity() {

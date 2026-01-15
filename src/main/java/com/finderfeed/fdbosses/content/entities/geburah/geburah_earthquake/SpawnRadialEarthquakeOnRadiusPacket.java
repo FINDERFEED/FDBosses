@@ -4,9 +4,10 @@ import com.finderfeed.fdbosses.BossClientPackets;
 import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.RegisterFDPacket;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraftforge.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 @RegisterFDPacket("fdbosses:spawn_radial_earthquake_on_radius")
 public class SpawnRadialEarthquakeOnRadiusPacket extends FDPacket {
@@ -35,7 +36,7 @@ public class SpawnRadialEarthquakeOnRadiusPacket extends FDPacket {
     }
 
     @Override
-    public void write(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
+    public void write(FriendlyByteBuf registryFriendlyByteBuf) {
         registryFriendlyByteBuf.writeInt(entityId);
         registryFriendlyByteBuf.writeInt(radius);
         registryFriendlyByteBuf.writeDouble(this.direction.x);
@@ -44,12 +45,12 @@ public class SpawnRadialEarthquakeOnRadiusPacket extends FDPacket {
     }
 
     @Override
-    public void clientAction(IPayloadContext iPayloadContext) {
+    public void clientAction(Supplier<NetworkEvent.Context> supplier) {
         BossClientPackets.geburahEarthquakeSpawnEarthshatters(entityId, direction, radius, angle);
     }
 
     @Override
-    public void serverAction(IPayloadContext iPayloadContext) {
+    public void serverAction(Supplier<NetworkEvent.Context> supplier) {
 
     }
 

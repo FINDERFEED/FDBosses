@@ -1,7 +1,8 @@
 package com.finderfeed.fdbosses.content.entities.geburah;
 
+import com.finderfeed.fdlib.network.FDPacketHandler;
 import net.minecraft.util.Mth;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 
 public class GeburahLaserAttackPreparator {
 
@@ -21,7 +22,7 @@ public class GeburahLaserAttackPreparator {
             this.time = timeUntilAttack + FADE_OUT;
             this.currentTime = time;
         }else{
-            PacketDistributor.sendToPlayersTrackingEntity(geburah, new GeburahPrepareAttackPacket(geburah, timeUntilAttack));
+            FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(()->this.geburah), new GeburahPrepareAttackPacket(geburah, timeUntilAttack));
         }
     }
 

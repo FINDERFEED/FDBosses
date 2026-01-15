@@ -1,17 +1,25 @@
 package com.finderfeed.fdbosses.content.items.malkuth;
 
+import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.init.BossDataComponents;
 import com.finderfeed.fdbosses.init.BossItems;
+import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDLibCalls;
+import com.finderfeed.fdlib.network.FDPacketHandler;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDItemModelOptions;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDModelItemRenderer;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDModelItemRendererOptions;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -24,6 +32,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.ChunkPos;
@@ -32,9 +41,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.neoforged.neoforge.network.PacketDistributor;
+import net.minecraftforge.client.extensions.common.IClientItemExtensions;
+import net.minecraftforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class MalkuthFist extends Item {
 
@@ -47,10 +60,6 @@ public class MalkuthFist extends Item {
         if (!level.isClientSide){
 
             ItemStack item = player.getItemInHand(hand);
-
-            if (!item.has(BossDataComponents.MALKUTH_FIST_COMPONENT)){
-                item.set(BossDataComponents.MALKUTH_FIST_COMPONENT, new MalkuthFistDataComponent());
-            }
 
             if (hand == InteractionHand.MAIN_HAND){
 
@@ -71,7 +80,7 @@ public class MalkuthFist extends Item {
                                     .maxVerticalSpeedEdges(0.15f)
                                     .maxVerticalSpeedCenter(0.15f)
                     );
-                    PacketDistributor.sendToPlayersTrackingChunk((ServerLevel) level, new ChunkPos(player.getOnPos()),packet);
+                    FDPacketHandler.INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(()->((ServerLevel)level).getChunkAt(player.getOnPos())), packet);
                     BallParticleOptions ballParticleOptions = BallParticleOptions.builder()
                             .size(7f)
                             .scalingOptions(1,0,1)
@@ -115,8 +124,8 @@ public class MalkuthFist extends Item {
                             lookAngle.z * 0.1f
                     );
                     FDLibCalls.setServerPlayerSpeed((ServerPlayer) player, speed);
-                    player.setIgnoreFallDamageFromCurrentImpulse(true);
-                    player.currentImpulseImpactPos = player.position();
+//                    player.setIgnoreFallDamageFromCurrentImpulse(true);
+//                    player.currentImpulseImpactPos = player.position();
 
 
                     player.getCooldowns().addCooldown(BossItems.MALKUTH_FIST.get(), 5);
@@ -140,7 +149,7 @@ public class MalkuthFist extends Item {
         double dot = lookAngle.dot(new Vec3(0,1,0));
 
         if (player.onGround() && dot < -0.6){
-            ClipContext clipContext = new ClipContext(player.getEyePosition(), player.getEyePosition().add(lookAngle.scale(3)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+            ClipContext clipContext = new ClipContext(player.getEyePosition(), player.getEyePosition().add(lookAngle.scale(3)), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, null);
             var res = player.level().clip(clipContext);
             if (res.getType() != HitResult.Type.MISS){
                 return false;
@@ -151,7 +160,7 @@ public class MalkuthFist extends Item {
     }
 
     @Override
-    public int getUseDuration(ItemStack p_41454_, LivingEntity p_344979_) {
+    public int getUseDuration(ItemStack p_41454_) {
         return 72000;
     }
 
@@ -165,36 +174,29 @@ public class MalkuthFist extends Item {
         super.inventoryTick(stack, level, entity, slot, p_41408_);
         if (entity instanceof ServerPlayer serverPlayer){
 
-
-            if (!stack.has(BossDataComponents.MALKUTH_FIST_COMPONENT)){
-                stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT, new MalkuthFistDataComponent());
-            }
-
-            var data = stack.get(BossDataComponents.MALKUTH_FIST_COMPONENT);
+            int hookCooldown = getHookCooldown(stack);
 
             var cooldowns = serverPlayer.getCooldowns();
-            if (data.canSkipCooldown()){
+            if (canSkipCooldown(stack)){
                 if (cooldowns.isOnCooldown(stack.getItem())){
                     if (slot != Inventory.SLOT_OFFHAND) {
-                        data.setCanSkipCooldown(false);
-                        stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT, new MalkuthFistDataComponent(data));
+                        setCanSkipCooldown(stack,false);
                         cooldowns.removeCooldown(stack.getItem());
                     }
                 }else{
-                    data.setCanSkipCooldown(false);
-                    stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT,new MalkuthFistDataComponent(data));
+                    setCanSkipCooldown(stack,false);
                 }
             }
 
             if (!cooldowns.isOnCooldown(BossItems.MALKUTH_FIST.get()) && slot == Inventory.SLOT_OFFHAND){
-                if (data.getEntityHookCooldown() > 0){
-                    cooldowns.addCooldown(BossItems.MALKUTH_FIST.get(), data.getEntityHookCooldown());
+                if (hookCooldown > 0){
+                    cooldowns.addCooldown(BossItems.MALKUTH_FIST.get(),hookCooldown);
                 }
             }
 
-            if (data.getEntityHookCooldown() > 0){
-                data.setEntityHookCooldown(data.getEntityHookCooldown() - 1);
-                stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT.get(), new MalkuthFistDataComponent(data));
+
+            if (hookCooldown > 0){
+                setHookCooldown(stack, hookCooldown - 1);
             }
 
 
@@ -204,14 +206,36 @@ public class MalkuthFist extends Item {
     @Override
     public boolean onEntityItemUpdate(ItemStack stack, ItemEntity entity) {
         if (!entity.level().isClientSide) {
-            var data = stack.get(BossDataComponents.MALKUTH_FIST_COMPONENT);
-            if (data != null) {
-                data.setCanSkipCooldown(false);
-                stack.set(BossDataComponents.MALKUTH_FIST_COMPONENT, new MalkuthFistDataComponent(data));
-            }
+            setCanSkipCooldown(stack, false);
         }
         return super.onEntityItemUpdate(stack, entity);
     }
+
+    public static CompoundTag getFistData(ItemStack itemStack){
+        return itemStack.getOrCreateTagElement("malkuthFistData");
+    }
+
+    public static boolean canSkipCooldown(ItemStack itemStack){
+        var tag = getFistData(itemStack);
+        return tag.getBoolean("canSkipCooldown");
+    }
+
+    public static int getHookCooldown(ItemStack itemStack){
+        var tag = getFistData(itemStack);
+        return tag.getInt("hookCooldown");
+    }
+
+    public static void setCanSkipCooldown(ItemStack itemStack, boolean state){
+        var tag = getFistData(itemStack);
+        tag.putBoolean("canSkipCooldown", state);
+    }
+
+
+    public static void setHookCooldown(ItemStack itemStack, int cooldown){
+        var tag = getFistData(itemStack);
+        tag.putInt("hookCooldown", cooldown);
+    }
+
 
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
@@ -219,8 +243,70 @@ public class MalkuthFist extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack p_41421_, TooltipContext p_339594_, List<Component> components, TooltipFlag p_41424_) {
-        super.appendHoverText(p_41421_, p_339594_, components, p_41424_);
+    public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> components, TooltipFlag p_41424_) {
+        super.appendHoverText(p_41421_, p_41422_, components, p_41424_);
         components.add(Component.translatable("fdbosses.word.malkuth_fist_description").withStyle(ChatFormatting.GOLD));
+    }
+
+    @Override
+    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
+        super.initializeClient(consumer);
+        consumer.accept(FDModelItemRenderer.createExtensions(FDModelItemRendererOptions.create()
+                .addModel(FDItemModelOptions.builder()
+                        .modelInfo(BossModels.MALKUTH_FIST)
+                        .renderType((ctx,item)->{
+                            if (ctx != ItemDisplayContext.FIRST_PERSON_LEFT_HAND && ctx != ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+                                return RenderType.entityCutoutNoCull(FDBosses.location("textures/item/malkuth_fist_item.png"));
+                            }else{
+                                return RenderType.entityCutoutNoCull(FDBosses.location("textures/item/malkuth_fist_item_offhand.png"));
+                            }
+                        })
+                        .build())
+
+                .addModel(FDItemModelOptions.builder()
+                        .modelInfo(BossModels.MALKUTH_FIST_LAYER)
+                        .renderType((ctx,item)->{
+                            if (ctx != ItemDisplayContext.FIRST_PERSON_LEFT_HAND && ctx != ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+                                return RenderType.entityCutoutNoCull(FDBosses.location("textures/item/malkuth_fist_item_layer.png"));
+                            }else{
+                                return RenderType.entityCutoutNoCull(FDBosses.location("textures/item/malkuth_fist_item_offhand_layer.png"));
+                            }
+                        })
+                        .build())
+                .addModel(FDItemModelOptions.builder()
+                        .modelInfo(BossModels.MALKUTH_FIST)
+                        .renderType((ctx,item)->{
+                            if (ctx != ItemDisplayContext.FIRST_PERSON_LEFT_HAND && ctx != ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+                                return RenderType.eyes(FDBosses.location("textures/item/malkuth_fist_item_emissive.png"));
+                            }else{
+                                return RenderType.eyes(FDBosses.location("textures/item/malkuth_fist_item_offhand_emissive.png"));
+                            }
+                        })
+                        .build())
+                .setScale((ctx -> {
+                    if (ctx == ItemDisplayContext.FIRST_PERSON_LEFT_HAND || ctx == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND){
+                        return 0.75f;
+                    }
+                    return 1f;
+                }))
+                .addRotation3((itemDisplayContext -> {
+                    if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_RIGHT_HAND){
+                        return new Vector3f(30,0,0);
+                    }else if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND){
+                        return new Vector3f(30,0,0);
+                    }
+                    return new Vector3f();
+                }))
+                .addTranslation((itemDisplayContext -> {
+                    if (itemDisplayContext == ItemDisplayContext.FIRST_PERSON_LEFT_HAND){
+                        return new Vector3f(0.05f,0.0f,0.0f);
+                    }else if (itemDisplayContext == ItemDisplayContext.THIRD_PERSON_RIGHT_HAND){
+                        return new Vector3f(0.2f,-0.325f,0.05f);
+                    }else if (itemDisplayContext == ItemDisplayContext.THIRD_PERSON_LEFT_HAND) {
+                        return new Vector3f(0.2f,-0.325f,-0.05f);
+                    }
+                    return new Vector3f();
+                }))
+        ));
     }
 }

@@ -31,7 +31,7 @@ public class JudgementBallProjectile extends FDEntity implements AutoSerializabl
     public static JudgementBallProjectile summon(Level level, ProjectileMovementPath projectileMovementPath, float damage){
         JudgementBallProjectile judgementBallProjectile = new JudgementBallProjectile(BossEntities.GEBURAH_JUDGEMENT_BALL.get(), level);
 
-        judgementBallProjectile.setPos(projectileMovementPath.getPositions().getFirst());
+        judgementBallProjectile.setPos(projectileMovementPath.getPositions().get(0));
 
         judgementBallProjectile.damage = BossUtil.transformDamage(level, damage);
 
@@ -82,8 +82,8 @@ public class JudgementBallProjectile extends FDEntity implements AutoSerializabl
     }
 
     @Override
-    public void onRemovedFromLevel() {
-        super.onRemovedFromLevel();
+    public void onRemovedFromWorld() {
+        super.onRemovedFromWorld();
         level().addParticle(new JudgementBallExplosionParticleOptions(this.getDeltaMovement(),10,2f),this.getX(),this.getY() + this.getBbHeight()/2,this.getZ(),0,0,0);
 
     }
@@ -119,7 +119,7 @@ public class JudgementBallProjectile extends FDEntity implements AutoSerializabl
 
 
     @Override
-    protected void defineSynchedData(SynchedEntityData.Builder p_326003_) {
+    protected void defineSynchedData() {
 
     }
 
