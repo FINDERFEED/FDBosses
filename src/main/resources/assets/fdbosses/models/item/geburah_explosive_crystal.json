@@ -1,0 +1,22 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "fdbosses:item/geburah_explosive_crystal"
+  },
+
+  "overrides": [
+    {
+      "predicate": {
+        "fdbosses:exploding": 0
+      },
+      "model": "fdbosses:item/geburah/geburah_explosive_crystal_exploding_0"
+    },
+    {
+      "predicate": {
+        "fdbosses:exploding": 1
+      },
+      "model": "fdbosses:item/geburah/geburah_explosive_crystal_exploding_1"
+    }
+  ]
+
+}

@@ -1,0 +1,16 @@
+{
+  "values": [
+    "fdbosses:justicestone_wall",
+    "fdbosses:justicestone_column_wall",
+    "fdbosses:justicestone_bricks",
+    "fdbosses:chiseled_justicestone_bricks",
+    "fdbosses:justicestone_stairs",
+    "fdbosses:justicestone_column",
+    "fdbosses:justicestone_beam",
+    "fdbosses:polished_justicestone",
+    "fdbosses:justicestone_bricks_slab",
+    "fdbosses:polished_justicestone_slab",
+    "fdbosses:polished_justicestone_stairs"
+  ],
+  "replace": false
+}

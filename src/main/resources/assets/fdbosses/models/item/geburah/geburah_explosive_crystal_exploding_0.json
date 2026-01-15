@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "fdbosses:item/geburah_explosive_crystal"
+  }
+}

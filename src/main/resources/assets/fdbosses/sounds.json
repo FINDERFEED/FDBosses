@@ -156,5 +156,49 @@
         "stream": true
       }
     ]
+  },
+  "geburah_sin": {
+    "sounds": [ "fdbosses:geburah_sin" ]
+  },
+  "rotating_weapons_cling": {
+    "sounds": [ "fdbosses:rotating_weapons_cling" ]
+  },
+  "geburah_core_ray_strike": {
+    "sounds": [ "fdbosses:geburah_core_ray_strike" ]
+  },
+  "geburah_ray_shot": {
+    "sounds": [ "fdbosses:geburah_ray_shot" ]
+  },
+  "geburah_ray_loop": {
+    "sounds": [ "fdbosses:geburah_ray_loop" ]
+  },
+  "geburah_cannon_shoot": {
+    "sounds": [ "fdbosses:geburah_cannon_shoot" ]
+  },
+  "geburah_sin_change": {
+    "sounds": [ "fdbosses:geburah_sin_change" ]
+  },
+  "geburah_stomp": {
+    "sounds": [ "fdbosses:geburah_stomp" ]
+  },
+  "geburah_death": {
+    "sounds": [ "fdbosses:geburah_death" ]
+  },
+  "geburah_helicopter": {
+    "sounds": [ "fdbosses:helicopter" ]
+  },
+  "geburah_floor_opening": {
+    "sounds": [ "fdbosses:geburah_floor_opening" ]
+  },
+  "geburah_rise": {
+    "sounds": [ "fdbosses:geburah_rise" ]
+  },
+  "geburah_theme": {
+    "sounds": [
+      {
+        "name": "fdbosses:music/geburah_theme",
+        "stream": true
+      }
+    ]
   }
 }

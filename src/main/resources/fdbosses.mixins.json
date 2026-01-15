@@ -9,8 +9,7 @@
     "EntityMixin",
     "JigsawPlacementMixin",
     "PlayerListMixin",
-    "PlayerMixin",
-    "ServerPlayerMixin"
+    "PlayerMixin"
   ],
   "minVersion": "0.8",
   "client": [

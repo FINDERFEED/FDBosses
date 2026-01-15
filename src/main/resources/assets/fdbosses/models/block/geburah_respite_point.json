@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "fdbosses:block/chiseled_justicestone_bricks",
+    "east": "fdbosses:block/chiseled_justicestone_bricks",
+    "north": "fdbosses:block/geburah_respawn_point_setter",
+    "particle": "fdbosses:block/chiseled_justicestone_bricks",
+    "south": "fdbosses:block/chiseled_justicestone_bricks",
+    "up": "fdbosses:block/chiseled_justicestone_bricks",
+    "west": "fdbosses:block/chiseled_justicestone_bricks"
+  }
+}

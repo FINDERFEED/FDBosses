@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "fdbosses:block/justicestone_column_top",
+    "side": "fdbosses:block/justicestone_column"
+  }
+}

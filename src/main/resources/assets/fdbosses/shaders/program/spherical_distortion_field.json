@@ -1,0 +1,26 @@
+{
+  "blend": {
+    "func": "add",
+    "srcrgb": "one",
+    "dstrgb": "one"
+  },
+  "vertex": "blit",
+  "fragment": "fdbosses:spherical_distortion_field",
+  "attributes": [ "Position" ],
+  "samplers": [
+    { "name": "DiffuseSampler" }
+  ],
+  "uniforms": [
+    { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "inverseProjection", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "inverseModelview", "type": "matrix4x4", "count": 16, "values": [ 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0 ] },
+    { "name": "ScreenSize",  "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] },
+    { "name": "InSize",  "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] },
+    { "name": "OutSize", "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] },
+    { "name": "sphereRelativePosition", "type": "float",     "count": 3,  "values": [ 10.0, 10.0, 10.0 ] },
+    { "name": "sphereRadius", "type": "float",     "count": 1,  "values": [ 1.0 ] },
+    { "name": "innerSphereRadius", "type": "float",     "count": 1,  "values": [ 1.0 ] },
+    { "name": "floorOffset", "type": "float",     "count": 1,  "values": [ 1.0 ] },
+    { "name": "effectStrength", "type": "float",     "count": 1,  "values": [ 1.0 ] }
+  ]
+}

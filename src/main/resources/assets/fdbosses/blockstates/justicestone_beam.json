@@ -1,0 +1,18 @@
+{
+  "variants": {
+    "axis=x": {
+      "model": "fdbosses:block/justicestone_beam_horizontal"
+    },
+    "axis=y": {
+      "model": "fdbosses:block/justicestone_beam_horizontal",
+      "x": 90,
+      "z": 90,
+      "y": 90
+    },
+    "axis=z": {
+      "model": "fdbosses:block/justicestone_beam_horizontal",
+      "z": 90,
+      "y": 90
+    }
+  }
+}
