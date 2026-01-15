@@ -72,7 +72,7 @@ public class DistortionSphereEffectHandler {
         if (sphericalDistortionEffect == null) return;
 
         var stage = event.getStage();
-        if (stage != RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) return;
+        if (stage != RenderLevelStageEvent.Stage.AFTER_WEATHER) return;
 
         if (currentEffect == null) return;
 
@@ -83,6 +83,7 @@ public class DistortionSphereEffectHandler {
 
         Vec3 spherePos = currentEffect.position;
         Vector3f relativeSpherePos = spherePos.subtract(camPos).toVector3f();
+
 
 
         Matrix4f mat = new Matrix4f(RenderSystem.getModelViewMatrix());

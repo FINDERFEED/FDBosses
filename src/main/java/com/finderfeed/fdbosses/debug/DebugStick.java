@@ -4,6 +4,9 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.ChesedMiniRay;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
+import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
+import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffectHandler;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_cannon.MalkuthCannonEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_crush.MalkuthCrushAttack;
@@ -59,6 +62,17 @@ public class DebugStick extends Item {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+
+        if (level.isClientSide){
+
+            DistortionSphereEffectHandler.setDistortionSphereEffect(new DistortionSphereEffect(
+                    player.getEyePosition().add(player.getLookAngle().scale(50)), 60, GeburahEntity.ARENA_RADIUS * 2,2, 0
+            ));
+
+        }
+        if (true){
+            return InteractionResultHolder.consume(player.getItemInHand(hand));
+        }
 
         if (!level.isClientSide){
 

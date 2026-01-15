@@ -168,7 +168,7 @@ public class GeburahChainTrapEntity extends Entity implements AutoSerializable, 
     @Override
     protected void positionRider(Entity entity, MoveFunction moveFunction) {
 
-        float height = entity.getBbHeight() / 2;
+        float height = 0;
 
         if (this.lastKnownTargetPos == null){
             this.lastKnownTargetPos = entity.position().add(0, height, 0);

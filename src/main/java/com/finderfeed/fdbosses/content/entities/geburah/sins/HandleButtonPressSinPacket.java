@@ -50,6 +50,7 @@ public class HandleButtonPressSinPacket extends FDPacket {
                 PlayerSinsHandler.sin((ServerPlayer) player, 0);
             }else{
                 sin.setCustomData(pressedTimes + 1);
+                PlayerSins.setPlayerSins(player, sins);
             }
 
         }

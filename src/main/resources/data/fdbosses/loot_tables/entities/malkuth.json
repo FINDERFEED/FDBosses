@@ -18,6 +18,17 @@
         {
           "type": "minecraft:item",
           "functions": [],
+          "name": "fdbosses:malkuth_fist"
+        }
+      ],
+      "rolls": 1.0
+    },
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "functions": [],
           "name": "fdbosses:malkuth_trophy"
         }
       ],
