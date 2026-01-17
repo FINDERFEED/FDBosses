@@ -2184,40 +2184,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             }
         }
 
-        @SubscribeEvent
-        public static void playerSetRespawnPos(PlayerSetSpawnEvent event){
 
-            if (event.getEntity() instanceof ServerPlayer serverPlayer){
-                var respawnData = GeburahRespiteBlock.getRespawnData(serverPlayer);
-                if (respawnData != null){
-                    if (respawnData.getBoolean("shouldCancelSpawnSet")){
-                        respawnData.remove("shouldCancelSpawnSet");
-
-                        if (respawnData.contains("tempRespawningDimension")){
-                            ResourceKey<Level> dimension = ResourceKey.create(Registries.DIMENSION, new ResourceLocation(respawnData.getString("tempRespawningDimension")));
-
-                            BlockPos pos = new BlockPos(
-                                    respawnData.getInt("tempRespawningPosX"),
-                                    respawnData.getInt("tempRespawningPosY"),
-                                    respawnData.getInt("tempRespawningPosZ")
-                            );
-
-                            serverPlayer.setRespawnPosition(dimension, pos, respawnData.getFloat("tempRespawningAngle"), true, false);
-
-                            respawnData.remove("tempRespawningDimension");
-                            respawnData.remove("tempRespawningPosX");
-                            respawnData.remove("tempRespawningPosY");
-                            respawnData.remove("tempRespawningPosZ");
-                            respawnData.remove("tempRespawningAngle");
-                        }
-
-                        event.setCanceled(true);
-                    }
-                }
-            }
-
-
-        }
 
         //PlayerListMixin
 //        @SubscribeEvent

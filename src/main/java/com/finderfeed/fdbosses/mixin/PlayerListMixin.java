@@ -21,14 +21,14 @@ import java.util.Optional;
 @Mixin(PlayerList.class)
 public class PlayerListMixin {
 
+
     @Shadow
     @Final
     private MinecraftServer server;
 
-    @Inject(method = "respawn", at = @At(value = "INVOKE", target = "Ljava/util/Optional;empty()Ljava/util/Optional;"))
-    public void respawn(ServerPlayer serverPlayer, boolean p_11238_, CallbackInfoReturnable<ServerPlayer> cir,
-                        @Local(ordinal = 0) LocalRef<ServerLevel> serverLevel,
-                        @Local(name = "blockpos") LocalRef<BlockPos> blockPosLocalRef){
+
+    @Inject(method = "respawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getLevelData()Lnet/minecraft/world/level/storage/LevelData;"))
+    public void respawn(ServerPlayer serverPlayer, boolean p_11238_, CallbackInfoReturnable<ServerPlayer> cir, @Local(ordinal = 1) LocalRef<ServerPlayer> serverPlayerLocalRef, @Local(ordinal = 1) LocalRef<ServerLevel> serverLevelLocalRef){
 
 
         var respawnPos = GeburahRespiteBlock.getSpecialRespawnPoint(serverPlayer);
@@ -37,73 +37,108 @@ public class PlayerListMixin {
             var respawnData = GeburahRespiteBlock.getRespawnData(serverPlayer);
             if (respawnData.getBoolean("diedToGeburah")){
 
-                serverLevel.set(this.server.getLevel(respawnPos.first));
-                blockPosLocalRef.set(respawnPos.second);
 
-            }
+                var level = this.server.getLevel(respawnPos.first);
+                Vec3 pos = respawnPos.second.getCenter();
 
-        }
-
-
-    }
-
-
-
-    @Inject(method = "respawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;findRespawnPositionAndUseSpawnBlock(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;FZZ)Ljava/util/Optional;", shift = At.Shift.AFTER))
-    public void respawn2(ServerPlayer serverPlayer, boolean p_11238_, CallbackInfoReturnable<ServerPlayer> cir,
-                        @Local(ordinal = 0) LocalRef<ServerLevel> serverLevel,
-                        @Local(name = "blockpos") LocalRef<BlockPos> blockPosLocalRef){
-
-
-        var respawnPos = GeburahRespiteBlock.getSpecialRespawnPoint(serverPlayer);
-        if (respawnPos != null){
-
-
-            var respawnData = GeburahRespiteBlock.getRespawnData(serverPlayer);
-            if (respawnData.getBoolean("diedToGeburah")){
-
-                serverLevel.set(this.server.getLevel(respawnPos.first));
-                blockPosLocalRef.set(respawnPos.second);
-
-            }
-
-        }
-
-
-    }
-
-
-    @Inject(method = "respawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/level/ServerPlayer;restoreFrom(Lnet/minecraft/server/level/ServerPlayer;Z)V"))
-    public void respawn3(ServerPlayer serverPlayer, boolean p_11238_, CallbackInfoReturnable<ServerPlayer> cir, @Local LocalRef<Optional<Vec3>> optional){
-
-
-        var respawnPos = GeburahRespiteBlock.getSpecialRespawnPoint(serverPlayer);
-        if (respawnPos != null){
-
-
-            var respawnData = GeburahRespiteBlock.getRespawnData(serverPlayer);
-            if (respawnData.getBoolean("diedToGeburah")){
-                optional.set(Optional.of(respawnPos.second.getCenter()));
-                respawnData.remove("diedToGeburah");
-
-                var respawnDimension = serverPlayer.getRespawnDimension();
-                var respawn = serverPlayer.getRespawnPosition();
-                float angle = serverPlayer.getRespawnAngle();
-
-                if (respawnDimension != null && respawnPos != null) {
-                    respawnData.putString("tempRespawningDimension", respawnDimension.location().toString());
-                    respawnData.putInt("tempRespawningPosX", respawn.getX());
-                    respawnData.putInt("tempRespawningPosY", respawn.getY());
-                    respawnData.putInt("tempRespawningPosZ", respawn.getZ());
-                    respawnData.putFloat("tempRespawningAngle", angle);
+                if (level != null) {
+                    var player = serverPlayerLocalRef.get();
+                    serverLevelLocalRef.set(level);
+                    player.setServerLevel(level);
+                    player.setPos(pos.x,pos.y,pos.z);
                 }
 
-                respawnData.putBoolean("shouldCancelSpawnSet", true);
+                respawnData.remove("diedToGeburah");
+
             }
 
         }
 
 
     }
+
+
+
+//
+//    @Inject(method = "respawn", at = @At(value = "INVOKE", target = "Ljava/util/Optional;empty()Ljava/util/Optional;"))
+//    public void respawn(ServerPlayer serverPlayer, boolean p_11238_, CallbackInfoReturnable<ServerPlayer> cir,
+//                        @Local(ordinal = 0) LocalRef<ServerLevel> serverLevel,
+//                        @Local(name = "blockpos") LocalRef<BlockPos> blockPosLocalRef){
+//
+//
+//        var respawnPos = GeburahRespiteBlock.getSpecialRespawnPoint(serverPlayer);
+//        if (respawnPos != null){
+//
+//            var respawnData = GeburahRespiteBlock.getRespawnData(serverPlayer);
+//            if (respawnData.getBoolean("diedToGeburah")){
+//
+//                serverLevel.set(this.server.getLevel(respawnPos.first));
+//                blockPosLocalRef.set(respawnPos.second);
+//
+//            }
+//
+//        }
+//
+//
+//    }
+//
+//
+//
+//    @Inject(method = "respawn", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/player/Player;findRespawnPositionAndUseSpawnBlock(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/core/BlockPos;FZZ)Ljava/util/Optional;", shift = At.Shift.AFTER))
+//    public void respawn2(ServerPlayer serverPlayer, boolean p_11238_, CallbackInfoReturnable<ServerPlayer> cir,
+//                        @Local(ordinal = 0) LocalRef<ServerLevel> serverLevel,
+//                        @Local(name = "blockpos") LocalRef<BlockPos> blockPosLocalRef){
+//
+//
+//        var respawnPos = GeburahRespiteBlock.getSpecialRespawnPoint(serverPlayer);
+//        if (respawnPos != null){
+//
+//
+//            var respawnData = GeburahRespiteBlock.getRespawnData(serverPlayer);
+//            if (respawnData.getBoolean("diedToGeburah")){
+//
+//                serverLevel.set(this.server.getLevel(respawnPos.first));
+//                blockPosLocalRef.set(respawnPos.second);
+//
+//            }
+//
+//        }
+//
+//
+//    }
+//
+//
+//    @Inject(method = "respawn", at = @At(value = "INVOKE", target = "Ljava/util/Optional;isPresent()Z", ordinal = 0))
+//    public void respawn3(ServerPlayer serverPlayer, boolean p_11238_, CallbackInfoReturnable<ServerPlayer> cir, @Local LocalRef<Optional<Vec3>> optional){
+//
+//
+//        var respawnPos = GeburahRespiteBlock.getSpecialRespawnPoint(serverPlayer);
+//        if (respawnPos != null){
+//
+//
+//            var respawnData = GeburahRespiteBlock.getRespawnData(serverPlayer);
+//            if (respawnData.getBoolean("diedToGeburah")){
+//                optional.set(Optional.of(respawnPos.second.getCenter()));
+//                respawnData.remove("diedToGeburah");
+//
+//                var respawnDimension = serverPlayer.getRespawnDimension();
+//                var respawn = serverPlayer.getRespawnPosition();
+//                float angle = serverPlayer.getRespawnAngle();
+//
+//                if (respawnDimension != null && respawn != null) {
+//                    respawnData.putString("tempRespawningDimension", respawnDimension.location().toString());
+//                    respawnData.putInt("tempRespawningPosX", respawn.getX());
+//                    respawnData.putInt("tempRespawningPosY", respawn.getY());
+//                    respawnData.putInt("tempRespawningPosZ", respawn.getZ());
+//                    respawnData.putFloat("tempRespawningAngle", angle);
+//                }
+//
+//                respawnData.putBoolean("shouldCancelSpawnSet", true);
+//            }
+//
+//        }
+//
+//
+//    }
 
 }

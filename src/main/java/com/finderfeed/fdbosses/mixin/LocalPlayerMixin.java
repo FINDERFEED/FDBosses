@@ -13,18 +13,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(LocalPlayer.class)
 public abstract class LocalPlayerMixin {
 
-    @Shadow public Input input;
+//    @Shadow public Input input;
 
 
-    @Shadow protected int sprintTriggerTime;
+//    @Shadow protected int sprintTriggerTime;
 
     @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/player/LocalPlayer;canStartSprinting()Z", shift = At.Shift.BEFORE))
     public void aiStep(CallbackInfo ci){
         Player player = (Player) (Object) this;
         if (player.getUseItem().is(BossItems.PHASE_SPHERE.get())){
-            this.input.leftImpulse /= 0.2F;
-            this.input.forwardImpulse /= 0.2F;
-            this.sprintTriggerTime = 7;
+            var input = ((LocalPlayer)player).input;
+            input.leftImpulse /= 0.2F;
+            input.forwardImpulse /= 0.2F;
         }
     }
 

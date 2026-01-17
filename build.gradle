@@ -111,7 +111,6 @@ dependencies {
     minecraft "net.neoforged:forge:${minecraft_version}-${forge_version}"
 
 
-
 //    implementation fg.deobf("curse.maven:cyanide-541676:5778405")
 
     if (file("build/jarmods").isDirectory()) {
