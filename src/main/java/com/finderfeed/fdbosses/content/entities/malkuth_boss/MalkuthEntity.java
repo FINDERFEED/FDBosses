@@ -2770,6 +2770,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public boolean onFDDespawn() {
         BossSpawnerEntity spawner = this.getSpawner();
         if (spawner != null){
+            for (var cannon : this.getPlayerCannons(false)){
+                cannon.setBrokenRequiresMaterials(false);
+                cannon.setBroken(false);
+            }
             spawner.setActive(true);
             return true;
         }
