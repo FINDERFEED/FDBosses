@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.items.chesed;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossCoreShaders;
 import com.finderfeed.fdbosses.init.BossItems;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -45,12 +46,14 @@ public class PhaseSphereOverlay implements IGuiOverlay {
 
         float progress = FDMathUtil.lerp(progressO, PhaseSphereOverlay.progress, pticks) / MAX_PROGRESS;
 
-        FDShaderRenderer.start(guiGraphics, shader)
-                .setShaderUniform("progress", FDEasings.easeOut(progress))
-                .setShaderUniform("size", width, height)
-                .setShaderUniform("time",time / 200)
-                .setResolution(width,height)
-                .end();
+        if (BossConfigs.BOSS_CONFIG_CLIENT.get().phaseSphereVisualEffect) {
+            FDShaderRenderer.start(guiGraphics, shader)
+                    .setShaderUniform("progress", FDEasings.easeOut(progress))
+                    .setShaderUniform("size", width, height)
+                    .setShaderUniform("time", time / 200)
+                    .setResolution(width, height)
+                    .end();
+        }
         RenderSystem.defaultBlendFunc();
 
     }
