@@ -79,7 +79,7 @@ public class PlayerSinsHandler {
             int sinnedTimes = playerSins.getSinnedTimes();
 
             if (sinnedTimes + amount >= BossConfigs.BOSS_CONFIG.get().geburahConfig.maxPlayerSins){
-                player.hurt(BossDamageSources.GEBURAH_SINNED_TOO_MUCH_SOURCE, Float.MAX_VALUE);
+                player.hurt(BossDamageSources.GEBURAH_SINNED_TOO_MUCH_SOURCE, BossUtil.JUST_ENOUGH_DAMAGE);
             }else {
                 playerSins.setSinnedTimes(sinnedTimes + amount);
                 playerSins.setSinGainCooldown(cooldown);

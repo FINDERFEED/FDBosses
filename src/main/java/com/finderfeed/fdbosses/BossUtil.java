@@ -50,6 +50,8 @@ import java.util.function.Predicate;
 
 public class BossUtil {
 
+    public static final int JUST_ENOUGH_DAMAGE = 9000000;
+
     public static final Random random = new Random();
 
     public static final TargetingConditions ALL = TargetingConditions.forNonCombat().selector(p->true).ignoreLineOfSight().ignoreInvisibilityTesting();

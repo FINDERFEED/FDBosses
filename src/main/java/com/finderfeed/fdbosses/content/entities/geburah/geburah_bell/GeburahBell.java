@@ -179,8 +179,10 @@ public class GeburahBell extends FDLivingEntity {
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
-        tag.putBoolean("is_red",this.getEntityData().get(IS_RED));
-        tag.putUUID("geburah", geburah);
+        tag.putBoolean("is_red", this.getEntityData().get(IS_RED));
+        if (this.geburah != null) {
+            tag.putUUID("geburah", geburah);
+        }
     }
 
     @Override
