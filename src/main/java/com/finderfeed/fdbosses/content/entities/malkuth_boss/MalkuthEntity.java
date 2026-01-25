@@ -2356,7 +2356,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 for (var entity : this.level().getEntitiesOfClass(LivingEntity.class, firstBox, entity -> !(entity instanceof MalkuthBossBuddy))){
                     entity.invulnerableTime = 0;
-                    float damage = Integer.MAX_VALUE;
+                    float damage = BossUtil.JUST_ENOUGH_DAMAGE;
                     if (entity instanceof Player player){
                         if (!MalkuthWeaknessHandler.isWeakTo(player, giantSwordUltimateStartAttackType)){
                             damage = 0.1f;
@@ -2367,7 +2367,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 for (var entity : this.level().getEntitiesOfClass(LivingEntity.class, secondBox, entity -> !(entity instanceof MalkuthBossBuddy))){
                     entity.invulnerableTime = 0;
-                    float damage = Integer.MAX_VALUE;
+                    float damage = BossUtil.JUST_ENOUGH_DAMAGE;
                     if (entity instanceof Player player){
                         if (!MalkuthWeaknessHandler.isWeakTo(player, MalkuthAttackType.getOpposite(giantSwordUltimateStartAttackType))){
                             damage = 0.1f;
@@ -2804,7 +2804,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             LivingEntity entity = event.getEntity();
 
             if (!entity.level().isClientSide && effect.equals(BossEffects.MARK_OF_A_COWARD.get())){
-                entity.hurt(BossDamageSources.MALKUTH_COWARDICE_SOURCE, Float.MAX_VALUE);
+                entity.hurt(BossDamageSources.MALKUTH_COWARDICE_SOURCE, BossUtil.JUST_ENOUGH_DAMAGE);
             }
 
 
