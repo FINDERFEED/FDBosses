@@ -76,7 +76,7 @@
   "effect_description.fdbosses.shocked": "Зменшує кінцеву шкоду на заданий відсоток.",
   "fdbosses.skills.chesed.crystals_description": "Застосовує цю здатність перед атакою блискавки.\n\nЗнищує всі кристали, а потім викликає по 1 кристалу з кожного боку поля бою.\n\nЯкщо гравець знищує кристал, цей гравець стає {{(fdbosses:effect)id=fdbosses:chesed_energized,level=1}}.",
   "fdbosses.skills.chesed.crystals": "Кристали",
-  "fdbosses.close_skill_info": "Натисніть порожнє місце, щоб закрити",
+  "fdbosses.close_skill_info": "Натисніть порожнє місце, аби закрити",
   "fdbosses.bosses.description.chesed": "Істота, народжена зі скель, роз'їдених скалком. Володіє величезною магічною силою.\n\n§cРекомендована зброя: {{(fdlib:item)item=minecraft:diamond_axe}}",
   "fdbosses.skills.chesed.mightiness": "Могутність",
   "fdbosses.skills.chesed.mightiness_description": "Чеседа неможливо поранити безпосередньо, і з його арени не можна легко втекти.\n\nУсю шкоду, завдану Чеседом, не можна зменшити жодним опором.\n\nДає всім учасникам бою {{(fdbosses:effect)id=minecraft:night_vision}}, коли вони живі.\n\nЯкщо гравець відводить погляд від Чеседа, цей гравець отримує {{(fdbosses:effect)id=fdbosses:chesed_gaze}}.\n\nЧесед переходить до другої фази, коли здоров'я падає нижче половини.",
@@ -262,13 +262,13 @@
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.justice_core.info": "Ядро Ґебура.\n\nМожна застосувати до будь-яких обладунків на верстаці.\n\nНадає гравцям коричний ефект: вхідна шкода зменшується та обмежується кількістю останньої отриманої шкоди (після всіх опорів).\n\nНе можна накопичувати.",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.justice_core.stats": "Зменшення шкоди:\n{{(fdlib:image)path=fdbosses:boss_protection}}: {{(fdbosses:config_float) config=itemConfig, value=justiceCoreDamageReduction}}% зменшення вхідного збитку.",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.polished_justicestone.info": "Багато правосудекаменю.",
-  "fdbosses.boss_drop.fdbosses.geburah.fdbosses.geburah_trophy.info": "Трофей Ґебура, щоб продемонструвати ваші героїчні вчинки",
+  "fdbosses.boss_drop.fdbosses.geburah.fdbosses.geburah_trophy.info": "Трофей Ґебура, аби продемонструвати ваші героїчні вчинки",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.divine_gear.stats": "Пошкодження:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearDamage}}.\n\nУдар інтервал:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearAttackCooldown}} тики.\n\nТривалість:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearLifetime}} тиків.\n\nЧас відновлення заряду:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearChargeReplenishTime}} тактів.\n\nРадіус атаки:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearAttackRadius}} блоків.",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.divine_gear.info": "Дозволяє розмістити вежу, яка атакуватиме §cБУДЬ-ЯКИХ§r мобів навколо неї.\n\nПріоритезує атаку на сутність, яку ви атакували останньою.\n\nЗберігає до {{(fdbosses:config_float) config=itemConfig, value=divineGearCharges}} стягнення.",
 
 
 
-  "fdbosses.word.cant_find_arena": "Не можу знайти структуру в цьому вимірі",
+  "fdbosses.word.cant_find_arena": "Не вдалося знайти структуру в цьому вимірі",
   "fdbosses.skills.geburah.sin_stay_still_sin": "Гріх тиші",
   "fdbosses.skills.geburah.sin_stay_still_sin_description": "Коли цей гріх активний, людям заборонено стояти на місці.",
   "fdbosses.word.set_special_respawn_point": "Установлено спеціальну позицію відродження",
