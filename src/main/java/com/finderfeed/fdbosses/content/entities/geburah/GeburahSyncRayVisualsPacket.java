@@ -4,8 +4,9 @@ import com.finderfeed.fdbosses.BossClientPackets;
 import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.RegisterFDPacket;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.RegistryFriendlyByteBuf;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraftforge.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 @RegisterFDPacket("fdbosses:geburah_sync_ray_visuals")
 public class GeburahSyncRayVisualsPacket extends FDPacket {
@@ -24,18 +25,19 @@ public class GeburahSyncRayVisualsPacket extends FDPacket {
     }
 
     @Override
-    public void write(RegistryFriendlyByteBuf registryFriendlyByteBuf) {
+    public void write(FriendlyByteBuf registryFriendlyByteBuf) {
         registryFriendlyByteBuf.writeBoolean(visualsActive);
         registryFriendlyByteBuf.writeInt(geburah);
     }
 
     @Override
-    public void clientAction(IPayloadContext iPayloadContext) {
+    public void clientAction(Supplier<NetworkEvent.Context> supplier) {
         BossClientPackets.geburahSyncRayVisuals(geburah, visualsActive);
     }
 
     @Override
-    public void serverAction(IPayloadContext iPayloadContext) {
+    public void serverAction(Supplier<NetworkEvent.Context> supplier) {
 
     }
+
 }
