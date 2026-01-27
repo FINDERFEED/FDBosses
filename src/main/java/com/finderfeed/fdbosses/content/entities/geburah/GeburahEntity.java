@@ -999,7 +999,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
         if (stage < maxStages) {
             if (localStage == 0) {
-                this.getStompingController().stompFullCircle(30, true, 1f, BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage);
+                this.getStompingController().stompFullCircle(30, true, 1f, BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage));
                 attackController.setCurrentAttack(new GeburahRoundAndRoundLaserAttack(this, this.sideSwitch), false);
                 this.sideSwitch = !sideSwitch;
                 inst.nextStage();
@@ -1101,7 +1101,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
                     if (controller.getCurrentAttack() == null){
                         inst.nextStage();
                         if (this.sinnedHalfTimes()) {
-                            this.getStompingController().stompFullCircle(10, true, 1f, BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage);
+                            this.getStompingController().stompFullCircle(10, true, 1f, BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage));
                         }
                     }
                 }else{
@@ -1214,7 +1214,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
             this.getRayController().shoot(frequency - 20, rayShotRadius, true, rayPositions);
 
-            stompingController.stomp(frequency - 30, true, 1f, BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage, stompInstances);
+            stompingController.stomp(frequency - 30, true, 1f, BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage), stompInstances);
         }
 
     }
@@ -1275,7 +1275,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
             this.constantRotatingLaser(md * 0.5f);
 
             if ((tick + 20) % 30 == 0){
-                this.getStompingController().stompFullCircle(10,true,1f,BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage);
+                this.getStompingController().stompFullCircle(10,true,1f,BossUtil.transformDamage(level(), BossConfigs.BOSS_CONFIG.get().geburahConfig.earthquakeDamage));
             }
 
         }else{
