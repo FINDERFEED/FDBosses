@@ -2765,6 +2765,10 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     public boolean onFDDespawn() {
         BossSpawnerEntity spawner = this.getSpawner();
         if (spawner != null){
+            for (var cannon : this.getPlayerCannons(false)){
+                cannon.setBrokenRequiresMaterials(false);
+                cannon.setBroken(false);
+            }
             if (level() instanceof ServerLevel serverLevel){
                 FDMusicAreasHandler.removeArea(serverLevel.getServer(), this.getUUID(), 40);
             }
