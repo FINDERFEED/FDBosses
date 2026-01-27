@@ -85,6 +85,12 @@ public class BossClientPackets {
 
     private static Random random = new Random();
 
+    public static void geburahSyncRayVisuals(int geburah, boolean rayState){
+        if (FDClientHelpers.getClientLevel().getEntity(geburah) instanceof GeburahEntity geburah1){
+            geburah1.setLaserVisualsState(rayState);
+        }
+    }
+
     public static void forceAttackEntity(int entityId){
         if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof LivingEntity livingEntity){
             Minecraft.getInstance().gameMode.attack(Minecraft.getInstance().player, livingEntity);

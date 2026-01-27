@@ -2023,6 +2023,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         this.getWeaponRotationController().onStartSeeingGeburah(player);
         this.getScalesController().syncToPlayer(player);
         bossBar.addPlayer(player);
+        PacketDistributor.sendToPlayer(player, new GeburahSyncRayVisualsPacket(this, this.isLaserVisualActive()));
     }
 
     @Override
