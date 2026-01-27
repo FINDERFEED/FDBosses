@@ -2774,6 +2774,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 cannon.setBrokenRequiresMaterials(false);
                 cannon.setBroken(false);
             }
+            if (level() instanceof ServerLevel serverLevel){
+                FDMusicAreasHandler.removeArea(serverLevel.getServer(), this.getUUID(), 40);
+            }
             spawner.setActive(true);
             return true;
         }
