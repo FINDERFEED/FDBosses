@@ -205,7 +205,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         malkuthSecondPhaseInitializer = new MalkuthSecondPhaseInitializer(this);
 
         this.headControllerContainer = new HeadControllerContainer<>(this)
-                .addHeadController(CLIENT_MODEL, "head");
+                .addHeadController(CLIENT_MODEL, "head", true);
         this.lookControl = this.headControllerContainer;
 
 

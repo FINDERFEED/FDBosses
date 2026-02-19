@@ -73,7 +73,7 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
         }
 
         this.lookControl = new HeadControllerContainer<>(this)
-                .addHeadController(CLIENT_MODEL, "head");
+                .addHeadController(CLIENT_MODEL, "head", true);
 
         this.attackChain = new AttackChain(this.level().random)
                 .registerAttack(SIMPLE_HIT, this::simpleAxeAttack)
