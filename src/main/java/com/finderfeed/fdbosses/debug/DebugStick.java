@@ -1,6 +1,8 @@
 package com.finderfeed.fdbosses.debug;
 
 import com.finderfeed.fdbosses.BossTargetFinder;
+import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahRayCastingCircle;
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
@@ -43,9 +45,16 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            DivineGear.summon(player, player.position());
-
         }else{
+
+            level.addParticle(ChesedRayOptions.builder()
+                            .color(1f,0f,0f,1f)
+                            .in(10)
+                            .out(10)
+                            .width(1)
+                            .end(player.getEyePosition().add(player.getLookAngle().scale(10)))
+                    .build(), player.getX(), player.getY(), player.getZ(), 0,0,0);
+
         }
 
         return super.use(level, player, hand);
