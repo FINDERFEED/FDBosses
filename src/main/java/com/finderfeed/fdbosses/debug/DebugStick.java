@@ -36,11 +36,12 @@ public class DebugStick extends Item {
                     .particleLookDirection(new Vector3f(-1,1,1))
                     .xyzRotationSpeed(0,10,0)
                     .xyzRotation(0,level.random.nextInt(0,360),0)
-                            .lightenedUp(true)
+                            .lightenedUp()
                     .lifetime(100)
-                    .frictionAffectsRotation(true)
+                    .frictionAffectsRotation()
                     .friction(0.95f)
-                    .flipSprite(true)
+                    .flipSprite()
+                    .alphaDecreasing()
                     .build(), ppos.x,ppos.y,ppos.z,1,0,0,0,0);
 
 

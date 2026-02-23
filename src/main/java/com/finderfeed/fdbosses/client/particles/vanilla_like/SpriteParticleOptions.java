@@ -81,6 +81,7 @@ public class SpriteParticleOptions implements ParticleOptions {
     public static final byte IS_LIGHTENED_UP = 0b1000000;
     public static final byte FRICTION_AFFECTS_XYZ_ROTATION = 0b0100000;
     public static final byte IS_FLIPPED = 0b0010000;
+    public static final byte ALPHA_DECREASING = 0b0001000;
     private final byte flags;
 
 
@@ -131,6 +132,10 @@ public class SpriteParticleOptions implements ParticleOptions {
 
     public boolean isFlipped(){
         return (flags & IS_FLIPPED) != 0;
+    }
+
+    public boolean isAlphaDecreasing(){
+        return (flags & ALPHA_DECREASING) != 0;
     }
 
     public float getFriction() {
@@ -214,7 +219,7 @@ public class SpriteParticleOptions implements ParticleOptions {
             return this;
         }
 
-        public Builder lightenedUp(boolean is) {
+        public Builder lightenedUp() {
             this.flags = (byte) (flags | IS_LIGHTENED_UP);
             return this;
         }
@@ -224,13 +229,18 @@ public class SpriteParticleOptions implements ParticleOptions {
             return this;
         }
 
-        public Builder frictionAffectsRotation(boolean b) {
+        public Builder frictionAffectsRotation() {
             this.flags = (byte) (flags | FRICTION_AFFECTS_XYZ_ROTATION);
             return this;
         }
 
-        public Builder flipSprite(boolean b) {
+        public Builder flipSprite() {
             this.flags = (byte) (flags | IS_FLIPPED);
+            return this;
+        }
+
+        public Builder alphaDecreasing() {
+            this.flags = (byte) (flags | ALPHA_DECREASING);
             return this;
         }
 

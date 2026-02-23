@@ -8,6 +8,7 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
@@ -101,6 +102,11 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
 
         int light = this.getLightColor(pticks);
 
+        float alpha = 1f;
+        if (this.options.isAlphaDecreasing()){
+            alpha = Mth.clamp(1 - (this.age + pticks) / this.lifetime,0, 1);
+        }
+
         if (lookingAtCamera){
             vertex.addVertex(mat, (float)- w, (float)- w, (float)0).setUv(u0,v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
             vertex.addVertex(mat, (float)+ w, (float)- w, (float)0).setUv(u1,v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
@@ -154,7 +160,7 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
 
     @Override
     public ParticleRenderType getRenderType() {
-        return ParticleRenderType.PARTICLE_SHEET_LIT;
+        return ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
     @Override
