@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.client.particles.vanilla_like;
 
+import com.finderfeed.fdbosses.content.util.BossCodecs;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.MapCodec;
@@ -13,6 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public class SpriteParticleOptions implements ParticleOptions {
 
@@ -27,38 +29,39 @@ public class SpriteParticleOptions implements ParticleOptions {
         return RecordCodecBuilder.mapCodec(instance ->
                 instance.group(
                         VEC3_CODEC.fieldOf("look_dir").forGetter(o -> o.particleLookDirection),
+                        VEC3_CODEC.fieldOf("xyz_rotation").forGetter(o -> o.XYZRotation),
                         VEC3_CODEC.fieldOf("rot_speed").forGetter(o -> o.XYZRotationSpeed),
                         Codec.INT.fieldOf("lifetime").forGetter(o -> o.lifetime),
                         Codec.FLOAT.fieldOf("size").forGetter(o -> o.size),
-                        Codec.BOOL.fieldOf("light").forGetter(o -> o.isLightenedUp),
                         Codec.FLOAT.fieldOf("friction").forGetter(o -> o.friction),
-                        Codec.BOOL.fieldOf("friction_affects_rot").forGetter(o -> o.frictionAffectsXYZRotation)
-                ).apply(instance, (look, rot, life, size, light, fric, fricRot) ->
-                        new SpriteParticleOptions(type, look, rot, life, size, light, fric, fricRot))
+                        Codec.BYTE.fieldOf("flags").forGetter(o -> o.flags)
+                ).apply(instance, (look, xyzrot, rot, life, size, fric, flags) ->
+                        new SpriteParticleOptions(type, look, xyzrot, rot, life, size, fric, flags))
         );
     }
+
 
 
     public static StreamCodec<RegistryFriendlyByteBuf, SpriteParticleOptions> streamCodec(ParticleType<?> type) {
         return StreamCodec.of(
                 (buf, o) -> {
-                    ByteBufCodecs.VECTOR3F.encode(buf, o.particleLookDirection);
+                    BossCodecs.LIGHT_VECTOR3F_DIRECTION.encode(buf, o.particleLookDirection);
+                    ByteBufCodecs.VECTOR3F.encode(buf, o.XYZRotation);
                     ByteBufCodecs.VECTOR3F.encode(buf, o.XYZRotationSpeed);
                     buf.writeInt(o.lifetime);
                     buf.writeFloat(o.size);
-                    buf.writeBoolean(o.isLightenedUp);
                     buf.writeFloat(o.friction);
-                    buf.writeBoolean(o.frictionAffectsXYZRotation);
+                    buf.writeByte(o.flags);
                 },
                 buf -> new SpriteParticleOptions(
                         type,
+                        BossCodecs.LIGHT_VECTOR3F_DIRECTION.decode(buf),
                         ByteBufCodecs.VECTOR3F.decode(buf),
                         ByteBufCodecs.VECTOR3F.decode(buf),
                         buf.readInt(),
                         buf.readFloat(),
-                        buf.readBoolean(),
                         buf.readFloat(),
-                        buf.readBoolean()
+                        buf.readByte()
                 )
         );
     }
@@ -68,32 +71,42 @@ public class SpriteParticleOptions implements ParticleOptions {
 
     private final ParticleType<?> particleType;
     private final Vector3f particleLookDirection;
+    private final Vector3f XYZRotation;
     private final Vector3f XYZRotationSpeed;
     private final int lifetime;
     private final float size;
-    private final boolean isLightenedUp;
     private final float friction;
-    private final boolean frictionAffectsXYZRotation;
+
+
+    public static final byte IS_LIGHTENED_UP = 0b1000000;
+    public static final byte FRICTION_AFFECTS_XYZ_ROTATION = 0b0100000;
+    public static final byte IS_FLIPPED = 0b0010000;
+    private final byte flags;
+
 
 
     private SpriteParticleOptions(
             ParticleType<?> type,
             Vector3f look,
             Vector3f rot,
+            Vector3f rotSpeed,
             int lifetime,
             float size,
-            boolean light,
             float friction,
-            boolean frictionRot
+            byte flags
     ) {
+        this.XYZRotation = rot;
         this.particleType = type;
         this.particleLookDirection = look;
-        this.XYZRotationSpeed = rot;
+        this.XYZRotationSpeed = rotSpeed;
         this.lifetime = lifetime;
         this.size = size;
-        this.isLightenedUp = light;
         this.friction = friction;
-        this.frictionAffectsXYZRotation = frictionRot;
+        this.flags = flags;
+    }
+
+    public Vector3f getXYZRotation() {
+        return XYZRotation;
     }
 
     public Vector3f getParticleLookDirection() {
@@ -113,7 +126,11 @@ public class SpriteParticleOptions implements ParticleOptions {
     }
 
     public boolean isLightenedUp() {
-        return isLightenedUp;
+        return (flags & IS_LIGHTENED_UP) != 0;
+    }
+
+    public boolean isFlipped(){
+        return (flags & IS_FLIPPED) != 0;
     }
 
     public float getFriction() {
@@ -121,23 +138,28 @@ public class SpriteParticleOptions implements ParticleOptions {
     }
 
     public boolean frictionAffectsXYZRotation() {
-        return frictionAffectsXYZRotation;
+        return (flags & FRICTION_AFFECTS_XYZ_ROTATION) != 0;
     }
 
-    public static Builder create(ParticleType<?> particleType){
+    public static Builder builder(ParticleType<?> particleType){
         return new Builder(particleType);
+    }
+
+    public static <T extends ParticleType<?>> Builder builder(Supplier<T> particleType){
+        return builder(particleType.get());
     }
 
     public static class Builder {
 
         private final ParticleType<?> type;
         private Vector3f look = new Vector3f();
+        private Vector3f xyzRotationSpeed = new Vector3f();
         private Vector3f xyzRotation = new Vector3f();
         private int lifetime = 10;
         private float size = 0.5f;
-        private boolean light = false;
         private float friction = 1f;
-        private boolean frictionAffectsRotation = true;
+
+        private byte flags = 0;
 
         public Builder(ParticleType<?> type) {
             this.type = type;
@@ -157,7 +179,7 @@ public class SpriteParticleOptions implements ParticleOptions {
         }
 
         public Builder xyzRotationSpeed(Vector3f v) {
-            this.xyzRotation = v;
+            this.xyzRotationSpeed = v;
             return this;
         }
 
@@ -167,6 +189,19 @@ public class SpriteParticleOptions implements ParticleOptions {
 
         public Builder xyzRotationSpeed(Vec3 rotation) {
             return this.xyzRotationSpeed(rotation.toVector3f());
+        }
+
+        public Builder xyzRotation(Vector3f v) {
+            this.xyzRotation = v;
+            return this;
+        }
+
+        public Builder xyzRotation(float xd, float yd, float zd) {
+            return this.xyzRotation(new Vector3f(xd, yd, zd));
+        }
+
+        public Builder xyzRotation(Vec3 rotation) {
+            return this.xyzRotation(rotation.toVector3f());
         }
 
         public Builder lifetime(int t) {
@@ -180,7 +215,7 @@ public class SpriteParticleOptions implements ParticleOptions {
         }
 
         public Builder lightenedUp(boolean is) {
-            this.light = is;
+            this.flags = (byte) (flags | IS_LIGHTENED_UP);
             return this;
         }
 
@@ -190,12 +225,17 @@ public class SpriteParticleOptions implements ParticleOptions {
         }
 
         public Builder frictionAffectsRotation(boolean b) {
-            this.frictionAffectsRotation = b;
+            this.flags = (byte) (flags | FRICTION_AFFECTS_XYZ_ROTATION);
+            return this;
+        }
+
+        public Builder flipSprite(boolean b) {
+            this.flags = (byte) (flags | IS_FLIPPED);
             return this;
         }
 
         public SpriteParticleOptions build() {
-            return new SpriteParticleOptions(type, look, xyzRotation, lifetime, size, light, friction, frictionAffectsRotation);
+            return new SpriteParticleOptions(type, look, xyzRotation, xyzRotationSpeed, lifetime, size, friction, flags);
         }
     }
 

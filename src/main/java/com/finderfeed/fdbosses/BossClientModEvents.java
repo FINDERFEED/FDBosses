@@ -18,6 +18,7 @@ import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticle;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticle;
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticle;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticle;
+import com.finderfeed.fdbosses.client.particles.vanilla_like.AnimatedSpriteParticle;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedRenderer;
@@ -449,6 +450,8 @@ public class BossClientModEvents {
         event.registerSpecial(BossParticles.JUDGEMENT_BALL_EXPLOSION.get(), new JudgementBallExplosionParticle.Factory());
         event.registerSpecial(BossParticles.GEBURAH_RAY_DECAL.get(), new GeburahRayStrikeDecalParticle.Factory());
         event.registerSpecial(BossParticles.COLORED_JUMPING_PARTICLE.get(), new ColoredJumpingParticle.Factory());
+        event.registerSpriteSet(BossParticles.GEAR.get(), AnimatedSpriteParticle.Factory::new);
+        event.registerSpriteSet(BossParticles.SMALL_GEAR.get(), AnimatedSpriteParticle.Factory::new);
     }
 
     @SubscribeEvent

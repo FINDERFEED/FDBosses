@@ -1,28 +1,11 @@
 package com.finderfeed.fdbosses.debug;
 
-import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.client.BossParticles;
-import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
-import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
-import com.finderfeed.fdbosses.content.entities.geburah.casts.GeburahRayCastingCircle;
-import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
-import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffectHandler;
-import com.finderfeed.fdbosses.content.entities.geburah.geburah_bell.GeburahBell;
-import com.finderfeed.fdbosses.content.entities.geburah.judgement_bird.JudgementBirdEntity;
-import com.finderfeed.fdbosses.content.entities.geburah.sins.GeburahTriggerSinEffectPacket;
-import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
-import com.finderfeed.fdbosses.content.items.geburah.DivineGear;
-import com.finderfeed.fdbosses.init.BossSounds;
-import com.finderfeed.fdlib.systems.music.data.FDMusicData;
-import com.finderfeed.fdlib.systems.music.data.FDMusicPartData;
-import com.finderfeed.fdlib.systems.music.music_areas.FDMusicArea;
-import com.finderfeed.fdlib.systems.music.music_areas.FDMusicAreasHandler;
-import com.finderfeed.fdlib.systems.music.music_areas.shapes.FDMusicAreaCylinder;
+import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -30,9 +13,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.network.PacketDistributor;
+import org.joml.Vector3f;
 
 public class DebugStick extends Item {
 
@@ -45,15 +27,32 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-        }else{
 
-            level.addParticle(ChesedRayOptions.builder()
-                            .color(1f,0f,0f,1f)
-                            .in(10)
-                            .out(10)
-                            .width(1)
-                            .end(player.getEyePosition().add(player.getLookAngle().scale(10)))
-                    .build(), player.getX(), player.getY(), player.getZ(), 0,0,0);
+            ServerLevel serverLevel = (ServerLevel) level;
+
+            Vec3 ppos = player.position().add(0, 1.5, 0).add(player.getLookAngle());
+
+            serverLevel.sendParticles(SpriteParticleOptions.builder(BossParticles.GEAR)
+                    .particleLookDirection(new Vector3f(-1,1,1))
+                    .xyzRotationSpeed(0,10,0)
+                    .xyzRotation(0,level.random.nextInt(0,360),0)
+                            .lightenedUp(true)
+                    .lifetime(100)
+                    .frictionAffectsRotation(true)
+                    .friction(0.95f)
+                    .flipSprite(true)
+                    .build(), ppos.x,ppos.y,ppos.z,1,0,0,0,0);
+
+
+        }else{
+//
+//            level.addParticle(ChesedRayOptions.builder()
+//                            .color(1f,0f,0f,1f)
+//                            .in(10)
+//                            .out(10)
+//                            .width(1)
+//                            .end(player.getEyePosition().add(player.getLookAngle().scale(10)))
+//                    .build(), player.getX(), player.getY(), player.getZ(), 0,0,0);
 
         }
 

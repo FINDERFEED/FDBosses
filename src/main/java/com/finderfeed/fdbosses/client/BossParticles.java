@@ -17,6 +17,7 @@ import com.finderfeed.fdbosses.FDBosses;
 
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
+import com.finderfeed.fdbosses.client.particles.vanilla_like.ASParticleType;
 import com.finderfeed.fdbosses.content.entities.geburah.judgement_ball_projectile.JudgementBallExplosionParticleOptions;
 import com.finderfeed.fdbosses.content.entities.geburah.particles.geburah_ray.GeburahRayOptions;
 import com.mojang.serialization.MapCodec;
@@ -188,5 +189,8 @@ public class BossParticles {
             return ColoredJumpingParticleOptions.STREAM_CODEC;
         }
     });
+
+    public static final Supplier<ASParticleType> SMALL_GEAR = PARTICLES.register("small_gear", ()-> new ASParticleType(true));
+    public static final Supplier<ASParticleType> GEAR = PARTICLES.register("gear", ()-> new ASParticleType(true));
 
 }
