@@ -134,9 +134,32 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         }else if (stage == 3){
             this.setSpawnGhosts(true);
             if (this.dashingStage(target, tick, 5, 2, 0.5f)){
+                Vec3 fwd = this.getLookAngle().multiply(1,0,1).normalize();
+                Vec3 left = fwd.yRot(FDMathUtil.FPI / 2);
+                Vec3 slashPos = this.position().add(fwd.scale(0.5f)).add(0,1.1,0).add(left.scale(-0.25));
+                Vec3 circlePos1 = this.position().add(fwd.scale(0.25f)).add(0,1.1,0).add(left.scale(-0.25));
+                SpriteParticleOptions options = SpriteParticleOptions.builder(BossParticles.NETZACH_POKE)
+                        .size(2f)
+                        .lifetime(4)
+                        .lightenedUp()
+                        .particleLookDirection(fwd)
+                        .verticalRendering()
+                        .build();
+                SpriteParticleOptions options3 = SpriteParticleOptions.builder(BossParticles.NETZACH_POKE_CIRCLE)
+                        .size(1.5f)
+                        .lifetime(3)
+                        .lightenedUp()
+                        .particleLookDirection(fwd)
+                        .build();
+                ((ServerLevel)level()).sendParticles(options, slashPos.x, slashPos.y, slashPos.z, 1, 0,0,0,0);
+                ((ServerLevel)level()).sendParticles(options3, circlePos1.x, circlePos1.y, circlePos1.z, 1, 0,0,0,0);
                 attackInstance.nextStage();
             }
+
+
         }else if (stage == 4){
+
+
 
             if (tick > 3){
                 Vec3 between = target.position().subtract(this.position());

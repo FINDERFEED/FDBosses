@@ -459,6 +459,8 @@ public class BossClientModEvents {
         event.registerSpriteSet(BossParticles.NETZACH_SLASH.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.YELLOW_SPARK.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.NETZACH_CRUSH.get(), AnimatedSpriteParticle.Factory::new);
+        event.registerSpriteSet(BossParticles.NETZACH_POKE_CIRCLE.get(), AnimatedSpriteParticle.Factory::new);
+        event.registerSpriteSet(BossParticles.NETZACH_POKE.get(), AnimatedSpriteParticle.Factory::new);
     }
 
     @SubscribeEvent
