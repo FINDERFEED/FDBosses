@@ -9,6 +9,7 @@ import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAtta
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedRayOptions;
 import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticleOptions;
+import com.finderfeed.fdbosses.client.particles.entity_ghost.EntityGhostParticleOptions;
 import com.finderfeed.fdbosses.client.particles.malkuth_slash.MalkuthHorizontalSlashOptions;
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
@@ -187,6 +188,18 @@ public class BossParticles {
         @Override
         public StreamCodec<? super RegistryFriendlyByteBuf, ColoredJumpingParticleOptions> streamCodec() {
             return ColoredJumpingParticleOptions.STREAM_CODEC;
+        }
+    });
+
+    public static final Supplier<ParticleType<EntityGhostParticleOptions>> ENTITY_GHOST = PARTICLES.register("entity_ghost", () -> new ParticleType<EntityGhostParticleOptions>(true) {
+        @Override
+        public MapCodec<EntityGhostParticleOptions> codec() {
+            return EntityGhostParticleOptions.CODEC;
+        }
+
+        @Override
+        public StreamCodec<? super RegistryFriendlyByteBuf, EntityGhostParticleOptions> streamCodec() {
+            return EntityGhostParticleOptions.STREAM_CODEC;
         }
     });
 

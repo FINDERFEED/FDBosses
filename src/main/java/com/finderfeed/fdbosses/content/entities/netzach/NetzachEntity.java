@@ -1,5 +1,8 @@
 package com.finderfeed.fdbosses.content.entities.netzach;
 
+import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdbosses.client.particles.entity_ghost.EntityGhostParticleOptions;
+import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.init.BossAnims;
@@ -16,6 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -27,6 +31,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable, AutoSerializable {
 
+    public static final EntityDataAccessor<Boolean> SPAWN_GHOSTS = SynchedEntityData.defineId(NetzachEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Float> GRAVITY = SynchedEntityData.defineId(NetzachEntity.class, EntityDataSerializers.FLOAT);
 
     public static final String MAIN_LAYER = "main";
@@ -54,6 +59,23 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         if (!level().isClientSide){
             this.setTarget(this.level().getNearestPlayer(this.getX(),this.getY(),this.getZ(), 120, null));
             this.attackChain.tick();
+        }else{
+
+            this.handleGhostSpawning();
+        }
+    }
+
+    private void handleGhostSpawning(){
+        if (!this.isSpawningGhosts()) return;
+
+        Vec3 oldPos = new Vec3(xo, yo, zo);
+        Vec3 currentPos = this.position();
+        Vec3 b = oldPos.subtract(currentPos);
+        Vec3 nb = b.normalize();
+        float len = (float) b.length();
+        for (float i = 0; i < len; i+=2){
+            Vec3 ppos = currentPos.add(nb.scale(i));
+            level().addParticle(new EntityGhostParticleOptions(this, 3), true, ppos.x, ppos.y, ppos.z,0,0,0);
         }
     }
 
@@ -86,15 +108,31 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                     .build());
             attackInstance.nextStage();
         }else if (stage == 1){
+            this.setSpawnGhosts(true);
             if (this.dashingStage(target, tick, 10, 2, 0.25f)){
                 attackInstance.nextStage();
             }
         }else if (stage == 2){
-            this.setDeltaMovement(Vec3.ZERO);
-            if (tick > 14){
+            if (tick == 5){
+                Vec3 fwd = this.getLookAngle().multiply(1,0,1).normalize();
+                Vec3 slashPos = this.position().add(fwd.scale(-0.4)).add(0,1.25,0);
+                SpriteParticleOptions options = SpriteParticleOptions.builder(BossParticles.NETZACH_SLASH)
+                        .size(3.5f)
+                        .lifetime(4)
+                        .xyzRotation(15,0,0)
+                        .lightenedUp()
+                        .particleLookDirection(fwd)
+                        .verticalRendering()
+                        .build();
+                ((ServerLevel)level()).sendParticles(options, slashPos.x, slashPos.y, slashPos.z, 1, 0,0,0,0);
+
+            }else if (tick > 14){
                 attackInstance.nextStage();
+            }else if (tick >= 3){
+                this.setSpawnGhosts(false);
             }
         }else if (stage == 3){
+            this.setSpawnGhosts(true);
             if (this.dashingStage(target, tick, 5, 2, 0.5f)){
                 attackInstance.nextStage();
             }
@@ -107,6 +145,8 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                 Vec3 pushVector = horizontal.add(0,len / 1.5f,0).normalize();
                 this.setDeltaMovement(pushVector.scale(1.5));
                 attackInstance.nextStage();
+            }else if (tick > 1){
+                this.setSpawnGhosts(false);
             }
             
         }else if (stage == 5){
@@ -186,10 +226,19 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         this.entityData.set(GRAVITY, gravity);
     }
 
+    public void setSpawnGhosts(boolean state){
+        this.entityData.set(SPAWN_GHOSTS, state);
+    }
+
+    public boolean isSpawningGhosts(){
+        return this.entityData.get(SPAWN_GHOSTS);
+    }
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(GRAVITY, (float) Mob.DEFAULT_BASE_GRAVITY);
+        builder.define(SPAWN_GHOSTS, false);
     }
 
     @Override

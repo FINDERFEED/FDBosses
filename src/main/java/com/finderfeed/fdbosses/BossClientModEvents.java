@@ -12,6 +12,7 @@ import com.finderfeed.fdbosses.client.particles.arc_lightning.ArcLightningPartic
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticle;
 import com.finderfeed.fdbosses.client.particles.chesed_attack_ray.ChesedAttackRayParticle;
 import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticle;
+import com.finderfeed.fdbosses.client.particles.entity_ghost.EntityGhostParticle;
 import com.finderfeed.fdbosses.client.particles.malkuth_slash.MalkuthHorizontalSlashParticle;
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticle;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticle;
@@ -452,6 +453,7 @@ public class BossClientModEvents {
         event.registerSpecial(BossParticles.JUDGEMENT_BALL_EXPLOSION.get(), new JudgementBallExplosionParticle.Factory());
         event.registerSpecial(BossParticles.GEBURAH_RAY_DECAL.get(), new GeburahRayStrikeDecalParticle.Factory());
         event.registerSpecial(BossParticles.COLORED_JUMPING_PARTICLE.get(), new ColoredJumpingParticle.Factory());
+        event.registerSpecial(BossParticles.ENTITY_GHOST.get(), new EntityGhostParticle.Factory());
         event.registerSpriteSet(BossParticles.GEAR.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.SMALL_GEAR.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.NETZACH_SLASH.get(), AnimatedSpriteParticle.Factory::new);
