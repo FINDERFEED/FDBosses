@@ -62,6 +62,7 @@ public class BossModels {
 
 
     //Netzach
+    public static final Supplier<FDModelInfo> NETZACH = INFOS.register("netzach",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"),1.0f));
     public static final Supplier<FDModelInfo> GEAR_ATTACK = INFOS.register("gear_attack",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"gear_attack"),1.0f));
 
 

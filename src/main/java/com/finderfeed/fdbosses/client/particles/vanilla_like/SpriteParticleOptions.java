@@ -83,6 +83,7 @@ public class SpriteParticleOptions implements ParticleOptions {
     public static final byte IS_FLIPPED = 0b0010000;
     public static final byte ALPHA_DECREASING = 0b0001000;
     public static final byte VERTICAL_RENDERING = 0b0000100;
+    public static final byte QUAD_SIZE_DECREASING = 0b0000010;
     private final byte flags;
 
 
@@ -142,6 +143,10 @@ public class SpriteParticleOptions implements ParticleOptions {
 
     public boolean isRenderedVertically(){
         return (flags & VERTICAL_RENDERING) != 0;
+    }
+
+    public boolean quadSizeDecreasing(){
+        return (flags & QUAD_SIZE_DECREASING) != 0;
     }
 
     public float getFriction() {
@@ -253,6 +258,11 @@ public class SpriteParticleOptions implements ParticleOptions {
 
         public Builder alphaDecreasing() {
             this.flags = (byte) (flags | ALPHA_DECREASING);
+            return this;
+        }
+
+        public Builder quadSizeDecreasing() {
+            this.flags = (byte) (flags | QUAD_SIZE_DECREASING);
             return this;
         }
 

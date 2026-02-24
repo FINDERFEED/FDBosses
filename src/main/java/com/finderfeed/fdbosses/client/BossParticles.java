@@ -194,5 +194,6 @@ public class BossParticles {
     public static final Supplier<ASParticleType> GEAR = PARTICLES.register("gear", ()-> new ASParticleType(true));
     public static final Supplier<ASParticleType> NETZACH_SLASH = PARTICLES.register("netzach_slash", ()-> new ASParticleType(true));
     public static final Supplier<ASParticleType> YELLOW_SPARK = PARTICLES.register("yellow_spark", ()-> new ASParticleType(true));
+    public static final Supplier<ASParticleType> NETZACH_CRUSH = PARTICLES.register("netzach_crush", ()-> new ASParticleType(true));
 
 }

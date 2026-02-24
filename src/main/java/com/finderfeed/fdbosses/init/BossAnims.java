@@ -296,4 +296,24 @@ public class BossAnims {
     });
 
 
+    //NETZACH
+
+    public static DeferredHolder<Animation,Animation> NETZACH_IDLE = ANIMATIONS.register("netzach_idle", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
+    });
+
+    public static DeferredHolder<Animation,Animation> NETZACH_ATTACK_SERIES_1 = ANIMATIONS.register("netzach_attack_series_1", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
+    });
+
+    public static DeferredHolder<Animation,Animation> NETZACH_FALL = ANIMATIONS.register("netzach_fall", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
+    });
+
+    public static DeferredHolder<Animation,Animation> NETZACH_FALL_END = ANIMATIONS.register("netzach_fall_end", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
+    });
+
+
+
 }

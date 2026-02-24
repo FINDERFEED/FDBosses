@@ -53,6 +53,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crys
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashProjectile;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.NetzachEntity;
 import com.finderfeed.fdbosses.content.items.geburah.DivineGear;
 import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistChain;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
@@ -422,6 +423,13 @@ public class BossEntities {
             .sized(0.25f,0.25f)
             .build("netzach_aerial_gear"));
 
+    public static final Supplier<EntityType<NetzachEntity>> NETZACH = ENTITIES.register("netzach",()->EntityType.Builder.of(
+                    NetzachEntity::new, MobCategory.MISC
+            )
+            .updateInterval(1)
+            .sized(0.6F, 1.95F)
+            .build("netzach"));
+
     //ITEMS
     public static final Supplier<EntityType<MalkuthFistChain>> MALKUTH_FIST_CHAIN = ENTITIES.register("malkuth_fist_chain",()->EntityType.Builder.of(
                     MalkuthFistChain::new, MobCategory.MISC
@@ -437,8 +445,13 @@ public class BossEntities {
 
 
 
+
+
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event){
+
+        event.put(NETZACH.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,20).build());
+
 
         event.put(GEBURAH_BELL.get(), LivingEntity.createLivingAttributes()
                         .add(Attributes.MAX_HEALTH, 2)

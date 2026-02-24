@@ -72,6 +72,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crys
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.NetzachEntity;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereOverlay;
 import com.finderfeed.fdbosses.content.items.geburah.DivineGear;
@@ -455,6 +456,7 @@ public class BossClientModEvents {
         event.registerSpriteSet(BossParticles.SMALL_GEAR.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.NETZACH_SLASH.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.YELLOW_SPARK.get(), AnimatedSpriteParticle.Factory::new);
+        event.registerSpriteSet(BossParticles.NETZACH_CRUSH.get(), AnimatedSpriteParticle.Factory::new);
     }
 
     @SubscribeEvent
@@ -466,6 +468,13 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_CHAIN_TRAP.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD.get(), GeburahCastingCircleRenderer::new);
+
+        event.registerEntityRenderer(BossEntities.NETZACH.get(), FDEntityRendererBuilder.<NetzachEntity>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<NetzachEntity>builder()
+                                .model(BossModels.NETZACH)
+                                .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/netzach.png")))
+                                .build())
+                .build());
 
         event.registerEntityRenderer(BossEntities.NETZACH_AERIAL_GEAR.get(), FDEntityRendererBuilder.<NetzachAerialGearAttack>builder()
                         .addLayer(FDEntityRenderLayerOptions.<NetzachAerialGearAttack>builder()
@@ -495,6 +504,7 @@ public class BossClientModEvents {
                                     matrices.mulPose(Axis.ZP.rotationDegrees(time * 60));
 
 
+                                    matrices.scale(1.25f,1.25f,1.25f);
                                 }))
                                 .color(((netzachAerialGearAttack, v) -> {
                                     float p = 1;

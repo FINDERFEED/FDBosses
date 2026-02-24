@@ -35,6 +35,9 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
     private float yrd;
     private float zrd;
 
+    private float quadSizeO;
+    private float quadSizeMax;
+
     public AnimatedSpriteParticle(SpriteParticleOptions options, SpriteSet spriteSet, ClientLevel clientLevel, double x, double y, double z, double xd, double yd, double zd) {
         super(clientLevel, x, y, z, xd, yd, zd);
         this.particleLookDirection = options.getParticleLookDirection();
@@ -42,6 +45,8 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
         this.spriteSet = spriteSet;
         this.lifetime = options.getLifetime();
         this.quadSize = options.getSize();
+        this.quadSizeO = options.getSize();
+        this.quadSizeMax = options.getSize();
         this.setSpriteFromAge(spriteSet);
         this.xrd = options.getXYZRotationSpeed().x;
         this.yrd = options.getXYZRotationSpeed().y;
@@ -98,7 +103,9 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
 
         Matrix4f mat = matrices.last().pose();
 
-        float w = quadSize / 2;
+
+
+        float w = this.getQuadSize(pticks)/ 2;
 
         int light = this.getLightColor(pticks);
 
@@ -147,6 +154,11 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
     }
 
     @Override
+    public float getQuadSize(float pticks) {
+        return FDMathUtil.lerp(quadSizeO, quadSize, pticks);
+    }
+
+    @Override
     public void tick() {
         this.setSpriteFromAge(spriteSet);
 
@@ -164,6 +176,10 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
             zrd = zrd * options.getFriction();
         }
 
+        if (this.options.quadSizeDecreasing()) {
+            quadSizeO = quadSize;
+            quadSize = quadSizeMax * Mth.clamp(1 - age / (float) lifetime, 0, 1);
+        }
 
         super.tick();
 

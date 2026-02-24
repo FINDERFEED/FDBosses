@@ -134,7 +134,7 @@ public class NetzachAerialGearAttack extends BossSimpleProjectile {
         this.teleportTo(location.x, location.y, location.z);
         this.setReachedDestination(true);
         Vec3 fwd = this.getLastKnownDeltaMovement().multiply(1,0,1).normalize();
-        BossUtil.netzachGearSlam((ServerLevel) level(), location.add(0,0.1,0).subtract(fwd.scale(0.5f)), 60, fwd);
+        BossUtil.netzachGearSlam((ServerLevel) level(), location.add(0,0.01,0).subtract(fwd.scale(0.5f)), 60, fwd);
         PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                 .frequency(5f)
                 .amplitude(2.5f)
@@ -142,7 +142,9 @@ public class NetzachAerialGearAttack extends BossSimpleProjectile {
                 .stayTime(0)
                 .outTime(6)
                 .build(),this.position(),20);
+
     }
+
 
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> accessor) {

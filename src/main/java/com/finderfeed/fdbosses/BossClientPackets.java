@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
+import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
@@ -58,6 +59,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -840,12 +842,23 @@ public class BossClientPackets {
 
     public static void netzachGearSlam(Vec3 pos, int data){
 
+
+
         //1f,0.8f,0.2f
         Level level = FDClientHelpers.getClientLevel();
-        Vec3 direction = FDUtil.decodeDirection(data).reverse();
+        Vec3 direction = FDUtil.decodeDirection(data);
         Matrix4f mat = new Matrix4f();
         FDRenderUtil.applyMovementMatrixRotations(mat, direction);
 
+
+        BallParticleOptions flash = BallParticleOptions.builder()
+                .color(1f,0.8f,0.2f)
+                .scalingOptions(1,0,2)
+                .brightness(4)
+                .size(5f)
+                .build();
+
+        level.addParticle(flash,true,pos.x,pos.y,pos.z,0,0,0);
 
         //JUMPING PARTICLES
         for (var dir : new HorizontalCircleRandomDirections(level.random, 20, 1f)){
@@ -861,17 +874,72 @@ public class BossClientPackets {
                     .size(0.02f)
                     .build();
 
-            float horizontalSpeed = random.nextFloat() * 0.3f + 0.05f;
+            float horizontalSpeed = random.nextFloat() * 0.5f + 0.05f;
 
             float verticalSpeed = random.nextFloat() * 0.3f + 0.2f;
 
-            dir = dir.subtract(direction.scale(0.5));
+            dir = dir.subtract(direction.scale(-0.5));
 
             Vec3 ppos = pos.add(
                     dir.scale(0.5f)
             );
 
             level.addParticle(options,ppos.x,ppos.y,ppos.z,dir.x * horizontalSpeed, verticalSpeed,dir.z * horizontalSpeed);
+        }
+
+
+        float particlesFan = FDMathUtil.FPI / 4;
+        for (int i = 0; i < 40; i++){
+            Vec3 randomDir = direction.yRot(-particlesFan  + particlesFan * 2 * random.nextFloat());
+            Vec3 ppos = pos.add(randomDir).add(randomDir.scale(random.nextFloat() * 2f));
+
+            Vec3 m = randomDir.add(0, 0.75f + random.nextFloat(), 0)
+                    .normalize()
+                    .scale(random.nextFloat() + 0.05f);
+            level.addParticle(SpriteParticleOptions.builder(BossParticles.YELLOW_SPARK)
+                            .friction(0.7f)
+                            .lightenedUp()
+                            .lifetime(random.nextInt(10,15))
+                            .quadSizeDecreasing()
+                            .frictionAffectsRotation()
+                            .xyzRotationSpeed(random.nextInt(0,360),0,0)
+                            .xyzRotationSpeed(BossUtil.randomPlusMinus() * 20,0,0)
+                            .size(random.nextFloat() * 0.2f + 0.1f)
+                    .build(), ppos.x, ppos.y, ppos.z, m.x,m.y,m.z);
+        }
+
+
+        Vec3 fwd = direction.multiply(1,0,1).normalize();
+
+        int[] rotations = {
+                30,
+                -30,
+                30,
+                -30
+        };
+
+        Vec3[] directions = {
+                fwd.yRot(FDMathUtil.FPI / 4),
+                fwd.yRot(-FDMathUtil.FPI / 4),
+                fwd.yRot(FDMathUtil.FPI / 10),
+                fwd.yRot(-FDMathUtil.FPI / 10)
+        };
+
+        int id = 0;
+        for (var dir : directions){
+            Vec3 p = pos.add(dir.scale(3));
+            Vec3 nrm = new Vec3(0,1,0).cross(dir);
+
+            SpriteParticleOptions options = SpriteParticleOptions.builder(BossParticles.NETZACH_CRUSH)
+                    .size(5f)
+                    .xyzRotation(0,0,rotations[id])
+                    .lifetime(10)
+                    .particleLookDirection(nrm)
+                    .lightenedUp()
+                    .build();
+
+            level.addParticle(options, true, p.x, p.y, p.z, 0,0,0);
+            id++;
         }
 
 
