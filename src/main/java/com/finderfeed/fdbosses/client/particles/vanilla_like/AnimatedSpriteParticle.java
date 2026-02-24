@@ -118,16 +118,28 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
             vertex.addVertex(mat, (float)+ w, (float)- w, (float)0).setUv(u1,v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
             vertex.addVertex(mat, (float)- w, (float)- w, (float)0).setUv(u0,v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
 
-        }else{
-            vertex.addVertex(mat, (float)- w, (float)0, (float) - w).setUv(u0,v0).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
-            vertex.addVertex(mat, (float)+ w, (float)0, (float) - w).setUv(u1,v0).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
-            vertex.addVertex(mat, (float)+ w, (float)0, (float) + w).setUv(u1,v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
-            vertex.addVertex(mat, (float)- w, (float)0, (float) + w).setUv(u0,v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+        }else {
+            if (!this.options.isRenderedVertically()) {
+                vertex.addVertex(mat, (float) -w, (float) 0, (float) -w).setUv(u0, v0).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+                vertex.addVertex(mat, (float) +w, (float) 0, (float) -w).setUv(u1, v0).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+                vertex.addVertex(mat, (float) +w, (float) 0, (float) +w).setUv(u1, v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+                vertex.addVertex(mat, (float) -w, (float) 0, (float) +w).setUv(u0, v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
 
-            vertex.addVertex(mat, (float)- w, (float)0, (float)+ w).setUv(u0,v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
-            vertex.addVertex(mat, (float)+ w, (float)0, (float)+ w).setUv(u1,v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
-            vertex.addVertex(mat, (float)+ w, (float)0, (float)- w).setUv(u1,v0).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
-            vertex.addVertex(mat, (float)- w, (float)0, (float)- w).setUv(u0,v0).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+                vertex.addVertex(mat, (float) -w, (float) 0, (float) +w).setUv(u0, v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+                vertex.addVertex(mat, (float) +w, (float) 0, (float) +w).setUv(u1, v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+                vertex.addVertex(mat, (float) +w, (float) 0, (float) -w).setUv(u1, v0).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+                vertex.addVertex(mat, (float) -w, (float) 0, (float) -w).setUv(u0, v0).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+            }else{
+                vertex.addVertex(mat, (float) -w, (float) -w, (float) 0).setUv(u0, v0).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+                vertex.addVertex(mat, (float) +w, (float) -w, (float) 0).setUv(u1, v0).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+                vertex.addVertex(mat, (float) +w, (float) +w, (float) 0).setUv(u1, v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+                vertex.addVertex(mat, (float) -w, (float) +w, (float) 0).setUv(u0, v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+
+                vertex.addVertex(mat, (float) -w, (float) +w, (float) 0).setUv(u0, v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+                vertex.addVertex(mat, (float) +w, (float) +w, (float) 0).setUv(u1, v1).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+                vertex.addVertex(mat, (float) +w, (float) -w, (float) 0).setUv(u1, v0).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+                vertex.addVertex(mat, (float) -w, (float) -w, (float) 0).setUv(u0, v0).setColor(this.rCol, gCol, bCol, alpha).setLight(light);
+            }
         }
 
 

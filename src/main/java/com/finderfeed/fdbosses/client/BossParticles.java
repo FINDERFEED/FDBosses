@@ -192,5 +192,7 @@ public class BossParticles {
 
     public static final Supplier<ASParticleType> SMALL_GEAR = PARTICLES.register("small_gear", ()-> new ASParticleType(true));
     public static final Supplier<ASParticleType> GEAR = PARTICLES.register("gear", ()-> new ASParticleType(true));
+    public static final Supplier<ASParticleType> NETZACH_SLASH = PARTICLES.register("netzach_slash", ()-> new ASParticleType(true));
+    public static final Supplier<ASParticleType> YELLOW_SPARK = PARTICLES.register("yellow_spark", ()-> new ASParticleType(true));
 
 }

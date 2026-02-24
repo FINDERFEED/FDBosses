@@ -417,6 +417,9 @@ public class BossClientPackets {
             case BossUtil.DIVINE_GEAR_RAY_PARTICLES -> {
                 divineGearRayParticles(pos,data);
             }
+            case BossUtil.NETZACH_GEAR_SLAM -> {
+                netzachGearSlam(pos, data);
+            }
         }
     }
 
@@ -835,6 +838,44 @@ public class BossClientPackets {
         }
     }
 
+    public static void netzachGearSlam(Vec3 pos, int data){
+
+        //1f,0.8f,0.2f
+        Level level = FDClientHelpers.getClientLevel();
+        Vec3 direction = FDUtil.decodeDirection(data).reverse();
+        Matrix4f mat = new Matrix4f();
+        FDRenderUtil.applyMovementMatrixRotations(mat, direction);
+
+
+        //JUMPING PARTICLES
+        for (var dir : new HorizontalCircleRandomDirections(level.random, 20, 1f)){
+
+            ColoredJumpingParticleOptions options = new ColoredJumpingParticleOptions.Builder()
+                    .colorStart(new FDColor(1f, 1f, 1f, 1f))
+                    .colorEnd(new FDColor(1f, 0.8f, 0.3f, 1f))
+                    .maxPointsInTrail(2)
+                    .reflectionStrength(0.33f)
+                    .gravity(1.5f)
+                    .lifetime(-1)
+                    .maxJumpAmount(0)
+                    .size(0.02f)
+                    .build();
+
+            float horizontalSpeed = random.nextFloat() * 0.3f + 0.05f;
+
+            float verticalSpeed = random.nextFloat() * 0.3f + 0.2f;
+
+            dir = dir.subtract(direction.scale(0.5));
+
+            Vec3 ppos = pos.add(
+                    dir.scale(0.5f)
+            );
+
+            level.addParticle(options,ppos.x,ppos.y,ppos.z,dir.x * horizontalSpeed, verticalSpeed,dir.z * horizontalSpeed);
+        }
+
+
+    }
     public static void geburahRayParticles(Vec3 pos, int data){
 
 

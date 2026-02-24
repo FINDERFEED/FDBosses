@@ -71,6 +71,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crys
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crystal.MalkuthRepairEntityRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
+import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereOverlay;
 import com.finderfeed.fdbosses.content.items.geburah.DivineGear;
@@ -452,6 +453,8 @@ public class BossClientModEvents {
         event.registerSpecial(BossParticles.COLORED_JUMPING_PARTICLE.get(), new ColoredJumpingParticle.Factory());
         event.registerSpriteSet(BossParticles.GEAR.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.SMALL_GEAR.get(), AnimatedSpriteParticle.Factory::new);
+        event.registerSpriteSet(BossParticles.NETZACH_SLASH.get(), AnimatedSpriteParticle.Factory::new);
+        event.registerSpriteSet(BossParticles.YELLOW_SPARK.get(), AnimatedSpriteParticle.Factory::new);
     }
 
     @SubscribeEvent
@@ -463,6 +466,45 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_CHAIN_TRAP.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD.get(), GeburahCastingCircleRenderer::new);
+
+        event.registerEntityRenderer(BossEntities.NETZACH_AERIAL_GEAR.get(), FDEntityRendererBuilder.<NetzachAerialGearAttack>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<NetzachAerialGearAttack>builder()
+                                .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/gear_attack.png")))
+                                .light(LightTexture.FULL_BRIGHT)
+                                .model(BossModels.GEAR_ATTACK)
+                                .transformation(((netzachAerialGearAttack, matrices, v) -> {
+                                    matrices.translate(0,netzachAerialGearAttack.getBbHeight() / 2,0);
+                                    Vec3 lastKnownMovement = netzachAerialGearAttack.getLastKnownDeltaMovement();
+                                    FDRenderUtil.applyMovementMatrixRotations(matrices, lastKnownMovement);
+
+                                    float time;
+                                    if (netzachAerialGearAttack.hasReachedDestination()){
+                                        time = netzachAerialGearAttack.tickCount + netzachAerialGearAttack.getId() * 20 - netzachAerialGearAttack.reachedDestinationTicks;
+                                    }else{
+                                        time = netzachAerialGearAttack.tickCount + netzachAerialGearAttack.getId() * 20 + v;
+                                    }
+
+                                    float shakep = 1;
+                                    if (netzachAerialGearAttack.hasReachedDestination()) {
+                                        shakep = 1 - Mth.clamp((netzachAerialGearAttack.reachedDestinationTicks + v) / 3, 0, 1);
+                                    }
+                                    float angle = (float) Math.sin(FDMathUtil.FPI * 10 * shakep) * 10f * FDEasings.squareHill(shakep);
+                                    matrices.mulPose(Axis.XP.rotationDegrees(angle));
+
+
+                                    matrices.mulPose(Axis.ZP.rotationDegrees(time * 60));
+
+
+                                }))
+                                .color(((netzachAerialGearAttack, v) -> {
+                                    float p = 1;
+                                    if (netzachAerialGearAttack.hasReachedDestination()) {
+                                        p = 1 - Mth.clamp((netzachAerialGearAttack.reachedDestinationTicks + v) / NetzachAerialGearAttack.DISAPPEAR_TICKS, 0, 1);
+                                    }
+                                    return new FDColor(1,1,1,p);
+                                }))
+                                .build())
+                .build());
 
         event.registerEntityRenderer(BossEntities.DIVINE_GEAR.get(), FDEntityRendererBuilder.<DivineGear>builder()
                         .addLayer(FDEntityRenderLayerOptions.<DivineGear>builder()

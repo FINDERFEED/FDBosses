@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.debug;
 
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
+import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.BlockPos;
@@ -30,19 +31,23 @@ public class DebugStick extends Item {
 
             ServerLevel serverLevel = (ServerLevel) level;
 
-            Vec3 ppos = player.position().add(0, 1.5, 0).add(player.getLookAngle());
+            Vec3 ppos = player.position().add(0, 1.1, 0).add(player.getLookAngle().scale(0.5));
 
-            serverLevel.sendParticles(SpriteParticleOptions.builder(BossParticles.GEAR)
-                    .particleLookDirection(new Vector3f(-1,1,1))
-                    .xyzRotationSpeed(0,10,0)
-                    .xyzRotation(0,level.random.nextInt(0,360),0)
-                            .lightenedUp()
-                    .lifetime(100)
-                    .frictionAffectsRotation()
-                    .friction(0.95f)
-                    .flipSprite()
-                    .alphaDecreasing()
-                    .build(), ppos.x,ppos.y,ppos.z,1,0,0,0,0);
+//            serverLevel.sendParticles(SpriteParticleOptions.builder(BossParticles.NETZACH_SLASH)
+//                    .particleLookDirection(player.getLookAngle())
+////                            .xyzRotation(0,20,0)
+//                    .lifetime(4)
+//
+//                    .frictionAffectsRotation()
+//                    .friction(0.95f)
+//                            .size(2f)
+////                    .flipSprite()
+//                    .verticalRendering()
+//
+//                    .build(), ppos.x,ppos.y,ppos.z,1,0,0,0,0);
+
+
+            NetzachAerialGearAttack.summon(player, ppos, player.getLookAngle().scale(3));
 
 
         }else{
