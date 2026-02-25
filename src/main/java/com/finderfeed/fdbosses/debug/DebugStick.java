@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.debug;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.BlockPos;
@@ -31,7 +32,7 @@ public class DebugStick extends Item {
 
             ServerLevel serverLevel = (ServerLevel) level;
 
-            Vec3 ppos = player.position().add(0, 1.1, 0).add(player.getLookAngle().scale(0.5));
+            Vec3 ppos = player.position().add(0, 0, 0).add(player.getLookAngle().scale(0.5));
 
 //            serverLevel.sendParticles(SpriteParticleOptions.builder(BossParticles.NETZACH_SLASH)
 //                    .particleLookDirection(player.getLookAngle())
@@ -47,7 +48,7 @@ public class DebugStick extends Item {
 //                    .build(), ppos.x,ppos.y,ppos.z,1,0,0,0,0);
 
 
-            NetzachAerialGearAttack.summon(player, ppos, player.getLookAngle().scale(3));
+            NetzachRollingGearAttack.summon(player, ppos, player.getLookAngle().multiply(1,0,1).normalize().scale(2));
 
 
         }else{

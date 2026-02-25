@@ -54,6 +54,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.Malku
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEntity;
+import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack;
 import com.finderfeed.fdbosses.content.items.geburah.DivineGear;
 import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistChain;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
@@ -429,6 +430,12 @@ public class BossEntities {
             .updateInterval(1)
             .sized(0.6F, 1.95F)
             .build("netzach"));
+
+    public static final Supplier<EntityType<NetzachRollingGearAttack>> NETZACH_ROLLING_GEAR = ENTITIES.register("netzach_rolling_gear",()->EntityType.Builder.of(
+                    NetzachRollingGearAttack::new, MobCategory.MISC
+            )
+            .sized(0.25F, 0.25F)
+            .build("netzach_rolling_gear"));
 
     //ITEMS
     public static final Supplier<EntityType<MalkuthFistChain>> MALKUTH_FIST_CHAIN = ENTITIES.register("malkuth_fist_chain",()->EntityType.Builder.of(

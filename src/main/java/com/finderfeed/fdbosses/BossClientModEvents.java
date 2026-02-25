@@ -74,6 +74,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.Malku
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEntity;
+import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereOverlay;
 import com.finderfeed.fdbosses.content.items.geburah.DivineGear;
@@ -461,6 +462,7 @@ public class BossClientModEvents {
         event.registerSpriteSet(BossParticles.NETZACH_CRUSH.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.NETZACH_POKE_CIRCLE.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.NETZACH_POKE.get(), AnimatedSpriteParticle.Factory::new);
+        event.registerSpriteSet(BossParticles.EARTH_CRACK.get(), AnimatedSpriteParticle.Factory::new);
     }
 
     @SubscribeEvent
@@ -477,6 +479,40 @@ public class BossClientModEvents {
                         .addLayer(FDEntityRenderLayerOptions.<NetzachEntity>builder()
                                 .model(BossModels.NETZACH)
                                 .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/netzach.png")))
+                                .build())
+                .build());
+
+        event.registerEntityRenderer(BossEntities.NETZACH_ROLLING_GEAR.get(), FDEntityRendererBuilder.<NetzachRollingGearAttack>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<NetzachRollingGearAttack>builder()
+                                .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/gear_attack.png")))
+                                .light(LightTexture.FULL_BRIGHT)
+                                .model(BossModels.GEAR_ATTACK)
+                                .transformation(((netzachAerialGearAttack, matrices, v) -> {
+                                    matrices.translate(0,netzachAerialGearAttack.getBbHeight() / 2,0);
+                                    Vec3 lastKnownMovement = netzachAerialGearAttack.getLastKnownDeltaMovement();
+                                    FDRenderUtil.applyMovementMatrixRotations(matrices, lastKnownMovement);
+
+                                    float time;
+                                    if (netzachAerialGearAttack.hasReachedDestination()){
+                                        time = netzachAerialGearAttack.tickCount + netzachAerialGearAttack.getId() * 20 - netzachAerialGearAttack.reachedDestinationTicks;
+                                    }else{
+                                        time = netzachAerialGearAttack.tickCount + netzachAerialGearAttack.getId() * 20 + v;
+                                    }
+
+                                    float shakep = 1;
+                                    if (netzachAerialGearAttack.hasReachedDestination()) {
+                                        shakep = 1 - Mth.clamp((netzachAerialGearAttack.reachedDestinationTicks + v) / 3, 0, 1);
+                                    }
+                                    float angle = (float) Math.sin(FDMathUtil.FPI * 10 * shakep) * 10f * FDEasings.squareHill(shakep);
+                                    matrices.mulPose(Axis.XP.rotationDegrees(angle));
+
+
+                                    matrices.mulPose(Axis.YN.rotationDegrees(90));
+                                    matrices.mulPose(Axis.ZP.rotationDegrees(-time * 60));
+
+
+                                    matrices.scale(1.25f,1.25f,1.25f);
+                                }))
                                 .build())
                 .build());
 
