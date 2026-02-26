@@ -156,7 +156,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
 
                         b = aTargetPos.subtract(gear.position());
 
-                        Vec3 speed = b.normalize().scale(2.5);
+                        Vec3 speed = b.normalize().scale(3);
                         gear.setDeltaMovement(speed);
                     }
                 }

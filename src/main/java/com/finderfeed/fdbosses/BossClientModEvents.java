@@ -524,7 +524,8 @@ public class BossClientModEvents {
                                 .transformation(((netzachAerialGearAttack, matrices, v) -> {
                                     matrices.translate(0,netzachAerialGearAttack.getBbHeight() / 2,0);
                                     Vec3 lastKnownMovement = netzachAerialGearAttack.getLastKnownDeltaMovement();
-                                    FDRenderUtil.applyMovementMatrixRotations(matrices, lastKnownMovement);
+//                                    FDRenderUtil.applyMovementMatrixRotations(matrices, lastKnownMovement);
+                                    matrices.mulPose(netzachAerialGearAttack.getCurrentRotation(v));
 
                                     float time;
                                     if (netzachAerialGearAttack.hasReachedDestination()){

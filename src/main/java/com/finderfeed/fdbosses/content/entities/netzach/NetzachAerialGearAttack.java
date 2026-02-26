@@ -4,30 +4,23 @@ import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.BossSimpleProjectile;
-import com.finderfeed.fdbosses.content.entities.FDOwnableEntity;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
-import com.finderfeed.fdlib.util.ProjectileMovementPath;
-import com.finderfeed.fdlib.util.math.FDMathUtil;
-import net.minecraft.core.particles.ParticleOptions;
+import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
-
-import java.util.UUID;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 
 public class NetzachAerialGearAttack extends BossSimpleProjectile implements AutoSerializable {
 
@@ -35,6 +28,9 @@ public class NetzachAerialGearAttack extends BossSimpleProjectile implements Aut
 
     @SerializableField
     private Vec3 flyTo;
+
+    private Quaternionf currentRotation;
+    private Quaternionf oldRotation;
 
     public static NetzachAerialGearAttack summon(LivingEntity owner, Vec3 pos, Vec3 speed, Vec3 flyTo){
         NetzachAerialGearAttack gearAttack = new NetzachAerialGearAttack(BossEntities.NETZACH_AERIAL_GEAR.get(), owner.level());
@@ -71,6 +67,14 @@ public class NetzachAerialGearAttack extends BossSimpleProjectile implements Aut
                 this.remove(RemovalReason.DISCARDED);
             }
         }else{
+            var current = this.getCurrentRotation(1);
+            this.oldRotation = new Quaternionf(current);
+
+            if (!this.hasReachedDestination()) {
+                var target = this.getTargetRotation();
+                this.currentRotation = currentRotation.slerp(target, 0.5f, new Quaternionf());
+            }
+
             this.particles();
         }
     }
@@ -81,6 +85,21 @@ public class NetzachAerialGearAttack extends BossSimpleProjectile implements Aut
 
     public void setFlyTo(Vec3 flyTo) {
         this.flyTo = flyTo;
+    }
+
+    public Quaternionf getCurrentRotation(float pticks) {
+        if (currentRotation == null || this.oldRotation == null){
+            this.currentRotation = this.getTargetRotation();
+            this.oldRotation = new Quaternionf(this.currentRotation);
+        }
+        return oldRotation.slerp(currentRotation, pticks, new Quaternionf());
+    }
+
+    public Quaternionf getTargetRotation(){
+        Matrix4f rot = new Matrix4f();
+        FDRenderUtil.applyMovementMatrixRotations(rot, this.getLastKnownDeltaMovement().normalize());
+        Quaternionf q = rot.getNormalizedRotation(new Quaternionf());
+        return q;
     }
 
     private void particles(){
