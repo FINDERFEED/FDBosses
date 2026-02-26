@@ -6,11 +6,15 @@ import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptio
 import com.finderfeed.fdbosses.content.entities.BossSimpleProjectile;
 import com.finderfeed.fdbosses.content.entities.FDOwnableEntity;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdlib.nbt.AutoSerializable;
+import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
+import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
@@ -25,17 +29,30 @@ import org.joml.Vector3f;
 
 import java.util.UUID;
 
-public class NetzachAerialGearAttack extends BossSimpleProjectile {
+public class NetzachAerialGearAttack extends BossSimpleProjectile implements AutoSerializable {
 
     public static int DISAPPEAR_TICKS = 40;
 
-    public static NetzachAerialGearAttack summon(LivingEntity owner, Vec3 pos, Vec3 speed){
+    @SerializableField
+    private Vec3 flyTo;
+
+    public static NetzachAerialGearAttack summon(LivingEntity owner, Vec3 pos, Vec3 speed, Vec3 flyTo){
         NetzachAerialGearAttack gearAttack = new NetzachAerialGearAttack(BossEntities.NETZACH_AERIAL_GEAR.get(), owner.level());
         gearAttack.setOwner(owner);
-        gearAttack.setDeltaMovement(speed);
         gearAttack.setPos(pos);
+        if (flyTo != null){
+            Vec3 between = flyTo.subtract(pos).scale(0.25);
+            gearAttack.flyTo = flyTo;
+            gearAttack.setDeltaMovement(between);
+        }else {
+            gearAttack.setDeltaMovement(speed);
+        }
         owner.level().addFreshEntity(gearAttack);
         return gearAttack;
+    }
+
+    public static NetzachAerialGearAttack summon(LivingEntity owner, Vec3 pos, Vec3 speed){
+        return summon(owner, pos, speed, null);
     }
 
     public NetzachAerialGearAttack(EntityType<?> type, Level level) {
@@ -46,12 +63,24 @@ public class NetzachAerialGearAttack extends BossSimpleProjectile {
     public void tick() {
         super.tick();
         if (!level().isClientSide){
+            if (flyTo != null){
+                Vec3 between = flyTo.subtract(this.position()).scale(0.25);
+                this.setDeltaMovement(between);
+            }
             if (this.reachedDestinationTicks > DISAPPEAR_TICKS){
                 this.remove(RemovalReason.DISCARDED);
             }
         }else{
             this.particles();
         }
+    }
+
+    public Vec3 getFlyTo() {
+        return flyTo;
+    }
+
+    public void setFlyTo(Vec3 flyTo) {
+        this.flyTo = flyTo;
     }
 
     private void particles(){
@@ -129,22 +158,33 @@ public class NetzachAerialGearAttack extends BossSimpleProjectile {
 
     @Override
     public void onBlockHit(BlockHitResult result) {
-        this.setDeltaMovement(Vec3.ZERO);
-        Vec3 location = result.getLocation();
-        this.teleportTo(location.x, location.y, location.z);
-        this.setReachedDestination(true);
-        Vec3 fwd = this.getLastKnownDeltaMovement().multiply(1,0,1).normalize();
-        BossUtil.netzachGearSlam((ServerLevel) level(), location.add(0,0.01,0).subtract(fwd.scale(0.5f)), 60, fwd);
-        PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
-                .frequency(5f)
-                .amplitude(2.5f)
-                .inTime(0)
-                .stayTime(0)
-                .outTime(6)
-                .build(),this.position(),20);
-
+        if (flyTo == null) {
+            this.setDeltaMovement(Vec3.ZERO);
+            Vec3 location = result.getLocation();
+            this.teleportTo(location.x, location.y, location.z);
+            this.setReachedDestination(true);
+            Vec3 fwd = this.getLastKnownDeltaMovement().multiply(1, 0, 1).normalize();
+            BossUtil.netzachGearSlam((ServerLevel) level(), location.add(0, 0.01, 0).subtract(fwd.scale(0.5f)), 60, fwd);
+            PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                    .frequency(5f)
+                    .amplitude(2.5f)
+                    .inTime(0)
+                    .stayTime(0)
+                    .outTime(6)
+                    .build(), this.position(), 20);
+        }
     }
 
+
+    @Override
+    protected void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+    }
+
+    @Override
+    protected void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+    }
 
     @Override
     public void onSyncedDataUpdated(EntityDataAccessor<?> accessor) {

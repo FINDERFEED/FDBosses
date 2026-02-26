@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
@@ -46,7 +47,12 @@ public abstract class BossSimpleProjectile extends FDOwnableEntity {
 
     public void processHits(){
         Vec3 start = this.getBoundingBox().getCenter();
-        Vec3 end = start.add(this.getDeltaMovement());
+
+        Vec3 movement = this.getDeltaMovement();
+        double len = Mth.clamp(movement.length(), 0, 10);
+        movement = movement.normalize().scale(len);
+
+        Vec3 end = start.add(movement);
         ClipContext clipContext = new ClipContext(start,end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
         BlockHitResult result = level().clip(clipContext);
         if (result.getType() != HitResult.Type.MISS){

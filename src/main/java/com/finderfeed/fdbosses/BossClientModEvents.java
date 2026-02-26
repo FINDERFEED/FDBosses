@@ -550,6 +550,8 @@ public class BossClientModEvents {
                                     float p = 1;
                                     if (netzachAerialGearAttack.hasReachedDestination()) {
                                         p = 1 - Mth.clamp((netzachAerialGearAttack.reachedDestinationTicks + v) / NetzachAerialGearAttack.DISAPPEAR_TICKS, 0, 1);
+                                    }else{
+                                        p = Mth.clamp((netzachAerialGearAttack.tickCount + v) / 5, 0,1);
                                     }
                                     return new FDColor(1,1,1,p);
                                 }))

@@ -314,6 +314,14 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
     });
 
+    public static DeferredHolder<Animation,Animation> NETZACH_THROW_GEAR_LEFT = ANIMATIONS.register("netzach_throw_gear_left", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
+    });
+
+    public static DeferredHolder<Animation,Animation> NETZACH_THROW_GEAR_RIGHT = ANIMATIONS.register("netzach_throw_gear_right", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
+    });
+
 
 
 }

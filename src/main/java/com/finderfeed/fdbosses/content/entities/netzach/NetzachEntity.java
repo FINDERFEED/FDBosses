@@ -12,6 +12,8 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.F
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
+import com.finderfeed.fdlib.util.FDTargetFinder;
+import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
@@ -26,8 +28,11 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 
 public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable, AutoSerializable {
 
@@ -37,15 +42,18 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     public static final String MAIN_LAYER = "main";
 
     public static final String ATTACK_SERIES_1 = "attack_series_1";
+    public static final String THROW_GEAR = "throw_gear";
 
     public AttackChain attackChain;
 
     public NetzachEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
         attackChain = new AttackChain(level.random)
-                .registerAttack(ATTACK_SERIES_1, this::attackSeriesOne)
+//                .registerAttack(ATTACK_SERIES_1, this::attackSeriesOne)
+                .registerAttack(THROW_GEAR, this::throwGear)
                 .attackListener(this::attackListener)
-                .addAttack(0, ATTACK_SERIES_1)
+//                .addAttack(0, ATTACK_SERIES_1)
+                .addAttack(0, THROW_GEAR)
 
         ;
 
@@ -84,6 +92,80 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
             return AttackAction.WAIT;
         }
         return AttackAction.PROCEED;
+    }
+
+    private boolean isAttackingLeft;
+
+    private boolean throwGear(AttackInstance attackInstance){
+
+        int tick = attackInstance.tick;
+        int stage = attackInstance.stage;
+
+        if (this.getTarget() != null) {
+            this.lookAt(EntityAnchorArgument.Anchor.FEET, this.getTarget().position());
+        }else{
+            return true;
+        }
+
+        if (stage == 0) {
+            isAttackingLeft = random.nextBoolean();
+            if (isAttackingLeft) {
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_THROW_GEAR_LEFT)
+                                .important()
+                                .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_IDLE).build())
+                        .build());
+            }else{
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_THROW_GEAR_RIGHT)
+                                .important()
+                                .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_IDLE).build())
+                        .build());
+            }
+            attackInstance.nextStage();
+        }else if (stage == 1){
+
+            if (tick == 5){
+                Vec3 fwd = this.getLookAngle().multiply(1,0,1).normalize();
+                Vec3 left = fwd.yRot(FDMathUtil.FPI / 2);
+                Vec3 startPos = this.position().add(0,1.5,0);
+                Vec3 nextPos;
+
+                if (isAttackingLeft){
+                    nextPos = startPos.add(left.scale(3)).add(0,2,0);
+                }else{
+                    nextPos = startPos.add(left.scale(-3)).add(0,2,0);
+                }
+                NetzachAerialGearAttack.summon(this, startPos, Vec3.ZERO, nextPos);
+            } else if (tick == 11){
+                Vec3 targetPos = this.getTarget().position();
+                for (var gear : FDTargetFinder.getEntitiesInSphere(NetzachAerialGearAttack.class, level(), this.position().add(0,2,0), 20)) {
+                    if (gear.getFlyTo() != null) {
+                        gear.setFlyTo(null);
+                        Vec3 b = targetPos.subtract(gear.position());
+                        Vec3 hb = b.multiply(1,0,1);
+                        Vec3 nhb = hb.normalize();
+
+                        Vec3 aTargetPos;
+                        ClipContext clipContext = new ClipContext(targetPos, targetPos.add(0,-2.5,0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+                        var result = level().clip(clipContext);
+
+                        if (result.getType() == HitResult.Type.MISS){
+                            aTargetPos = this.getTarget().position().add(0,this.getTarget().getBbHeight() / 2,0);
+                        }else{
+                            aTargetPos = result.getLocation().add(nhb.reverse().scale(3));
+                        }
+
+                        b = aTargetPos.subtract(gear.position());
+
+                        Vec3 speed = b.normalize().scale(2.5);
+                        gear.setDeltaMovement(speed);
+                    }
+                }
+            } else if (tick > 30){
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean attackSeriesOne(AttackInstance attackInstance) {
