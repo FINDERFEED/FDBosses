@@ -10,6 +10,7 @@ import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
+import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
@@ -18,6 +19,7 @@ import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDTargetFinder;
+import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
@@ -53,6 +55,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     public static final String ROLLING_GEAR = "rolling_gear";
     public static final String BASIC_ATTACK = "basic_attack";
     public static final String PUSH_AWAY_ATTACK = "push_away_attack";
+    public static final String JUMP_CRUSH = "jump_crush";
 
     public AttackChain attackChain;
 
@@ -64,11 +67,13 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                 .registerAttack(ROLLING_GEAR, this::throwRollingGear)
                 .registerAttack(BASIC_ATTACK, this::basicAttack)
                 .registerAttack(PUSH_AWAY_ATTACK, this::pushAway)
+                .registerAttack(JUMP_CRUSH, this::jumpAndCrush)
                 .attackListener(this::attackListener)
 //                .addAttack(0, ATTACK_SERIES_1)
 //                .addAttack(0, THROW_GEAR)
 //                .addAttack(0, PUSH_AWAY_ATTACK)
-                .addAttack(0, BASIC_ATTACK)
+//                .addAttack(0, BASIC_ATTACK)
+                .addAttack(0, JUMP_CRUSH)
 
         ;
 
@@ -108,6 +113,89 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         }
         return AttackAction.PROCEED;
     }
+
+    @SerializableField
+    private ProjectileMovementPath jumpAndCrushPath;
+
+    private boolean jumpAndCrush(AttackInstance instance){
+
+        int tick = instance.tick;
+        int stage = instance.stage;
+
+        if (stage == 0){
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_CRUSH_JUMP)
+                            .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_CRUSH_JUMP_MIDAIR)
+                                    .build())
+                    .build());
+            instance.nextStage();
+        } else if (stage == 1){
+            if (this.getTarget() != null) {
+                this.lookAt(EntityAnchorArgument.Anchor.FEET, this.getTarget().position());
+            }
+            if (tick >= 10){
+                var target = this.getTarget();
+                if (target == null){
+                    return true;
+                }else{
+                    this.noPhysics = true;
+                    this.setSpawnGhosts(true);
+                    this.jumpAndCrushPath = createJumpToPath(15, target.position());
+                    this.jumpAndCrushPath.tick(this);
+                }
+                instance.nextStage();
+            }
+        }else if (stage == 2){
+
+            if (this.jumpAndCrushPath == null){
+                this.noPhysics = false;
+                return true;
+            }
+
+            this.noPhysics = true;
+            if (this.jumpAndCrushPath.isFinished()){
+                this.noPhysics = false;
+                instance.nextStage();
+                return false;
+            }
+            this.jumpAndCrushPath.tick(this);
+
+        }else if (stage == 3){
+
+            this.noPhysics = false;
+            if (tick == 0){
+                this.setSpawnGhosts(false);
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_CRUSH_JUMP_END)
+                        .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_IDLE).build())
+                        .build());
+                this.setDeltaMovement(Vec3.ZERO);
+            }
+            if (tick > 40){
+
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
+    private ProjectileMovementPath createJumpToPath(int time, Vec3 target){
+
+        Vec3 startPos = this.position();
+        Vec3 between = target.subtract(startPos);
+
+        Vec3 hb = between.multiply(1,0,1);
+
+        Vec3 pos2 = startPos.add(hb.x * 0.25, 10, hb.z * 0.25);
+        Vec3 pos3 = startPos.add(hb.x * 0.75, 7, hb.z * 0.75);
+
+        return new ProjectileMovementPath(time, false)
+                .addPos(startPos)
+                .addPos(pos2)
+                .addPos(pos3)
+                .addPos(target);
+    }
+
 
     public static final int RANGED_ATTACK_THROW_GEAR = 0;
     public static final int RANGED_ATTACK_ROLLING_GEAR = 1;

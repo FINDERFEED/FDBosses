@@ -2797,7 +2797,6 @@
 			}
 		},
 		"netzach_crush_jump": {
-			"loop": "hold_on_last_frame",
 			"animation_length": 0.7917,
 			"bones": {
 				"main": {
