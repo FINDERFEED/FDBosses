@@ -77,7 +77,12 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
         boolean lookingAtCamera = particleLookDirection.x == 0 && particleLookDirection.y == 0 && particleLookDirection.z == 0;
 
         if (lookingAtCamera){
-            matrices.mulPose(camera.rotation());
+            if (options.cameraLookY()){
+                var rotation = camera.rotation();
+                matrices.mulPose(new Quaternionf(0,rotation.y,0,rotation.w));
+            }else {
+                matrices.mulPose(camera.rotation());
+            }
         }else{
             FDRenderUtil.applyMovementMatrixRotations(matrices, new Vec3(particleLookDirection));
         }
@@ -157,7 +162,7 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
 
         float p = 1f;
 
-        if (this.options.quadSizeDecreasing()){
+        if (this.options.quadSizeIncreasing()){
             p = Mth.clamp((age + pticks) / lifetime,0,1);
             if (this.options.quadSizeEaseIn()){
                 p = FDEasings.easeIn(p);

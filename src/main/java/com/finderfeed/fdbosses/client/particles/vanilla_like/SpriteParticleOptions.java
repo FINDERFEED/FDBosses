@@ -91,8 +91,9 @@ public class SpriteParticleOptions implements ParticleOptions {
     private final byte flags;
 
     public static final byte QUAD_SIZE_EASE_IN = 0b1000000;
-    public static final byte QUAD_SIZE_EASE_OUT = 0b1000000;
-    public static final byte QUAD_SIZE_EASE_IN_OUT = 0b1000000;
+    public static final byte QUAD_SIZE_EASE_OUT = 0b0100000;
+    public static final byte QUAD_SIZE_EASE_IN_OUT = 0b0010000;
+    public static final byte CAMERA_LOOK_Y = 0b0001000;
     private final byte flags2;
 
 
@@ -162,6 +163,11 @@ public class SpriteParticleOptions implements ParticleOptions {
 
     public boolean quadSizeIncreasing(){
         return (flags & QUAD_SIZE_INCREASING) != 0;
+    }
+
+
+    public boolean cameraLookY(){
+        return (flags2 & CAMERA_LOOK_Y) != 0;
     }
 
     public boolean quadSizeEaseIn(){
@@ -271,6 +277,11 @@ public class SpriteParticleOptions implements ParticleOptions {
 
         public Builder frictionAffectsRotation() {
             this.flags = (byte) (flags | FRICTION_AFFECTS_XYZ_ROTATION);
+            return this;
+        }
+
+        public Builder lookAtCameraY() {
+            this.flags2 = (byte) (flags2 | CAMERA_LOOK_Y);
             return this;
         }
 

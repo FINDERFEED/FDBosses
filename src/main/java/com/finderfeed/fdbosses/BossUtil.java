@@ -79,6 +79,7 @@ public class BossUtil {
     public static final int GEBURAH_PREPARE_RAYS_FRAMES = 21;
     public static final int DIVINE_GEAR_RAY_PARTICLES = 22;
     public static final int NETZACH_GEAR_SLAM = 23;
+    public static final int NETZACH_PUSH_AWAY = 24;
 
     public static Vec3 matTransformDirectionVec3(Matrix4f mat, Vec3 v){
         Vector3f v1 = mat.transformDirection(
@@ -380,6 +381,10 @@ public class BossUtil {
 
     public static void netzachGearSlam(ServerLevel serverLevel, Vec3 pos, double radius, Vec3 direction){
         posEvent(serverLevel, pos, NETZACH_GEAR_SLAM, FDUtil.encodeDirection(direction), radius);
+    }
+
+    public static void netzachPushAway(ServerLevel serverLevel, Vec3 pos, double radius){
+        posEvent(serverLevel, pos, NETZACH_PUSH_AWAY, 0, radius);
     }
 
     public static void malkuthSwordsInsertParticles(ServerLevel serverLevel, Vec3 pos, double radius, int malkuthEntityId){

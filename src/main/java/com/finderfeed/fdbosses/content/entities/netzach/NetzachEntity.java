@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.netzach;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.entity_ghost.EntityGhostParticleOptions;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
@@ -24,6 +25,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -37,6 +39,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.network.PacketDistributor;
 
+import java.util.ArrayList;
+
 public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable, AutoSerializable {
 
     public static final EntityDataAccessor<Boolean> SPAWN_GHOSTS = SynchedEntityData.defineId(NetzachEntity.class, EntityDataSerializers.BOOLEAN);
@@ -48,6 +52,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     public static final String THROW_GEAR = "throw_gear";
     public static final String ROLLING_GEAR = "rolling_gear";
     public static final String BASIC_ATTACK = "basic_attack";
+    public static final String PUSH_AWAY_ATTACK = "push_away_attack";
 
     public AttackChain attackChain;
 
@@ -58,9 +63,11 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                 .registerAttack(THROW_GEAR, this::throwGear)
                 .registerAttack(ROLLING_GEAR, this::throwRollingGear)
                 .registerAttack(BASIC_ATTACK, this::basicAttack)
+                .registerAttack(PUSH_AWAY_ATTACK, this::pushAway)
                 .attackListener(this::attackListener)
 //                .addAttack(0, ATTACK_SERIES_1)
 //                .addAttack(0, THROW_GEAR)
+//                .addAttack(0, PUSH_AWAY_ATTACK)
                 .addAttack(0, BASIC_ATTACK)
 
         ;
@@ -104,6 +111,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
 
     public static final int RANGED_ATTACK_THROW_GEAR = 0;
     public static final int RANGED_ATTACK_ROLLING_GEAR = 1;
+    public static final int PUSH_AWAY = 2;
 
     private int rangedAttackType = RANGED_ATTACK_THROW_GEAR;
 
@@ -119,16 +127,23 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         }
 
         if (stage == 0){
-            ClipContext clipContext = new ClipContext(target.position(), target.position().add(0,-2.5,0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
-            var result = level().clip(clipContext);
-            if (result.getType() == HitResult.Type.MISS) {
-                rangedAttackType = RANGED_ATTACK_THROW_GEAR;
-            }else{
-                if (rangedAttackType == RANGED_ATTACK_THROW_GEAR){
-                    rangedAttackType = RANGED_ATTACK_ROLLING_GEAR;
-                }else{
+
+            if (this.distanceTo(target) > 7) {
+
+                ClipContext clipContext = new ClipContext(target.position(), target.position().add(0, -2.5, 0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+                var result = level().clip(clipContext);
+                if (result.getType() == HitResult.Type.MISS) {
                     rangedAttackType = RANGED_ATTACK_THROW_GEAR;
+                } else {
+                    if (rangedAttackType == RANGED_ATTACK_THROW_GEAR) {
+                        rangedAttackType = RANGED_ATTACK_ROLLING_GEAR;
+                    } else {
+                        rangedAttackType = RANGED_ATTACK_THROW_GEAR;
+                    }
                 }
+
+            }else{
+                rangedAttackType = PUSH_AWAY;
             }
         }
 
@@ -136,9 +151,65 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
             return this.throwRollingGear(attackInstance);
         }else if (rangedAttackType == RANGED_ATTACK_THROW_GEAR){
             return this.throwGear(attackInstance);
-        }else{
+        }else if (rangedAttackType == PUSH_AWAY){
+          return this.pushAway(attackInstance);
+        } else{
             return true;
         }
+    }
+
+    private boolean pushAway(AttackInstance attackInstance){
+
+        int tick = attackInstance.tick;
+        int stage = attackInstance.stage;
+
+        if (this.getTarget() == null){
+            return true;
+        }
+
+        if (stage == 0) {
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_PUSH_AWAY)
+                    .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_IDLE).build())
+                            .important()
+                            .setSpeed(1.25f)
+                    .build());
+            attackInstance.nextStage();
+        } else if (stage == 1){
+            if (tick == 14){
+
+                BossUtil.netzachPushAway((ServerLevel) level(), this.position(), 60);
+
+                var targets = FDTargetFinder.getEntitiesInSphere(LivingEntity.class, level(), this.position(), 8, entity -> {
+                    return entity != this;
+                });
+
+                for (var target : targets){
+                    Vec3 pos = this.position();
+                    Vec3 tpos = target.position();
+                    Vec3 b = tpos.subtract(pos);
+                    Vec3 speed = b.multiply(1,0,1).normalize().scale(3f);
+
+                    if (target.onGround()){
+                        speed = speed.add(0,0.5f,0);
+                    }else{
+                        speed = speed.add(0,0.5f,0);
+                    }
+
+                    if (target instanceof ServerPlayer serverPlayer){
+                        serverPlayer.hasImpulse = true;
+                        FDLibCalls.setServerPlayerSpeed(serverPlayer, speed);
+                    }else{
+                        target.setDeltaMovement(speed);
+                    }
+
+                }
+
+            }else if (tick > 30){
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private boolean isRollingGearLeftAttack;
@@ -234,7 +305,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                     NetzachRollingGearAttack.summon(this, startPos, speed.scale(2));
                 }
 
-            } else if (tick > 30){
+            } else if (tick > 25){
                 return true;
             }
         }
@@ -310,7 +381,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                         gear.setDeltaMovement(speed);
                     }
                 }
-            } else if (tick > 30){
+            } else if (tick > 25){
                 return true;
             }
         }

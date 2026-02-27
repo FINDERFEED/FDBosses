@@ -322,12 +322,15 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
     });
 
-
     public static DeferredHolder<Animation,Animation> NETZACH_ROLLING_GEAR_LEFT = ANIMATIONS.register("netzach_rolling_gear_left", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
     });
 
     public static DeferredHolder<Animation,Animation> NETZACH_ROLLING_GEAR_RIGHT = ANIMATIONS.register("netzach_rolling_gear_right", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
+    });
+
+    public static DeferredHolder<Animation,Animation> NETZACH_PUSH_AWAY = ANIMATIONS.register("netzach_push_away", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
     });
 
