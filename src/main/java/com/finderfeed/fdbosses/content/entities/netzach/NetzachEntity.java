@@ -6,18 +6,20 @@ import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptio
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
+import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDTargetFinder;
-import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -33,6 +35,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable, AutoSerializable {
 
@@ -43,17 +46,22 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
 
     public static final String ATTACK_SERIES_1 = "attack_series_1";
     public static final String THROW_GEAR = "throw_gear";
+    public static final String ROLLING_GEAR = "rolling_gear";
+    public static final String BASIC_ATTACK = "basic_attack";
 
     public AttackChain attackChain;
 
     public NetzachEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
         attackChain = new AttackChain(level.random)
-//                .registerAttack(ATTACK_SERIES_1, this::attackSeriesOne)
+                .registerAttack(ATTACK_SERIES_1, this::attackSeriesOne)
                 .registerAttack(THROW_GEAR, this::throwGear)
+                .registerAttack(ROLLING_GEAR, this::throwRollingGear)
+                .registerAttack(BASIC_ATTACK, this::basicAttack)
                 .attackListener(this::attackListener)
 //                .addAttack(0, ATTACK_SERIES_1)
-                .addAttack(0, THROW_GEAR)
+//                .addAttack(0, THROW_GEAR)
+                .addAttack(0, BASIC_ATTACK)
 
         ;
 
@@ -94,7 +102,149 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         return AttackAction.PROCEED;
     }
 
-    private boolean isAttackingLeft;
+    public static final int RANGED_ATTACK_THROW_GEAR = 0;
+    public static final int RANGED_ATTACK_ROLLING_GEAR = 1;
+
+    private int rangedAttackType = RANGED_ATTACK_THROW_GEAR;
+
+    private boolean basicAttack(AttackInstance attackInstance){
+
+        int tick = attackInstance.tick;
+        int stage = attackInstance.stage;
+
+        var target = this.getTarget();
+
+        if (target == null){
+            return false;
+        }
+
+        if (stage == 0){
+            ClipContext clipContext = new ClipContext(target.position(), target.position().add(0,-2.5,0), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+            var result = level().clip(clipContext);
+            if (result.getType() == HitResult.Type.MISS) {
+                rangedAttackType = RANGED_ATTACK_THROW_GEAR;
+            }else{
+                if (rangedAttackType == RANGED_ATTACK_THROW_GEAR){
+                    rangedAttackType = RANGED_ATTACK_ROLLING_GEAR;
+                }else{
+                    rangedAttackType = RANGED_ATTACK_THROW_GEAR;
+                }
+            }
+        }
+
+        if (rangedAttackType == RANGED_ATTACK_ROLLING_GEAR){
+            return this.throwRollingGear(attackInstance);
+        }else if (rangedAttackType == RANGED_ATTACK_THROW_GEAR){
+            return this.throwGear(attackInstance);
+        }else{
+            return true;
+        }
+    }
+
+    private boolean isRollingGearLeftAttack;
+
+    private boolean throwRollingGear(AttackInstance attackInstance) {
+
+        int tick = attackInstance.tick;
+        int stage = attackInstance.stage;
+
+        if (this.getTarget() != null) {
+            this.lookAt(EntityAnchorArgument.Anchor.FEET, this.getTarget().position());
+        }else{
+            return true;
+        }
+
+
+        if (stage == 0) {
+            isRollingGearLeftAttack = !isRollingGearLeftAttack;
+            if (isRollingGearLeftAttack) {
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_ROLLING_GEAR_LEFT)
+                        .important()
+                        .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_IDLE).build())
+                        .build());
+            }else{
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_ROLLING_GEAR_RIGHT)
+                        .important()
+                        .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_IDLE).build())
+                        .build());
+            }
+            attackInstance.nextStage();
+        }else if (stage == 1){
+
+            if (tick == 9){
+                Vec3 fwd = this.getLookAngle().multiply(1,0,1).normalize();
+                Vec3 left = fwd.yRot(FDMathUtil.FPI / 2);
+
+                if (isRollingGearLeftAttack){
+                    Vec3 ppos = this.position().add(0,1,0).add(left.scale(-0.25f));
+                    SpriteParticleOptions spriteParticleOptions = SpriteParticleOptions.builder(BossParticles.NETZACH_SLASH)
+                            .xyzRotation(30,-40,0)
+                            .particleLookDirection(fwd)
+                            .verticalRendering()
+                            .size(4f)
+                            .lightenedUp()
+                            .lifetime(4)
+                            .build();
+                    FDLibCalls.sendParticles((ServerLevel) level(), spriteParticleOptions, ppos, 60);
+
+                }else{
+                    Vec3 ppos = this.position().add(0,1,0).add(left.scale(-0.25f));
+                    SpriteParticleOptions spriteParticleOptions = SpriteParticleOptions.builder(BossParticles.NETZACH_SLASH)
+                            .xyzRotation(-30,40,0)
+                            .particleLookDirection(fwd)
+                            .verticalRendering()
+                            .size(4f)
+                            .lightenedUp()
+                            .flipSprite()
+                            .lifetime(4)
+                            .build();
+                    FDLibCalls.sendParticles((ServerLevel) level(), spriteParticleOptions, ppos, 60);
+                }
+
+
+
+            } else if (tick == 10){
+                Vec3 fwd = this.getLookAngle().multiply(1,0,1).normalize();
+                Vec3 startPos = this.position();
+
+                PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                        .frequency(5)
+                        .amplitude(2.5f)
+                        .inTime(0)
+                        .stayTime(0)
+                        .outTime(5)
+                        .build(),this.position(),60);
+
+
+                SlamParticlesPacket packet = new SlamParticlesPacket(
+                        new SlamParticlesPacket.SlamData(this.getOnPos(),this.position().add(0,0.5f,0),fwd)
+                                .maxAngle(FDMathUtil.FPI)
+                                .maxSpeed(0.5f)
+                                .collectRadius(2)
+                                .maxParticleLifetime(30)
+                                .count(5)
+                                .particleSizeMultiplier(0.75f)
+                                .maxVerticalSpeedEdges(0.15f)
+                                .maxVerticalSpeedCenter(0.4f)
+                );
+                PacketDistributor.sendToPlayersTrackingEntity(this,packet);
+
+                for (int i = -1; i <= 1; i++) {
+                    Vec3 speed = fwd.yRot(FDMathUtil.FPI / 16 * i);
+                    NetzachRollingGearAttack.summon(this, startPos, speed.scale(2));
+                }
+
+            } else if (tick > 30){
+                return true;
+            }
+        }
+
+        return false;
+
+
+    }
+
+    private boolean isThrowGearLeftAttack = false;
 
     private boolean throwGear(AttackInstance attackInstance){
 
@@ -108,8 +258,8 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         }
 
         if (stage == 0) {
-            isAttackingLeft = random.nextBoolean();
-            if (isAttackingLeft) {
+            isThrowGearLeftAttack = !isThrowGearLeftAttack;
+            if (isThrowGearLeftAttack) {
                 this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_THROW_GEAR_LEFT)
                                 .important()
                                 .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_IDLE).build())
@@ -129,13 +279,13 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                 Vec3 startPos = this.position().add(0,1.5,0);
                 Vec3 nextPos;
 
-                if (isAttackingLeft){
+                if (isThrowGearLeftAttack){
                     nextPos = startPos.add(left.scale(3)).add(0,2,0);
                 }else{
                     nextPos = startPos.add(left.scale(-3)).add(0,2,0);
                 }
                 NetzachAerialGearAttack.summon(this, startPos, Vec3.ZERO, nextPos);
-            } else if (tick == 11){
+            } else if (tick == 12){
                 Vec3 targetPos = this.getTarget().position();
                 for (var gear : FDTargetFinder.getEntitiesInSphere(NetzachAerialGearAttack.class, level(), this.position().add(0,2,0), 20)) {
                     if (gear.getFlyTo() != null) {
@@ -156,7 +306,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
 
                         b = aTargetPos.subtract(gear.position());
 
-                        Vec3 speed = b.normalize().scale(3);
+                        Vec3 speed = b.normalize().scale(2.5);
                         gear.setDeltaMovement(speed);
                     }
                 }

@@ -933,7 +933,7 @@ public class BossClientPackets {
             SpriteParticleOptions options = SpriteParticleOptions.builder(BossParticles.NETZACH_CRUSH)
                     .size(5f)
                     .xyzRotation(0,0,rotations[id])
-                    .lifetime(10)
+                    .lifetime(9)
                     .particleLookDirection(nrm)
                     .lightenedUp()
                     .build();
