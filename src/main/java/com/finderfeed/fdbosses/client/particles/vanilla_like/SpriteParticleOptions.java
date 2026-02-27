@@ -34,9 +34,10 @@ public class SpriteParticleOptions implements ParticleOptions {
                         Codec.INT.fieldOf("lifetime").forGetter(o -> o.lifetime),
                         Codec.FLOAT.fieldOf("size").forGetter(o -> o.size),
                         Codec.FLOAT.fieldOf("friction").forGetter(o -> o.friction),
-                        Codec.BYTE.fieldOf("flags").forGetter(o -> o.flags)
-                ).apply(instance, (look, xyzrot, rot, life, size, fric, flags) ->
-                        new SpriteParticleOptions(type, look, xyzrot, rot, life, size, fric, flags))
+                        Codec.BYTE.fieldOf("flags").forGetter(o -> o.flags),
+                        Codec.BYTE.fieldOf("flags2").forGetter(o -> o.flags2)
+                ).apply(instance, (look, xyzrot, rot, life, size, fric, flags, flags2) ->
+                        new SpriteParticleOptions(type, look, xyzrot, rot, life, size, fric, flags, flags2))
         );
     }
 
@@ -52,6 +53,7 @@ public class SpriteParticleOptions implements ParticleOptions {
                     buf.writeFloat(o.size);
                     buf.writeFloat(o.friction);
                     buf.writeByte(o.flags);
+                    buf.writeByte(o.flags2);
                 },
                 buf -> new SpriteParticleOptions(
                         type,
@@ -61,6 +63,7 @@ public class SpriteParticleOptions implements ParticleOptions {
                         buf.readInt(),
                         buf.readFloat(),
                         buf.readFloat(),
+                        buf.readByte(),
                         buf.readByte()
                 )
         );
@@ -84,7 +87,13 @@ public class SpriteParticleOptions implements ParticleOptions {
     public static final byte ALPHA_DECREASING = 0b0001000;
     public static final byte VERTICAL_RENDERING = 0b0000100;
     public static final byte QUAD_SIZE_DECREASING = 0b0000010;
+    public static final byte QUAD_SIZE_INCREASING = 0b0000001;
     private final byte flags;
+
+    public static final byte QUAD_SIZE_EASE_IN = 0b1000000;
+    public static final byte QUAD_SIZE_EASE_OUT = 0b1000000;
+    public static final byte QUAD_SIZE_EASE_IN_OUT = 0b1000000;
+    private final byte flags2;
 
 
 
@@ -96,7 +105,8 @@ public class SpriteParticleOptions implements ParticleOptions {
             int lifetime,
             float size,
             float friction,
-            byte flags
+            byte flags,
+            byte flags2
     ) {
         this.XYZRotation = rot;
         this.particleType = type;
@@ -106,6 +116,7 @@ public class SpriteParticleOptions implements ParticleOptions {
         this.size = size;
         this.friction = friction;
         this.flags = flags;
+        this.flags2 = flags2;
     }
 
     public Vector3f getXYZRotation() {
@@ -149,6 +160,23 @@ public class SpriteParticleOptions implements ParticleOptions {
         return (flags & QUAD_SIZE_DECREASING) != 0;
     }
 
+    public boolean quadSizeIncreasing(){
+        return (flags & QUAD_SIZE_INCREASING) != 0;
+    }
+
+    public boolean quadSizeEaseIn(){
+        return (flags2 & QUAD_SIZE_EASE_IN) != 0;
+    }
+
+    public boolean quadSizeEaseOut(){
+        return (flags2 & QUAD_SIZE_EASE_OUT) != 0;
+    }
+
+    public boolean quadSizeEaseInOut(){
+        return (flags2 & QUAD_SIZE_EASE_IN_OUT) != 0;
+    }
+
+
     public float getFriction() {
         return friction;
     }
@@ -176,6 +204,7 @@ public class SpriteParticleOptions implements ParticleOptions {
         private float friction = 1f;
 
         private byte flags = 0;
+        private byte flags2 = 0;
 
         public Builder(ParticleType<?> type) {
             this.type = type;
@@ -245,6 +274,25 @@ public class SpriteParticleOptions implements ParticleOptions {
             return this;
         }
 
+        public Builder quadSizeIncreasing(){
+            this.flags = (byte) (flags | QUAD_SIZE_INCREASING);
+            return this;
+        }
+
+        public Builder quadSizeEaseIn(){
+            this.flags2 = (byte) (flags2 | QUAD_SIZE_EASE_IN);
+            return this;
+        }
+
+        public Builder quadSizeEaseOut(){
+            this.flags2 = (byte) (flags2 | QUAD_SIZE_EASE_OUT);
+            return this;
+        }
+
+        public Builder quadSizeEaseInOut(){
+            this.flags2 = (byte) (flags2 | QUAD_SIZE_EASE_IN_OUT);
+            return this;
+        }
 
         public Builder verticalRendering() {
             this.flags = (byte) (flags | VERTICAL_RENDERING);
@@ -267,7 +315,7 @@ public class SpriteParticleOptions implements ParticleOptions {
         }
 
         public SpriteParticleOptions build() {
-            return new SpriteParticleOptions(type, look, xyzRotation, xyzRotationSpeed, lifetime, size, friction, flags);
+            return new SpriteParticleOptions(type, look, xyzRotation, xyzRotationSpeed, lifetime, size, friction, flags, flags2);
         }
     }
 

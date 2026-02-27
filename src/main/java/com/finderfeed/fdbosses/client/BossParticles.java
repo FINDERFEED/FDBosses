@@ -211,5 +211,6 @@ public class BossParticles {
     public static final Supplier<ASParticleType> NETZACH_POKE = PARTICLES.register("netzach_poke", ()-> new ASParticleType(true));
     public static final Supplier<ASParticleType> NETZACH_POKE_CIRCLE = PARTICLES.register("netzach_poke_circle", ()-> new ASParticleType(true));
     public static final Supplier<ASParticleType> EARTH_CRACK = PARTICLES.register("earth_crack", ()-> new ASParticleType(true));
+    public static final Supplier<ASParticleType> BIG_GEAR = PARTICLES.register("big_gear", ()-> new ASParticleType(true));
 
 }

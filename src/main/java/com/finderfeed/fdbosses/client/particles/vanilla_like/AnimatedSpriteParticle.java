@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.client.particles.vanilla_like;
 
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -35,7 +36,6 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
     private float yrd;
     private float zrd;
 
-    private float quadSizeO;
     private float quadSizeMax;
 
     public AnimatedSpriteParticle(SpriteParticleOptions options, SpriteSet spriteSet, ClientLevel clientLevel, double x, double y, double z, double xd, double yd, double zd) {
@@ -45,7 +45,6 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
         this.spriteSet = spriteSet;
         this.lifetime = options.getLifetime();
         this.quadSize = options.getSize();
-        this.quadSizeO = options.getSize();
         this.quadSizeMax = options.getSize();
         this.setSpriteFromAge(spriteSet);
         this.xrd = options.getXYZRotationSpeed().x;
@@ -155,7 +154,33 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
 
     @Override
     public float getQuadSize(float pticks) {
-        return FDMathUtil.lerp(quadSizeO, quadSize, pticks);
+
+        float p = 1f;
+
+        if (this.options.quadSizeDecreasing()){
+            p = Mth.clamp((age + pticks) / lifetime,0,1);
+            if (this.options.quadSizeEaseIn()){
+                p = FDEasings.easeIn(p);
+            }else if (this.options.quadSizeEaseInOut()){
+                p = FDEasings.easeInOut(p);
+            }else if (this.options.quadSizeEaseOut()){
+                p = FDEasings.easeOut(p);
+            }
+        }else if (this.options.quadSizeDecreasing()){
+            p = Mth.clamp((age + pticks) / lifetime,0,1);
+            if (this.options.quadSizeEaseIn()){
+                p = 1 - FDEasings.easeIn(p);
+            }else if (this.options.quadSizeEaseInOut()){
+                p = 1 - FDEasings.easeInOut(p);
+            }else if (this.options.quadSizeEaseOut()){
+                p = 1 - FDEasings.easeOut(p);
+            }else{
+                p = 1 - p;
+            }
+        }
+
+
+        return FDMathUtil.lerp(0, quadSizeMax, p);
     }
 
     @Override
@@ -174,11 +199,6 @@ public class AnimatedSpriteParticle extends TextureSheetParticle {
             xrd = xrd * options.getFriction();
             yrd = yrd * options.getFriction();
             zrd = zrd * options.getFriction();
-        }
-
-        if (this.options.quadSizeDecreasing()) {
-            quadSizeO = quadSize;
-            quadSize = quadSizeMax * Mth.clamp(1 - age / (float) lifetime, 0, 1);
         }
 
         super.tick();
