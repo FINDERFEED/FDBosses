@@ -467,7 +467,7 @@ public class BossClientPackets {
                 SpriteParticleOptions options = SpriteParticleOptions.builder(BossParticles.YELLOW_SPARK)
                         .xyzRotationSpeed(20 * BossUtil.randomPlusMinus(),0,0)
                         .friction(0.9f)
-                        .lifetime(random.nextInt(10,15))
+                        .lifetime(random.nextInt(15,25))
                         .size(0.5f + 0.5f * random.nextFloat())
                         .lightenedUp()
                         .quadSizeDecreasing()
