@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.client.particles.entity_ghost.EntityGhostParticle
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDLibCalls;
@@ -16,6 +17,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.F
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
+import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDTargetFinder;
@@ -34,8 +36,10 @@ import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -44,6 +48,9 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import java.util.ArrayList;
 
 public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable, AutoSerializable {
+
+    public static final int ARENA_HEIGHT = 40;
+    public static final int ARENA_RADIUS = 40;
 
     public static final EntityDataAccessor<Boolean> SPAWN_GHOSTS = SynchedEntityData.defineId(NetzachEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Float> GRAVITY = SynchedEntityData.defineId(NetzachEntity.class, EntityDataSerializers.FLOAT);
@@ -56,6 +63,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     public static final String BASIC_ATTACK = "basic_attack";
     public static final String PUSH_AWAY_ATTACK = "push_away_attack";
     public static final String JUMP_CRUSH = "jump_crush";
+    public static final String GEAR_CRUSH = "gear_crush";
 
     public AttackChain attackChain;
 
@@ -68,12 +76,18 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                 .registerAttack(BASIC_ATTACK, this::basicAttack)
                 .registerAttack(PUSH_AWAY_ATTACK, this::pushAway)
                 .registerAttack(JUMP_CRUSH, this::jumpAndCrush)
+                .registerAttack(GEAR_CRUSH, this::gearCrush)
                 .attackListener(this::attackListener)
-//                .addAttack(0, ATTACK_SERIES_1)
-//                .addAttack(0, THROW_GEAR)
-//                .addAttack(0, PUSH_AWAY_ATTACK)
-//                .addAttack(0, BASIC_ATTACK)
-                .addAttack(0, JUMP_CRUSH)
+                .addAttack(0, AttackOptions.chainOptionsBuilder()
+                        .addAttack(ATTACK_SERIES_1)
+                        .addAttack(BASIC_ATTACK)
+                        .addAttack(GEAR_CRUSH)
+                        .addAttack(BASIC_ATTACK)
+                        .addAttack(JUMP_CRUSH)
+                        .addAttack(BASIC_ATTACK)
+                        .addAttack(BASIC_ATTACK)
+                        .addAttack(GEAR_CRUSH)
+                        .build())
 
         ;
 
@@ -112,6 +126,59 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
             return AttackAction.WAIT;
         }
         return AttackAction.PROCEED;
+    }
+
+    private boolean gearCrush(AttackInstance attackInstance) {
+
+        int tick = attackInstance.tick;
+        int stage = attackInstance.stage;
+
+        if (this.getTarget() == null){
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_IDLE)
+                    .build());
+            return true;
+        }
+
+        var target = this.getTarget();
+        this.lookAt(EntityAnchorArgument.Anchor.FEET, target.position());
+
+        if (stage == 0){
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_CAST_SOMETHING)
+                            .important()
+                            .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_IDLE).build())
+                    .build());
+            attackInstance.nextStage();
+        }else if (stage == 1){
+
+            if (tick == 6){
+
+                var entities = new ArrayList<>(level().getEntitiesOfClass(LivingEntity.class, this.constructArenaBox(), (entity) -> {
+                    return entity instanceof Player player && BossUtil.isPlayerInSurvival(player);
+                }));
+                entities.add(this.getTarget());
+
+                for (var entity : entities){
+                    NetzachGearCrushAttack.summon(this, entity, entity.getLookAngle());
+                }
+
+            }else if (tick > 25){
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
+    private AABB constructArenaBox(){
+        return new AABB(
+                -ARENA_RADIUS,
+                -10,
+                -ARENA_RADIUS,
+                ARENA_RADIUS,
+                ARENA_HEIGHT,
+                ARENA_RADIUS
+        ).move(this.position());
     }
 
     @SerializableField
@@ -230,7 +297,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                         .outTime(10)
                         .build(),this.position(),30);
             }
-            if (tick > 40){
+            if (tick > 25){
 
                 return true;
             }
@@ -624,7 +691,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                 Vec3 between = target.position().subtract(gearPos);
                 Vec3 hb = between.multiply(1,0,1);
 
-                Vec3 targetPos = target.position().add(hb.normalize().reverse().scale(2));
+                Vec3 targetPos = target.position().add(hb.normalize().reverse().scale(0));
 
                 Vec3 speed = targetPos.subtract(gearPos).normalize().scale(2.5f);
 

@@ -334,19 +334,11 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
     });
 
-    public static DeferredHolder<Animation,Animation> NETZACH_CRUSH_JUMP = ANIMATIONS.register("netzach_crush_jump", ()->{
-        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
-    });
-
-    public static DeferredHolder<Animation,Animation> NETZACH_CRUSH_JUMP_MIDAIR = ANIMATIONS.register("netzach_crush_jump_midair", ()->{
-        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
-    });
-
-    public static DeferredHolder<Animation,Animation> NETZACH_CRUSH_JUMP_END = ANIMATIONS.register("netzach_crush_jump_end", ()->{
-        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
-    });
-
     public static DeferredHolder<Animation,Animation> NETZACH_CRUSH = ANIMATIONS.register("netzach_crush", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
+    });
+
+    public static DeferredHolder<Animation,Animation> NETZACH_CAST_SOMETHING = ANIMATIONS.register("netzach_cast_something", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
     });
 

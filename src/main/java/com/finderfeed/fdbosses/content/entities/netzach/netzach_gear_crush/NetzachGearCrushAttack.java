@@ -103,6 +103,20 @@ public class NetzachGearCrushAttack extends FDOwnableEntity {
 
         Vec3 ppos = this.position().add(0,1.25,0);
 
+
+        SpriteParticleOptions gearoptions = SpriteParticleOptions.builder(BossParticles.BIG_GEAR)
+                .size(8f)
+                .lifetime(15)
+                .particleLookDirection(0,1,0)
+                .xyzRotationSpeed(0,2.5f,0)
+                .frictionAffectsRotation()
+                .quadSizeIncreasing()
+                .quadSizeEaseOut()
+                .alphaDecreasing()
+                .lightenedUp()
+                .build();
+        level().addParticle(gearoptions, true, ppos.x, ppos.y, ppos.z,0,0,0);
+
         BallParticleOptions flash = BallParticleOptions.builder()
                 .color(1f,0.8f,0.2f)
                 .scalingOptions(1,0,2)
