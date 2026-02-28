@@ -117,57 +117,118 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     @SerializableField
     private ProjectileMovementPath jumpAndCrushPath;
 
+    @SerializableField
+    private Vec3 jumpFlyTo;
+
     private boolean jumpAndCrush(AttackInstance instance){
 
         int tick = instance.tick;
         int stage = instance.stage;
 
         if (stage == 0){
-            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_CRUSH_JUMP)
-                            .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_CRUSH_JUMP_MIDAIR)
-                                    .build())
+            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_CRUSH)
+                            .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_IDLE.get()).build())
+                            .important()
                     .build());
             instance.nextStage();
+            this.jumpFlyTo = this.position().add(0,7,0);
         } else if (stage == 1){
             if (this.getTarget() != null) {
                 this.lookAt(EntityAnchorArgument.Anchor.FEET, this.getTarget().position());
             }
-            if (tick >= 10){
-                var target = this.getTarget();
-                if (target == null){
+
+            this.noPhysics = true;
+
+
+            if (tick < 18) {
+                if (this.jumpFlyTo == null) {
+                    this.jumpFlyTo = this.position().add(0, 10, 0);
+                }
+
+                this.setGravity((float) (Mob.DEFAULT_BASE_GRAVITY / 3));
+
+                Vec3 deltaMovement = this.jumpFlyTo.subtract(this.position()).scale(0.25f);
+                this.setDeltaMovement(deltaMovement);
+                if (tick > 10){
+                    this.setSpawnGhosts(false);
+                }else{
+                    this.setSpawnGhosts(true);
+                }
+            }else{
+
+
+                if (this.getTarget() == null){
+                    this.noPhysics = false;
                     return true;
                 }else{
-                    this.noPhysics = true;
-                    this.setSpawnGhosts(true);
-                    this.jumpAndCrushPath = createJumpToPath(15, target.position());
-                    this.jumpAndCrushPath.tick(this);
+                    this.jumpAndCrushPath = new ProjectileMovementPath(2, false)
+                            .addPos(this.position())
+                            .addPos(this.getTarget().position());
                 }
+
                 instance.nextStage();
             }
+
         }else if (stage == 2){
 
-            if (this.jumpAndCrushPath == null){
+            if (this.getTarget() == null){
                 this.noPhysics = false;
                 return true;
             }
 
-            this.noPhysics = true;
-            if (this.jumpAndCrushPath.isFinished()){
-                this.noPhysics = false;
-                instance.nextStage();
-                return false;
+            if (this.jumpAndCrushPath == null){
+                this.jumpAndCrushPath = new ProjectileMovementPath(2, false)
+                        .addPos(this.position())
+                        .addPos(this.getTarget().position());
             }
-            this.jumpAndCrushPath.tick(this);
+
+            if (tick > 10){
+
+                this.setSpawnGhosts(true);
+                if (this.jumpAndCrushPath.isFinished()){
+                    var lastPos = this.jumpAndCrushPath.getPositions().getLast();
+                    this.teleportTo(lastPos.x, lastPos.y, lastPos.z);
+
+
+                    this.setGravity((float) Mob.DEFAULT_BASE_GRAVITY);
+                    this.setDeltaMovement(Vec3.ZERO);
+                    instance.nextStage();
+                    return false;
+                }
+                this.jumpAndCrushPath.tick(this);
+            }
 
         }else if (stage == 3){
 
+
+            this.setGravity((float) Mob.DEFAULT_BASE_GRAVITY);
+
+            this.setSpawnGhosts(false);
             this.noPhysics = false;
             if (tick == 0){
-                this.setSpawnGhosts(false);
-                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_CRUSH_JUMP_END)
-                        .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_IDLE).build())
-                        .build());
+                this.setSpawnGhosts(true);
+
                 this.setDeltaMovement(Vec3.ZERO);
+            }else if (tick == 2){
+
+                this.setSpawnGhosts(false);
+                BossUtil.netzachCrush((ServerLevel) level(), this.position(), 60);
+
+                Vec3 targetPos = this.position().add(1,0,0);
+                if (this.getTarget() != null){
+                    targetPos = this.getTarget().position();
+                }
+                Vec3 between = targetPos.subtract(this.position());
+
+                this.spawnRollingGearsAround(between, 8, 1.5f);
+
+                PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                        .frequency(10)
+                        .amplitude(2.5f)
+                        .inTime(0)
+                        .stayTime(0)
+                        .outTime(10)
+                        .build(),this.position(),30);
             }
             if (tick > 40){
 
@@ -179,22 +240,15 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         return false;
     }
 
-    private ProjectileMovementPath createJumpToPath(int time, Vec3 target){
-
-        Vec3 startPos = this.position();
-        Vec3 between = target.subtract(startPos);
-
-        Vec3 hb = between.multiply(1,0,1);
-
-        Vec3 pos2 = startPos.add(hb.x * 0.25, 10, hb.z * 0.25);
-        Vec3 pos3 = startPos.add(hb.x * 0.75, 7, hb.z * 0.75);
-
-        return new ProjectileMovementPath(time, false)
-                .addPos(startPos)
-                .addPos(pos2)
-                .addPos(pos3)
-                .addPos(target);
+    private void spawnRollingGearsAround(Vec3 initialDirection, int count, float speed){
+        initialDirection = initialDirection.multiply(1,0,1).add(0.001,0,0).normalize();
+        float angle = FDMathUtil.FPI * 2 / count;
+        for (int i = 0; i < count; i++){
+            Vec3 direction = initialDirection.yRot(angle * i);
+            NetzachRollingGearAttack netzachRollingGearAttack = NetzachRollingGearAttack.summon(this, this.position(), direction.scale(speed));
+        }
     }
+
 
 
     public static final int RANGED_ATTACK_THROW_GEAR = 0;

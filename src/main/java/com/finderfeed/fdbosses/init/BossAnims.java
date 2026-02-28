@@ -346,6 +346,10 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
     });
 
+    public static DeferredHolder<Animation,Animation> NETZACH_CRUSH = ANIMATIONS.register("netzach_crush", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
+    });
+
 
 
 }

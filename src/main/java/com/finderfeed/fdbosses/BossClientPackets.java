@@ -425,7 +425,60 @@ public class BossClientPackets {
             case BossUtil.NETZACH_PUSH_AWAY -> {
                 netzachPushAway(pos, data);
             }
+            case BossUtil.NETZACH_CRUSH -> {
+                netzachCrush(pos, data);
+            }
         }
+    }
+
+    private static void netzachCrush(Vec3 pos, int data) {
+        Level level = FDClientHelpers.getClientLevel();
+        BallParticleOptions flash = BallParticleOptions.builder()
+                .color(1f,0.8f,0.4f)
+                .scalingOptions(1,0,1)
+                .brightness(2)
+                .size(7f)
+                .build();
+        level.addParticle(flash,true,pos.x,pos.y,pos.z,0,0,0);
+
+
+
+        for (var direction : new HorizontalCircleRandomDirections(level.random, 6, 0)){
+
+            Vec3 p = pos.add(direction.scale(3));
+            Vec3 nrm = new Vec3(0,1,0).cross(direction);
+
+            SpriteParticleOptions options = SpriteParticleOptions.builder(BossParticles.NETZACH_CRUSH)
+                    .size(5f)
+                    .lifetime(9)
+                    .particleLookDirection(nrm)
+                    .lightenedUp()
+                    .build();
+
+            level.addParticle(options, true, p.x, p.y, p.z, 0,0,0);
+
+        }
+
+        for (int i = 0; i < 5; i++){
+            for (var direction : new HorizontalCircleRandomDirections(level.random, 24, 1)){
+
+                Vec3 p = pos.add(direction.scale(random.nextFloat() * 4));
+
+                SpriteParticleOptions options = SpriteParticleOptions.builder(BossParticles.YELLOW_SPARK)
+                        .xyzRotationSpeed(20 * BossUtil.randomPlusMinus(),0,0)
+                        .friction(0.9f)
+                        .lifetime(random.nextInt(10,15))
+                        .size(0.5f + 0.5f * random.nextFloat())
+                        .lightenedUp()
+                        .quadSizeDecreasing()
+                        .quadSizeEaseOut()
+                        .build();
+
+                level.addParticle(options, true, p.x, p.y, p.z, 0,0.05f + random.nextFloat() * 0.5f,0);
+
+            }
+        }
+
     }
 
     private static void netzachPushAway(Vec3 pos, int data) {
