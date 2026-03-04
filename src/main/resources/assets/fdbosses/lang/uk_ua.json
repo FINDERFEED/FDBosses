@@ -76,7 +76,7 @@
   "effect_description.fdbosses.shocked": "Зменшує кінцеву шкоду на заданий відсоток.",
   "fdbosses.skills.chesed.crystals_description": "Застосовує цю здатність перед атакою блискавки.\n\nЗнищує всі кристали, а потім викликає по 1 кристалу з кожного боку поля бою.\n\nЯкщо гравець знищує кристал, цей гравець стає {{(fdbosses:effect)id=fdbosses:chesed_energized,level=1}}.",
   "fdbosses.skills.chesed.crystals": "Кристали",
-  "fdbosses.close_skill_info": "Натисніть порожнє місце, аби закрити",
+  "fdbosses.close_skill_info": "Натисніть порожнє місце, щоби закрити",
   "fdbosses.bosses.description.chesed": "Істота, народжена зі скель, роз'їдених скалком. Володіє величезною магічною силою.\n\n§cРекомендована зброя: {{(fdlib:item)item=minecraft:diamond_axe}}",
   "fdbosses.skills.chesed.mightiness": "Могутність",
   "fdbosses.skills.chesed.mightiness_description": "Чеседа неможливо поранити безпосередньо, і з його арени не можна легко втекти.\n\nУсю шкоду, завдану Чеседом, не можна зменшити жодним опором.\n\nДає всім учасникам бою {{(fdbosses:effect)id=minecraft:night_vision}}, коли вони живі.\n\nЯкщо гравець відводить погляд від Чеседа, цей гравець отримує {{(fdbosses:effect)id=fdbosses:chesed_gaze}}.\n\nЧесед переходить до другої фази, коли здоров'я падає нижче половини.",
@@ -126,7 +126,7 @@
 
   "fdbosses.boss_drop.fdbosses.chesed.fdbosses.lightning_core.info": "Ядро, з якого Чесед черпає свою силу. \n\nМожна застосувати до будь-якої зброї на верстаці. \n\nПід час атаки на сутностей зі зброєю, удосконаленою ядром блискавки, є шанс викликати примару вашої зброї, який атакує ціль і завдасть певний відсоток шкоди від вашої зброї, завдаючи {{(fdbosses:effect)id=fdbosses:shocked}}.",
   "fdbosses.boss_drop.fdbosses.chesed.fdbosses.lightning_core.stats": "Шок:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=effectConfig, value=shockDamageReductionPercent}}% вихідної шкоди скорочення.\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=flyingSwordShockDuration}} тактів.\n\nЗброя-привид: \n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=flyingSwordDamagePercent}}% шкоди від зброї.\n\nШанс виклику:  {{(fdbosses:config_float) config=itemConfig, value=chanceToSummonFlyingSword}}%",
-  "fdbosses.boss_drop.fdbosses.chesed.fdbosses.chesed_trophy.info": "Трофей Чеседа, щоб продемонструвати ваші героїчні вчинки",
+  "fdbosses.boss_drop.fdbosses.chesed.fdbosses.chesed_trophy.info": "Трофей Чеседа, щоби продемонструвати ваші героїчні вчинки",
   "fdbosses.boss_drop.fdbosses.chesed.fdbosses.phase_sphere.info": "Можна використовувати для поетапного проходження блоків на високій швидкості.\n\n§cУвага!§r\n\nМоби все одно зможуть завдати вам шкоди, ви захищені лише від задухи в блоках.",
   "fdbosses.boss_drop.fdbosses.chesed.fdbosses.phase_sphere.stats": "Тривалість етапу:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=phaseSphereUseDuration}} тики.\n\nЗатримка:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=phaseSphereCooldown}} тактів.",
 
@@ -149,7 +149,7 @@
   "advancements.qliphoth_awakening.geburah.description": "Божественна конструкція, вічний суддя, злий тиран став",
   "advancements.qliphoth_awakening.geburah.title": "Ґебура",
   "fdbosses.word.tried_to_break_arena": "Зла сила заважає вам зіпсувати це місце.",
-  "fdbosses.tldr.chesed": "Шкода Чеседа пробиває обладунки та щити.\n\nЩоб завдати шкоду Чеседу:\n\nЗачекайте, доки не атакує промінь блискавки, убийте кристал сокирою, щоб отримати {{(fdbosses:effect)id=fdbosses:chesed_energized,level=1}}, біжіть до відбивача променів і змусьте Чеседа вдарити його. Ви маєте імунітет до атака променем блискавки, коли ви {{(fdbosses:effect)id=fdbosses:chesed_energized}}.\n\nЧесед має атаку, шкода від якої залежить від кількости активних монолітів, якщо всі моноліти активні — немає можливости вижити під час атаки — убийте його.",
+  "fdbosses.tldr.chesed": "Шкода Чеседа пробиває обладунки та щити.\n\nЩоби завдати шкоду Чеседу:\n\nЗачекайте, доки не атакує промінь блискавки, убийте кристал сокирою, щоб отримати {{(fdbosses:effect)id=fdbosses:chesed_energized,level=1}}, біжіть до відбивача променів і змусьте Чеседа вдарити його. Ви маєте імунітет до атака променем блискавки, коли ви {{(fdbosses:effect)id=fdbosses:chesed_energized}}.\n\nЧесед має атаку, шкода від якої залежить від кількости активних монолітів, якщо всі моноліти активні — немає можливости вижити під час атаки — убийте його.",
   "fdbosses.word.tldr": "Короткий опис боса",
   "fdbosses.word.short_description": "Короткий опис",
   "death.attack.cowardice": "%s покарано за своє боягузтво",
@@ -171,7 +171,7 @@
   "fdbosses.skills.malkuth.cannons_stats": "Гарматне ядро:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=malkuthConfig, value=cannonDamage}}.",
   "fdbosses.skills.malkuth.cannons_description": "Тип шкоди: §cВогняна§r / §bЛьодяна§r\n\nМалкут стрибає на стіну позаду нього та наказує своїм гарматам стріляти нищівними пострілами в ціль.\n\nЯкщо ця здатність застосована, гармати бою можна використовувати ще раз, якщо вони не зламані.\n\n§lДруга фаза:§r\n\nКоли починається друга фаза, Малкут наказує своїм гарматам розбити гармати на боці учасників бою.",
   "fdbosses.skills.malkuth.fair_duel": "Чесний двобій",
-  "fdbosses.skills.malkuth.fair_duel_description": "Учасники бою можуть використовувати дві гармати на своєму боці, щоб битися на рівних із Малкутом.\n\nЩоб зробити постріл, натисніть ПКМ на гарматі.\n\nУчасники бою можуть використовувати лише ту гармату, до якої вони наразі слабкі.\n\nПісля пострілу гармата стає непридатною до наступного використання здатности гармати.",
+  "fdbosses.skills.malkuth.fair_duel_description": "Учасники бою можуть використовувати дві гармати на своєму боці, щоби битися на рівних із Малкутом.\n\nЩоби зробити постріл, натисніть ПКМ по гарматі.\n\nУчасники бою можуть використовувати лише ту гармату, до якої вони наразі слабкі.\n\nПісля пострілу гармата стає непридатною до наступного використання здатности гармати.",
   "fdbosses.skills.malkuth.arcslash": "Дугові розрізи",
   "fdbosses.skills.malkuth.arcslash_stats": "Розріз:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=malkuthConfig, value=arcSlashesDamage}}.",
   "fdbosses.skills.malkuth.arcslash_description": "Тип шкоди: §cВогняна§r / §bЛьодяна§r\n\nМалкут заряджає свої мечі та випускає повітряні дугові розрізи, покриваючи всю арену.",
@@ -195,12 +195,12 @@
   "fdbosses.skills.malkuth.hellshaper_description": "Тип шкоди: §cВогняна§r / §bЛьодяна§r\n\nМалкут ударяє землю, викликаючи плавучі острови, підкидаючи всіх у повітря та роблячи підлогу непридатною для ходьби.\n\nПісля цього запускає вогняні кулі на ці острови.",
   "fdbosses.word.socials": "Соцмережі мода",
   "fdbosses.word.mod_discord": "Сервер Discord мода",
-  "fdbosses.word.patreon": "Підтримати розробку на Patreon (Shift+ЛКМ, аби побачити хто підтримав)",
-  "fdbosses.word.boosty": "Підтримати розробку на Boosty (Shift+ЛКМ, аби побачити хто підтримав)",
+  "fdbosses.word.patreon": "Підтримати розробку на Patreon (Shift+ЛКМ, щоби побачити хто підтримав)",
+  "fdbosses.word.boosty": "Підтримати розробку на Boosty (Shift+ЛКМ, щоби побачити хто підтримав)",
   "fdbosses.word.socials_word": "Соцмережі",
 
   "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.fire_and_ice_core.stats": "Шкода:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballToolDamagePercent}}% шкоди інструмента.\n\nЗдатність предмета час відновлення:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballAbilityCooldown}} тактів",
-  "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.fire_and_ice_core.info": "Ядро Малкута.\n\nМожна приєднати до будь-якого предмета, який має пошкодження, щоб мати можливість викликати вогняні кулі Малкута.\n\nВикористовуйте предмет, щоб випустити вогняну кулю, яка завдасть відсоток шкоди предмету та запалить цілі.\n\nПрисідайте, поки використання предмета для випуску крижаної кулі, яка натомість уповільнить цілі.",
+  "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.fire_and_ice_core.info": "Ядро Малкута.\n\nМожна приєднати до будь-якого предмета, який має пошкодження, щоби мати можливість викликати вогняні кулі Малкута.\n\nВикористовуйте предмет, щоби випустити вогняну кулю, яка завдасть відсоток шкоди предмету та запалить цілі.\n\nПрисідайте, поки використання предмета для випуску крижаної кулі, яка натомість уповільнить цілі.",
   "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.malkuth_trophy.info": "Трофей Малкута для демонстрації ваших героїчних вчинків",
   "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.malkuth_fist.stats": "Шкода розчавлення:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=iceFireGauntletCrushDamage}}.\n\nЗатримка:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=iceFireGauntletCooldown}} тактів",
   "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.malkuth_fist.info": "§6У правій руці:§r\n\nДіє як гачок для блоків. Виконує розгромну атаку Малкута у позиції захвату.\nЯкщо використовується на землі обличчям донизу, користувач піднімається в повітря.\n\n§6У лівій руці:§r\n\nДіє як захватний гак для сутностей. Змушує користувача автоматично атакувати ціль, а потім відкидає користувача від цілі.\n\n§6Комбо:§r\n\nЯкщо використовувати предмет у лівій руці, а потім перемістити його назад у праву руку, його час відновлення скидається.",
@@ -262,7 +262,7 @@
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.justice_core.info": "Ядро Ґебура.\n\nМожна застосувати до будь-яких обладунків на верстаці.\n\nНадає гравцям коричний ефект: вхідна шкода зменшується та обмежується кількістю останньої отриманої шкоди (після всіх опорів).\n\nНе можна накопичувати.",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.justice_core.stats": "Зменшення шкоди:\n{{(fdlib:image)path=fdbosses:boss_protection}}: {{(fdbosses:config_float) config=itemConfig, value=justiceCoreDamageReduction}}% зменшення вхідного збитку.",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.polished_justicestone.info": "Багато правосудекаменю.",
-  "fdbosses.boss_drop.fdbosses.geburah.fdbosses.geburah_trophy.info": "Трофей Ґебура, аби продемонструвати ваші героїчні вчинки",
+  "fdbosses.boss_drop.fdbosses.geburah.fdbosses.geburah_trophy.info": "Трофей Ґебура, щоби продемонструвати ваші героїчні вчинки",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.divine_gear.stats": "Пошкодження:\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearDamage}}.\n\nУдар інтервал:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearAttackCooldown}} тики.\n\nТривалість:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearLifetime}} тиків.\n\nЧас відновлення заряду:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearChargeReplenishTime}} тактів.\n\nРадіус атаки:\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearAttackRadius}} блоків.",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.divine_gear.info": "Дозволяє розмістити вежу, яка атакуватиме §cБУДЬ-ЯКИХ§r мобів навколо неї.\n\nПріоритезує атаку на сутність, яку ви атакували останньою.\n\nЗберігає до {{(fdbosses:config_float) config=itemConfig, value=divineGearCharges}} стягнення.",
 
@@ -275,7 +275,7 @@
   "fdbosses.word.item_is_not_released_yet": "Цей предмет ще не випущено!",
   "fdbosses.word.malkuth_fist_description": "Діє як гачок для блоків у правій руці, для сутностей у лівій руці. Використання предмета в лівій руці, а потім переміщення його в праву руку скидає його час відновлення.",
   "fdbosses.word.phase_sphere_description": "При використанні дозволяє поетапно переходити через блоки протягом обмеженого часу.",
-  "fdbosses.word.divine_gear_description": "Натисніть ПКМ по блоку, аби встановити вежу, яка атакуватиме будь-якого моба навколо нього.",
+  "fdbosses.word.divine_gear_description": "Натисніть ПКМ по блоку, щоби встановити вежу, яка атакуватиме будь-якого моба навколо нього.",
 
 
   "fml.menu.mods.info.description.fdbosses": "Додає різних босів з унікальними механіками."
