@@ -4,15 +4,12 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossEffects;
 import com.finderfeed.fdbosses.init.BossSounds;
-import com.finderfeed.fdlib.init.FDEDataSerializers;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -26,8 +23,6 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 public class ChesedCrystalEntity extends FDLivingEntity implements ChesedBossBuddy {
-
-    public static final EntityDataAccessor<Vec3> DIRECTION = SynchedEntityData.defineId(ChesedCrystalEntity.class, FDEDataSerializers.VEC3.get());
 
     private boolean dead = false;
     private int deathTime = 20;
@@ -155,11 +150,19 @@ public class ChesedCrystalEntity extends FDLivingEntity implements ChesedBossBud
     }
 
     public Vec3 getCrystalFacingDirection(){
-        return this.entityData.get(DIRECTION);
+        return Vec3.directionFromRotation(this.getXRot(), this.getYRot());
     }
 
     public void setCrystalFacingDirection(Vec3 v){
-        this.entityData.set(DIRECTION,v);
+        if (v.lengthSqr() < 1.0E-6) {
+            return;
+        }
+        Vec3 normalized = v.normalize();
+        double horizontalDistance = Math.sqrt(normalized.x * normalized.x + normalized.z * normalized.z);
+        this.setXRot((float)(-(Mth.atan2(normalized.y, horizontalDistance) * Mth.RAD_TO_DEG)));
+        this.setYRot((float)(Mth.atan2(-normalized.x, normalized.z) * Mth.RAD_TO_DEG));
+        this.xRotO = this.getXRot();
+        this.yRotO = this.getYRot();
     }
 
     @Override
@@ -175,7 +178,6 @@ public class ChesedCrystalEntity extends FDLivingEntity implements ChesedBossBud
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder data) {
         super.defineSynchedData(data);
-        data.define(DIRECTION,new Vec3(0,1,0));
     }
 
 }
