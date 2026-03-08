@@ -97,7 +97,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -422,13 +421,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         var monoliths = this.getMonoliths();
         float monolithHPGain = BossConfigs.BOSS_CONFIG.get().chesedConfig.additionalSecondPhaseMonolithHP;
         for (var m : monoliths){
-            AttributeModifier hpModifier = new AttributeModifier(FDBosses.location("monolith_hp"), monolithHPGain, AttributeModifier.Operation.ADD_VALUE);
-            var attr = m.getAttribute(Attributes.MAX_HEALTH);
-            if (attr != null) {
-                attr.addPermanentModifier(
-                        hpModifier
-                );
-            }
+            m.setMaxHealthBonus(monolithHPGain);
             m.setHealth(m.getMaxHealth());
             m.setDeactivated(false);
         }

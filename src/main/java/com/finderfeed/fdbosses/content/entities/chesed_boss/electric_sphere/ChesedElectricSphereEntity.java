@@ -13,11 +13,12 @@ import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningParticleOptions;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
@@ -28,7 +29,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
-public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSerializable, ChesedBossBuddy {
+public class ChesedElectricSphereEntity extends FDEntity implements AutoSerializable, ChesedBossBuddy {
 
     @SerializableField
     private ProjectileMovementPath path;
@@ -37,7 +38,7 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
     private float damage;
 
 
-    public ChesedElectricSphereEntity(EntityType<? extends LivingEntity> type, Level level) {
+    public ChesedElectricSphereEntity(EntityType<?> type, Level level) {
         super(type, level);
     }
 
@@ -156,10 +157,9 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
 
     @Override
     public boolean hurt(DamageSource src, float damage) {
-
         if (!src.is(DamageTypes.GENERIC_KILL) && !src.is(DamageTypes.FELL_OUT_OF_WORLD)) return false;
-
-        return super.hurt(src, damage);
+        this.discard();
+        return true;
     }
 
     @Override
@@ -184,5 +184,9 @@ public class ChesedElectricSphereEntity extends FDLivingEntity implements AutoSe
     public void load(CompoundTag tag) {
         this.autoLoad(tag);
         super.load(tag);
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
     }
 }
