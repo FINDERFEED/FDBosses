@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -35,6 +36,8 @@ public class DebugStick extends Item {
 
             Vec3 ppos = player.position().add(0, 0, 0).add(player.getLookAngle().scale(0.5));
 
+            BacktrackEntity.summon(player, 10);
+
 //            serverLevel.sendParticles(SpriteParticleOptions.builder(BossParticles.NETZACH_SLASH)
 //                    .particleLookDirection(player.getLookAngle())
 ////                            .xyzRotation(0,20,0)
@@ -51,7 +54,7 @@ public class DebugStick extends Item {
 
 //            NetzachRollingGearAttack.summon(player, ppos, player.getLookAngle().multiply(1,0,1).normalize().scale(2));
 
-            NetzachGearCrushAttack.summon(player, player, player.getLookAngle());
+//            NetzachGearCrushAttack.summon(player, player, player.getLookAngle());
 
         }else{
 //

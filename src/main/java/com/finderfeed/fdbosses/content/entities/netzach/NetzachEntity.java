@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignabl
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
@@ -30,6 +31,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -221,8 +223,11 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                 }else{
                     this.setSpawnGhosts(true);
                 }
-            }else{
 
+
+
+            }else{
+                level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.ATTACK_DING.get(), SoundSource.HOSTILE, 3f, 1f);
 
                 if (this.getTarget() == null){
                     this.noPhysics = false;
@@ -275,6 +280,9 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
             if (tick == 0){
                 this.setSpawnGhosts(true);
 
+                level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.GEBURAH_RAY_SHOT.get(), SoundSource.HOSTILE, 2f, 1f);
+                level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.HOSTILE, 2f, 1f);
+                level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.ROCK_IMPACT.get(), SoundSource.HOSTILE, 2f, 1f);
                 this.setDeltaMovement(Vec3.ZERO);
             }else if (tick == 2){
 
@@ -486,6 +494,9 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
             } else if (tick == 10){
                 Vec3 fwd = this.getLookAngle().multiply(1,0,1).normalize();
                 Vec3 startPos = this.position();
+
+
+                level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.HOSTILE, 2f, 1f);
 
                 PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                         .frequency(5)

@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptio
 import com.finderfeed.fdbosses.content.entities.FDOwnableEntity;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDColor;
@@ -17,6 +18,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -66,6 +68,7 @@ public class NetzachGearCrushAttack extends FDOwnableEntity {
                         .stayTime(0)
                         .outTime(6)
                         .build(), this.position(), 20);
+                level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.HOSTILE, 2f, 1f);
             }
 
 

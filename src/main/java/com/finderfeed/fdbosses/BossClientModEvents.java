@@ -75,6 +75,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.Mal
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttackRenderer;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereOverlay;
@@ -477,6 +478,18 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.NETZACH_GEAR_CRUSH.get(), NetzachGearCrushAttackRenderer::new);
+
+        event.registerEntityRenderer(BossEntities.BACKTRACK_ENTITY.get(), FDEntityRendererBuilder.<BacktrackEntity>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<BacktrackEntity>builder()
+                                .model(BossModels.PLAYER_MODEL)
+                                .renderType(RenderType.lightning())
+                                .color(84f/255, 46/255f,30/255f,0.75f)
+                                .build())
+                        .shouldRender(((backtrackEntity, frustum, v, v1, v2) -> {
+                            var player = FDClientHelpers.getClientPlayer();
+                            return backtrackEntity.getOwner() == player;
+                        }))
+                .build());
 
         event.registerEntityRenderer(BossEntities.NETZACH.get(), FDEntityRendererBuilder.<NetzachEntity>builder()
                         .addLayer(FDEntityRenderLayerOptions.<NetzachEntity>builder()

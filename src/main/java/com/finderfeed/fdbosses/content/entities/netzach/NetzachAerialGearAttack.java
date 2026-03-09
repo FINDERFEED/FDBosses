@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.BossSimpleProjectile;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
@@ -13,6 +14,7 @@ import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -191,6 +193,8 @@ public class NetzachAerialGearAttack extends BossSimpleProjectile implements Aut
                     .stayTime(0)
                     .outTime(6)
                     .build(), this.position(), 20);
+            level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.HOSTILE, 2f, 1f);
+            level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.ROCK_IMPACT.get(), SoundSource.HOSTILE, 2f, 1f);
         }
     }
 
