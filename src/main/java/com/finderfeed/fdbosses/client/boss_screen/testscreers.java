@@ -39,27 +39,40 @@ public class testscreers extends SimpleFDScreen {
 //        this.renderLine(gr, p1.x, p1.y, p3.x, p3.y, r,g,0);
 
         FD2DShape testshape = new FD2DShape(List.of(
-                new Vector3f(-20,0,-20),
-                new Vector3f(-20,0,20),
-                new Vector3f(20,0,20),
-                new Vector3f(20,0,-20)
-        ));
+                new Vector3f(-60,0,-60).add(anchor.x,0,anchor.y),
+                new Vector3f(-80,0,-50).add(anchor.x,0,anchor.y),
+                new Vector3f(-40,0,0).add(anchor.x,0,anchor.y),
+                new Vector3f(-80,0,50).add(anchor.x,0,anchor.y),
+                new Vector3f(-60,0,60).add(anchor.x,0,anchor.y),
+
+                new Vector3f(0,0,20).add(anchor.x,0,anchor.y),
+
+                new Vector3f(60,0,60).add(anchor.x,0,anchor.y),
+                new Vector3f(80,0,50).add(anchor.x,0,anchor.y),
+                new Vector3f(40,0,0).add(anchor.x,0,anchor.y),
+                new Vector3f(80,0,-50).add(anchor.x,0,anchor.y),
+                new Vector3f(60,0,-60).add(anchor.x,0,anchor.y)
+                ));
 
         var triangles = BossUtil.splitShapeToTriangles(testshape);
 
+
+        int id = 0;
         for (var shape : triangles){
 
+            float p = (float) id / triangles.size();
+            var points = shape.getPoints();
 
+            for (int i = 0; i < points.size(); i++){
+                var p1 = BossUtil.getListValueCircular(points, i);
+                var p2 = BossUtil.getListValueCircular(points, i + 1);
+                this.renderLine(gr, p1.x, p1.z, p2.x, p2.z, p, 1, 0);
+            }
 
+            id++;
         }
 
     }
-
-    public void renderTriangle(FD2DShape shape){
-
-    }
-
-
 
     public void renderLine(GuiGraphics graphics, float x1, float y1, float x2, float y2, float r, float g, float b){
         Tesselator tesselator = Tesselator.getInstance();

@@ -86,7 +86,63 @@ public class BossUtil {
     public static final int NETZACH_CRUSH = 25;
 
 
+
+
+    //accepts xz plane only
+    //basically a raycast into infinite x
+    public static boolean isPointIn2dShape(FD2DShape shape, Vector2f point){
+        List<Vector2f> points = new ArrayList<>(shape.getPoints().stream().map(vec -> {
+            return new Vector2f(vec.x, vec.z);
+        }).toList());
+
+        int intersections = 0;
+
+        for (int i = 0; i < points.size(); i++){
+            var p1 = BossUtil.getListValueCircular(points, i);
+            var p2 = BossUtil.getListValueCircular(points, i + 1);
+
+            if (p1.y > point.y && p2.y < point.y || p1.y < point.y && p2.y > point.y){
+
+                if (p1.x > point.x && p2.x > point.x){
+                    intersections++;
+                } else if (p1.x > point.x && p2.x < point.x || p1.x < point.x && p2.x > point.x){
+                    Vector2f nrm = getNormalPoint(p1, p2, point);
+                    Vector2f normal = nrm.sub(point, new Vector2f());
+                    var dot = normal.dot(new Vector2f(1,0));
+                    if (dot >= 0){
+                        intersections++;
+                    }
+                }
+
+            }
+        }
+
+        return intersections % 2 != 0;
+    }
+
+    //pp - plane point
+    public static Vector2f getNormalPoint(Vector2f pp1, Vector2f pp2, Vector2f p){
+        float x1 = pp1.x;
+        float y1 = pp1.y;
+
+        float x2 = pp2.x;
+        float y2 = pp2.y;
+
+        float x3 = p.x;
+        float y3 = p.y;
+
+        float b = (y2 - y1) / (x2 - x1 + 0.000001f);
+
+        float x = (x3 / b - y1 + y3 + b * x1) / (b + 1 / b);
+        float y = b * (x - x1) + y1;
+
+        return new Vector2f(x, y);
+    }
+
+
+
     // accepts shape in xz plane
+    // Ear clipping algorithm
     public static List<FD2DShape> splitShapeToTriangles(FD2DShape shape){
 
         if (shape.getPoints().size() < 3){
@@ -177,7 +233,7 @@ public class BossUtil {
         index = index % list.size();
 
         if (index < 0){
-            return list.get(list.size() - index - 1);
+            return list.get(list.size() + index);
         }else{
             return list.get(index);
         }
@@ -189,8 +245,8 @@ public class BossUtil {
         Vector2f b = p3.sub(p1, new Vector2f());
         Vector2f p = point.sub(p1, new Vector2f());
 
-        float w1 = (p.x - a.x * p.y / a.y) / (b.x - a.x * b.y / a.y);
-        float w2 = (p.y - b.y * w1) / a.y;
+        float w1 = (p.x - a.x * p.y / (a.y + 0.00001f)) / (b.x - a.x * b.y / (a.y + 0.00001f));
+        float w2 = (p.y - b.y * w1) / (a.y + 0.00001f);
 
         return w1 <= 1 && w2 <= 1 && w1 >= 0 && w2 >= 0
                 && (w1 + w2 <= 1);
