@@ -10,6 +10,7 @@ import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.BoundToEntityProcessor;
+import com.finderfeed.fdlib.systems.shapes.FD2DShape;
 import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.BlockPos;
@@ -42,7 +43,9 @@ import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.util.AttributeUtil;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.joml.Matrix3f;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.util.*;
@@ -81,6 +84,117 @@ public class BossUtil {
     public static final int NETZACH_GEAR_SLAM = 23;
     public static final int NETZACH_PUSH_AWAY = 24;
     public static final int NETZACH_CRUSH = 25;
+
+
+    // accepts shape in xz plane
+    public static List<FD2DShape> splitShapeToTriangles(FD2DShape shape){
+
+        if (shape.getPoints().size() < 3){
+            return new ArrayList<>();
+        }
+
+        List<Vector2f> points = new ArrayList<>(shape.getPoints().stream().map(vec -> {
+            return new Vector2f(vec.x, vec.z);
+        }).toList());
+
+        List<FD2DShape> triangles = new ArrayList<>();
+
+        int index = 0;
+        while (points.size() > 3){
+
+            var p1 = getListValueCircular(points, index - 1);
+            var p2 = getListValueCircular(points, index);
+            var p3 = getListValueCircular(points, index + 1);
+
+            if (isAngleConvex(p1,p2,p3)){
+
+                boolean triangleValid = true;
+                for (var point : points){
+                    if (point.equals(p1) || point.equals(p2) || point.equals(p3)){
+                        continue;
+                    }
+                    if (BossUtil.isPointInTriangle(p1, p2, p3, point)) {
+                        triangleValid = false;
+                        break;
+                    }
+                }
+
+                if (triangleValid){
+                    triangles.add(new FD2DShape(List.of(
+                            new Vector3f(p1.x,0,p1.y),
+                            new Vector3f(p2.x,0,p2.y),
+                            new Vector3f(p3.x,0,p3.y)
+                    )));
+                    points.remove(index);
+                    index = 0;
+                    continue;
+                }
+
+            }
+
+            index++;
+        }
+
+        Vector2f p1 = points.get(0);
+        Vector2f p2 = points.get(1);
+        Vector2f p3 = points.get(2);
+
+        triangles.add(new FD2DShape(
+                List.of(
+                        new Vector3f(p1.x, 0, p1.y),
+                        new Vector3f(p2.x, 0, p2.y),
+                        new Vector3f(p3.x, 0, p3.y)
+                )
+        ));
+
+        return triangles;
+    }
+
+
+    // p2 is a point where angle is checked
+    public static boolean isAngleConvex(Vector2f p1, Vector2f p2, Vector2f p3){
+
+        Vector2f v1 = p1.sub(p2, new Vector2f());
+        Vector2f v2 = p3.sub(p2, new Vector2f());
+
+        Matrix3f mat = new Matrix3f(
+                1, v1.x, v2.x,
+                1, v1.y, v2.y,
+                1, 0,0
+        );
+
+        var det = mat.determinant();
+
+        return det > 0;
+    }
+
+    public static <T> T getListValueCircular(List<T> list, int index){
+
+        if (list.isEmpty()){
+            return null;
+        }
+
+        index = index % list.size();
+
+        if (index < 0){
+            return list.get(list.size() - index - 1);
+        }else{
+            return list.get(index);
+        }
+
+    }
+
+    public static boolean isPointInTriangle(Vector2f p1, Vector2f p2, Vector2f p3, Vector2f point){
+        Vector2f a = p2.sub(p1, new Vector2f());
+        Vector2f b = p3.sub(p1, new Vector2f());
+        Vector2f p = point.sub(p1, new Vector2f());
+
+        float w1 = (p.x - a.x * p.y / a.y) / (b.x - a.x * b.y / a.y);
+        float w2 = (p.y - b.y * w1) / a.y;
+
+        return w1 <= 1 && w2 <= 1 && w1 >= 0 && w2 >= 0
+                && (w1 + w2 <= 1);
+    }
 
     public static Vec3 matTransformDirectionVec3(Matrix4f mat, Vec3 v){
         Vector3f v1 = mat.transformDirection(
