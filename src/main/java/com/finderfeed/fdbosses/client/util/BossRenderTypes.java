@@ -33,6 +33,22 @@ public class BossRenderTypes extends RenderType{
                     .createCompositeState(false)
     );
 
+    public static final RenderType LIGHTNING_NO_CULL_TRIANGLES = create(
+            "lightning_no_cull",
+            DefaultVertexFormat.POSITION_COLOR,
+            VertexFormat.Mode.TRIANGLES,
+            1536,
+            false,
+            true,
+            RenderType.CompositeState.builder()
+                    .setShaderState(RENDERTYPE_LIGHTNING_SHADER)
+                    .setWriteMaskState(COLOR_DEPTH_WRITE)
+                    .setTransparencyState(LIGHTNING_TRANSPARENCY)
+                    .setOutputState(WEATHER_TARGET)
+                    .setCullState(RenderStateShard.NO_CULL)
+                    .createCompositeState(false)
+    );
+
 
     public static final RenderStateShard.TransparencyStateShard FD_ADDITIVE_TRANSPARENCY = new RenderStateShard.TransparencyStateShard(
             "fd_additive_transparency", () -> {

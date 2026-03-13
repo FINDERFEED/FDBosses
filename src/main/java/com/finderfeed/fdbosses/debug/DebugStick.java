@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.client.Minecraft;
@@ -33,12 +34,13 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
+//            SectorAttack.summon(player, SectorAttack.ShapesRegistry.SIMPLE_CHECKERBOARD_2_ID);
 
 //            ServerLevel serverLevel = (ServerLevel) level;
 //
 //            Vec3 ppos = player.position().add(0, 0, 0).add(player.getLookAngle().scale(0.5));
 //
-//            BacktrackEntity.summon(player, 10);
+            BacktrackEntity.summon(player, 30);
 
 
 //            serverLevel.sendParticles(SpriteParticleOptions.builder(BossParticles.NETZACH_SLASH)
@@ -69,7 +71,7 @@ public class DebugStick extends Item {
 //                            .end(player.getEyePosition().add(player.getLookAngle().scale(10)))
 //                    .build(), player.getX(), player.getY(), player.getZ(), 0,0,0);
 
-            Minecraft.getInstance().setScreen(new testscreers());
+//            Minecraft.getInstance().setScreen(new testscreers());
         }
 
         return super.use(level, player, hand);
