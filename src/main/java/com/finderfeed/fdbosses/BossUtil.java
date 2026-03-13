@@ -103,7 +103,7 @@ public class BossUtil {
 
             if (p1.y > point.y && p2.y < point.y || p1.y < point.y && p2.y > point.y){
 
-                if (p1.x > point.x && p2.x > point.x){
+                if (p1.x >= point.x && p2.x >= point.x){
                     intersections++;
                 } else if (p1.x > point.x && p2.x < point.x || p1.x < point.x && p2.x > point.x){
                     Vector2f nrm = getNormalPoint(p1, p2, point);

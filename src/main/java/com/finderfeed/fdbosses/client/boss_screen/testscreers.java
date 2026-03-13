@@ -56,17 +56,19 @@ public class testscreers extends SimpleFDScreen {
 
         var triangles = BossUtil.splitShapeToTriangles(testshape);
 
+        float col = 1;
+        if (BossUtil.isPointIn2dShape(testshape, new Vector2f(mx,my))){
+            col = 0;
+        }
 
         int id = 0;
         for (var shape : triangles){
-
-            float p = (float) id / triangles.size();
             var points = shape.getPoints();
 
             for (int i = 0; i < points.size(); i++){
                 var p1 = BossUtil.getListValueCircular(points, i);
                 var p2 = BossUtil.getListValueCircular(points, i + 1);
-                this.renderLine(gr, p1.x, p1.z, p2.x, p2.z, p, 1, 0);
+                this.renderLine(gr, p1.x, p1.z, p2.x, p2.z, col, 1 - col, 0);
             }
 
             id++;
