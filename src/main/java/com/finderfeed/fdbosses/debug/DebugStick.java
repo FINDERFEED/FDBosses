@@ -34,7 +34,7 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-//            SectorAttack.summon(player, SectorAttack.ShapesRegistry.SIMPLE_TWO_SECTORS_ID, 50);
+            SectorAttack.summon(player,"test", 50);
 
 //            ServerLevel serverLevel = (ServerLevel) level;
 //
@@ -71,7 +71,7 @@ public class DebugStick extends Item {
 //                            .end(player.getEyePosition().add(player.getLookAngle().scale(10)))
 //                    .build(), player.getX(), player.getY(), player.getZ(), 0,0,0);
 
-            Minecraft.getInstance().setScreen(new testscreers());
+//            Minecraft.getInstance().setScreen(new testscreers());
         }
 
         return super.use(level, player, hand);

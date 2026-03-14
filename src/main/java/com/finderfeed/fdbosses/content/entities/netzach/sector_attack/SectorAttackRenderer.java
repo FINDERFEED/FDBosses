@@ -1,9 +1,12 @@
 package com.finderfeed.fdbosses.content.entities.netzach.sector_attack;
 
+import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.util.BossRenderTypes;
+import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -11,8 +14,12 @@ import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Random;
 
 public class SectorAttackRenderer extends EntityRenderer<SectorAttack> {
+
+    //16 97
+    public static final ResourceLocation CLOCK_ARROW = FDBosses.location("textures/entities/netzach/clockarrow.png");
 
     public SectorAttackRenderer(EntityRendererProvider.Context p_174008_) {
         super(p_174008_);
@@ -40,10 +47,6 @@ public class SectorAttackRenderer extends EntityRenderer<SectorAttack> {
 
         matrices.pushPose();
 
-
-//        matrices.translate(0,0.01,0);
-
-
         matrices.translate(offset.x,0.01,offset.z);
 
         Matrix4f mat = matrices.last().pose();
@@ -53,12 +56,59 @@ public class SectorAttackRenderer extends EntityRenderer<SectorAttack> {
             var p1 = points.get(0);
             var p2 = points.get(1);
             var p3 = points.get(2);
-            vertex.addVertex(mat, p1.x, p1.y, p1.z).setColor(1f,1f,1f,1f);
-            vertex.addVertex(mat, p2.x, p2.y, p2.z).setColor(1f,1f,1f,1f);
-            vertex.addVertex(mat, p3.x, p3.y, p3.z).setColor(1f,1f,1f,1f);
+            Random random = new Random(id * 34325L);
+            float r = random.nextFloat();
+            float g = random.nextFloat();
+            float b = random.nextFloat();
+
+            vertex.addVertex(mat, p1.x, p1.y, p1.z).setColor(r,g,b,1f);
+            vertex.addVertex(mat, p2.x, p2.y, p2.z).setColor(r,g,b,1f);
+            vertex.addVertex(mat, p3.x, p3.y, p3.z).setColor(r,g,b,1f);
             id++;
         }
+
+        var shape = entity.getAttackShape();
+
+        vertex.addVertex(mat, shape.getMinBoundX(),0.005f, shape.getMinBoundZ()).setColor(1f,1f,1f,0.1f);
+        vertex.addVertex(mat, shape.getMaxBoundX(),0.005f, shape.getMinBoundZ()).setColor(1f,1f,1f,0.1f);
+        vertex.addVertex(mat, shape.getMaxBoundX(),0.005f, shape.getMaxBoundZ()).setColor(1f,1f,1f,0.1f);
+
+        vertex.addVertex(mat, shape.getMinBoundX(),0.005f, shape.getMinBoundZ()).setColor(1f,1f,1f,0.1f);
+        vertex.addVertex(mat, shape.getMinBoundX(),0.005f, shape.getMaxBoundZ()).setColor(1f,1f,1f,0.1f);
+        vertex.addVertex(mat, shape.getMaxBoundX(),0.005f, shape.getMaxBoundZ()).setColor(1f,1f,1f,0.1f);
+
+        if (!entity.isFollowingOwner()) {
+            Random random = new Random(entity.getId() * 343L);
+            var offsets = entity.getAttackVisualOffsets();
+            vertex = src.getBuffer(RenderType.text(CLOCK_ARROW));
+
+            float xSize = 0.75f;
+            float ySize = xSize / 0.1649484f;
+
+            for (var offs : offsets) {
+                matrices.pushPose();
+                matrices.translate(offs.x, 0,offs.y);
+
+                QuadRenderer.start(vertex)
+                        .pose(matrices)
+                        .verticalRendering()
+                        .sizeX(xSize)
+                        .sizeY(ySize)
+                        .translate(0,ySize - 1,0)
+                        .rotationDegrees(random.nextFloat() * 360)
+                        .renderBack()
+                        .render();
+
+                matrices.popPose();
+            }
+        }
+
+
+
+
         matrices.popPose();
+
+
 
 
     }

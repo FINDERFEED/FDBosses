@@ -18,6 +18,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.joml.Vector2f;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +40,7 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
 
     protected List<FD2DShape> triangulatedForRendering = new ArrayList<>();
 
-    protected List<Vec3> attackVisualOffsets = null;
+    protected List<Vector2f> attackVisualOffsets = null;
 
     private Vec3 ownerPos;
 
@@ -84,8 +85,43 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
 
     }
 
-    public List<Vec3> getAttackVisualOffsets() {
+    public List<Vector2f> getAttackVisualOffsets() {
         if (this.attackVisualOffsets == null){
+            var shape = this.getAttackShape();
+            if (shape == null){
+                return new ArrayList<>();
+            }
+
+            this.attackVisualOffsets = new ArrayList<>();
+
+            float minX = shape.getMinBoundX();
+            float minZ = shape.getMinBoundZ();
+
+            float maxX = shape.getMaxBoundX();
+            float maxZ = shape.getMaxBoundZ();
+
+            float minStep = 2.5f;
+            float stepRandom = 1f;
+
+            for (float x = minX; x <= maxX; x += minStep + random.nextFloat() * stepRandom){
+                for (float z = minZ; z <= maxZ; z += minStep + random.nextFloat() * stepRandom){
+                    Vector2f point = new Vector2f(x,z);
+
+                    boolean inShape = false;
+
+                    for (var s : shape.getShapes()){
+                        if (BossUtil.isPointIn2dShape(s, point)){
+                            inShape = true;
+                            break;
+                        }
+                    }
+
+                    if (inShape){
+                        this.attackVisualOffsets.add(point);
+                    }
+
+                }
+            }
 
         }
         return attackVisualOffsets;
@@ -136,6 +172,8 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
         var shapeId = sectorAttackSyncPacket.shapeId;
         var sectorShape = ShapesRegistry.SHAPES.get(shapeId);
         triangulatedForRendering.clear();
+
+        this.attackShapeId = shapeId;
 
         if (sectorShape == null) return;
         var shapes = sectorShape.getShapes();
@@ -211,6 +249,13 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
         public static final SectorAttackShape SIMPLE_TWO_SECTORS = register(SIMPLE_TWO_SECTORS_ID, new SectorAttackShape()
                 .addSector(2,14,FDMathUtil.FPI / 4, 0)
                 .addSector(2,14,FDMathUtil.FPI / 4, FDMathUtil.FPI)
+        );
+
+        public static final SectorAttackShape TEST = register("test", new SectorAttackShape()
+                .addSector(2,14,FDMathUtil.FPI / 4, 0)
+                .addSector(2,14,FDMathUtil.FPI / 4, FDMathUtil.FPI)
+                .addTriangle(10,0,6,8,FDMathUtil.FPI / 2)
+                .addSquare(15,0,4,-FDMathUtil.FPI / 2)
         );
 
         public static SectorAttackShape register(String name, SectorAttackShape shape){
