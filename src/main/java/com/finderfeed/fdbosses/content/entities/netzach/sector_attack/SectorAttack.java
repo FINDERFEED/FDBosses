@@ -1,7 +1,10 @@
 package com.finderfeed.fdbosses.content.entities.netzach.sector_attack;
 
 import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.OwnableEntity;
+import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
@@ -19,12 +22,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector2f;
+import org.joml.Random;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class SectorAttack extends OwnableEntity implements AutoSerializable {
+
+    public static final int MAX_ATTACK_DELAY_TIME = 5;
+    public static final int ATTACK_TIME = 2;
 
     public static final EntityDataAccessor<Boolean> FOLLOWING_OWNER = SynchedEntityData.defineId(SectorAttack.class, EntityDataSerializers.BOOLEAN);
 
@@ -34,7 +41,7 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
     @SerializableField
     private int timeUntilAttack;
 
-    private int clientVisualsTick = 0;
+    protected int clientVisualsTick = 0;
 
 
 
@@ -85,6 +92,73 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
 
     }
 
+    private void smashParticles(int tick){
+
+        tick -= ATTACK_TIME - 1;
+
+        if (tick > MAX_ATTACK_DELAY_TIME) return;
+
+        var attackVisualOffsets = this.getAttackVisualOffsets();
+
+        for (int k = 0; k < attackVisualOffsets.size(); k++){
+
+            var rand = this.generateRandomForAttackVisual(k);
+            int delay = this.getAttackDelayForAttackVisual(rand);
+
+            var pos = this.getOwnerPos();
+            if (pos == null){
+                pos = this.position();
+            }
+
+            if (delay == tick) {
+                var offset = attackVisualOffsets.get(k);
+
+                double x = offset.x + pos.x;
+                double z = offset.y + pos.z;
+
+                for (int i = 0; i < 2; i++) {
+
+                    for (var dir : new HorizontalCircleRandomDirections(random, 6, 1)) {
+
+                        Vec3 ppos = dir.scale(random.nextFloat() * 4f).add(x, this.getY(), z);
+                        float vSpeed = 0.1f + random.nextFloat() * 0.9f;
+                        float hSpeed = 0.1f + random.nextFloat() * 0.5f;
+
+                        var options = SpriteParticleOptions.builder(BossParticles.YELLOW_SPARK)
+                                .friction(0.7f)
+                                .lightenedUp()
+                                .lifetime(random.nextInt(20, 25))
+                                .quadSizeDecreasing()
+                                .frictionAffectsRotation()
+                                .xyzRotationSpeed(random.nextInt(0, 360), 0, 0)
+                                .xyzRotationSpeed(BossUtil.randomPlusMinus() * 20, 0, 0)
+                                .size(random.nextFloat() * 0.5f + 0.1f)
+                                .build();
+
+                        level().addParticle(options, true, ppos.x, ppos.y, ppos.z,
+                                hSpeed * dir.x,
+                                vSpeed,
+                                hSpeed * dir.z
+                        );
+
+
+                    }
+
+                }
+
+            }
+        }
+
+    }
+
+    protected int getAttackDelayForAttackVisual(Random generatedRandom){
+        return generatedRandom.nextInt(MAX_ATTACK_DELAY_TIME);
+    }
+
+    protected Random generateRandomForAttackVisual(int i){
+        return new Random((this.getId() + i * 32L) * 343L);
+    }
+
     public List<Vector2f> getAttackVisualOffsets() {
         if (this.attackVisualOffsets == null){
             var shape = this.getAttackShape();
@@ -100,8 +174,8 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
             float maxX = shape.getMaxBoundX();
             float maxZ = shape.getMaxBoundZ();
 
-            float minStep = 2.5f;
-            float stepRandom = 1f;
+            float minStep = 1.5f;
+            float stepRandom = 2.5f;
 
             for (float x = minX; x <= maxX; x += minStep + random.nextFloat() * stepRandom){
                 for (float z = minZ; z <= maxZ; z += minStep + random.nextFloat() * stepRandom){
@@ -254,8 +328,8 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
         public static final SectorAttackShape TEST = register("test", new SectorAttackShape()
                 .addSector(2,14,FDMathUtil.FPI / 4, 0)
                 .addSector(2,14,FDMathUtil.FPI / 4, FDMathUtil.FPI)
-                .addTriangle(10,0,6,8,FDMathUtil.FPI / 2)
-                .addSquare(15,0,4,-FDMathUtil.FPI / 2)
+                .addTriangle(10,0,6,8,FDMathUtil.FPI / 4)
+                .addSquare(15,0,4,-FDMathUtil.FPI / 4)
         );
 
         public static SectorAttackShape register(String name, SectorAttackShape shape){

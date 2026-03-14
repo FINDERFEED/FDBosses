@@ -34,7 +34,7 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            SectorAttack.summon(player,"test", 50);
+            SectorAttack.summon(player,SectorAttack.ShapesRegistry.SIMPLE_CHECKERBOARD_2_ID, 50);
 
 //            ServerLevel serverLevel = (ServerLevel) level;
 //
