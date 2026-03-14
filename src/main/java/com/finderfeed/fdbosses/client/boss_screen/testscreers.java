@@ -12,6 +12,7 @@ import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class testscreers extends SimpleFDScreen {
@@ -57,7 +58,8 @@ public class testscreers extends SimpleFDScreen {
         var triangles = BossUtil.splitShapeToTriangles(testshape);
 
         float col = 1;
-        if (BossUtil.isPointIn2dShape(testshape, new Vector2f(mx,my))){
+        Vector2f point = new Vector2f(mx,my);
+        if (BossUtil.isPointIn2dShape(testshape, point)){
             col = 0;
         }
 
@@ -73,6 +75,36 @@ public class testscreers extends SimpleFDScreen {
 
             id++;
         }
+
+
+
+
+        List<Vector2f> points = new ArrayList<>(testshape.getPoints().stream().map(vec -> {
+            return new Vector2f(vec.x, vec.z);
+        }).toList());
+
+
+        for (int i = 0; i < points.size(); i++){
+            var p1 = BossUtil.getListValueCircular(points, i);
+            var p2 = BossUtil.getListValueCircular(points, i + 1);
+
+            if (p1.y > point.y && p2.y <= point.y || p1.y <= point.y && p2.y > point.y){
+
+                if (p1.x >= point.x && p2.x >= point.x){
+                    this.renderLine(gr, p1.x, p1.y, p2.x, p2.y, 1,1,1);
+                } else if (p1.x > point.x && p2.x < point.x || p1.x < point.x && p2.x > point.x){
+                    Vector2f nrm = BossUtil.getNormalPoint(p1, p2, point);
+                    Vector2f normal = nrm.sub(point, new Vector2f());
+                    var dot = normal.dot(new Vector2f(1,0));
+                    if (dot >= 0){
+                        this.renderLine(gr, p1.x, p1.y, p2.x, p2.y, 1,1,1);
+                    }
+                }
+
+            }
+        }
+
+
 
     }
 

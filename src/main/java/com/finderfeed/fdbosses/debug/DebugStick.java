@@ -34,13 +34,13 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-//            SectorAttack.summon(player, SectorAttack.ShapesRegistry.SIMPLE_CHECKERBOARD_2_ID);
+//            SectorAttack.summon(player, SectorAttack.ShapesRegistry.SIMPLE_TWO_SECTORS_ID, 50);
 
 //            ServerLevel serverLevel = (ServerLevel) level;
 //
 //            Vec3 ppos = player.position().add(0, 0, 0).add(player.getLookAngle().scale(0.5));
 //
-            BacktrackEntity.summon(player, 30);
+//            BacktrackEntity.summon(player, 30);
 
 
 //            serverLevel.sendParticles(SpriteParticleOptions.builder(BossParticles.NETZACH_SLASH)
@@ -71,7 +71,7 @@ public class DebugStick extends Item {
 //                            .end(player.getEyePosition().add(player.getLookAngle().scale(10)))
 //                    .build(), player.getX(), player.getY(), player.getZ(), 0,0,0);
 
-//            Minecraft.getInstance().setScreen(new testscreers());
+            Minecraft.getInstance().setScreen(new testscreers());
         }
 
         return super.use(level, player, hand);

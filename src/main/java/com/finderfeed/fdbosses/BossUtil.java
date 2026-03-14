@@ -86,6 +86,13 @@ public class BossUtil {
     public static final int NETZACH_CRUSH = 25;
 
 
+    public static int calculateNeededStepCountOnCircle(float circleRadius, float circleSectorAngle, float desiredStepLength){
+        float circleLength = FDMathUtil.FPI * 2 * circleRadius;
+        float p = circleSectorAngle / FDMathUtil.FPI / 2;
+        circleLength *= p;
+        float steps = circleLength / desiredStepLength;
+        return (int) Math.ceil(steps);
+    }
 
 
     //accepts xz plane only
@@ -101,7 +108,7 @@ public class BossUtil {
             var p1 = BossUtil.getListValueCircular(points, i);
             var p2 = BossUtil.getListValueCircular(points, i + 1);
 
-            if (p1.y > point.y && p2.y < point.y || p1.y < point.y && p2.y > point.y){
+            if (p1.y > point.y && p2.y <= point.y || p1.y <= point.y && p2.y > point.y){
 
                 if (p1.x >= point.x && p2.x >= point.x){
                     intersections++;

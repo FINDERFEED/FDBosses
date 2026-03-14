@@ -29,16 +29,25 @@ public class SectorAttackRenderer extends EntityRenderer<SectorAttack> {
 
         Vec3 ownerPos = owner.getPosition(pticks);
         Vec3 thisPos = entity.getPosition(pticks);
-
         Vec3 offset = ownerPos.subtract(thisPos);
+
+        if (!entity.isFollowingOwner()){
+            var p = entity.getOwnerPos();
+            if (p != null){
+                offset = p.subtract(thisPos);
+            }
+        }
 
         matrices.pushPose();
 
 
 //        matrices.translate(0,0.01,0);
+
+
         matrices.translate(offset.x,0.01,offset.z);
 
         Matrix4f mat = matrices.last().pose();
+        int id = 0;
         for (var triangle : triangulated){
             var points = triangle.getPoints();
             var p1 = points.get(0);
@@ -47,6 +56,7 @@ public class SectorAttackRenderer extends EntityRenderer<SectorAttack> {
             vertex.addVertex(mat, p1.x, p1.y, p1.z).setColor(1f,1f,1f,1f);
             vertex.addVertex(mat, p2.x, p2.y, p2.z).setColor(1f,1f,1f,1f);
             vertex.addVertex(mat, p3.x, p3.y, p3.z).setColor(1f,1f,1f,1f);
+            id++;
         }
         matrices.popPose();
 
