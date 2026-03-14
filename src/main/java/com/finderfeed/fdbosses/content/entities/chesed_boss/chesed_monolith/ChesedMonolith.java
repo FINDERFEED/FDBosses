@@ -6,7 +6,7 @@ import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDLivingEntity;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.client.particles.lightning_particle.LightningParticleOptions;
 import net.minecraft.nbt.CompoundTag;
@@ -15,18 +15,19 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
-public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, ChesedBossBuddy {
+public class ChesedMonolith extends FDEntity implements AutoSerializable, ChesedBossBuddy {
 
     public static final EntityDataAccessor<Boolean> DEACTIVATED = SynchedEntityData.defineId(ChesedMonolith.class, EntityDataSerializers.BOOLEAN);
+    private static final float BASE_MAX_HEALTH = 50.0f;
 
 
     @SerializableField
@@ -35,7 +36,13 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
     @SerializableField
     private boolean immuneToAttacks = false;
 
-    public ChesedMonolith(EntityType<? extends LivingEntity> type, Level level) {
+    @SerializableField
+    private float health = BASE_MAX_HEALTH;
+
+    @SerializableField
+    private float maxHealthBonus = 0;
+
+    public ChesedMonolith(EntityType<?> type, Level level) {
         super(type, level);
     }
 
@@ -58,6 +65,9 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
 
     public void setDeactivated(boolean deactivated) {
         this.deactivated = deactivated;
+        if (!level().isClientSide) {
+            this.entityData.set(DEACTIVATED, deactivated);
+        }
     }
 
     @Override
@@ -67,7 +77,6 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        super.defineSynchedData(builder);
         builder.define(DEACTIVATED,false);
     }
 
@@ -86,11 +95,27 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
 
     @Override
     public boolean hurt(DamageSource src, float damage) {
-
-
         if ((this.isDeactivated() || this.isImmuneToAttacks()) && !src.is(DamageTypes.GENERIC_KILL) && !src.is(DamageTypes.FELL_OUT_OF_WORLD)) return false;
 
-        return super.hurt(src, damage);
+        if (src.is(DamageTypes.GENERIC_KILL) || src.is(DamageTypes.FELL_OUT_OF_WORLD)) {
+            this.remove(RemovalReason.KILLED);
+            return true;
+        }
+
+        if (level().isClientSide) {
+            return true;
+        }
+
+        SoundEvent sound = this.getHurtSound(src);
+        if (sound != null) {
+            level().playSound(null, this.getX(), this.getY(), this.getZ(), sound, SoundSource.HOSTILE, 1f, 1f);
+        }
+
+        this.health -= damage;
+        if (this.health <= 0) {
+            this.die(src);
+        }
+        return true;
     }
 
     @Override
@@ -103,10 +128,9 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
         super.setDeltaMovement(Vec3.ZERO);
     }
 
-    @Override
     public void die(DamageSource src) {
         if (src.is(DamageTypes.GENERIC_KILL) || src.is(DamageTypes.FELL_OUT_OF_WORLD)){
-            super.die(src);
+            this.remove(RemovalReason.KILLED);
         }else {
             if (level() instanceof ServerLevel serverLevel) {
                 this.setHealth(this.getMaxHealth());
@@ -135,13 +159,11 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
     }
 
     @Nullable
-    @Override
     protected SoundEvent getHurtSound(DamageSource p_21239_) {
         return BossSounds.MONOLITH_HIT.get();
     }
 
     @Nullable
-    @Override
     protected SoundEvent getDeathSound() {
         return BossSounds.MONOLITH_HIT.get();
     }
@@ -154,14 +176,26 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
         this.immuneToAttacks = immuneToAttacks;
     }
 
-    @Override
-    public boolean isNoGravity() {
-        return true;
+    public float getMaxHealth() {
+        return BASE_MAX_HEALTH + maxHealthBonus;
+    }
+
+    public void setHealth(float health) {
+        this.health = Math.max(0, Math.min(health, this.getMaxHealth()));
+    }
+
+    public float getHealth() {
+        return health;
+    }
+
+    public void setMaxHealthBonus(float maxHealthBonus) {
+        this.maxHealthBonus = maxHealthBonus;
+        this.health = Math.min(this.health, this.getMaxHealth());
     }
 
     @Override
-    protected double getDefaultGravity() {
-        return 0;
+    public boolean isNoGravity() {
+        return true;
     }
 
     @Override
@@ -176,16 +210,6 @@ public class ChesedMonolith extends FDLivingEntity implements AutoSerializable, 
 
     @Override
     public void push(double p_20286_, double p_20287_, double p_20288_) {
-
-    }
-
-    @Override
-    protected void pushEntities() {
-
-    }
-
-    @Override
-    public void knockback(double p_147241_, double p_147242_, double p_147243_) {
 
     }
 
