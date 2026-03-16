@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.boss_screen.testscreers;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.NetzachEffectHandler;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
@@ -34,7 +35,7 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            SectorAttack.summon(player,SectorAttack.ShapesRegistry.SIMPLE_CHECKERBOARD_2_ID, 50);
+//            SectorAttack.summon(player,SectorAttack.ShapesRegistry.SIMPLE_CHECKERBOARD_2_ID, 50);
 
 //            ServerLevel serverLevel = (ServerLevel) level;
 //
@@ -62,6 +63,8 @@ public class DebugStick extends Item {
 //            NetzachGearCrushAttack.summon(player, player, player.getLookAngle());
 
         }else{
+
+            NetzachEffectHandler.flash(60,10);
 //
 //            level.addParticle(ChesedRayOptions.builder()
 //                            .color(1f,0f,0f,1f)

@@ -72,21 +72,21 @@ public class SectorAttackRenderer extends EntityRenderer<SectorAttack> {
             float g = random.nextFloat();
             float b = random.nextFloat();
 
-            vertex.addVertex(mat, p1.x, p1.y, p1.z).setColor(r,g,b,1f);
-            vertex.addVertex(mat, p2.x, p2.y, p2.z).setColor(r,g,b,1f);
-            vertex.addVertex(mat, p3.x, p3.y, p3.z).setColor(r,g,b,1f);
+            vertex.addVertex(mat, p1.x, p1.y, p1.z).setColor(0.743f,0.478f,0.239f,0.6f);
+            vertex.addVertex(mat, p2.x, p2.y, p2.z).setColor(0.743f,0.478f,0.239f,0.6f);
+            vertex.addVertex(mat, p3.x, p3.y, p3.z).setColor(0.743f,0.478f,0.239f,0.6f);
             id++;
         }
 
         var shape = entity.getAttackShape();
 
-        vertex.addVertex(mat, shape.getMinBoundX(),0.005f, shape.getMinBoundZ()).setColor(1f,1f,1f,0.1f);
-        vertex.addVertex(mat, shape.getMaxBoundX(),0.005f, shape.getMinBoundZ()).setColor(1f,1f,1f,0.1f);
-        vertex.addVertex(mat, shape.getMaxBoundX(),0.005f, shape.getMaxBoundZ()).setColor(1f,1f,1f,0.1f);
-
-        vertex.addVertex(mat, shape.getMinBoundX(),0.005f, shape.getMinBoundZ()).setColor(1f,1f,1f,0.1f);
-        vertex.addVertex(mat, shape.getMinBoundX(),0.005f, shape.getMaxBoundZ()).setColor(1f,1f,1f,0.1f);
-        vertex.addVertex(mat, shape.getMaxBoundX(),0.005f, shape.getMaxBoundZ()).setColor(1f,1f,1f,0.1f);
+//        vertex.addVertex(mat, shape.getMinBoundX(),0.005f, shape.getMinBoundZ()).setColor(1f,1f,1f,0.1f);
+//        vertex.addVertex(mat, shape.getMaxBoundX(),0.005f, shape.getMinBoundZ()).setColor(1f,1f,1f,0.1f);
+//        vertex.addVertex(mat, shape.getMaxBoundX(),0.005f, shape.getMaxBoundZ()).setColor(1f,1f,1f,0.1f);
+//
+//        vertex.addVertex(mat, shape.getMinBoundX(),0.005f, shape.getMinBoundZ()).setColor(1f,1f,1f,0.1f);
+//        vertex.addVertex(mat, shape.getMinBoundX(),0.005f, shape.getMaxBoundZ()).setColor(1f,1f,1f,0.1f);
+//        vertex.addVertex(mat, shape.getMaxBoundX(),0.005f, shape.getMaxBoundZ()).setColor(1f,1f,1f,0.1f);
 
         if (!entity.isFollowingOwner()) {
 
