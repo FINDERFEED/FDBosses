@@ -73,6 +73,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_repair_crys
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashRenderer;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.NetzachEffectOverlay;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
@@ -100,7 +101,6 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.r
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDItemModelOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDModelItemRenderer;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.FDModelItemRendererOptions;
-import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.item.interfaces.FDItemRenderType;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockEntityRendererBuilder;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockEntityTransformation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.tile.renderer.FDBlockRenderLayerOptions;
@@ -437,6 +437,7 @@ public class BossClientModEvents {
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("malkuth_weakness"),new MalkuthWeaknessOverlay());
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("chesed_item_overlay"),new PhaseSphereOverlay());
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("geburah_sin_overlay"),new GeburahSinsOverlay());
+        event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("netzach_overlay"),new NetzachEffectOverlay());
     }
 
 

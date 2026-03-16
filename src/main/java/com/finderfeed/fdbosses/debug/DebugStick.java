@@ -1,19 +1,9 @@
 package com.finderfeed.fdbosses.debug;
 
-import com.finderfeed.fdbosses.client.BossParticles;
-import com.finderfeed.fdbosses.client.boss_screen.testscreers;
-import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
-import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
-import com.finderfeed.fdbosses.content.entities.netzach.NetzachEffectHandler;
-import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack;
-import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
-import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
-import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.NetzachEffectOverlay;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -22,7 +12,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 public class DebugStick extends Item {
 
@@ -64,7 +53,7 @@ public class DebugStick extends Item {
 
         }else{
 
-            NetzachEffectHandler.flash(60,10);
+            NetzachEffectOverlay.flash(60,10);
 //
 //            level.addParticle(ChesedRayOptions.builder()
 //                            .color(1f,0f,0f,1f)
