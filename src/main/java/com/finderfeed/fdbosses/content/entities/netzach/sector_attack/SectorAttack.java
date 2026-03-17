@@ -78,7 +78,7 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
                 this.setFollowingOwner(false);
             }
 
-            if (ticksAfterAttack > 40){
+            if (ticksAfterAttack > 80){
                 this.remove(RemovalReason.DISCARDED);
             }
 
@@ -91,6 +91,7 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
                 this.ownerPos = owner.position();
             }
         }else{
+            this.smashParticles(ticksAfterAttack);
             ticksAfterAttack++;
         }
 
@@ -325,8 +326,10 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
         );
 
         public static final SectorAttackShape SIMPLE_TWO_SECTORS = register(SIMPLE_TWO_SECTORS_ID, new SectorAttackShape()
-                .addSector(2,14,FDMathUtil.FPI / 4, 0)
-                .addSector(2,14,FDMathUtil.FPI / 4, FDMathUtil.FPI)
+                .addSquare(-20,-20,20,0)
+                .addSquare(20,20,20,0)
+                .addSquare(5,-5,5,0)
+                .addSquare(-5,5,5,0)
         );
 
         public static final SectorAttackShape TEST = register("test", new SectorAttackShape()

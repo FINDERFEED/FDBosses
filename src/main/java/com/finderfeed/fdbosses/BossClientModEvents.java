@@ -485,12 +485,12 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.BACKTRACK_ENTITY.get(), FDEntityRendererBuilder.<BacktrackEntity>builder()
                         .addLayer(FDEntityRenderLayerOptions.<BacktrackEntity>builder()
                                 .model(BossModels.PLAYER_MODEL)
-                                .renderType(RenderType.lightning())
-                                .color(84f/255, 46/255f,30/255f,0.75f)
+                                .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/backtrack_entity.png")))
+                                .color(1f,1f,1f,1f)
                                 .build())
                         .shouldRender(((backtrackEntity, frustum, v, v1, v2) -> {
                             var player = FDClientHelpers.getClientPlayer();
-                            return backtrackEntity.getOwner() == player;
+                            return player.distanceTo(backtrackEntity) > 0.3 && backtrackEntity.getOwner() == player || BossUtil.isPlayerInSurvival(player);
                         }))
                 .build());
 

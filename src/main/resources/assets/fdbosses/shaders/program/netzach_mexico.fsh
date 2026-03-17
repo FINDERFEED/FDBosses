@@ -119,11 +119,11 @@ vec4 chainsawInHalf(vec3 uvt){
 
     float lineY = 1. - fr;
 
-    float leftRightGlithIntensity = 20.;
+    float leftRightGlithIntensity = 22.;
 
-    float lineUpDownGlitch = hash11(lineY * 50.);
+    float lineUpDownGlitch = hash11(lineY * 100.);
 
-    lineY += lineUpDownGlitch * 0.05;
+    lineY += lineUpDownGlitch * 0.04;
 
     if (uvt.y < lineY - texelLineDelta){
 
@@ -139,7 +139,12 @@ vec4 chainsawInHalf(vec3 uvt){
 
         return texture(DiffuseSampler, uvt.xy + vec2(currentOffsetUp + sinOffset, 0.));
     }else{
-        return texture(DiffuseSampler, vec2(uvt.x , lineY));
+        float addition = hash13(vec3(
+        uvt.x * 300.,
+        uvt.y * 300.,
+        uvt.z * 30.
+        ));
+        return texture(DiffuseSampler, vec2(uvt.x , lineY)) + addition * 0.2;
     }
 
 
@@ -153,18 +158,18 @@ vec4 whiteLines(vec4 color, vec3 uvt){
 
 
 
-    float h = hash13(vec3(0., lineY, uvt.z * 10.));
-    float h2 = hash13(vec3(100.32, lineY, uvt.z * 10.));
+    float h = hash13(vec3(0., lineY, uvt.z * 20.));
+    float h2 = hash13(vec3(100.32, lineY, uvt.z * 20.));
 
     float lineWidth = mix(0.4,1., h2);
 
-    float lineStartPos = mix(-4.,4.,h);
+    float lineStartPos = mix(-3.,3.,h);
 
     float x = uvt.x;
     float y = uvt.y;
     if (x > lineStartPos && x < lineStartPos + lineWidth){
 
-        if (fract(lineY) < 0.025){
+        if (fract(lineY) < 0.03){
 
             float addition = hash13(vec3(
             uvt.x * 1000.,
@@ -191,8 +196,36 @@ vec4 whiteLines(vec4 color, vec3 uvt){
     return color;
 }
 
+vec4 srcAlphaOneMinusSrcAlpha(vec4 src, vec4 dest) {
+    return vec4(
+    src.r * src.a + dest.r * (1.0 - src.a),
+    src.g * src.a + dest.g * (1.0 - src.a),
+    src.b * src.a + dest.b * (1.0 - src.a),
+    src.a * src.a + dest.a * (1.0 - src.a)
+    );
+}
+
+#define sq2 1.41421356
+
+vec4 addVignette(vec4 color, vec3 uvt){
+
+    float len = length(uvt.xy - 0.5) * 2;
+    float alphaMod = 0;
+    float size = 1;
+
+    if (len > size){
+        float l = len - size;
+        float d = sq2 - size;
+        alphaMod = min(1, l / d);
+    }
 
 
+    alphaMod = max(len - 0.5,0) / 0.9;
+
+    vec4 finalColor = srcAlphaOneMinusSrcAlpha(vec4(0,0,0,1) * (alphaMod + 0.001), color);
+
+    return finalColor;
+}
 
 vec4 mexicofy(vec4 color){
 
@@ -226,11 +259,13 @@ void main(){
 
     base = whiteNoiseAddition(uvt, base);
 
-    if (fract(uvt.z) < 0.2){
+    if (fract(uvt.z) < 0.4){
         base = whiteLines(base, uvt);
     }
 
     base = mexicofy(base);
+
+    base = addVignette(base, uvt);
 
     fragColor = base;
 

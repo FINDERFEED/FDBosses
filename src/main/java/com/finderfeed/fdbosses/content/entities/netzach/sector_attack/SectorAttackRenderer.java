@@ -1,7 +1,9 @@
 package com.finderfeed.fdbosses.content.entities.netzach.sector_attack;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.util.BossRenderTypes;
+import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.util.math.ComplexEasingFunction;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
@@ -40,7 +42,8 @@ public class SectorAttackRenderer extends EntityRenderer<SectorAttack> {
         var triangulated = entity.triangulatedForRendering;
         if (triangulated.isEmpty()) return;
         var owner = entity.getOwner();
-        if (Minecraft.getInstance().player != owner) return;
+        var player = FDClientHelpers.getClientPlayer();
+        if (player != owner && BossUtil.isPlayerInSurvival(player) || owner == null) return;
 
         var vertex = src.getBuffer(BossRenderTypes.LIGHTNING_NO_CULL_TRIANGLES);
 

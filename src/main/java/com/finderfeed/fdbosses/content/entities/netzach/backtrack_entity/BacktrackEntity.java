@@ -52,11 +52,16 @@ public class BacktrackEntity extends FDOwnableEntity implements AutoSerializable
                     return;
                 }
                 if (this.backtrackTime-- < 0) {
-                    livingEntity.teleportTo((ServerLevel) this.level(), this.getX(), this.getY(), this.getZ(), new HashSet<>(), this.getYRot(),0);
+                    livingEntity.teleportTo((ServerLevel) this.level(), this.getX(), this.getY(), this.getZ(), new HashSet<>(), livingEntity.getYRot() + 180,livingEntity.getXRot());
                     this.remove(RemovalReason.DISCARDED);
                 }
             }
         }
+    }
+
+    @Override
+    public boolean isCurrentlyGlowing() {
+        return true;
     }
 
     @Override

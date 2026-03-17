@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.netzach;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.content.util.BossVignetteHandler;
 import com.finderfeed.fdlib.systems.post_shaders.FDPostShaderInitializeEvent;
 import com.finderfeed.fdlib.systems.post_shaders.FDRenderPostShaderEvent;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -34,10 +35,11 @@ public class NetzachEffectOverlay implements LayeredDraw.Layer {
 
     public static PostChain EFFECT;
 
-    private static int effectActiveTime;
+    private static int effectActiveTime = -1;
     private static int maxFlashTime;
     private static int flashTime;
     private static int flashTimeO;
+    private static int maxEffectTime;
 
     @Override
     public void render(GuiGraphics graphics, DeltaTracker tracker) {
@@ -61,13 +63,19 @@ public class NetzachEffectOverlay implements LayeredDraw.Layer {
             float time = Minecraft.getInstance().level.getGameTime() + pticks;
 
 
-            float ptime = FDMathUtil.lerp(flashTimeO, flashTime, pticks);
-            float p = FDEasings.easeOut(1 - ptime / maxFlashTime);
+            float ptime = Mth.clamp(1 - (effectActiveTime - pticks) / maxEffectTime,0,1);
+
+            float effectTimeP;
+            if (ptime < 0.5){
+                effectTimeP = FDEasings.easeOut(ptime / 0.5f);
+            }else{
+                effectTimeP = FDEasings.easeOut((1 - ptime) / 0.5f);
+            }
 
             var guiScale = (float) screen.getGuiScale();
 
 
-            float uMove = time / 6 + p * 4;
+            float uMove = effectTimeP * 20;
             float tapeDimensions = 16 * (5 / guiScale);
             float u = width / tapeDimensions / 2;
 
@@ -93,9 +101,14 @@ public class NetzachEffectOverlay implements LayeredDraw.Layer {
     @SubscribeEvent
     public static void clientTickEvent(ClientTickEvent.Pre event) {
         if (!Minecraft.getInstance().isPaused()) {
-            flashTimeO = flashTime;
-            flashTime = Mth.clamp(flashTime - 1, 0, Integer.MAX_VALUE);
-            effectActiveTime = Mth.clamp(effectActiveTime - 1, 0, Integer.MAX_VALUE);
+            if (effectActiveTime > 0) {
+                flashTimeO = flashTime;
+                flashTime = Mth.clamp(flashTime - 1, 0, Integer.MAX_VALUE);
+                effectActiveTime = Mth.clamp(effectActiveTime - 1, 0, Integer.MAX_VALUE);
+            }else if (effectActiveTime == 0){
+                BossVignetteHandler.setCurrentVignette(0,2,20,1f,1f,1f,1f);
+                effectActiveTime = -1;
+            }
         }
     }
 
@@ -131,6 +144,7 @@ public class NetzachEffectOverlay implements LayeredDraw.Layer {
     public static void flash(int effectTime, int flashTime){
         maxFlashTime = flashTime;
         effectActiveTime = effectTime;
+        maxEffectTime = effectTime;
         NetzachEffectOverlay.flashTime = flashTime;
         NetzachEffectOverlay.flashTimeO = flashTime;
     }

@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.debug;
 
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEffectOverlay;
+import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -23,15 +24,20 @@ public class DebugStick extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 
+        int attackTime = 100;
+
         if (!level.isClientSide){
 
-            SectorAttack.summon(player,SectorAttack.ShapesRegistry.SIMPLE_CHECKERBOARD_2_ID, 50);
-
+            if (player.isCrouching()) {
+                SectorAttack.summon(player, SectorAttack.ShapesRegistry.SIMPLE_TWO_SECTORS_ID, attackTime - 1);
+            }else{
+                SectorAttack.summon(player, SectorAttack.ShapesRegistry.SIMPLE_CHECKERBOARD_2_ID, attackTime - 1);
+            }
 //            ServerLevel serverLevel = (ServerLevel) level;
 //
 //            Vec3 ppos = player.position().add(0, 0, 0).add(player.getLookAngle().scale(0.5));
 //
-//            BacktrackEntity.summon(player, 30);
+            BacktrackEntity.summon(player, attackTime);
 
 
 //            serverLevel.sendParticles(SpriteParticleOptions.builder(BossParticles.NETZACH_SLASH)
@@ -54,7 +60,7 @@ public class DebugStick extends Item {
 
         }else{
 
-            NetzachEffectOverlay.flash(200,10);
+            NetzachEffectOverlay.flash(attackTime,10);
 //
 //            level.addParticle(ChesedRayOptions.builder()
 //                            .color(1f,0f,0f,1f)
