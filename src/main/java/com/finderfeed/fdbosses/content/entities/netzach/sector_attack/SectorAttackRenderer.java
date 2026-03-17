@@ -3,7 +3,6 @@ package com.finderfeed.fdbosses.content.entities.netzach.sector_attack;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.util.BossRenderTypes;
 import com.finderfeed.fdlib.util.math.ComplexEasingFunction;
-import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -60,22 +59,17 @@ public class SectorAttackRenderer extends EntityRenderer<SectorAttack> {
 
         matrices.translate(offset.x,0.01,offset.z);
 
-        Matrix4f mat = matrices.last().pose();
-        int id = 0;
-        for (var triangle : triangulated){
-            var points = triangle.getPoints();
-            var p1 = points.get(0);
-            var p2 = points.get(1);
-            var p3 = points.get(2);
-            Random random = new Random(id * 34325L);
-            float r = random.nextFloat();
-            float g = random.nextFloat();
-            float b = random.nextFloat();
-
-            vertex.addVertex(mat, p1.x, p1.y, p1.z).setColor(0.743f,0.478f,0.239f,0.6f);
-            vertex.addVertex(mat, p2.x, p2.y, p2.z).setColor(0.743f,0.478f,0.239f,0.6f);
-            vertex.addVertex(mat, p3.x, p3.y, p3.z).setColor(0.743f,0.478f,0.239f,0.6f);
-            id++;
+        if (entity.isFollowingOwner()) {
+            Matrix4f mat = matrices.last().pose();
+            for (var triangle : triangulated) {
+                var points = triangle.getPoints();
+                var p1 = points.get(0);
+                var p2 = points.get(1);
+                var p3 = points.get(2);
+                vertex.addVertex(mat, p1.x, p1.y, p1.z).setColor(0.743f, 0.478f, 0.239f, 0.6f);
+                vertex.addVertex(mat, p2.x, p2.y, p2.z).setColor(0.743f, 0.478f, 0.239f, 0.6f);
+                vertex.addVertex(mat, p3.x, p3.y, p3.z).setColor(0.743f, 0.478f, 0.239f, 0.6f);
+            }
         }
 
         var shape = entity.getAttackShape();
@@ -110,7 +104,7 @@ public class SectorAttackRenderer extends EntityRenderer<SectorAttack> {
 
 
 
-                float time = entity.clientVisualsTick + pticks - startTime;
+                float time = entity.ticksAfterAttack + pticks - startTime;
                 float alphaVal = ALPHA.apply(time);
                 float offsetY = Mth.clamp(FDEasings.easeIn(1 - Mth.clamp(time / SectorAttack.ATTACK_TIME,0,1)), 0, 1) * 10;
 

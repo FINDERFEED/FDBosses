@@ -116,10 +116,13 @@ public class NetzachEffectOverlay implements LayeredDraw.Layer {
     public static void processEffect(FDRenderPostShaderEvent.Level event) {
         if (effectActiveTime > 0) {
             event.doDefaultShaderBeforeShaderStuff();
-            float time = FDMathUtil.lerp(flashTimeO, flashTime, event.getDeltaTracker().getGameTimeDeltaPartialTick(false));
-            float p = FDEasings.easeIn(time / maxFlashTime);
+            float percentageTime = FDMathUtil.lerp(flashTimeO, flashTime, event.getDeltaTracker().getGameTimeDeltaPartialTick(false));
+            float p = FDEasings.easeIn(percentageTime / maxFlashTime);
+
+            float time = Minecraft.getInstance().level.getGameTime() + event.getDeltaTracker().getGameTimeDeltaPartialTick(false);
 
             EFFECT.setUniform("percent", p);
+            EFFECT.setUniform("time", time);
 
             EFFECT.process(event.getDeltaTracker().getGameTimeDeltaPartialTick(false));
         }

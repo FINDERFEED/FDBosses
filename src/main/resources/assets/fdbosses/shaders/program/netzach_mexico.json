@@ -15,6 +15,7 @@
     { "name": "ScreenSize",  "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] },
     { "name": "InSize",  "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] },
     { "name": "OutSize", "type": "float",     "count": 2,  "values": [ 1.0, 1.0 ] },
-    { "name": "percent", "type": "float",     "count": 1,  "values": [ 1.0 ] }
+    { "name": "percent", "type": "float",     "count": 1,  "values": [ 1.0 ] },
+    { "name": "time", "type": "float",     "count": 1,  "values": [ 1.0 ] }
   ]
 }

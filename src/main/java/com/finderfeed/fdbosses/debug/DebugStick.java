@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.debug;
 
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEffectOverlay;
+import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.BlockPos;
@@ -24,7 +25,7 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-//            SectorAttack.summon(player,SectorAttack.ShapesRegistry.SIMPLE_CHECKERBOARD_2_ID, 50);
+            SectorAttack.summon(player,SectorAttack.ShapesRegistry.SIMPLE_CHECKERBOARD_2_ID, 50);
 
 //            ServerLevel serverLevel = (ServerLevel) level;
 //
@@ -53,7 +54,7 @@ public class DebugStick extends Item {
 
         }else{
 
-            NetzachEffectOverlay.flash(60,10);
+            NetzachEffectOverlay.flash(200,10);
 //
 //            level.addParticle(ChesedRayOptions.builder()
 //                            .color(1f,0f,0f,1f)

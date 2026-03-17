@@ -41,7 +41,7 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
     @SerializableField
     private int timeUntilAttack;
 
-    protected int clientVisualsTick = 0;
+    protected int ticksAfterAttack = 0;
 
 
 
@@ -78,6 +78,10 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
                 this.setFollowingOwner(false);
             }
 
+            if (ticksAfterAttack > 40){
+                this.remove(RemovalReason.DISCARDED);
+            }
+
             timeUntilAttack = Mth.clamp(timeUntilAttack - 1, 0, Integer.MAX_VALUE);
         }
 
@@ -87,7 +91,7 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
                 this.ownerPos = owner.position();
             }
         }else{
-            clientVisualsTick++;
+            ticksAfterAttack++;
         }
 
     }
