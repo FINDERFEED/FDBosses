@@ -1,16 +1,32 @@
 package com.finderfeed.fdbosses.content.entities.netzach.netzach_minigame;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.init.BossSounds;
+import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
+import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.github.L_Ender.cataclysm.init.ModSounds;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.Util;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
+import net.minecraft.world.phys.Vec3;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.Random;
 
 public class NetzachMinigameScreen extends SimpleFDScreen {
 
@@ -18,71 +34,139 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
     public static final ResourceLocation GUI = FDBosses.location("textures/gui/netzach_minigame/netzach_minigame.png");
 
     //Hours * Minutes * angle
-    public static float MAX_ROTATION = 12 * 60 * 360;
+    public static float MAX_ROTATION = 12 * 360;
 
     private float currentRotation = 0;
     private float oldRotation = 0;
 
     private int rotationStrength = 0;
-
     private float rotating = 0;
+    private float targetRotation = MAX_ROTATION / 2f;
+
+    private static final int GAME_ENDING_TICK_TIME = 5;
+    private int gameEndingTick = 0;
+
+    private int tickerForStuff = 0;
+    private int randomnessTicker = 0;
+    private RandomSource randomSource = new XoroshiroRandomSource(252345435L);
+    private DeltaTracker.Timer timerForRandomness = new DeltaTracker.Timer(120,0,f->f);
+
 
     public NetzachMinigameScreen(){
-
+        targetRotation = 1000;
     }
 
     @Override
     public void render(GuiGraphics graphics, int mx, int my, float pticks) {
+
+        randomnessTicker += timerForRandomness.advanceTime(Util.getMillis(), true);
+
+
         this.renderBlurredBackground(pticks);
 
         PoseStack matrices = graphics.pose();
 
+        matrices.pushPose();
+
+        this.gameEndShake(matrices, pticks);
+
         var anchor = this.getAnchor(0.5f,0.5f);
-
-        var window = Minecraft.getInstance().getWindow();
-
         float scale = 1;
-
         float guiSize = 232 * scale;
 
         FDRenderUtil.bindTexture(GUI);
 
         FDRenderUtil.blitWithBlendCentered(matrices, anchor.x, anchor.y, guiSize, guiSize, 0,0,232,232, 512,512,0,1f);
 
-
-
         float rotation = this.getCurrentRotation(FDRenderUtil.tryGetPartialTickIgnorePause());
 
 
-
-        //20 80 hour arrow
         float hourRotation = rotation / 12;
         float hourArrowWidth = 20 * scale;
         float hourArrowWHeight = 80 * scale;
         float hourArrowOffset = 33 * scale;
 
-        matrices.pushPose();
+        float minuteArrowWidth = 44 * scale;
+        float minuteArrowWHeight = 114 * scale;
+        float minuteArrowOffset = 35 * scale;
+
         matrices.translate(anchor.x, anchor.y, 0);
+
+
+        matrices.pushPose();
+        matrices.mulPose(Axis.ZP.rotationDegrees(targetRotation / 12));
+        FDRenderUtil.blitWithBlendRgb(matrices, -hourArrowWidth / 2, -hourArrowOffset - hourArrowWHeight / 2, hourArrowWidth, hourArrowWHeight,232 + 20,114,20,80,512,512,0,0.25f, 1,0,0);
+        matrices.popPose();
+
+        matrices.pushPose();
+        matrices.mulPose(Axis.ZP.rotationDegrees(targetRotation));
+        FDRenderUtil.blitWithBlendRgb(matrices, -minuteArrowWidth / 2, -minuteArrowOffset - minuteArrowWHeight / 2, minuteArrowWidth, minuteArrowWHeight,232 + 44,0,44,114,512,512,0,0.25f,1,0,0);
+        matrices.popPose();
+
+
+        //20 80 hour arrow
+        matrices.pushPose();
         matrices.mulPose(Axis.ZP.rotationDegrees(hourRotation));
         FDRenderUtil.blitWithBlendCentered(matrices, 0, -hourArrowOffset, hourArrowWidth, hourArrowWHeight,232,114,20,80,512,512,0,1);
         matrices.popPose();
 
 
         //44 114 minute arrow
-        float minuteArrowWidth = 44 * scale;
-        float minuteArrowWHeight = 114 * scale;
-        float minuteArrowOffset = 35 * scale;
-
         matrices.pushPose();
-        matrices.translate(anchor.x, anchor.y, 0);
         matrices.mulPose(Axis.ZP.rotationDegrees(rotation));
         FDRenderUtil.blitWithBlendCentered(matrices, 0, -minuteArrowOffset, minuteArrowWidth, minuteArrowWHeight,232,0,44,114,512,512,0,1);
         matrices.popPose();
 
 
-
+        matrices.popPose();
 
     }
+
+    private void gameEndShake(PoseStack matrices, float pticks){
+        if (gameEndingTick > 0) {
+
+            float p = (float) Mth.clamp(GAME_ENDING_TICK_TIME - gameEndingTick + pticks, 0, GAME_ENDING_TICK_TIME) / GAME_ENDING_TICK_TIME;
+
+            p = 1 - FDEasings.easeIn(p);
+
+            randomSource.setSeed(randomnessTicker * 232L);
+
+
+            float ampl = 5f;
+            Vec3 dir = new Vec3(ampl * p,0,0).zRot((float) (randomSource.nextGaussian() * FDMathUtil.FPI * 2));
+
+//            float rx = ( random2.nextFloat() * ampl * 2 - ampl) * p;
+//            float ry = ( random2.nextFloat() * ampl * 2 - ampl) * p;
+
+            float rx = (float) dir.x;
+            float ry = (float) dir.y;
+
+
+            matrices.translate(
+                    rx,
+                    ry,
+                    0
+            );
+
+
+        }else if (rotationStrength != 0){
+            float p = Math.abs(rotationStrength / 5f);
+
+            randomSource.setSeed(randomnessTicker * 632L);
+
+            float ampl = 0.5f;
+            float rx = ( randomSource.nextFloat() * ampl * 2 - ampl) * p;
+            float ry = ( randomSource.nextFloat() * ampl * 2 - ampl) * p;
+
+            matrices.translate(
+                    rx,
+                    ry,
+                    0
+            );
+
+        }
+    }
+
 
     @Override
     public boolean keyPressed(int keyCode, int p_96553_, int p_96554_) {
@@ -107,7 +191,7 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
         rotation = rotation % MAX_ROTATION;
 
         if (rotation < 0){
-            rotation = MAX_ROTATION - rotation;
+            rotation = MAX_ROTATION + rotation;
         }
 
         return rotation;
@@ -120,6 +204,21 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
     @Override
     public void tick() {
         super.tick();
+
+        tickerForStuff++;
+
+        gameEndingTick = Mth.clamp(gameEndingTick - 1,0,Integer.MAX_VALUE);
+
+        this.tickRotation();
+
+
+    }
+
+    private void tickRotation(){
+
+        if (rotationStrength != 0){
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.MACE_SMASH_GROUND_HEAVY, 1.5f, 0.05f));
+        }
 
         int maxRotationStrengthTick = 5;
         if (rotating == 0){
@@ -139,10 +238,37 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
         float rotationStr = (float) rotationStrength / maxRotationStrengthTick;
 
         oldRotation = currentRotation;
-
         float rotationSpeed = 20;
-        currentRotation += rotationSpeed * rotationStr;
+        float nextRotation = currentRotation + rotationSpeed * rotationStr;
 
+        float nrmrTarget = this.normalizeRotation(targetRotation);
+        float nrmrCurrent = this.normalizeRotation(nextRotation);
+        float nrmrOld = this.normalizeRotation(currentRotation);
+
+        if (rotationStr != 0) {
+            float rotation = nextRotation;
+            if (rotationStr > 0) {
+                if (nrmrCurrent >= nrmrTarget && (nrmrOld <= nrmrTarget || nrmrOld > nrmrCurrent)){
+                    rotation = targetRotation;
+                    oldRotation = rotation;
+                    this.gameCompleted();
+                }
+            } else {
+                if (nrmrOld >= nrmrTarget && (nrmrCurrent <= nrmrTarget || nrmrCurrent > nrmrOld)){
+                    rotation = targetRotation;
+                    oldRotation = rotation;
+                    this.gameCompleted();
+                }
+            }
+            currentRotation = rotation;
+        }
+    }
+
+    public void gameCompleted(){
+        targetRotation = this.targetRotation + BossUtil.randomPlusMinus() * (500 + FDClientHelpers.getClientLevel().random.nextFloat() * 500);
+        this.rotationStrength = 0;
+        this.gameEndingTick = GAME_ENDING_TICK_TIME;
+        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.MACE_SMASH_GROUND, 1f));
     }
 
     @Override
