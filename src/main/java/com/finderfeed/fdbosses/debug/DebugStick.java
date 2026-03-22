@@ -2,9 +2,11 @@ package com.finderfeed.fdbosses.debug;
 
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEffectOverlay;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_minigame.NetzachMinigameScreen;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -27,17 +29,17 @@ public class DebugStick extends Item {
         int attackTime = 100;
 
         if (!level.isClientSide){
-
-            if (player.isCrouching()) {
-                SectorAttack.summon(player, SectorAttack.ShapesRegistry.SIMPLE_TWO_SECTORS_ID, attackTime - 1);
-            }else{
-                SectorAttack.summon(player, SectorAttack.ShapesRegistry.SIMPLE_CHECKERBOARD_2_ID, attackTime - 1);
-            }
+//
+//            if (player.isCrouching()) {
+//                SectorAttack.summon(player, SectorAttack.ShapesRegistry.SIMPLE_TWO_SECTORS_ID, attackTime - 1);
+//            }else{
+//                SectorAttack.summon(player, SectorAttack.ShapesRegistry.SIMPLE_CHECKERBOARD_2_ID, attackTime - 1);
+//            }
 //            ServerLevel serverLevel = (ServerLevel) level;
 //
 //            Vec3 ppos = player.position().add(0, 0, 0).add(player.getLookAngle().scale(0.5));
 //
-            BacktrackEntity.summon(player, attackTime);
+//            BacktrackEntity.summon(player, attackTime);
 
 
 //            serverLevel.sendParticles(SpriteParticleOptions.builder(BossParticles.NETZACH_SLASH)
@@ -60,7 +62,8 @@ public class DebugStick extends Item {
 
         }else{
 
-            NetzachEffectOverlay.flash(attackTime,10);
+            Minecraft.getInstance().setScreen(new NetzachMinigameScreen());
+//            NetzachEffectOverlay.flash(attackTime,10);
 //
 //            level.addParticle(ChesedRayOptions.builder()
 //                            .color(1f,0f,0f,1f)
