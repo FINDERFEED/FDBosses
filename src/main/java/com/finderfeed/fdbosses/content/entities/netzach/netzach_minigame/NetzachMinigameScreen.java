@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.netzach.netzach_minigame;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.particles.SparkScreenParticle;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
@@ -24,6 +25,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector2f;
+import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Random;
