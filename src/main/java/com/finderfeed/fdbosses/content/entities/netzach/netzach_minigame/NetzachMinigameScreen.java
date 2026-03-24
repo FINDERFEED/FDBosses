@@ -54,7 +54,7 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
     private int randomnessTicker = 0;
     private Random random = new Random();
     private RandomSource randomSource = new XoroshiroRandomSource(252345435L);
-    private DeltaTracker.Timer timerForRandomness = new DeltaTracker.Timer(120,0,f->f);
+    private DeltaTracker.Timer timerForRandomness = new DeltaTracker.Timer(80,0,f->f);
 
     private ScreenParticleEngine screenParticleEngine = new ScreenParticleEngine();
 
@@ -67,6 +67,7 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
 
         randomnessTicker += timerForRandomness.advanceTime(Util.getMillis(), true);
 
+        pticks = FDRenderUtil.tryGetPartialTickIgnorePause();
 
         this.renderBlurredBackground(pticks);
 
@@ -74,7 +75,7 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
 
         matrices.pushPose();
 
-        this.gameEndShake(matrices, pticks);
+        this.gameEndShake(matrices, pticks,435, true);
 
         var anchor = this.getAnchor(0.5f,0.5f);
         float scale = 1;
@@ -84,9 +85,9 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
 
         FDRenderUtil.blitWithBlendCentered(matrices, anchor.x, anchor.y, guiSize, guiSize, 0,0,232,232, 512,512,0,1f);
 
-        float rotation = this.getCurrentRotation(FDRenderUtil.tryGetPartialTickIgnorePause());
+        float rotation = this.getCurrentRotation(pticks);
 
-        this.screenParticleEngine.render(graphics, FDRenderUtil.tryGetPartialTickIgnorePause());
+        this.screenParticleEngine.render(graphics, pticks);
 
         float hourRotation = rotation / 12;
         float hourArrowWidth = 20 * scale;
@@ -111,12 +112,12 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
         matrices.popPose();
 
 
+
         //20 80 hour arrow
         matrices.pushPose();
         matrices.mulPose(Axis.ZP.rotationDegrees(hourRotation));
         FDRenderUtil.blitWithBlendCentered(matrices, 0, -hourArrowOffset, hourArrowWidth, hourArrowWHeight,232,114,20,80,512,512,0,1);
         matrices.popPose();
-
 
         //44 114 minute arrow
         matrices.pushPose();
@@ -127,16 +128,54 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
 
         matrices.popPose();
 
+        float wholeOffset = -20;
+        float keysOffset = 160;
+
+        matrices.pushPose();
+        int shiftLeft = 0;
+        if (rotating < 0){
+            shiftLeft = 58;
+            this.gameEndShake(matrices, pticks, 5345,false);
+        }else{
+            this.gameEndShake(matrices, pticks, 5345,true);
+        }
+        FDRenderUtil.blitWithBlendCentered(matrices, anchor.x - keysOffset, anchor.y + wholeOffset, 58, 57, 396 + shiftLeft,0,58,57,512,512,0,1f);
+        matrices.popPose();
+
+        matrices.pushPose();
+        int shiftRight = 0;
+        if (rotating > 0){
+            shiftRight = 58;
+            this.gameEndShake(matrices, pticks, 8745,false);
+        }else{
+            this.gameEndShake(matrices, pticks, 8745,true);
+        }
+        FDRenderUtil.blitWithBlendCentered(matrices, anchor.x + keysOffset, anchor.y + wholeOffset, 58, 57, 396 + shiftRight,57,58,57,512,512,0,1f);
+        matrices.popPose();
+
+
+        int arrowsOffset = 57;
+        //48 32
+        matrices.pushPose();
+        this.gameEndShake(matrices, pticks, 302,true);
+        FDRenderUtil.blitWithBlendCentered(matrices, anchor.x + keysOffset, anchor.y + wholeOffset + arrowsOffset, 48,32, 348, 32, 48, 32, 512, 512,0, 1f);
+        matrices.popPose();
+
+        matrices.pushPose();
+        this.gameEndShake(matrices, pticks, 1302,true);
+        FDRenderUtil.blitWithBlendCentered(matrices, anchor.x - keysOffset, anchor.y + wholeOffset + arrowsOffset, 48,32, 348, 0, 48, 32, 512, 512,0, 1f);
+        matrices.popPose();
+
     }
 
-    private void gameEndShake(PoseStack matrices, float pticks){
+    private void gameEndShake(PoseStack matrices, float pticks, int seed, boolean doRotatingShake){
         if (gameEndingTick > 0) {
 
             float p = (float) Mth.clamp(GAME_ENDING_TICK_TIME - gameEndingTick + pticks, 0, GAME_ENDING_TICK_TIME) / GAME_ENDING_TICK_TIME;
 
             p = 1 - FDEasings.easeIn(p);
 
-            randomSource.setSeed(randomnessTicker * 232L);
+            randomSource.setSeed(randomnessTicker * 232L + seed);
 
 
             float ampl = 5f;
@@ -156,10 +195,10 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
             );
 
 
-        }else if (rotationStrength != 0){
+        }else if (rotationStrength != 0 && doRotatingShake){
             float p = Math.abs(rotationStrength / 5f);
 
-            randomSource.setSeed(randomnessTicker * 632L);
+            randomSource.setSeed(randomnessTicker * 632L + seed);
 
             float ampl = 0.5f;
             float rx = ( randomSource.nextFloat() * ampl * 2 - ampl) * p;
