@@ -21,7 +21,9 @@ import org.lwjgl.opengl.GL11;
 public class SparkScreenParticle extends FDScreenParticle<SparkScreenParticle> {
 
     private FDTrailDataGenerator<SparkScreenParticle> trailData;
+    public FDColor endColor = new FDColor(1f,1f,1f,1f);
     private float quadSize;
+
 
     public SparkScreenParticle(float quadSize, int trailPoints){
         this.quadSize = quadSize;
@@ -36,13 +38,23 @@ public class SparkScreenParticle extends FDScreenParticle<SparkScreenParticle> {
     }
 
     @Override
+    public SparkScreenParticle setLifetime(int lifetime) {
+        return super.setLifetime(lifetime + trailData.getMaxPointsAmount());
+    }
+
+    @Override
     public void tick() {
+        if (this.getAge() >= this.getLifetime() - trailData.getMaxPointsAmount()){
+            this.setSpeed(0,0);
+            this.setAcceleration(0,0);
+        }
         super.tick();
         this.trailData.tick(this);
     }
 
     @Override
     public void render(GuiGraphics graphics, BufferBuilder vertex, float partialTicks) {
+        partialTicks = FDRenderUtil.tryGetPartialTickIgnorePause();
         PoseStack matrices = graphics.pose();
         float x = (float)this.getX(partialTicks);
         float y = (float)this.getY(partialTicks);
@@ -51,24 +63,31 @@ public class SparkScreenParticle extends FDScreenParticle<SparkScreenParticle> {
         float halfQuadSize = this.quadSize / 2;
 
         matrices.pushPose();
-        matrices.translate(x, y, 0.0F);
+        matrices.translate(x, y, 0);
 
         FDTrailRenderer.renderTrail(this, trailData, vertex, matrices, this.quadSize, 4, 20, partialTicks,
-                new FDColor(this.getR(),this.getG(),this.getB(),this.getA()),
+                endColor,
                 new FDColor(this.getR(),this.getG(),this.getB(),this.getA())
         );
 
         matrices.mulPose(Axis.ZN.rotationDegrees(roll));
         Matrix4f m = matrices.last().pose();
-        vertex.addVertex(m, -halfQuadSize, -halfQuadSize, 0.0F).setColor(this.getR(), this.getG(), this.getB(), this.getA());
-        vertex.addVertex(m, -halfQuadSize, halfQuadSize, 0.0F).setColor(this.getR(), this.getG(), this.getB(), this.getA());
-        vertex.addVertex(m, halfQuadSize, halfQuadSize, 0.0F).setColor(this.getR(), this.getG(), this.getB(), this.getA());
-        vertex.addVertex(m, halfQuadSize, -halfQuadSize, 0.0F).setColor(this.getR(), this.getG(), this.getB(), this.getA());
+        float a = 0;
+
+        vertex.addVertex(m, -halfQuadSize, -halfQuadSize, 0.0F).setColor(this.getR(), this.getG(), this.getB(), this.getA() * a);
+        vertex.addVertex(m, -halfQuadSize, halfQuadSize, 0.0F).setColor(this.getR(), this.getG(), this.getB(), this.getA() * a);
+        vertex.addVertex(m, halfQuadSize, halfQuadSize, 0.0F).setColor(this.getR(), this.getG(), this.getB(), this.getA() * a);
+        vertex.addVertex(m, halfQuadSize, -halfQuadSize, 0.0F).setColor(this.getR(), this.getG(), this.getB(), this.getA() * a);
 
 
         matrices.popPose();
 
 
+    }
+
+    public SparkScreenParticle setEndColor(float r, float g, float b, float a){
+        this.endColor = new FDColor(r,g,b,a);
+        return this;
     }
 
     @Override

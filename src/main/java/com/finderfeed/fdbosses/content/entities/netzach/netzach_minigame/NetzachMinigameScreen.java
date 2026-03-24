@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
+import com.finderfeed.fdlib.systems.screen.screen_particles.ScreenParticleEngine;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -51,9 +52,11 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
 
     private int tickerForStuff = 0;
     private int randomnessTicker = 0;
+    private Random random = new Random();
     private RandomSource randomSource = new XoroshiroRandomSource(252345435L);
     private DeltaTracker.Timer timerForRandomness = new DeltaTracker.Timer(120,0,f->f);
 
+    private ScreenParticleEngine screenParticleEngine = new ScreenParticleEngine();
 
     public NetzachMinigameScreen(){
         targetRotation = 1000;
@@ -83,6 +86,7 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
 
         float rotation = this.getCurrentRotation(FDRenderUtil.tryGetPartialTickIgnorePause());
 
+        this.screenParticleEngine.render(graphics, FDRenderUtil.tryGetPartialTickIgnorePause());
 
         float hourRotation = rotation / 12;
         float hourArrowWidth = 20 * scale;
@@ -208,6 +212,8 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
     public void tick() {
         super.tick();
 
+        this.screenParticleEngine.tick();
+
         tickerForStuff++;
 
         gameEndingTick = Mth.clamp(gameEndingTick - 1,0,Integer.MAX_VALUE);
@@ -232,8 +238,10 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
             }
         }else{
             if (rotating > 0){
+                this.rotationParticles(2, -FDMathUtil.FPI / 4, FDMathUtil.FPI / 6, 2f, 8f, 4,4);
                 rotationStrength = Mth.clamp(rotationStrength + 1,-maxRotationStrengthTick,maxRotationStrengthTick);
             }else{
+                this.rotationParticles(2, FDMathUtil.FPI / 4, FDMathUtil.FPI / 6, 2f, 8f, 4,4);
                 rotationStrength = Mth.clamp(rotationStrength - 1,-maxRotationStrengthTick,maxRotationStrengthTick);
             }
 
@@ -267,11 +275,37 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
         }
     }
 
+    public void rotationParticles(int count, float initialAngle, float radius, float minSpeed, float maxSpeed, int minLifetime, int maxLifetime){
+        var anchor = this.getAnchor(0.5f,0.5f);
+        for (int i = 0; i < count;i++) {
+            float speed = minSpeed + random.nextFloat() * (maxSpeed - minSpeed);
+
+            Vector3f v = new Vector3f(0, -speed * 2, 0).rotateZ(initialAngle + random.nextFloat() * radius * 2 - radius);
+
+            int lifetime = minLifetime;
+            if (maxLifetime != minLifetime){
+                lifetime += random.nextInt(maxLifetime - minLifetime);
+            }
+
+            SparkScreenParticle sparkScreenParticle = new SparkScreenParticle(0.25f,1)
+                    .setPos(anchor.x, anchor.y, true)
+                    .setColor(1f,0.8f,0.1f,1f)
+                    .setEndColor(1f,0.4f,0.1f,1f)
+                    .setSpeed(v.x,v.y)
+                    .setLifetime(lifetime)
+                    .setAcceleration(0,2);
+            screenParticleEngine.addParticle(sparkScreenParticle);
+
+        }
+    }
+
     public void gameCompleted(){
         targetRotation = this.targetRotation + BossUtil.randomPlusMinus() * (500 + FDClientHelpers.getClientLevel().random.nextFloat() * 500);
         this.rotationStrength = 0;
         this.gameEndingTick = GAME_ENDING_TICK_TIME;
         Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.MACE_SMASH_GROUND, 1f));
+
+        this.rotationParticles(30, 0, FDMathUtil.FPI / 2, 2f, 10f, 4,10);
     }
 
     @Override
