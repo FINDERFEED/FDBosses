@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum;
 
+import com.finderfeed.fdbosses.content.util.AttackTimings;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityTransformation;
 import com.finderfeed.fdlib.util.math.ComplexEasingFunction;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -20,24 +21,16 @@ public class NetzachPendulumTransform implements FDEntityTransformation<NetzachC
     @Override
     public void apply(NetzachClockPendulum pendulum, PoseStack matrices, float partialTicks) {
 
-        float attackTime = 30;
-        float wholeTime = NetzachClockPendulum.PREPARE_TIME * 2 + attackTime;
+        AttackTimings attackTimings = pendulum.getEntityData().get(NetzachClockPendulum.PENDULUM_ATTACK_TIMINGS);
 
 
+        float time = pendulum.tickCount + partialTicks;
 
-        float time = (pendulum.tickCount + partialTicks) % wholeTime;
-
-        float upDownPercent = 0;
-        if (time <= NetzachClockPendulum.PREPARE_TIME){
-            upDownPercent = 1 - FDEasings.easeIn(time / NetzachClockPendulum.PREPARE_TIME);
-        }else if (time >= NetzachClockPendulum.PREPARE_TIME + attackTime){
-            upDownPercent = (time - NetzachClockPendulum.PREPARE_TIME - attackTime) / NetzachClockPendulum.PREPARE_TIME;
-            upDownPercent = FDEasings.easeIn(upDownPercent);
-        }
-
+        float upPercent = attackTimings.getAttackTimingPercent(NetzachClockPendulum.PENDULUM_APPEAR, time);
+        float downPercent = attackTimings.getAttackTimingPercent(NetzachClockPendulum.PENDULUM_DISAPPEAR, time);
 
         float length = pendulum.getAttackLength();
-        float swingPercent = FDEasings.easeInOut(Mth.clamp((time - NetzachClockPendulum.PREPARE_TIME) / attackTime,0,1));
+        float swingPercent = FDEasings.easeInOut(attackTimings.getAttackTimingPercent(NetzachClockPendulum.PENDULUM_ATTACK, time));
 
         float offset = FDMathUtil.lerp(-length,length,swingPercent);
 
@@ -50,7 +43,7 @@ public class NetzachPendulumTransform implements FDEntityTransformation<NetzachC
         matrices.mulPose(Axis.YN.rotationDegrees((180 - yAngle)));
         matrices.translate(0,0,offset);
         matrices.mulPose(Axis.XP.rotation(zAngle + FDMathUtil.FPI));
-        matrices.translate(0,height * upDownPercent, 0);
+        matrices.translate(0,height * (1 - upPercent) + downPercent * height, 0);
 
     }
 

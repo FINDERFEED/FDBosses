@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.content.entities.geburah.SinsEntityDataSerializer;
 import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSin;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.MalkuthSlashTypeSerializer;
+import com.finderfeed.fdbosses.content.entities.netzach.AttackTimingsSerializer;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -18,5 +19,8 @@ public class BossEntityDataSerializers {
     public static final DeferredHolder<EntityDataSerializer<?>, MalkuthSlashTypeSerializer> MALKUTH_ATTACK_TYPE = ENTITY_DATA_SERIALIZERS.register("malkuth_attack", MalkuthSlashTypeSerializer::new);
 
     public static final DeferredHolder<EntityDataSerializer<?>, SinsEntityDataSerializer> SINS = ENTITY_DATA_SERIALIZERS.register("sins", SinsEntityDataSerializer::new);
+
+    public static final DeferredHolder<EntityDataSerializer<?>, AttackTimingsSerializer> ATTACK_TIMINGS = ENTITY_DATA_SERIALIZERS.register("timings", AttackTimingsSerializer::new);
+
 
 }
