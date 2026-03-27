@@ -65,6 +65,7 @@ public class BossModels {
     public static final Supplier<FDModelInfo> NETZACH = INFOS.register("netzach",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"),1.0f));
     public static final Supplier<FDModelInfo> GEAR_ATTACK = INFOS.register("gear_attack",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"gear_attack"),1.0f));
     public static final Supplier<FDModelInfo> PLAYER_MODEL = INFOS.register("player_model",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"player_model"),1.0f));
+    public static final Supplier<FDModelInfo> CLOCK_PENDULUM = INFOS.register("clock_pendulum",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_pendulum"),1.0f));
 
 
 }

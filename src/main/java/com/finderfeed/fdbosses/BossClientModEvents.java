@@ -77,6 +77,8 @@ import com.finderfeed.fdbosses.content.entities.netzach.NetzachEffectOverlay;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachPendulumTransform;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttackRenderer;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
@@ -481,6 +483,20 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.NETZACH_GEAR_CRUSH.get(), NetzachGearCrushAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.SECTOR_ATTACK.get(), SectorAttackRenderer::new);
+
+        event.registerEntityRenderer(BossEntities.NETZACH_CLOCK_PENDULUM.get(), FDEntityRendererBuilder.<NetzachClockPendulum>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<NetzachClockPendulum>builder()
+                                .model(BossModels.CLOCK_PENDULUM)
+                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/netzach/clock_pendulum.png")))
+                                .transformation(new NetzachPendulumTransform())
+                                .build())
+                        .ignoreYaw(((netzachClockPendulum, v) -> {
+                            return true;
+                        }))
+                        .shouldRender(((netzachClockPendulum, frustum, v, v1, v2) -> {
+                            return true;
+                        }))
+                .build());
 
         event.registerEntityRenderer(BossEntities.BACKTRACK_ENTITY.get(), FDEntityRendererBuilder.<BacktrackEntity>builder()
                         .addLayer(FDEntityRenderLayerOptions.<BacktrackEntity>builder()
