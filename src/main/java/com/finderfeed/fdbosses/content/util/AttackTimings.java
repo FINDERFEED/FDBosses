@@ -49,6 +49,23 @@ public class AttackTimings implements AutoSerializable {
         return time >= 0 && time < attackTiming;
     }
 
+    public int getAttackTimingTick(int attack, float time){
+        int timeBefore = 0;
+
+        for (int i = 0; i < attack; i++){
+            timeBefore += timings.get(i);
+        }
+
+        int attackTiming = timings.get(attack);
+
+        time = time - timeBefore;
+        if (time < 0 || time > attackTiming){
+            time = -1;
+        }
+
+        return (int) time;
+    }
+
     public float getAttackTimingPercent(int attack, float time){
         int timeBefore = 0;
 

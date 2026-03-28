@@ -40,7 +40,7 @@ public class NetzachPendulumTransform implements FDEntityTransformation<NetzachC
         float zAngle = (float) Math.atan2(offset, -height);
 
         matrices.translate(0,pendulumFromEarthOffset,0);
-        matrices.mulPose(Axis.YN.rotationDegrees((180 - yAngle)));
+        matrices.mulPose(Axis.YP.rotationDegrees((- yAngle)));
         matrices.translate(0,0,offset);
         matrices.mulPose(Axis.XP.rotation(zAngle + FDMathUtil.FPI));
         matrices.translate(0,height * (1 - upPercent) + downPercent * height, 0);

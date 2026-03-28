@@ -279,6 +279,10 @@ public class BossUtil {
     }
 
     public static void createOnEarthBlockExplosionEffect(Level level, Vec3 position, Vec3 attackDirection, int intensity, BlockState fallback){
+        createOnEarthBlockExplosionEffect(level, position, attackDirection, intensity, 1, fallback);
+    }
+
+    public static void createOnEarthBlockExplosionEffect(Level level, Vec3 position, Vec3 attackDirection, int intensity,float speedModifier, BlockState fallback){
 
         attackDirection = attackDirection.normalize();
 
@@ -310,7 +314,7 @@ public class BossUtil {
             float rndOffs = level.random.nextFloat();
             Vec3 spawnOffset = position.add(direction.normalize().multiply(rndOffs,rndOffs,rndOffs));
 
-            ChesedFallingBlock fallingBlock = ChesedFallingBlock.summon(level, states.get(level.random.nextInt(states.size())), spawnOffset, speed, 0, 0.05f);
+            ChesedFallingBlock fallingBlock = ChesedFallingBlock.summon(level, states.get(level.random.nextInt(states.size())), spawnOffset, speed.scale(speedModifier), 0, 0.05f);
 
 
             float rnd = level.random.nextFloat() * 0.05f;
