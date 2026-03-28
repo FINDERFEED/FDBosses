@@ -31,11 +31,11 @@ public class NetzachClockPendulum extends FDEntity {
         pendulum.setPos(startPos);
         pendulum.lookAt(EntityAnchorArgument.Anchor.FEET, startPos.add(direction));
 
-        AttackTimings attackTimings = new AttackTimings(20)
+        AttackTimings attackTimings = new AttackTimings(10)
                 .addAttackTiming(10)
                 .addAttackTiming(attackDuration)
                 .addAttackTiming(10)
-                .addAttackTiming(20);
+                .addAttackTiming(30);
 
         pendulum.getEntityData().set(PENDULUM_ATTACK_TIMINGS, attackTimings);
 

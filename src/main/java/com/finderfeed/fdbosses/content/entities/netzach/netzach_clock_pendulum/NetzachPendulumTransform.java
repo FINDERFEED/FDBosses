@@ -26,13 +26,13 @@ public class NetzachPendulumTransform implements FDEntityTransformation<NetzachC
 
         float time = pendulum.tickCount + partialTicks;
 
-        float upPercent = attackTimings.getAttackTimingPercent(NetzachClockPendulum.PENDULUM_APPEAR, time);
-        float downPercent = attackTimings.getAttackTimingPercent(NetzachClockPendulum.PENDULUM_DISAPPEAR, time);
+        float upPercent = FDEasings.easeIn(attackTimings.getAttackTimingPercent(NetzachClockPendulum.PENDULUM_APPEAR, time));
+        float downPercent = FDEasings.easeIn(attackTimings.getAttackTimingPercent(NetzachClockPendulum.PENDULUM_DISAPPEAR, time));
 
         float length = pendulum.getAttackLength();
         float swingPercent = FDEasings.easeInOut(attackTimings.getAttackTimingPercent(NetzachClockPendulum.PENDULUM_ATTACK, time));
 
-        float offset = FDMathUtil.lerp(-length,length,swingPercent);
+        float offset = FDMathUtil.lerp(-length,length,swingPercent) - length * downPercent * 0.5f;
 
         float pendulumFromEarthOffset = (1 - IN_AND_OUT.apply(swingPercent)) * 0.5f;
         float height = 20 + pendulumFromEarthOffset;
