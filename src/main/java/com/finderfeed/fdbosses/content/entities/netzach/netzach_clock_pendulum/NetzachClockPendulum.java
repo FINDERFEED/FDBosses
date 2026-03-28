@@ -8,7 +8,11 @@ import com.finderfeed.fdbosses.content.util.AttackTimings;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
+import com.finderfeed.fdlib.ClientMixinHandler;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
+import com.finderfeed.fdlib.systems.shake.PositionedScreenShake;
+import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -18,6 +22,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -70,30 +75,98 @@ public class NetzachClockPendulum extends FDEntity {
             this.tickDamage();
 
             this.impactBlocks(timings);
+            this.attackBlocks(timings);
         }else{
+            this.attackParticles(timings);
             this.impactParticles(timings);
         }
+    }
+
+    private void attackParticles(AttackTimings attackTimings){
+
+        if (attackTimings.isTimeForAttack(PENDULUM_ATTACK, tickCount)){
+
+
+            Vec3 pos = this.getCurrentPendulumWorldPos();
+
+            ClientMixinHandler.addShake(new PositionedScreenShake(FDShakeData.builder()
+                    .amplitude(1f)
+                    .frequency(5)
+                    .outTime(5)
+                    .build(), pos, 50));
+
+
+            Vec3 dir = this.getLookAngle().multiply(-1,0,-1).normalize();
+            Vec3 left = dir.yRot(FDMathUtil.FPI / 2);
+
+            ColoredJumpingParticleOptions options = new ColoredJumpingParticleOptions.Builder()
+                    .colorStart(new FDColor(1f, 1f, 1f, 1f))
+                    .colorEnd(new FDColor(1f, 0.8f, 0.3f, 1f))
+                    .maxPointsInTrail(2)
+                    .reflectionStrength(0.33f)
+                    .gravity(1f)
+                    .lifetime(-1)
+                    .maxJumpAmount(0)
+                    .size(0.02f)
+                    .build();
+
+
+            for (int i = 0; i < 4; i++){
+
+                Vec3 r = left.scale(BossUtil.randomPlusMinus()).scale(0.5f + random.nextFloat() * 0.2f);
+
+                Vec3 offset = dir.scale(random.nextFloat())
+                        .add(r);
+
+                Vec3 ppos = pos.add(offset);
+
+                Vec3 pspeed = dir
+                        .scale(1 + random.nextFloat())
+                        .add(r)
+                        .add(0,1,0)
+                        .normalize()
+                        .scale(random.nextFloat() * 0.25 + 0.25f);
+
+                level().addParticle(options, true, ppos.x, ppos.y, ppos.z, pspeed.x, pspeed.y, pspeed.z);
+
+            }
+
+        }
+
+    }
+
+    private void attackBlocks(AttackTimings attackTimings){
+
+        if (attackTimings.isTimeForAttack(PENDULUM_ATTACK, tickCount) && tickCount % 2 == 0){
+
+            Vec3 pos = this.getCurrentPendulumWorldPos();
+            Vec3 dir = this.getLookAngle().multiply(-1,0,-1).normalize();
+            BossUtil.createOnEarthBlockExplosionEffect(level(), pos, dir, 1, 0.8f, Blocks.STONE.defaultBlockState());
+
+        }
+
     }
 
     private void impactParticles(AttackTimings timings){
         int tick = timings.getAttackTimingTick(PENDULUM_WAIT_1, tickCount);
         if (tick == 0){
 
-
             Vec3 startPos = this.getCurrentPendulumWorldPos();
+
+            ColoredJumpingParticleOptions options = new ColoredJumpingParticleOptions.Builder()
+                    .colorStart(new FDColor(1f, 1f, 1f, 1f))
+                    .colorEnd(new FDColor(1f, 0.8f, 0.3f, 1f))
+                    .maxPointsInTrail(2)
+                    .reflectionStrength(0.33f)
+                    .gravity(1f)
+                    .lifetime(-1)
+                    .maxJumpAmount(0)
+                    .size(0.02f)
+                    .build();
 
             for (var dir : new HorizontalCircleRandomDirections(level().random, 20, 1f)){
 
-                ColoredJumpingParticleOptions options = new ColoredJumpingParticleOptions.Builder()
-                        .colorStart(new FDColor(1f, 1f, 1f, 1f))
-                        .colorEnd(new FDColor(1f, 0.8f, 0.3f, 1f))
-                        .maxPointsInTrail(2)
-                        .reflectionStrength(0.33f)
-                        .gravity(1f)
-                        .lifetime(-1)
-                        .maxJumpAmount(0)
-                        .size(0.02f)
-                        .build();
+
 
                 float horizontalSpeed = random.nextFloat() * 0.5f + 0.05f;
 
@@ -111,12 +184,21 @@ public class NetzachClockPendulum extends FDEntity {
     }
 
     private void impactBlocks(AttackTimings timings){
+
+
         int tick = timings.getAttackTimingTick(PENDULUM_WAIT_1, tickCount);
         if (tick == 0){
             int c = 4;
             float angle = FDMathUtil.FPI * 2 / c;
 
             Vec3 startPos = this.getCurrentPendulumWorldPos();
+
+            PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                    .amplitude(1.25f)
+                    .frequency(15)
+                    .outTime(10)
+                    .build(), startPos, 50);
+
 
             for (int i = 0; i < c; i++ ){
                 Vec3 d = new Vec3(1,0,0).yRot(angle * i);

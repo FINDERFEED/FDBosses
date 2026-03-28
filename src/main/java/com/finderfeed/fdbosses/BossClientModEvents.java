@@ -487,8 +487,15 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.NETZACH_CLOCK_PENDULUM.get(), FDEntityRendererBuilder.<NetzachClockPendulum>builder()
                         .addLayer(FDEntityRenderLayerOptions.<NetzachClockPendulum>builder()
                                 .model(BossModels.CLOCK_PENDULUM)
-                                .renderType(RenderType.entityCutout(FDBosses.location("textures/entities/netzach/clock_pendulum.png")))
+                                .renderType(RenderType.entityTranslucentCull(FDBosses.location("textures/entities/netzach/clock_pendulum.png")))
                                 .transformation(new NetzachPendulumTransform())
+                                .color(((netzachClockPendulum, v) -> {
+                                    var timings = netzachClockPendulum.getEntityData().get(NetzachClockPendulum.PENDULUM_ATTACK_TIMINGS);
+                                    var p1 = timings.getAttackTimingPercent(NetzachClockPendulum.PENDULUM_APPEAR, netzachClockPendulum.tickCount + v);
+                                    var p2 = 1 - timings.getAttackTimingPercent(NetzachClockPendulum.PENDULUM_DISAPPEAR, netzachClockPendulum.tickCount + v);
+                                    var alpha = Math.min(p1, p2);
+                                    return new FDColor(1,1,1,alpha);
+                                }))
                                 .build())
                         .ignoreYaw(((netzachClockPendulum, v) -> {
                             return true;
