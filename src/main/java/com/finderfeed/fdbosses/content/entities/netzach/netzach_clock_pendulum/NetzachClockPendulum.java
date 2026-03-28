@@ -49,8 +49,8 @@ public class NetzachClockPendulum extends FDEntity {
         pendulum.setPos(startPos);
         pendulum.lookAt(EntityAnchorArgument.Anchor.FEET, startPos.add(direction));
 
-        AttackTimings attackTimings = new AttackTimings(10)
-                .addAttackTiming(10)
+        AttackTimings attackTimings = new AttackTimings(60)
+                .addAttackTiming(0)
                 .addAttackTiming(attackDuration)
                 .addAttackTiming(10)
                 .addAttackTiming(30);
@@ -82,6 +82,10 @@ public class NetzachClockPendulum extends FDEntity {
             this.attackParticles(timings);
             this.impactParticles(timings);
         }
+    }
+
+    protected float getSwingPercent(float time){
+        return FDEasings.easeInOut(this.getEntityData().get(PENDULUM_ATTACK_TIMINGS).getAttackTimingPercent(PENDULUM_ATTACK, time));
     }
 
     private void attackParticles(AttackTimings attackTimings){
@@ -215,8 +219,7 @@ public class NetzachClockPendulum extends FDEntity {
     }
 
     private Vec3 getCurrentPendulumWorldPos(){
-        var timings = this.getEntityData().get(PENDULUM_ATTACK_TIMINGS);
-        float p1 = FDEasings.easeInOut(timings.getAttackTimingPercent(PENDULUM_ATTACK, tickCount));
+        float p1 = this.getSwingPercent(tickCount);
 
         Vec3 dir = this.getLookAngle().multiply(1,0,1).normalize();
         var length = this.getAttackLength();
