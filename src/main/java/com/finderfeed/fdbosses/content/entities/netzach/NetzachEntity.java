@@ -3,9 +3,11 @@ package com.finderfeed.fdbosses.content.entities.netzach;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.entity_ghost.EntityGhostParticleOptions;
+import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossSounds;
@@ -66,6 +68,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     public static final String PUSH_AWAY_ATTACK = "push_away_attack";
     public static final String JUMP_CRUSH = "jump_crush";
     public static final String GEAR_CRUSH = "gear_crush";
+    public static final String PENDULUMS_STRIKE = "pendulums_strike";
 
     public AttackChain attackChain;
 
@@ -79,16 +82,18 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                 .registerAttack(PUSH_AWAY_ATTACK, this::pushAway)
                 .registerAttack(JUMP_CRUSH, this::jumpAndCrush)
                 .registerAttack(GEAR_CRUSH, this::gearCrush)
+                .registerAttack(PENDULUMS_STRIKE, this::pendulumsStrike)
                 .attackListener(this::attackListener)
                 .addAttack(0, AttackOptions.chainOptionsBuilder()
-                        .addAttack(ATTACK_SERIES_1)
-                        .addAttack(BASIC_ATTACK)
-                        .addAttack(GEAR_CRUSH)
-                        .addAttack(BASIC_ATTACK)
-                        .addAttack(JUMP_CRUSH)
-                        .addAttack(BASIC_ATTACK)
-                        .addAttack(BASIC_ATTACK)
-                        .addAttack(GEAR_CRUSH)
+//                        .addAttack(ATTACK_SERIES_1)
+//                        .addAttack(BASIC_ATTACK)
+//                        .addAttack(GEAR_CRUSH)
+//                        .addAttack(BASIC_ATTACK)
+//                        .addAttack(JUMP_CRUSH)
+//                        .addAttack(BASIC_ATTACK)
+//                        .addAttack(BASIC_ATTACK)
+//                        .addAttack(GEAR_CRUSH)
+                        .addAttack(PENDULUMS_STRIKE)
                         .build())
 
         ;
@@ -128,6 +133,56 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
             return AttackAction.WAIT;
         }
         return AttackAction.PROCEED;
+    }
+
+    private boolean pendulumsStrike(AttackInstance attackInstance){
+
+        int tick = attackInstance.tick;
+        int stage = attackInstance.stage;
+
+
+        if (stage == 0){
+            int t = 1;
+            int delay = 0;
+            for (int i = -20; i <= 20; i+= 5) {
+                this.pendulumStrike(tick, delay, 20, 40, i, -20 * t, 0, t, 40);
+                t = -t;
+                delay += 4;
+            }
+            if (tick >= 100){
+                attackInstance.nextStage();
+            }
+        }else if (stage == 1){
+            int t = 1;
+            int delay = 0;
+            for (int i = -20; i <= 20; i+= 5) {
+                this.pendulumStrike(tick, delay, 20, 40, -20 * t, i, t, 0, 40);
+                t = -t;
+                delay += 4;
+            }
+            if (tick >= 100){
+                attackInstance.nextStage();
+            }
+        }else if (stage == 2){
+            if (tick >= 100){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private void pendulumStrike(int tick, int tickDelay, int chargeTime, int attackDuration, float xOffset, float zOffset, float xDirection, float zDirection, float length){
+        tick -= tickDelay;
+        if (tick == 0){
+            RectanglePreparationParticleOptions options = new RectanglePreparationParticleOptions(new Vec3(xDirection,0,zDirection), length, 1.5f, chargeTime, chargeTime / 2, chargeTime / 2, 1f, 0.5f, 0.2f, 0.25f);
+            FDLibCalls.sendParticles((ServerLevel) level(), options, this.position().add(xOffset, 0.01f, zOffset), 120);
+        }else if (tick == chargeTime){
+            Vec3 dir = new Vec3(xDirection, 0, zDirection);
+            Vec3 pos = this.position().add(xOffset, 0, zOffset)
+                    .add(dir.normalize().scale(length / 2));
+            NetzachClockPendulum.summon(level(), pos, dir, length / 2, attackDuration);
+        }
     }
 
     private boolean gearCrush(AttackInstance attackInstance) {

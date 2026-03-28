@@ -31,7 +31,7 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            NetzachClockPendulum.summon(level, player.position(), player.getLookAngle(), 10, 60);
+            NetzachClockPendulum.summon(level, player.position(), player.getLookAngle(), 30, 60);
 
 //
 //            if (player.isCrouching()) {

@@ -26,6 +26,7 @@ public class NetzachPendulumTransform implements FDEntityTransformation<NetzachC
 
         float time = pendulum.tickCount + partialTicks;
 
+
         float upPercent = FDEasings.easeIn(attackTimings.getAttackTimingPercent(NetzachClockPendulum.PENDULUM_APPEAR, time));
         float downPercent = FDEasings.easeIn(attackTimings.getAttackTimingPercent(NetzachClockPendulum.PENDULUM_DISAPPEAR, time));
 
@@ -35,7 +36,7 @@ public class NetzachPendulumTransform implements FDEntityTransformation<NetzachC
         float offset = FDMathUtil.lerp(-length,length,swingPercent) - length * downPercent * 0.5f;
 
         float pendulumFromEarthOffset = (1 - IN_AND_OUT.apply(swingPercent)) * 0.5f;
-        float height = 20 + pendulumFromEarthOffset;
+        float height = pendulum.getAttackLength() * 2 + pendulumFromEarthOffset;
         float yAngle = pendulum.getViewYRot(partialTicks);
         float zAngle = (float) Math.atan2(offset, -height);
 
@@ -43,6 +44,12 @@ public class NetzachPendulumTransform implements FDEntityTransformation<NetzachC
         matrices.mulPose(Axis.YP.rotationDegrees((- yAngle)));
         matrices.translate(0,0,offset);
         matrices.mulPose(Axis.XP.rotation(zAngle + FDMathUtil.FPI));
+
+        if (attackTimings.isTimeForAttack(NetzachClockPendulum.PENDULUM_WAIT_1, time)) {
+            float wait1Percent = FDEasings.reversedEaseOut(attackTimings.getAttackTimingPercent(NetzachClockPendulum.PENDULUM_WAIT_1, time));
+            float someLittleShake = (float)Math.sin(time * 10) * wait1Percent * 5f;
+            matrices.mulPose(Axis.YP.rotationDegrees(someLittleShake));
+        }
         matrices.translate(0,height * (1 - upPercent) + downPercent * height, 0);
 
     }

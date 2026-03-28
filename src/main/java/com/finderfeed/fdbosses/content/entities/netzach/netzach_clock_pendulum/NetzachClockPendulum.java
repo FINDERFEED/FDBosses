@@ -23,6 +23,8 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -137,11 +139,15 @@ public class NetzachClockPendulum extends FDEntity {
 
     private void attackBlocks(AttackTimings attackTimings){
 
-        if (attackTimings.isTimeForAttack(PENDULUM_ATTACK, tickCount) && tickCount % 2 == 0){
-
+        if (attackTimings.isTimeForAttack(PENDULUM_ATTACK, tickCount)){
             Vec3 pos = this.getCurrentPendulumWorldPos();
-            Vec3 dir = this.getLookAngle().multiply(-1,0,-1).normalize();
-            BossUtil.createOnEarthBlockExplosionEffect(level(), pos, dir, 1, 0.8f, Blocks.STONE.defaultBlockState());
+
+            if (tickCount % 2 == 0) {
+                Vec3 dir = this.getLookAngle().multiply(-1, 0, -1).normalize();
+                BossUtil.createOnEarthBlockExplosionEffect(level(), pos, dir, 1, 0.8f, Blocks.STONE.defaultBlockState());
+            }
+
+            level().playSound(null, pos.x, pos.y, pos.z, SoundEvents.BASALT_BREAK, SoundSource.HOSTILE, 4f, 0.65f);
 
         }
 
@@ -185,13 +191,14 @@ public class NetzachClockPendulum extends FDEntity {
 
     private void impactBlocks(AttackTimings timings){
 
-
         int tick = timings.getAttackTimingTick(PENDULUM_WAIT_1, tickCount);
         if (tick == 0){
             int c = 4;
             float angle = FDMathUtil.FPI * 2 / c;
 
             Vec3 startPos = this.getCurrentPendulumWorldPos();
+
+            level().playSound(null, startPos.x, startPos.y, startPos.z, SoundEvents.MACE_SMASH_GROUND_HEAVY, SoundSource.HOSTILE, 4f, 0.75f);
 
             PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
                     .amplitude(1.25f)
@@ -241,7 +248,7 @@ public class NetzachClockPendulum extends FDEntity {
             });
 
             for (var entity : entities){
-                entity.hurt(level().damageSources().magic(), 1);
+                entity.hurt(level().damageSources().magic(), 20);
             }
 
         }
