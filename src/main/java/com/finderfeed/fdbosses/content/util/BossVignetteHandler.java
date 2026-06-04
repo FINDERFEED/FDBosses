@@ -9,6 +9,7 @@ import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.util.Mth;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
@@ -17,7 +18,7 @@ import org.joml.Vector4f;
 
 import java.io.IOException;
 
-@EventBusSubscriber(modid = FDBosses.MOD_ID)
+@EventBusSubscriber(modid = FDBosses.MOD_ID, value = Dist.CLIENT)
 public class BossVignetteHandler {
 
     public static int currentEffectTime = -1;
