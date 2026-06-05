@@ -506,7 +506,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
             this.skillInfoWidget.setSkillImage(info.getInfoIcon());
 
-            this.skillInfoWidget.moveWidgetTo(OPEN_TIME,0,2, FDEasings::easeOutBounce);
+            this.skillInfoWidget.moveWidgetTo(OPEN_TIME,-5,2, FDEasings::easeOutBounce);
             skillOpened = true;
         }else if (skillOpened && !state){
             this.skillInfoWidget.moveWidgetTo(OPEN_TIME / 2,-this.skillInfoWidget.getWidth(),2, FDEasings::easeIn);
