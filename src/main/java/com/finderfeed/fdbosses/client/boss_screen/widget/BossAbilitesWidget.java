@@ -50,7 +50,7 @@ public class BossAbilitesWidget extends FDWidget {
 
         if (this.bossAbilitiesButtonContainer.getChildren().size() > 10 && this.bossAbilitiesButtonContainer.getCurrentScroll() == 0){
 
-            float time = tickCount + pticks;
+            float time = tickCount + FDRenderUtil.tryGetPartialTickIgnorePause();
             float offsetY = (float) Math.sin(time / 2f);
 
             this.renderArrow(matrices, 14,95 + offsetY);
@@ -63,6 +63,9 @@ public class BossAbilitesWidget extends FDWidget {
         FDRenderUtil.fill(matrices, this.getX() + offsetX, this.getY() + offsetY, 1,1,1f,1f,1f,1f);
         FDRenderUtil.fill(matrices, this.getX() + offsetX + 1, this.getY() + offsetY + 1, 1,1,1f,1f,1f,1f);
         FDRenderUtil.fill(matrices, this.getX() + offsetX + 2, this.getY() + offsetY, 1,1,1f,1f,1f,1f);
+
+        FDRenderUtil.fill(matrices, this.getX() + offsetX + 3, this.getY() + offsetY - 1, 1,1,1f,1f,1f,1f);
+        FDRenderUtil.fill(matrices, this.getX() + offsetX - 1, this.getY() + offsetY - 1, 1,1,1f,1f,1f,1f);
 
     }
 

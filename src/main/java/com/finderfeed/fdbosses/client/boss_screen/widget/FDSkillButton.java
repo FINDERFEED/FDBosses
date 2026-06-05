@@ -33,7 +33,7 @@ public class FDSkillButton extends FDButton {
             PoseStack poseStack = graphics.pose();
             poseStack.pushPose();
             poseStack.translate(0,0,-100);
-            FDRenderUtil.renderScaledItemStack(graphics,this.getX() + this.getWidth() / 2 - 8, this.getY() + this.getHeight() - 8, 1f, stack);
+            FDRenderUtil.renderScaledItemStack(graphics,this.getX() + this.getWidth() / 2 - 8, this.getY() + this.getHeight() / 2 - 8, 1f, stack);
             poseStack.popPose();
         }
     }

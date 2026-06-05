@@ -176,7 +176,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         float bossInfoWidth = 237;
         float bossInfoHeight = 130;
 
-        float bossInfoYs = 0;
+        float bossInfoYs = -5;
 
         BossDetailsWidget widget = new BossDetailsWidget(this,  anchor.x, bossInfoYs, bossInfoWidth, bossInfoHeight);
         widget.setBossInfo(this.options.getEntityType().getDescription(),this.getBaseStringColor());
@@ -240,7 +240,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         Vector2f anchorEnd = this.getAnchor(1f,1f);
 
-        BossAbilitesWidget bossAbilitesWidget = new BossAbilitesWidget(this,anchorEnd.x - 237, anchorEnd.y,this.getBaseStringColor());
+        BossAbilitesWidget bossAbilitesWidget = new BossAbilitesWidget(this,anchorEnd.x - 233, anchorEnd.y,this.getBaseStringColor());
 
         List<BossInfo> skills = options.getSkills();
 
@@ -350,7 +350,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         socialsWidget = new QliphothAwakeningSocialsWidget(this, x - 60, y - 35, 120, 70);
 
 
-        FDButton button = new FDButtonWithTexture(this, anchor.x + 4,anchor.y - 36 * 2, 34, 34, FDBosses.location("textures/gui/link.png"))
+        FDButton button = new FDButtonWithTexture(this, anchor.x + 4,anchor.y - 37 * 2, 34, 34, FDBosses.location("textures/gui/link.png"))
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),
                         new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),0,0)
@@ -380,7 +380,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
 
         BossInfo bossInfo = new BossInfo(ResourceLocation.parse("minecraft:textures/item/book.png"),Component.translatable("fdbosses.word.short_description"),null,this.options.getTLDRComponent());
-        FDButton skill = new FDSkillButton(this,anchor.x + 4,anchor.y - 36,34,34, bossInfo)
+        FDButton skill = new FDSkillButton(this,anchor.x + 4,anchor.y - 37,34,34, bossInfo)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),
                         new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),0,0)
