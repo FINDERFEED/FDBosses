@@ -116,7 +116,7 @@ public class ChesedBossScreen extends BaseBossScreen {
         var anchor = this.getAnchor(0, 0.5f);
         float offsetX = this.getBossMenuXStart() / 2;
         float offsetY = 100;
-        this.bossX = anchor.x + offsetX;
+        this.bossX = anchor.x + offsetX + 34;
         this.bossY = anchor.y + offsetY;
 
         FDButton button = new FDButton(this, bossX - 23, bossY - 90, 50,50)

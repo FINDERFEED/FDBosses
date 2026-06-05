@@ -86,7 +86,7 @@ public class MalkuthBossScreen extends BaseBossScreen{
         super.init();
         Vector2f anchor = this.getAnchor(0, 0.5f);
 
-        this.bossX = this.getBossMenuXStart()/2 - 20;
+        this.bossX = this.getBossMenuXStart()/2;
         this.bossY = anchor.y + 90;
 
         float height = 150;
@@ -179,7 +179,7 @@ public class MalkuthBossScreen extends BaseBossScreen{
 
         matrices.translate(0,0,-100);
 
-        this.animationSystem.applyAnimations(malkuthModel, pticks);
+        this.animationSystem.applyAnimations(malkuthModel, FDRenderUtil.tryGetPartialTickIgnorePause());
 
         FDRenderUtil.renderFDModelInScreen(matrices, malkuthModel, bossX, bossY, 0, FDMathUtil.FPI, 0, 50, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY,
                 RenderType.entityTranslucent(FDBosses.location("textures/entities/malkuth/malkuth_screen.png")));

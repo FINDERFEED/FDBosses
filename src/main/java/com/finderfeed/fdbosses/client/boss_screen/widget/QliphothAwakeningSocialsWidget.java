@@ -83,14 +83,14 @@ public class QliphothAwakeningSocialsWidget extends FDWidget {
 
     private void initSocials(){
 
-        float offset = 0;
+        float offset = -1;
 
         float ypos = 29;
 
-        FDButton discord = new FDButtonWithTexture(this.widgetOwner, 9 + offset,ypos, 32, 32, FDBosses.location("textures/gui/discord.png"))
+        FDButton discord = new FDButtonWithTexture(this.widgetOwner, 9 + offset,ypos, 34, 34, FDBosses.location("textures/gui/discord.png"))
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),
-                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),1,1)
+                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),0,0)
                 ))
                 .setSound(BossSounds.BUTTON_CLICK.get())
                 .setOnHoverAction(((fdWidget, guiGraphics, v, v1, v2) -> {
@@ -105,10 +105,10 @@ public class QliphothAwakeningSocialsWidget extends FDWidget {
                     return true;
                 }));
 
-        FDButton patreon = new FDButtonWithTexture(this.widgetOwner, 9 + 35 + offset,ypos, 32, 32, FDBosses.location("textures/gui/patreon.png"))
+        FDButton patreon = new FDButtonWithTexture(this.widgetOwner, 9 + 35 + offset,ypos, 34, 34, FDBosses.location("textures/gui/patreon.png"))
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),
-                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),1,1)
+                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),0,0)
                 ))
                 .setSound(BossSounds.BUTTON_CLICK.get())
                 .setOnHoverAction(((fdWidget, guiGraphics, v, v1, v2) -> {
@@ -127,10 +127,10 @@ public class QliphothAwakeningSocialsWidget extends FDWidget {
                     return true;
                 }));
 
-        FDButton boosty = new FDButtonWithTexture(this.widgetOwner, 9 + 35 * 2 + offset,ypos, 32, 32, FDBosses.location("textures/gui/boosty.png"))
+        FDButton boosty = new FDButtonWithTexture(this.widgetOwner, 9 + 35 * 2 + offset,ypos, 34, 34, FDBosses.location("textures/gui/boosty.png"))
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),
-                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),1,1)
+                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),0,0)
                 ))
                 .setSound(BossSounds.BUTTON_CLICK.get())
                 .setOnHoverAction(((fdWidget, guiGraphics, v, v1, v2) -> {

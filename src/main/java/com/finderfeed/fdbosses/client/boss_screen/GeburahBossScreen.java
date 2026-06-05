@@ -66,7 +66,7 @@ public class GeburahBossScreen extends BaseBossScreen {
         super.init();
         Vector2f anchor = this.getAnchor(0, 0.5f);
 
-        this.bossX = this.getBossMenuXStart()/2;
+        this.bossX = this.getBossMenuXStart()/2 + 25;
         this.bossY = anchor.y + 100;
 
         float height = 150;
@@ -94,12 +94,12 @@ public class GeburahBossScreen extends BaseBossScreen {
 
 
 
-        float time = FDMathUtil.lerp(oldTick, geburahHelicopterTick, pticks) / 100f;
+        float time = FDMathUtil.lerp(oldTick, geburahHelicopterTick, FDRenderUtil.tryGetPartialTickIgnorePause()) / 100f;
 
 
         float yOffs = 0;
         if (geburahRotationSpeed > 100){
-            yOffs  = -(geburahRotationSpeed - 100 +  pticks) * 5;
+            yOffs  = -(geburahRotationSpeed - 100 +  FDRenderUtil.tryGetPartialTickIgnorePause()) * 5;
         }
 
 

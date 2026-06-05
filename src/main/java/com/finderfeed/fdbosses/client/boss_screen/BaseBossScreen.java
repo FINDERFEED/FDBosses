@@ -41,7 +41,7 @@ import java.util.Random;
 
 public abstract class BaseBossScreen extends SimpleFDScreen {
 
-    public static final int DEFAULT_TEXT_COLOR = 0x55ccff;
+    public static final int DEFAULT_TEXT_COLOR = 0xda9462;
 
     public static boolean wasSkillRead = false;
 
@@ -200,7 +200,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         SkillInfoWidget widget = new SkillInfoWidget(this,-200,2,200,anchor.y - 4,Component.literal("TTT"),this.getBaseStringColor());
 
 
-        FDButton fdButtonStats = new FDButton(this,108,79,75,26)
+        FDButton fdButtonStats = new FDButton(this,107,79,75,26)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),0,0)
@@ -209,7 +209,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                 .setText(Component.translatable("fdbosses.word.stats").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         61,1f,true,0,1);
 
-        FDButton fdButtonInfo = new FDButton(this,30,79,75,26)
+        FDButton fdButtonInfo = new FDButton(this,29,79,75,26)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
                         new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),0,0)
