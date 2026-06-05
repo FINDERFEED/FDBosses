@@ -20,7 +20,7 @@ public class FDButtonWithTexture extends FDButton {
     public void renderWidget(GuiGraphics graphics, float mx, float my, float pticks) {
         super.renderWidget(graphics, mx, my, pticks);
         FDRenderUtil.bindTexture(location);
-        FDRenderUtil.blitWithBlend(graphics.pose(), this.getX() + 8, this.getY() + 8, 16, 16, 0, 0, 1, 1, 1, 1, 0, 1f);
+        FDRenderUtil.blitWithBlend(graphics.pose(), this.getX() + this.getWidth() / 2 - 8, this.getY() + this.getHeight() / 2 - 8, 16, 16, 0, 0, 1, 1, 1, 1, 0, 1f);
     }
 
 }

@@ -46,14 +46,14 @@ public class BossAbilitesWidget extends FDWidget {
 
         //5 8
         FDRenderUtil.bindTexture(FDBosses.location("textures/gui/scroller.png"));
-        FDRenderUtil.blitWithBlend(matrices, this.getX() + 211, this.getY() + 28 + p * 62,5,8,0,0,1,1,1,1,0,1);
+        FDRenderUtil.blitWithBlend(matrices, this.getX() + 213, this.getY() + 28 + p * 62,5,8,0,0,1,1,1,1,0,1);
 
         if (this.bossAbilitiesButtonContainer.getChildren().size() > 10 && this.bossAbilitiesButtonContainer.getCurrentScroll() == 0){
 
             float time = tickCount + pticks;
             float offsetY = (float) Math.sin(time / 2f);
 
-            this.renderArrow(matrices, 15,95 + offsetY);
+            this.renderArrow(matrices, 14,95 + offsetY);
 
         }
 

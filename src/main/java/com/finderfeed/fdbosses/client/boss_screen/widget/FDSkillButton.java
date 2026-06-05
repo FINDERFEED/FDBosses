@@ -27,13 +27,13 @@ public class FDSkillButton extends FDButton {
 
         if (rl.isPresent()) {
             FDRenderUtil.bindTexture(rl.get());
-            FDRenderUtil.blitWithBlend(graphics.pose(), this.getX() + 8, this.getY() + 8, 16, 16, 0, 0, 1, 1, 1, 1, 0, 1f);
+            FDRenderUtil.blitWithBlend(graphics.pose(), this.getX() + this.getWidth() / 2 - 8, this.getY() + this.getHeight() / 2 - 8, 16, 16, 0, 0, 1, 1, 1, 1, 0, 1f);
         }else if (item.isPresent()){
             ItemStack stack = item.get();
             PoseStack poseStack = graphics.pose();
             poseStack.pushPose();
             poseStack.translate(0,0,-100);
-            FDRenderUtil.renderScaledItemStack(graphics,this.getX() + 8, this.getY() + 8, 1f, stack);
+            FDRenderUtil.renderScaledItemStack(graphics,this.getX() + this.getWidth() / 2 - 8, this.getY() + this.getHeight() - 8, 1f, stack);
             poseStack.popPose();
         }
     }
