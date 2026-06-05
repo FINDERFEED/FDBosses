@@ -135,7 +135,7 @@ public class GeburahBossScreen extends BaseBossScreen {
 
     @Override
     public int getBaseStringColor() {
-        return DEFAULT_TEXT_COLOR;
+        return 0xda9462;
     }
 
     @Override
