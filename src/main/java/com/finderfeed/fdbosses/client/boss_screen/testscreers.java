@@ -108,7 +108,7 @@ public class testscreers extends SimpleFDScreen {
 
     }
 
-    public void renderLine(GuiGraphics graphics, float x1, float y1, float x2, float y2, float r, float g, float b){
+    public static void renderLine(GuiGraphics graphics, float x1, float y1, float x2, float y2, float r, float g, float b){
         Tesselator tesselator = Tesselator.getInstance();
         var vertex = tesselator.begin(VertexFormat.Mode.DEBUG_LINES, DefaultVertexFormat.POSITION_COLOR);
         RenderSystem.setShader(GameRenderer::getPositionColorShader);

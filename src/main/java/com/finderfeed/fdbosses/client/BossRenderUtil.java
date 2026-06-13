@@ -3,16 +3,20 @@ package com.finderfeed.fdbosses.client;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 
 import java.util.List;
@@ -21,6 +25,27 @@ public class BossRenderUtil {
 
     public static final ResourceLocation BOSS_TOOLTIP = FDBosses.location("textures/gui/boss_screen_tooltip.png");
 
+    public static void renderLine(GuiGraphics graphics, float x1, float y1, float x2, float y2, float width, float r, float g, float b, float a){
+
+        PoseStack matrices = graphics.pose();
+        matrices.pushPose();
+
+        matrices.translate(x1,y1,0);
+
+        float v1 = x2 - x1;
+        float v2 = y2 - y1;
+
+        float angle = (float) Math.atan2(v1,v2 + 0.00001);
+
+        matrices.mulPose(Axis.ZN.rotation(angle));
+
+        float len = new Vector2f(v1,v2).length();
+
+        FDRenderUtil.fill(matrices, -width/2,0,width,len,r,g,b,a);
+
+        matrices.popPose();
+
+    }
 
     public static Vector2f renderBossScreenTooltip(GuiGraphics graphics, Component component,float x,float y, float desiredTextWidth,int textColor, float textScale) {
         Window window = Minecraft.getInstance().getWindow();
