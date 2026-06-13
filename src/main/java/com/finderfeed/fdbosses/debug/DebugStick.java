@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.debug;
 
+import com.finderfeed.fdbosses.client.boss_codex.BossCodexScreen;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEffectOverlay;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
@@ -31,7 +32,8 @@ public class DebugStick extends Item {
 
         if (!level.isClientSide){
 
-            NetzachClockPendulum.summon(level, player.position(), player.getLookAngle(), 30, 60);
+
+//            NetzachClockPendulum.summon(level, player.position(), player.getLookAngle(), 30, 60);
 
 //
 //            if (player.isCrouching()) {
@@ -66,7 +68,7 @@ public class DebugStick extends Item {
 
         }else{
 
-//            Minecraft.getInstance().setScreen(new NetzachMinigameScreen());
+            Minecraft.getInstance().setScreen(new BossCodexScreen());
 //            NetzachEffectOverlay.flash(attackTime,10);
 //
 //            level.addParticle(ChesedRayOptions.builder()
