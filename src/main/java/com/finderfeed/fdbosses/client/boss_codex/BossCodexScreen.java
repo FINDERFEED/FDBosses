@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerStartFight;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdlib.systems.screen.screen_particles.ScreenParticleEngine;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDButton;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.util.FDButtonTextures;
@@ -14,6 +15,7 @@ import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexSorting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -45,6 +47,21 @@ public class BossCodexScreen extends SimpleFDScreen {
 
     private List<LineBetweenStars> lines = new ArrayList<>();
 
+    public ScreenParticleEngine screenParticleEngine;
+
+    public StarButton starMalkuth;
+    public StarButton starYesod;
+    public StarButton starHod;
+    public StarButton starNetzach;
+    public StarButton starTiphereth;
+    public StarButton starGeburah;
+    public StarButton starChesed;
+    public StarButton starBinah;
+    public StarButton starHokma;
+    public StarButton starKether;
+
+    private int time = 0;
+
     public BossCodexScreen(){
 
     }
@@ -52,6 +69,10 @@ public class BossCodexScreen extends SimpleFDScreen {
     @Override
     protected void init() {
         super.init();
+
+        this.screenParticleEngine = new ScreenParticleEngine();
+
+        this.lines.clear();
 
         var window = Minecraft.getInstance().getWindow();
         float aspectRatio = (float) window.getHeight() / window.getWidth();
@@ -65,35 +86,42 @@ public class BossCodexScreen extends SimpleFDScreen {
 
 
         float sideOffset = 100;
+        int lineTravelTime = 8;
 
-        StarButton starMalkuth = new StarButton(this, 0,200, 24,24, random.nextInt(6), 0);
-        StarButton starYesod = new StarButton(this, 0,100, 24,24, random.nextInt(6), -30);
-        StarButton starHod = new StarButton(this, -sideOffset,30, 24,24, random.nextInt(6), 23);
-        StarButton starNetzach = new StarButton(this, sideOffset,30, 24,24, random.nextInt(6), -12);
-        StarButton starTiphereth = new StarButton(this, 0,-29, 24,24, random.nextInt(6), 40);
-        StarButton starGeburah = new StarButton(this, -sideOffset,-95, 24,24, random.nextInt(6), -10);
-        StarButton starChesed = new StarButton(this, sideOffset,-95, 24,24, random.nextInt(6), 23);
-        StarButton starBinah = new StarButton(this, -sideOffset,-220, 24,24, random.nextInt(6), -1);
-        StarButton starHokma = new StarButton(this, sideOffset,-220, 24,24, random.nextInt(6),23);
-        StarButton starKether = new StarButton(this, 0,-280, 24,24, random.nextInt(6), -23);
+        starMalkuth = new StarButton(this, 0,200, 24,24, random.nextInt(6), 0,0);
+        starYesod = new StarButton(this, 0,100, 24,24, random.nextInt(6), -30,lineTravelTime);
+        starHod = new StarButton(this, -sideOffset,30, 24,24, random.nextInt(6), 23,lineTravelTime * 2);
+        starNetzach = new StarButton(this, sideOffset,30, 24,24, random.nextInt(6), -12, lineTravelTime * 2);
+        starTiphereth = new StarButton(this, 0,-29, 24,24, random.nextInt(6), 40, lineTravelTime * 3);
+        starGeburah = new StarButton(this, -sideOffset,-95, 24,24, random.nextInt(6), -10, lineTravelTime * 4);
+        starChesed = new StarButton(this, sideOffset,-95, 24,24, random.nextInt(6), 23, lineTravelTime * 4);
+        starBinah = new StarButton(this, -sideOffset,-220, 24,24, random.nextInt(6), -1, lineTravelTime * 5);
+        starHokma = new StarButton(this, sideOffset,-220, 24,24, random.nextInt(6),23, lineTravelTime * 5);
+        starKether = new StarButton(this, 0,-280, 24,24, random.nextInt(6), -23, lineTravelTime * 6);
 
         int flashTime = 40;
-        LineBetweenStars lineBetweenStars1 = new LineBetweenStars(starMalkuth, starYesod, flashTime, 0);
-        LineBetweenStars lineBetweenStars14 = new LineBetweenStars(starMalkuth, starHod, flashTime, 31);
-        LineBetweenStars lineBetweenStars15 = new LineBetweenStars(starMalkuth, starNetzach, flashTime, 17);
 
-        LineBetweenStars lineBetweenStars2 = new LineBetweenStars(starYesod, starHod, flashTime, 20);
-        LineBetweenStars lineBetweenStars3 = new LineBetweenStars(starYesod, starNetzach, flashTime, 10);
-        LineBetweenStars lineBetweenStars12 = new LineBetweenStars(starNetzach, starChesed, flashTime, 29);
-        LineBetweenStars lineBetweenStars13 = new LineBetweenStars(starHod, starGeburah, flashTime, 7);
-        LineBetweenStars lineBetweenStars4 = new LineBetweenStars(starHod, starTiphereth, flashTime,4);
-        LineBetweenStars lineBetweenStars5 = new LineBetweenStars(starNetzach, starTiphereth, flashTime, 30);
-        LineBetweenStars lineBetweenStars6 = new LineBetweenStars(starTiphereth, starChesed, flashTime, 15);
-        LineBetweenStars lineBetweenStars7 = new LineBetweenStars(starTiphereth, starGeburah, flashTime, 5);
-        LineBetweenStars lineBetweenStars8 = new LineBetweenStars(starGeburah, starBinah, flashTime, 19);
-        LineBetweenStars lineBetweenStars9 = new LineBetweenStars(starChesed, starHokma, flashTime, 25);
-        LineBetweenStars lineBetweenStars10 = new LineBetweenStars(starBinah, starKether, flashTime, 34);
-        LineBetweenStars lineBetweenStars11 = new LineBetweenStars(starHokma, starKether, flashTime, 23);
+
+        LineBetweenStars lineBetweenStars1 = new LineBetweenStars(starMalkuth, starYesod, flashTime, 0,0,lineTravelTime);
+        LineBetweenStars lineBetweenStars14 = new LineBetweenStars(starMalkuth, starHod, flashTime, 31,0,lineTravelTime * 2);
+        LineBetweenStars lineBetweenStars15 = new LineBetweenStars(starMalkuth, starNetzach, flashTime, 17,0,lineTravelTime * 2);
+
+        LineBetweenStars lineBetweenStars2 = new LineBetweenStars(starYesod, starHod, flashTime, 20,lineTravelTime,lineTravelTime);
+        LineBetweenStars lineBetweenStars3 = new LineBetweenStars(starYesod, starNetzach, flashTime, 10,lineTravelTime,lineTravelTime);
+
+        LineBetweenStars lineBetweenStars12 = new LineBetweenStars(starNetzach, starChesed, flashTime, 29,lineTravelTime * 2,lineTravelTime * 2);
+        LineBetweenStars lineBetweenStars13 = new LineBetweenStars(starHod, starGeburah, flashTime, 7, lineTravelTime * 2,lineTravelTime * 2);
+
+        LineBetweenStars lineBetweenStars4 = new LineBetweenStars(starHod, starTiphereth, flashTime,4, lineTravelTime * 2,lineTravelTime);
+        LineBetweenStars lineBetweenStars5 = new LineBetweenStars(starNetzach, starTiphereth, flashTime, 30, lineTravelTime * 2,lineTravelTime);
+
+        LineBetweenStars lineBetweenStars6 = new LineBetweenStars(starTiphereth, starChesed, flashTime, 15,lineTravelTime * 3,lineTravelTime);
+        LineBetweenStars lineBetweenStars7 = new LineBetweenStars(starTiphereth, starGeburah, flashTime, 5,lineTravelTime * 3,lineTravelTime);
+
+        LineBetweenStars lineBetweenStars8 = new LineBetweenStars(starGeburah, starBinah, flashTime, 19, lineTravelTime * 4,lineTravelTime);
+        LineBetweenStars lineBetweenStars9 = new LineBetweenStars(starChesed, starHokma, flashTime, 25, lineTravelTime * 4,lineTravelTime);
+        LineBetweenStars lineBetweenStars10 = new LineBetweenStars(starBinah, starKether, flashTime, 34, lineTravelTime * 5,lineTravelTime);
+        LineBetweenStars lineBetweenStars11 = new LineBetweenStars(starHokma, starKether, flashTime, 23, lineTravelTime * 5,lineTravelTime);
 
         this.lines.add(lineBetweenStars14);
         this.lines.add(lineBetweenStars15);
@@ -127,6 +155,8 @@ public class BossCodexScreen extends SimpleFDScreen {
     @Override
     public void tick() {
         super.tick();
+        time++;
+        screenParticleEngine.tick();
         for (var line : lines) {
             line.tick();
         }
@@ -179,16 +209,16 @@ public class BossCodexScreen extends SimpleFDScreen {
         FDRenderUtil.blitWithBlendCentered(matrices, 0, 0, treeWidth, treeHeight, 0,0,1,1,1,1,0,1f);
 
         FDRenderUtil.bindTexture(NAMES);
-        FDRenderUtil.blitWithBlendCentered(matrices, 6,230, 66, 10,0,0,1,1,1,10,0,1);//MALKUTH
-        FDRenderUtil.blitWithBlendCentered(matrices, 14,70, 66, 10,0,1,1,1,1,10,0,1);//YESOD
-        FDRenderUtil.blitWithBlendCentered(matrices, -122,10, 66, 10,0,2,1,1,1,10,0,1);//HOD
-        FDRenderUtil.blitWithBlendCentered(matrices, 0,-65, 66, 10,0,3,1,1,1,10,0,1);//TIPHERETH
-        FDRenderUtil.blitWithBlendCentered(matrices, 155,-120, 66, 10,0,4,1,1,1,10,0,1);//CHESED
-        FDRenderUtil.blitWithBlendCentered(matrices, -146,-120, 66, 10,0,5,1,1,1,10,0,1);//GEBURAH
-        FDRenderUtil.blitWithBlendCentered(matrices, -136,-240, 66, 10,0,6,1,1,1,10,0,1);//BINAH
-        FDRenderUtil.blitWithBlendCentered(matrices, 13,-310, 66, 10,0,7,1,1,1,10,0,1);//KETER
-        FDRenderUtil.blitWithBlendCentered(matrices, 155,-240, 66, 10,0,8,1,1,1,10,0,1);//HOKMA
-        FDRenderUtil.blitWithBlendCentered(matrices, 155,10, 66, 10,0,9,1,1,1,10,0,1);//NETZACH
+        if (starMalkuth.isActivated())    this.renderName(matrices, 0,6,230, 0);// MALKUTH
+        if (starYesod.isActivated())      this.renderName(matrices, FDMathUtil.FPI * 0.574f,14,70, 1);// YESOD
+        if (starHod.isActivated())      this.renderName(matrices, FDMathUtil.FPI * 0.1574f,-122,10, 2);// HOD
+        if (starTiphereth.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.7574f, 0,-65, 3);// TIPHERETH
+        if (starChesed.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.874f, 155,-120, 4);// CHESED
+        if (starGeburah.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.374f, -146,-120, 5);// GEBURAH
+        if (starBinah.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.274f, -136,-240, 6);// BINAH
+        if (starKether.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.974f, 13,-310, 7);// KETER
+        if (starHokma.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.374f, 155,-240, 8);// HOKMA
+        if (starNetzach.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 1.174f, 155,10, 9);// NETZACH
 
         for (var line : lines) {
             line.render(graphics);
@@ -196,11 +226,25 @@ public class BossCodexScreen extends SimpleFDScreen {
 
         Vector2i mousePos = this.getMousePos();
 
+        screenParticleEngine.render(graphics,FDRenderUtil.tryGetPartialTickIgnorePause());
+
         for (Renderable renderable : this.renderables) {
             renderable.render(graphics, mousePos.x, mousePos.y, pticks);
         }
 
         matrices.popPose();
+    }
+
+    private void renderName(PoseStack matrices, float offset, float x, float y, float texPosY){
+
+        float t = (time + FDRenderUtil.tryGetPartialTickIgnorePause()) * 0.05f;
+
+        float ampl = 1.5f;
+        float xOffs = (float) Math.sin(t + offset) * ampl;
+        float yOffs = (float) Math.sin(t * 1.25f + FDMathUtil.FPI * 0.4235f + offset) * ampl;
+
+        FDRenderUtil.blitWithBlendCentered(matrices, x + xOffs,y + yOffs,66,10,0,texPosY,1,1,1,10,0,1);
+
     }
 
     @Override
