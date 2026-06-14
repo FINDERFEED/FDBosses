@@ -1,9 +1,14 @@
 package com.finderfeed.fdbosses.client.boss_codex;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
 import com.finderfeed.fdlib.systems.simple_screen.FDWidget;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDButton;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticle;
+import com.finderfeed.fdlib.util.math.ComplexEasingFunction;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -18,6 +23,7 @@ import java.util.Random;
 public class StarButton extends FDWidget {
 
     public static final ResourceLocation STAR = FDBosses.location("textures/gui/star/star.png");
+    public static final ResourceLocation SINGLE_STAR = FDBosses.location("textures/gui/star/singlestar.png");
 
     private int currentFrame;
     private int tick = 0;
@@ -43,7 +49,49 @@ public class StarButton extends FDWidget {
             var particleEngine = bossCodexScreen.screenParticleEngine;
             if (tick == activationTime) {
 
+                var particle = FlashyTexturedScreenParticle.create(FDRenderUtil.ParticleRenderTypesS.TEXTURES_DEFAULT, SINGLE_STAR)
+                        .setFlashFrequency(1f)
+                        .setFlashOffset(FDMathUtil.FPI / 4)
+                        .setRollFriction(0.8f)
+                        .setQuadScaleOptions(ComplexEasingFunction.builder()
+                                .addArea(1f, FDEasings::easeOut)
+                                .build())
+                        .setColor(1f,1f,1f,1f)
+                        .setMaxQuadSize(100f)
+                        .setPos(this.getX(),this.getY(),true)
+                        .setLifetime(20)
+                        .setRollSpeed((10 + random.nextFloat() * 10) * (startingAngle > 0 ? -1 : 1))
+                        .setRoll(random.nextFloat() * 45, true);
 
+                var particle2 = FDTexturedSParticle.create(FDRenderUtil.ParticleRenderTypesS.TEXTURES_BLUR_ADDITIVE, BallParticle.LOCATION)
+                        .setQuadScaleOptions(ComplexEasingFunction.builder()
+                                .addArea(1f, FDEasings::quadroHill)
+                                .build())
+                        .setColor(1f,1f,0f,1f)
+                        .setMaxQuadSize(100f)
+                        .setPos(this.getX(),this.getY(),true)
+                        .setLifetime(2);
+
+
+                particleEngine.addParticle(particle);
+                particleEngine.addParticle(particle2);
+
+                for (int i = 0; i < 40; i++){
+                    float speed = random.nextFloat() * 16f + 2f;
+                    Vec3 rnd = new Vec3(speed,0,0).zRot(random.nextFloat() * FDMathUtil.FPI * 2);
+
+                    FlashyColoredQuadParticle flashyColoredQuadParticle = new FlashyColoredQuadParticle()
+                            .setPos(this.getX(),this.getY(), true)
+                            .setColor(1f,1f,0.25f + random.nextFloat() * 0.25f,1f)
+                            .setQuadSize(0.75f)
+                            .setFlashOffset(random.nextFloat() * FDMathUtil.FPI)
+                            .setFlashFrequency(0.75f)
+                            .setSpeed(rnd.x,rnd.y)
+                            .setFriction(0.8f)
+                            .setLifetime(40);
+
+                    particleEngine.addParticle(flashyColoredQuadParticle);
+                }
 
             }
 
@@ -54,7 +102,7 @@ public class StarButton extends FDWidget {
 
                 FlashyColoredQuadParticle flashyColoredQuadParticle = new FlashyColoredQuadParticle()
                         .setPos(this.getX(),this.getY(), true)
-                        .setColor(1f,1f,0.25f,1f)
+                        .setColor(1f,1f,0.25f + random.nextFloat() * 0.25f,1f)
                         .setQuadSize(0.5f)
                         .setFlashFrequency(0.75f)
                         .setSpeed(rnd.x,rnd.y)

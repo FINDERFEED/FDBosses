@@ -16,14 +16,21 @@ public class FlashyTexturedScreenParticle extends FDTexturedSParticle {
 
     private float flashOffset;
 
+    private float rollFriction = 1f;
+
     public FlashyTexturedScreenParticle(Function<ResourceLocation, ? extends ParticleRenderType> factory, ResourceLocation location) {
         super(factory, location);
         flashOffset = new Random().nextFloat() * FDMathUtil.FPI * 2;
     }
 
+    public static FlashyTexturedScreenParticle create(Function<ResourceLocation, ? extends ParticleRenderType> factory, ResourceLocation location) {
+        return new FlashyTexturedScreenParticle(factory, location);
+    }
+
     @Override
     public void tick() {
         super.tick();
+        this.setRollSpeed(this.getRollSpeed() * rollFriction);
     }
 
     @Override
@@ -45,6 +52,11 @@ public class FlashyTexturedScreenParticle extends FDTexturedSParticle {
 
     public FlashyTexturedScreenParticle setFlashOffset(float flashOffset){
         this.flashOffset = flashOffset;
+        return this;
+    }
+
+    public FlashyTexturedScreenParticle setRollFriction(float rollFriction){
+        this.rollFriction = rollFriction;
         return this;
     }
 

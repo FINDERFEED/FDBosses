@@ -86,7 +86,7 @@ public class BossCodexScreen extends SimpleFDScreen {
 
 
         float sideOffset = 100;
-        int lineTravelTime = 8;
+        int lineTravelTime = 6;
 
         starMalkuth = new StarButton(this, 0,200, 24,24, random.nextInt(6), 0,0);
         starYesod = new StarButton(this, 0,100, 24,24, random.nextInt(6), -30,lineTravelTime);
