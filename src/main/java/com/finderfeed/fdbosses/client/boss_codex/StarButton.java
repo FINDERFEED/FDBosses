@@ -164,7 +164,7 @@ public class StarButton extends FDWidget {
                         64, 64,
                         0, 0,
                         1, 1, 1, 11,
-                        0, 1, 0.25f, 0.25f, 0.25f);
+                        0, 1, 0.1f, 0.1f, 0.1f);
             }
 
 
