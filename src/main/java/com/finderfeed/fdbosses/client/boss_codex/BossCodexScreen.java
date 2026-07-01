@@ -206,7 +206,7 @@ public class BossCodexScreen extends SimpleFDScreen {
         float treeWidth = 484;
         float treeHeight = 683;
         FDRenderUtil.bindTexture(TREE);
-        FDRenderUtil.blitWithBlendCentered(matrices, 0, 0, treeWidth, treeHeight, 0,0,1,1,1,1,0,1f);
+        FDRenderUtil.blitWithBlendCentered(matrices, -4.5f, -0.5f, treeWidth, treeHeight, 0,0,1,1,1,1,0,1f);
 
         FDRenderUtil.bindTexture(NAMES);
         if (starMalkuth.isActivated())    this.renderName(matrices, 0,6,230, 0);// MALKUTH
