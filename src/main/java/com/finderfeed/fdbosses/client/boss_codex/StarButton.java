@@ -41,6 +41,7 @@ public class StarButton extends FDWidget {
         this.random = new Random();
     }
 
+
     @Override
     public void tick() {
         super.tick();
@@ -110,10 +111,6 @@ public class StarButton extends FDWidget {
                         .setLifetime(40);
 
                 particleEngine.addParticle(flashyColoredQuadParticle);
-
-                if ((10L & 0b1) == 1){
-                    
-                }
 
             }
         }

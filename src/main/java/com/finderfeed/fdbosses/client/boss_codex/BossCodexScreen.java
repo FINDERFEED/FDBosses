@@ -2,8 +2,11 @@ package com.finderfeed.fdbosses.client.boss_codex;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.init.BossCoreShaders;
+import com.finderfeed.fdlib.FDLib;
+import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
 import com.finderfeed.fdlib.systems.screen.screen_particles.ScreenParticleEngine;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticle;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
@@ -19,14 +22,14 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class BossCodexScreen extends SimpleFDScreen {
 
@@ -161,11 +164,35 @@ public class BossCodexScreen extends SimpleFDScreen {
 
     }
 
+    private LinkedList<FDScreenParticle<?>> particles = new LinkedList<>();
+
     @Override
     public void tick() {
         super.tick();
 
+        particles.removeIf(FDScreenParticle::isRemoved);
 
+        if (time % 4 == 0) {
+            var mousePos = this.getMousePos();
+
+            var random = Minecraft.getInstance().level.random;
+
+            float speed = random.nextFloat() * 0.5f + 0.5f;
+            Vec3 rnd = new Vec3(speed, 0, 0).zRot(random.nextFloat() * FDMathUtil.FPI * 2);
+
+            FlashyColoredQuadParticle flashyColoredQuadParticle = new FlashyColoredQuadParticle()
+                    .setPos(mousePos.x, mousePos.y, true)
+                    .setColor(1f, 1f, 0.25f + random.nextFloat() * 0.25f, 1f)
+                    .setQuadSize(0.5f + random.nextFloat() * 0.25f)
+                    .setFlashFrequency(0.75f)
+                    .setSpeed(rnd.x, rnd.y)
+                    .setFriction(0.95f)
+                    .setLifetime(40);
+
+            particles.add(flashyColoredQuadParticle);
+
+            screenParticleEngine.addParticle(flashyColoredQuadParticle);
+        }
 
         time++;
         screenParticleEngine.tick();
@@ -225,6 +252,51 @@ public class BossCodexScreen extends SimpleFDScreen {
         BossCoreShaders.CODEX_UI.safeGetUniform("offsetY").set(offsetY);
         BossCoreShaders.CODEX_UI.safeGetUniform("scale").set(this.getRealScale());
         BossCoreShaders.CODEX_UI.safeGetUniform("screenSize").set((float) this.width, this.height);
+
+        int count = 64;
+        float[] positions = new float[count * 2];
+        Arrays.fill(positions, 1000000);
+        float[] radiuses = new float[count];
+
+        int index = 0;
+
+        for (var renderable : this.renderables){
+            if (renderable instanceof StarButton starButton){
+                if (starButton.isActivated()){
+
+                    positions[index * 2] = starButton.getX();
+                    positions[index * 2 + 1] = starButton.getY();
+                    radiuses[index] = 45;
+
+                    index++;
+                }
+            }
+        }
+
+        var mousePos = this.getMousePos();
+
+        positions[index * 2] = mousePos.x;
+        positions[index * 2 + 1] = mousePos.y;
+        radiuses[index] = 11;
+        index++;
+
+
+        for (int i = particles.size() - 1; i >= 0 && index < count; i--){
+            var particle = particles.get(i);
+            float p = 1 - (particle.getAge() + FDRenderUtil.tryGetPartialTickIgnorePause()) / particle.getLifetime();
+            p = FDEasings.easeOutBack(p);
+
+            positions[index * 2] = (float) particle.getX(FDRenderUtil.tryGetPartialTickIgnorePause());
+            positions[index * 2 + 1] = (float) particle.getY(FDRenderUtil.tryGetPartialTickIgnorePause());
+            radiuses[index] = p * 3;
+
+            index++;
+        }
+
+
+        BossCoreShaders.CODEX_UI.safeGetUniform("radiuses").set(radiuses);
+
+        BossCoreShaders.CODEX_UI.safeGetUniform("positions").set(positions);
 
         RenderSystem.setShaderTexture(0, RENDER_TARGET.getColorTextureId());
         RenderSystem.enableBlend();
@@ -295,13 +367,29 @@ public class BossCodexScreen extends SimpleFDScreen {
             line.render(graphics);
         }
 
-        Vector2i mousePos = this.getMousePos();
+
+        Vector2f mousePos = this.getMousePos();
 
         screenParticleEngine.render(graphics,FDRenderUtil.tryGetPartialTickIgnorePause());
 
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+
+        matrices.pushPose();
+        matrices.translate(mousePos.x,mousePos.y,0);
+        matrices.mulPose(Axis.ZP.rotationDegrees(-2 * (time + FDRenderUtil.tryGetPartialTickIgnorePause()) ));
+        FDRenderUtil.bindTexture(StarButton.STAR);
+        FDRenderUtil.blitWithBlendCentered(matrices,
+                0,0,
+                16, 16,
+                0, time / 2 % 10,
+                1, 1,
+                1, 11,
+                0, 1);
+
+        matrices.popPose();
+
         for (Renderable renderable : this.renderables) {
-            renderable.render(graphics, mousePos.x, mousePos.y, pticks);
+            renderable.render(graphics, (int) mousePos.x, (int) mousePos.y, pticks);
         }
         RenderSystem.defaultBlendFunc();
 
@@ -355,7 +443,7 @@ public class BossCodexScreen extends SimpleFDScreen {
         return super.mouseDragged(realPos.x, realPos.y, button, xOffs, yOffs);
     }
 
-    private Vector2i getMousePos(){
+    private Vector2f getMousePos(){
 
         float px = (float) Minecraft.getInstance().mouseHandler.xpos() / Minecraft.getInstance().getWindow().getWidth();
         float py = (float) Minecraft.getInstance().mouseHandler.ypos() / Minecraft.getInstance().getWindow().getHeight();
@@ -370,7 +458,7 @@ public class BossCodexScreen extends SimpleFDScreen {
         windowX /= rs;
         windowY /= rs;
 
-        return new Vector2i((int) windowX, (int) windowY);
+        return new Vector2f(windowX, windowY);
     }
 
     @Override

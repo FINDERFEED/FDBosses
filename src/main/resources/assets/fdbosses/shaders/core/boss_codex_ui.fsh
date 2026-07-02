@@ -4,6 +4,11 @@ uniform sampler2D Sampler0;
 
 uniform vec4 ColorModulator;
 
+#define POINT_COUNT 64
+
+uniform float positions[64];
+uniform float radiuses[POINT_COUNT];
+
 uniform vec2 screenSize;
 uniform float scale;
 uniform float time;
@@ -47,40 +52,40 @@ float hashwithoutsine13(vec3 p3)
 
 const vec3 GRADIENTS[32] = vec3[](
 
-// Edge vectors
-vec3( 1, 1, 0), vec3(-1, 1, 0),
-vec3( 1,-1, 0), vec3(-1,-1, 0),
+    vec3( 1, 1, 0), vec3(-1, 1, 0),
+    vec3( 1,-1, 0), vec3(-1,-1, 0),
 
-vec3( 1, 0, 1), vec3(-1, 0, 1),
-vec3( 1, 0,-1), vec3(-1, 0,-1),
+    vec3( 1, 0, 1), vec3(-1, 0, 1),
+    vec3( 1, 0,-1), vec3(-1, 0,-1),
 
-vec3( 0, 1, 1), vec3( 0,-1, 1),
-vec3( 0, 1,-1), vec3( 0,-1,-1),
+    vec3( 0, 1, 1), vec3( 0,-1, 1),
+    vec3( 0, 1,-1), vec3( 0,-1,-1),
 
-vec3( 0.5773503,  0.5773503,  0.5773503),
-vec3(-0.5773503,  0.5773503,  0.5773503),
-vec3( 0.5773503, -0.5773503,  0.5773503),
-vec3(-0.5773503, -0.5773503,  0.5773503),
+    vec3( 0.5773503,  0.5773503,  0.5773503),
+    vec3(-0.5773503,  0.5773503,  0.5773503),
+    vec3( 0.5773503, -0.5773503,  0.5773503),
+    vec3(-0.5773503, -0.5773503,  0.5773503),
 
-vec3( 0.5773503,  0.5773503, -0.5773503),
-vec3(-0.5773503,  0.5773503, -0.5773503),
-vec3( 0.5773503, -0.5773503, -0.5773503),
-vec3(-0.5773503, -0.5773503, -0.5773503),
+    vec3( 0.5773503,  0.5773503, -0.5773503),
+    vec3(-0.5773503,  0.5773503, -0.5773503),
+    vec3( 0.5773503, -0.5773503, -0.5773503),
+    vec3(-0.5773503, -0.5773503, -0.5773503),
 
-vec3( 0.7071068,  0.7071068, 0.0),
-vec3(-0.7071068,  0.7071068, 0.0),
-vec3( 0.7071068, -0.7071068, 0.0),
-vec3(-0.7071068, -0.7071068, 0.0),
+    vec3( 0.7071068,  0.7071068, 0.0),
+    vec3(-0.7071068,  0.7071068, 0.0),
+    vec3( 0.7071068, -0.7071068, 0.0),
+    vec3(-0.7071068, -0.7071068, 0.0),
 
-vec3( 0.7071068, 0.0,  0.7071068),
-vec3(-0.7071068, 0.0,  0.7071068),
-vec3( 0.7071068, 0.0, -0.7071068),
-vec3(-0.7071068, 0.0, -0.7071068),
+    vec3( 0.7071068, 0.0,  0.7071068),
+    vec3(-0.7071068, 0.0,  0.7071068),
+    vec3( 0.7071068, 0.0, -0.7071068),
+    vec3(-0.7071068, 0.0, -0.7071068),
 
-vec3(0.0,  0.7071068,  0.7071068),
-vec3(0.0, -0.7071068,  0.7071068),
-vec3(0.0,  0.7071068, -0.7071068),
-vec3(0.0, -0.7071068, -0.7071068)
+    vec3(0.0,  0.7071068,  0.7071068),
+    vec3(0.0, -0.7071068,  0.7071068),
+    vec3(0.0,  0.7071068, -0.7071068),
+    vec3(0.0, -0.7071068, -0.7071068)
+
 );
 
 
@@ -210,7 +215,7 @@ void main() {
     vec4 color = texture(Sampler0, texCoord0) * vertexColor;
 
     float screenPosX = (texCoord0.x - 0.5) * screenSize.x / scale + offsetX;
-    float screenPosY = (texCoord0.y - 0.5) * screenSize.y / scale + offsetY;
+    float screenPosY = ((1 - texCoord0.y) - 0.5) * screenSize.y / scale - offsetY;
 
 
     vec2 npos = vec2(screenPosX, screenPosY) * 0.01;
@@ -224,6 +229,26 @@ void main() {
     fog2 = transformNoiseValue(fog2, 1);
 
     float density = clamp(fog1 * fog2, 0, 1) * 0.4 + 0.6;
+
+
+    for (int i = 0; i < POINT_COUNT - 16; i++){
+
+        float posX = positions[i * 2];
+        float posY = positions[i * 2 + 1];
+
+        float radius = radiuses[i];
+
+        if (posX == 1000000 || radius < 0.001) {
+            continue;
+        }
+
+        float dist = distance(vec2(screenPosX, screenPosY), vec2(posX, posY));
+        float distMod = clamp(smoothstep(0,1,dist / radius), 0, 1);
+
+        density *= distMod;
+
+    }
+
 
 
     if (color.a == 0){
