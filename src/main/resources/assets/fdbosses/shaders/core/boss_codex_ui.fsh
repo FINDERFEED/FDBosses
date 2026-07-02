@@ -36,10 +36,59 @@ vec3 hashwithoutsine33( uvec3 x )
     return vec3(x)*(1.0/float(0xffffffffU));
 }
 
+//https://www.shadertoy.com/view/XlGcRh
+float hashwithoutsine13(vec3 p3)
+{
+    p3  = fract(p3 * .1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+
+const vec3 GRADIENTS[32] = vec3[](
+
+// Edge vectors
+vec3( 1, 1, 0), vec3(-1, 1, 0),
+vec3( 1,-1, 0), vec3(-1,-1, 0),
+
+vec3( 1, 0, 1), vec3(-1, 0, 1),
+vec3( 1, 0,-1), vec3(-1, 0,-1),
+
+vec3( 0, 1, 1), vec3( 0,-1, 1),
+vec3( 0, 1,-1), vec3( 0,-1,-1),
+
+vec3( 0.5773503,  0.5773503,  0.5773503),
+vec3(-0.5773503,  0.5773503,  0.5773503),
+vec3( 0.5773503, -0.5773503,  0.5773503),
+vec3(-0.5773503, -0.5773503,  0.5773503),
+
+vec3( 0.5773503,  0.5773503, -0.5773503),
+vec3(-0.5773503,  0.5773503, -0.5773503),
+vec3( 0.5773503, -0.5773503, -0.5773503),
+vec3(-0.5773503, -0.5773503, -0.5773503),
+
+vec3( 0.7071068,  0.7071068, 0.0),
+vec3(-0.7071068,  0.7071068, 0.0),
+vec3( 0.7071068, -0.7071068, 0.0),
+vec3(-0.7071068, -0.7071068, 0.0),
+
+vec3( 0.7071068, 0.0,  0.7071068),
+vec3(-0.7071068, 0.0,  0.7071068),
+vec3( 0.7071068, 0.0, -0.7071068),
+vec3(-0.7071068, 0.0, -0.7071068),
+
+vec3(0.0,  0.7071068,  0.7071068),
+vec3(0.0, -0.7071068,  0.7071068),
+vec3(0.0,  0.7071068, -0.7071068),
+vec3(0.0, -0.7071068, -0.7071068)
+);
+
+
 vec3 generateGradientVector(float x,float y,float z){
 
-    return normalize((hashwithoutsine33(uvec3(abs(x)*2329.,abs(y)*1209.,abs(z)*2239.)) -0.5) * 2.);
+//    return normalize((hashwithoutsine33(uvec3(abs(x)*2329.,abs(y)*1209.,abs(z)*2239.)) -0.5) * 2.);
 
+    return GRADIENTS[uint(hashwithoutsine13(vec3(x, y, z)) * 32) & 31u];
 }
 
 float dotPr(float dx, float dy, float dz,float lx,float ly,float lz,float xo,float yo,float zo){
@@ -125,6 +174,37 @@ float perlinNoise(float x,float y,float z,float sections,float octaves){
 }
 
 
+
+vec4 srcAlphaOneMinusSrcAlpha(vec4 dest, vec4 source){
+
+    float asour = source.w;
+
+    return vec4(
+    source.r * asour + dest.r * (1. - asour),
+    source.g * asour + dest.g * (1. - asour),
+    source.b * asour + dest.b * (1. - asour),
+    source.a * asour + dest.a * (1. - asour)
+    );
+
+}
+
+vec4 srcOneSrcAlpha(vec4 src, vec4 dest){
+
+    return vec4(
+    src.r + dest.r * src.a,
+    src.g + dest.g * src.a,
+    src.b + dest.b * src.a,
+    src.a + dest.a * src.a
+    );
+}
+
+float transformNoiseValue(float value, float amplitude){
+    value += 1; value /= 2;
+    value /= amplitude;
+    return value;
+}
+
+
 void main() {
 
     vec4 color = texture(Sampler0, texCoord0) * vertexColor;
@@ -135,9 +215,24 @@ void main() {
 
     vec2 npos = vec2(screenPosX, screenPosY) * 0.01;
 
-    float noise = perlinNoise(npos.x, npos.y, time, 1, 6);
+    float fog1 = perlinNoise(npos.x + 1000 - time * 2, npos.y + 100, time * 2, 0.6, 5);
+    fog1 = transformNoiseValue(fog1, 0.9);
+    fog1 = smoothstep(0,1,fog1);
+    fog1 = smoothstep(0,1,fog1);
 
-    color += noise;
+    float fog2 = perlinNoise(npos.x + 100 - time, npos.y + 100, time, 0.3, 1);
+    fog2 = transformNoiseValue(fog2, 1);
+
+    float density = clamp(fog1 * fog2, 0, 1) * 0.4 + 0.6;
+
+
+    if (color.a == 0){
+        color.rgb = vec3(0);
+        color.a += density;
+    }else{
+        color.rgb *= (1 - density);
+    }
+
 
     fragColor = color * ColorModulator;
 

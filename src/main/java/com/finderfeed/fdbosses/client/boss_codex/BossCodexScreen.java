@@ -219,7 +219,7 @@ public class BossCodexScreen extends SimpleFDScreen {
 
         RenderSystem.setShader(()-> BossCoreShaders.CODEX_UI);
 
-        float ntime =  0.01f * (time + pticks);
+        float ntime =  0.005f * (time + pticks);
         BossCoreShaders.CODEX_UI.safeGetUniform("time").set(ntime);
         BossCoreShaders.CODEX_UI.safeGetUniform("offsetX").set(-offsetX);
         BossCoreShaders.CODEX_UI.safeGetUniform("offsetY").set(offsetY);
