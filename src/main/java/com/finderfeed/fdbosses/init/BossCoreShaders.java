@@ -18,6 +18,7 @@ public class BossCoreShaders {
     public static ShaderInstance MALKUTH_BOSS_BAR;
     public static ShaderInstance PARTICLE_NO_DISCARD;
     public static ShaderInstance CHESED_ITEM_OVERLAY;
+    public static ShaderInstance CODEX_UI;
 
     @SubscribeEvent
     public static void registerShaders(RegisterShadersEvent event) throws IOException {
@@ -29,6 +30,9 @@ public class BossCoreShaders {
         }));
         event.registerShader(new ShaderInstance(event.getResourceProvider(), FDBosses.location("chesed_item_overlay"), DefaultVertexFormat.POSITION_TEX_COLOR), (shaderInstance -> {
             CHESED_ITEM_OVERLAY = shaderInstance;
+        }));
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), FDBosses.location("boss_codex_ui"), DefaultVertexFormat.POSITION_TEX_COLOR), (shaderInstance -> {
+            CODEX_UI = shaderInstance;
         }));
     }
 

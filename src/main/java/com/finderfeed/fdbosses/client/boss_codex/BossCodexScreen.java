@@ -1,40 +1,36 @@
 package com.finderfeed.fdbosses.client.boss_codex;
 
 import com.finderfeed.fdbosses.FDBosses;
-import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
-import com.finderfeed.fdbosses.content.entities.base.BossSpawnerStartFight;
-import com.finderfeed.fdbosses.init.BossSounds;
-import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdbosses.init.BossCoreShaders;
 import com.finderfeed.fdlib.systems.screen.screen_particles.ScreenParticleEngine;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
-import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDButton;
-import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.util.FDButtonTextures;
-import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.util.WidgetTexture;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.mojang.blaze3d.pipeline.RenderTarget;
+import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexSorting;
+import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix4f;
 import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 public class BossCodexScreen extends SimpleFDScreen {
+
+    public static RenderTarget RENDER_TARGET;
 
     //484 * 683
     public static final ResourceLocation TREE = FDBosses.location("textures/gui/tree_of_life.png");
@@ -70,10 +66,6 @@ public class BossCodexScreen extends SimpleFDScreen {
     protected void init() {
         super.init();
 
-        this.screenParticleEngine = new ScreenParticleEngine();
-
-        this.lines.clear();
-
         var window = Minecraft.getInstance().getWindow();
         float aspectRatio = (float) window.getHeight() / window.getWidth();
 
@@ -81,6 +73,23 @@ public class BossCodexScreen extends SimpleFDScreen {
         this.height = (int) (aspectRatio * this.width);
         scaleProgress = 0.235f;
         this.offsetY = 40;
+
+        if (RENDER_TARGET == null) {
+            RENDER_TARGET = new TextureTarget(
+                    window.getWidth(),
+                    window.getHeight(),
+                    true,
+                    Minecraft.ON_OSX
+            );
+        }else{
+            RENDER_TARGET.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
+        }
+
+        this.screenParticleEngine = new ScreenParticleEngine();
+
+        this.lines.clear();
+
+
 
         Random random = new Random();
 
@@ -155,6 +164,9 @@ public class BossCodexScreen extends SimpleFDScreen {
     @Override
     public void tick() {
         super.tick();
+
+
+
         time++;
         screenParticleEngine.tick();
         for (var line : lines) {
@@ -164,6 +176,7 @@ public class BossCodexScreen extends SimpleFDScreen {
 
     @Override
     public void render(GuiGraphics graphics, int mx, int my, float pticks) {
+
 
 
         var previousProjection = new Matrix4f(RenderSystem.getProjectionMatrix());
@@ -181,19 +194,57 @@ public class BossCodexScreen extends SimpleFDScreen {
 
 
         Window window = Minecraft.getInstance().getWindow();
-        FDRenderUtil.fill(graphics.pose(), 0,0,window.getWidth(),window.getHeight(),0,0,0,0.9f);
+        FDRenderUtil.fill(graphics.pose(), 0,0,window.getWidth(),window.getHeight(),0,0,0,0.75f);
         this.renderBackground(graphics, mx, my, pticks);
+
 
         this.renderTree(graphics, mx, my, pticks);
 
-
-
         RenderSystem.setProjectionMatrix(previousProjection, previousSorting);
+
 
     }
 
+    public void renderFramebufferedTree(GuiGraphics graphics, int mx, int my, float pticks) {
+
+        pticks = FDRenderUtil.tryGetPartialTickIgnorePause();
+
+        var matrices = graphics.pose();
+
+        matrices.pushPose();
+        RenderSystem.disableCull();
+
+        matrices.scale(1,-1,1);
+        matrices.translate(0,-this.height,0);
+
+        RenderSystem.setShader(()-> BossCoreShaders.CODEX_UI);
+
+        float ntime =  0.01f * (time + pticks);
+        BossCoreShaders.CODEX_UI.safeGetUniform("time").set(ntime);
+        BossCoreShaders.CODEX_UI.safeGetUniform("offsetX").set(-offsetX);
+        BossCoreShaders.CODEX_UI.safeGetUniform("offsetY").set(offsetY);
+        BossCoreShaders.CODEX_UI.safeGetUniform("scale").set(this.getRealScale());
+        BossCoreShaders.CODEX_UI.safeGetUniform("screenSize").set((float) this.width, this.height);
+
+        RenderSystem.setShaderTexture(0, RENDER_TARGET.getColorTextureId());
+        RenderSystem.enableBlend();
+
+
+        var vertex = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+        vertex.addVertex(matrices.last().pose(),0,0,0).setUv(0,0).setColor(1,1,1,1f);
+        vertex.addVertex(matrices.last().pose(), 0,this.height,0).setUv(0,1).setColor(1,1,1,1f);
+        vertex.addVertex(matrices.last().pose(), this.width,this.height,0).setUv(1,1).setColor(1,1,1,1f);
+        vertex.addVertex(matrices.last().pose(),this.width, 0,0).setUv(1,0).setColor(1,1,1,1f);
+
+        BufferUploader.drawWithShader(vertex.build());
+
+        RenderSystem.disableBlend();
+        matrices.popPose();
+
+    }
     public void renderTree(GuiGraphics graphics, int mx, int my, float pticks) {
         var matrices = graphics.pose();
+
 
         matrices.pushPose();
 
@@ -203,10 +254,30 @@ public class BossCodexScreen extends SimpleFDScreen {
         matrices.scale(rs,rs,rs);
         matrices.translate(offsetX, offsetY,0);
 
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+
+        var main = Minecraft.getInstance().getMainRenderTarget();
+
         float treeWidth = 484;
         float treeHeight = 683;
+        RENDER_TARGET.clear(Minecraft.ON_OSX);
+        RENDER_TARGET.bindWrite(true);
         FDRenderUtil.bindTexture(TREE);
         FDRenderUtil.blitWithBlendCentered(matrices, -4.5f, -0.5f, treeWidth, treeHeight, 0,0,1,1,1,1,0,1f);
+        main.bindWrite(true);
+
+        matrices.popPose();
+
+
+        this.renderFramebufferedTree(graphics, mx, my, pticks);
+
+
+        matrices.pushPose();
+
+        matrices.translate(this.width / 2f, this.height / 2f, 0);
+        matrices.scale(rs,rs,rs);
+        matrices.translate(offsetX, offsetY,0);
 
         FDRenderUtil.bindTexture(NAMES);
         if (starMalkuth.isActivated())    this.renderName(matrices, 0,6,230, 0);// MALKUTH
@@ -228,11 +299,15 @@ public class BossCodexScreen extends SimpleFDScreen {
 
         screenParticleEngine.render(graphics,FDRenderUtil.tryGetPartialTickIgnorePause());
 
+        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
         for (Renderable renderable : this.renderables) {
             renderable.render(graphics, mousePos.x, mousePos.y, pticks);
         }
+        RenderSystem.defaultBlendFunc();
 
         matrices.popPose();
+        RenderSystem.disableBlend();
+
     }
 
     private void renderName(PoseStack matrices, float offset, float x, float y, float texPosY){
