@@ -264,9 +264,26 @@ public class BossCodexScreen extends SimpleFDScreen {
             if (renderable instanceof StarButton starButton){
                 if (starButton.isActivated()){
 
+                    float starTime = starButton.getTick() + FDRenderUtil.tryGetPartialTickIgnorePause();
+
+                    float t = starTime + starButton.getCurrentFrame() * 0.37f;
+
+                    float flicker = 1f - 0.15f * (float)Math.pow(
+                            Math.max(0, Math.sin(t * 9f)),
+                            8
+                    );
+
+                    float radius = 43f * flicker;
+
+                    if (starTime > starButton.getActivationTime()){
+                        float p = 1 - Mth.clamp((starTime - starButton.getActivationTime()) / 10, 0, 1);
+                        radius = Math.max(radius, 100 * FDEasings.easeIn(p));
+                    }
+
+
                     positions[index * 2] = starButton.getX();
                     positions[index * 2 + 1] = starButton.getY();
-                    radiuses[index] = 45;
+                    radiuses[index] = radius;
 
                     index++;
                 }

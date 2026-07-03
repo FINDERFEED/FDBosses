@@ -209,6 +209,11 @@ float transformNoiseValue(float value, float amplitude){
     return value;
 }
 
+float steepStep(float x)
+{
+    x = clamp(x, 0.0, 1.0);
+    return clamp(1.0 / (1.0 + exp(-20.0 * (x - 0.5))), 0, 1);
+}
 
 void main() {
 
@@ -232,11 +237,12 @@ void main() {
 
     float fog1 = perlinNoise(npos.x + 1000 - time , npos.y + 100, time * 4, 0.6, 5);
     fog1 = transformNoiseValue(fog1, 0.9);
-    fog1 = smoothstep(0,1,fog1);
-    fog1 = smoothstep(0,1,fog1);
+    fog1 = steepStep(fog1);
 
     float fog2 = perlinNoise(npos.x + 100 - time * 0.5, npos.y + 100, time * 2, 0.3, 1);
     fog2 = transformNoiseValue(fog2, 1);
+
+
 
     float density = clamp(fog1 * fog2, 0, 1) * 0.6 + 0.4;
 
@@ -274,6 +280,7 @@ void main() {
     }else{
         color.rgb *= (1 - density);
     }
+
 
 
     fragColor = color * ColorModulator + vec4(0,0,0,circularShadow);

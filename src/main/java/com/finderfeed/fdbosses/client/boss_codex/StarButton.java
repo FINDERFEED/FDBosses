@@ -28,6 +28,7 @@ public class StarButton extends FDWidget {
     private int currentFrame;
     private int tick = 0;
     private float startingAngle = 0;
+    private int startingFrame;
 
     private int activationTime;
 
@@ -36,6 +37,7 @@ public class StarButton extends FDWidget {
     public StarButton(Screen screen, float x, float y, float width, float height, int startFrame, float startingAngle, int activationTime) {
         super(screen, x, y, width, height);
         this.currentFrame = Mth.clamp(startFrame,0,10);
+        this.startingFrame = currentFrame;
         this.startingAngle = startingAngle;
         this.activationTime = activationTime;
         this.random = new Random();
@@ -124,6 +126,21 @@ public class StarButton extends FDWidget {
         return this.tick > activationTime;
     }
 
+    public int getTick() {
+        return tick;
+    }
+
+    public int getActivationTime() {
+        return activationTime;
+    }
+
+    public int getCurrentFrame() {
+        return currentFrame;
+    }
+
+    public int getStartingFrame() {
+        return startingFrame;
+    }
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, float v, float v1, float v2) {
