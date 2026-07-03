@@ -39,7 +39,12 @@ public class BossCodexScreen extends SimpleFDScreen {
     public static final ResourceLocation TREE = FDBosses.location("textures/gui/tree_of_life.png");
     public static final ResourceLocation NAMES = FDBosses.location("textures/gui/names.png");
 
+    public float scaleProgressO = 1;
+    public float fromScaleProgress = 1;
     public float scaleProgress = 1;
+    public float targetScaleProgress = 1;
+    public int scaleTime = 0;
+    public int currentScaleTime = 0;
 
     public float offsetX = 0;
     public float offsetY = 0;
@@ -75,7 +80,12 @@ public class BossCodexScreen extends SimpleFDScreen {
         this.width = 400;
         this.height = (int) (aspectRatio * this.width);
         scaleProgress = 0.235f;
+        fromScaleProgress = scaleProgress;
+        scaleProgressO = scaleProgress;
+        targetScaleProgress = scaleProgress;
         this.offsetY = 40;
+
+        this.offsetX = 0;
 
         if (RENDER_TARGET == null) {
             RENDER_TARGET = new TextureTarget(
@@ -98,18 +108,20 @@ public class BossCodexScreen extends SimpleFDScreen {
 
 
         float sideOffset = 100;
+        float wOffset = -12;
+        float hOffset = -12;
         int lineTravelTime = 6;
 
-        starMalkuth = new StarButton(this, 0,200, 24,24, random.nextInt(6), 0,0);
-        starYesod = new StarButton(this, 0,100, 24,24, random.nextInt(6), -30,lineTravelTime);
-        starHod = new StarButton(this, -sideOffset,30, 24,24, random.nextInt(6), 23,lineTravelTime * 2);
-        starNetzach = new StarButton(this, sideOffset,30, 24,24, random.nextInt(6), -12, lineTravelTime * 2);
-        starTiphereth = new StarButton(this, 0,-29, 24,24, random.nextInt(6), 40, lineTravelTime * 3);
-        starGeburah = new StarButton(this, -sideOffset,-95, 24,24, random.nextInt(6), -10, lineTravelTime * 4);
-        starChesed = new StarButton(this, sideOffset,-95, 24,24, random.nextInt(6), 23, lineTravelTime * 4);
-        starBinah = new StarButton(this, -sideOffset,-220, 24,24, random.nextInt(6), -1, lineTravelTime * 5);
-        starHokma = new StarButton(this, sideOffset,-220, 24,24, random.nextInt(6),23, lineTravelTime * 5);
-        starKether = new StarButton(this, 0,-280, 24,24, random.nextInt(6), -23, lineTravelTime * 6);
+        starMalkuth = new StarButton(this, wOffset,200 + hOffset, 24,24, random.nextInt(6), 0,0);
+        starYesod = new StarButton(this, wOffset,100 + hOffset, 24,24, random.nextInt(6), -30,lineTravelTime);
+        starHod = new StarButton(this, -sideOffset + wOffset,30 + hOffset, 24,24, random.nextInt(6), 23,lineTravelTime * 2);
+        starNetzach = new StarButton(this, sideOffset + wOffset,30 + hOffset, 24,24, random.nextInt(6), -12, lineTravelTime * 2);
+        starTiphereth = new StarButton(this, wOffset,-29 + hOffset, 24,24, random.nextInt(6), 40, lineTravelTime * 3);
+        starGeburah = new StarButton(this, -sideOffset + wOffset,-95 + hOffset, 24,24, random.nextInt(6), -10, lineTravelTime * 4);
+        starChesed = new StarButton(this, sideOffset + wOffset,-95 + hOffset, 24,24, random.nextInt(6), 23, lineTravelTime * 4);
+        starBinah = new StarButton(this, -sideOffset + wOffset,-220 + hOffset, 24,24, random.nextInt(6), -1, lineTravelTime * 5);
+        starHokma = new StarButton(this, sideOffset + wOffset,-220 + hOffset, 24,24, random.nextInt(6),23, lineTravelTime * 5);
+        starKether = new StarButton(this, wOffset,-280 + hOffset, 24,24, random.nextInt(6), -23, lineTravelTime * 6);
 
         int flashTime = 40;
 
@@ -170,10 +182,20 @@ public class BossCodexScreen extends SimpleFDScreen {
     public void tick() {
         super.tick();
 
+        scaleProgressO = scaleProgress;
+        if (scaleTime != 0){
+            currentScaleTime = Mth.clamp(currentScaleTime + 1, 0, scaleTime);
+            float p = FDEasings.easeOut((float) currentScaleTime / scaleTime);
+
+            this.scaleProgress = FDMathUtil.lerp(fromScaleProgress, targetScaleProgress, p);
+        }else{
+            scaleProgress = targetScaleProgress;
+        }
+
         particles.removeIf(FDScreenParticle::isRemoved);
 
         if (time % 4 == 0) {
-            var mousePos = this.getMousePos();
+            var mousePos = this.getMousePos(0);
 
             var random = Minecraft.getInstance().level.random;
 
@@ -250,7 +272,7 @@ public class BossCodexScreen extends SimpleFDScreen {
         BossCoreShaders.CODEX_UI.safeGetUniform("time").set(ntime);
         BossCoreShaders.CODEX_UI.safeGetUniform("offsetX").set(-offsetX);
         BossCoreShaders.CODEX_UI.safeGetUniform("offsetY").set(offsetY);
-        BossCoreShaders.CODEX_UI.safeGetUniform("scale").set(this.getRealScale());
+        BossCoreShaders.CODEX_UI.safeGetUniform("scale").set(this.getRealScale(pticks));
         BossCoreShaders.CODEX_UI.safeGetUniform("screenSize").set((float) this.width, this.height);
 
         int count = 64;
@@ -273,7 +295,7 @@ public class BossCodexScreen extends SimpleFDScreen {
                             8
                     );
 
-                    float radius = 43f * flicker;
+                    float radius = 60f * flicker;
 
                     if (starTime > starButton.getActivationTime()){
                         float p = 1 - Mth.clamp((starTime - starButton.getActivationTime()) / 10, 0, 1);
@@ -290,7 +312,7 @@ public class BossCodexScreen extends SimpleFDScreen {
             }
         }
 
-        var mousePos = this.getMousePos();
+        var mousePos = this.getMousePos(pticks);
 
         positions[index * 2] = mousePos.x;
         positions[index * 2 + 1] = mousePos.y;
@@ -337,7 +359,7 @@ public class BossCodexScreen extends SimpleFDScreen {
 
         matrices.pushPose();
 
-        float rs = this.getRealScale();
+        float rs = this.getRealScale(FDRenderUtil.tryGetPartialTickIgnorePause());
 
         matrices.translate(this.width / 2f, this.height / 2f, 0);
         matrices.scale(rs,rs,rs);
@@ -385,7 +407,7 @@ public class BossCodexScreen extends SimpleFDScreen {
         }
 
 
-        Vector2f mousePos = this.getMousePos();
+        Vector2f mousePos = this.getMousePos(FDRenderUtil.tryGetPartialTickIgnorePause());
 
         screenParticleEngine.render(graphics,FDRenderUtil.tryGetPartialTickIgnorePause());
 
@@ -429,45 +451,60 @@ public class BossCodexScreen extends SimpleFDScreen {
 
     @Override
     public boolean isMouseOver(double mx, double my) {
-        var realPos = this.getMousePos();
+        var realPos = this.getMousePos(0);
         return super.isMouseOver(realPos.x, realPos.y);
     }
 
     @Override
     public boolean mouseScrolled(double mx, double my, double xOffs, double yOffs) {
-        scaleProgress = (float) Mth.clamp((scaleProgress + yOffs * 0.035f) ,0.0f, 1f);
-        var realPos = this.getMousePos();
+//        scaleProgress = (float) Mth.clamp((scaleProgress + yOffs * 0.035f) ,0.0f, 1f);
+//
+        this.scaleTo((float) (this.getTargetScaleProgress() + yOffs * 0.035f), 2);
+
+        var realPos = this.getMousePos(0);
         return super.mouseScrolled(realPos.x, realPos.y, xOffs, yOffs);
     }
 
-    public float getRealScale(){
-        return FDMathUtil.lerp(0.1f,5f, FDEasings.easeIn(scaleProgress));
+    public void scaleTo(float target, int time){
+        target = Mth.clamp(target, 0, 1);
+        this.currentScaleTime = 0;
+        this.fromScaleProgress = scaleProgress;
+        this.scaleTime = time;
+        this.targetScaleProgress = target;
+    }
+
+    public float getTargetScaleProgress() {
+        return targetScaleProgress;
+    }
+
+    public float getRealScale(float pticks){
+        return FDMathUtil.lerp(0.1f,5f, FDEasings.easeIn(FDMathUtil.lerp(scaleProgressO, scaleProgress, pticks)));
     }
 
     @Override
     public boolean mouseClicked(double mx, double my, int button) {
-        var realPos = this.getMousePos();
+        var realPos = this.getMousePos(0);
         return super.mouseClicked(realPos.x, realPos.y, button);
     }
 
     @Override
     public boolean mouseDragged(double mx, double my, int button, double xOffs, double yOffs) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            this.offsetX += (float) xOffs / this.getRealScale();
-            this.offsetY += (float) yOffs / this.getRealScale();
+            this.offsetX += (float) xOffs / this.getRealScale(0);
+            this.offsetY += (float) yOffs / this.getRealScale(0);
         }
-        var realPos = this.getMousePos();
+        var realPos = this.getMousePos(0);
         return super.mouseDragged(realPos.x, realPos.y, button, xOffs, yOffs);
     }
 
-    private Vector2f getMousePos(){
+    private Vector2f getMousePos(float pticks){
 
         float px = (float) Minecraft.getInstance().mouseHandler.xpos() / Minecraft.getInstance().getWindow().getWidth();
         float py = (float) Minecraft.getInstance().mouseHandler.ypos() / Minecraft.getInstance().getWindow().getHeight();
 
         float windowX = px * this.width;
         float windowY = py * this.height;
-        float rs = this.getRealScale();
+        float rs = this.getRealScale(pticks);
 
         windowX -= this.width / 2f + offsetX * rs;
         windowY -= this.height / 2f + offsetY * rs;
@@ -480,13 +517,13 @@ public class BossCodexScreen extends SimpleFDScreen {
 
     @Override
     public boolean mouseReleased(double mx, double my, int button) {
-        var realPos = this.getMousePos();
+        var realPos = this.getMousePos(0);
         return super.mouseReleased(realPos.x,realPos.y, button);
     }
 
     @Override
     public void mouseMoved(double mx, double my) {
-        var realPos = this.getMousePos();
+        var realPos = this.getMousePos(0);
         super.mouseMoved(realPos.x, realPos.y);
     }
 

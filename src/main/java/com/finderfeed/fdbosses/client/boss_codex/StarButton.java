@@ -17,6 +17,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector2f;
 
 import java.util.Random;
 
@@ -50,6 +51,9 @@ public class StarButton extends FDWidget {
         if (tick >= activationTime) {
             BossCodexScreen bossCodexScreen = (BossCodexScreen) this.widgetOwner;
             var particleEngine = bossCodexScreen.screenParticleEngine;
+
+            Vector2f pos = new Vector2f(this.getX() + this.getWidth() / 2, this.getY() + this.getHeight() / 2);
+
             if (tick == activationTime) {
 
                 var particle = FlashyTexturedScreenParticle.create(FDRenderUtil.ParticleRenderTypesS.TEXTURES_DEFAULT, SINGLE_STAR)
@@ -61,7 +65,7 @@ public class StarButton extends FDWidget {
                                 .build())
                         .setColor(1f,1f,1f,1f)
                         .setMaxQuadSize(100f)
-                        .setPos(this.getX(),this.getY(),true)
+                        .setPos(pos.x, pos.y,true)
                         .setLifetime(20)
                         .setRollSpeed((10 + random.nextFloat() * 10) * (startingAngle > 0 ? -1 : 1))
                         .setRoll(random.nextFloat() * 45, true);
@@ -72,7 +76,7 @@ public class StarButton extends FDWidget {
                                 .build())
                         .setColor(1f,1f,0f,1f)
                         .setMaxQuadSize(100f)
-                        .setPos(this.getX(),this.getY(),true)
+                        .setPos(pos.x,pos.y,true)
                         .setLifetime(2);
 
 
@@ -84,7 +88,7 @@ public class StarButton extends FDWidget {
                     Vec3 rnd = new Vec3(speed,0,0).zRot(random.nextFloat() * FDMathUtil.FPI * 2);
 
                     FlashyColoredQuadParticle flashyColoredQuadParticle = new FlashyColoredQuadParticle()
-                            .setPos(this.getX(),this.getY(), true)
+                            .setPos(pos.x, pos.y, true)
                             .setColor(1f,1f,0.25f + random.nextFloat() * 0.25f,1f)
                             .setQuadSize(0.75f)
                             .setFlashOffset(random.nextFloat() * FDMathUtil.FPI)
@@ -104,7 +108,7 @@ public class StarButton extends FDWidget {
                 Vec3 rnd = new Vec3(speed,0,0).zRot(random.nextFloat() * FDMathUtil.FPI * 2);
 
                 FlashyColoredQuadParticle flashyColoredQuadParticle = new FlashyColoredQuadParticle()
-                        .setPos(this.getX(),this.getY(), true)
+                        .setPos(pos.x, pos.y, true)
                         .setColor(1f,1f,0.25f + random.nextFloat() * 0.25f,1f)
                         .setQuadSize(0.5f)
                         .setFlashFrequency(0.75f)
@@ -151,7 +155,7 @@ public class StarButton extends FDWidget {
 
         matrices.pushPose();
 
-        matrices.translate(this.getX(),this.getY(), 0);
+        matrices.translate(this.getX() + this.getWidth() / 2,this.getY() + this.getHeight() / 2, 0);
 
 
             if (this.tick > activationTime) {

@@ -51,10 +51,10 @@ public class LineBetweenStars {
         float t2 = tick + FDRenderUtil.tryGetPartialTickIgnorePause();
         float p2 = Mth.clamp((t2 - delay) / travelTime,0,1);
 
-        float xt = FDMathUtil.lerp(starButton1.getX(), starButton2.getX(), p2);
-        float yt = FDMathUtil.lerp(starButton1.getY(), starButton2.getY(), p2);
+        float xt = FDMathUtil.lerp(starButton1.getX() + starButton1.getWidth() / 2, starButton2.getX() + starButton2.getWidth() / 2, p2);
+        float yt = FDMathUtil.lerp(starButton1.getY() + starButton1.getHeight() / 2, starButton2.getY() + starButton2.getHeight() / 2, p2);
 
-        BossRenderUtil.renderLine(graphics, starButton1.getX(), starButton1.getY(), xt, yt,
+        BossRenderUtil.renderLine(graphics, starButton1.getX() + starButton1.getWidth() / 2, starButton1.getY() + starButton1.getHeight() / 2, xt, yt,
                 2f,
                 1,1,val,1
         );
