@@ -2,11 +2,9 @@ package com.finderfeed.fdbosses.client.boss_codex;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.init.BossCoreShaders;
-import com.finderfeed.fdlib.FDLib;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
 import com.finderfeed.fdlib.systems.screen.screen_particles.ScreenParticleEngine;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
-import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticle;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
@@ -19,13 +17,11 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Renderable;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
-import org.joml.Vector2i;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
@@ -64,6 +60,7 @@ public class BossCodexScreen extends SimpleFDScreen {
 
     public int offsetTime = 0;
     public int currentOffsetTime = 0;
+    private boolean blockingOffset;
 
 
     private List<LineBetweenStars> lines = new ArrayList<>();
@@ -96,11 +93,11 @@ public class BossCodexScreen extends SimpleFDScreen {
 
         this.width = 400;
         this.height = (int) (aspectRatio * this.width);
-        scaleProgress = 0.235f;
+        scaleProgress = 0.635f;
         fromScaleProgress = scaleProgress;
         scaleProgressO = scaleProgress;
         targetScaleProgress = scaleProgress;
-        this.offsetY = 40;
+        this.offsetY = -250;
         this.offsetYPrev = this.offsetY;
         this.offsetYO = this.offsetY;
         this.offsetYTarget = this.offsetY;
@@ -111,6 +108,9 @@ public class BossCodexScreen extends SimpleFDScreen {
         this.offsetXO = this.offsetX;
         this.offsetXPrev = this.offsetX;
         this.offsetXTarget = this.offsetX;
+
+        this.scaleTo(0.235f, 42);
+        this.moveTo(0,40,42);
 
         if (RENDER_TARGET == null) {
             RENDER_TARGET = new TextureTarget(
@@ -126,7 +126,6 @@ public class BossCodexScreen extends SimpleFDScreen {
         this.screenParticleEngine = new ScreenParticleEngine();
 
         this.lines.clear();
-
 
 
         Random random = new Random();
@@ -223,9 +222,14 @@ public class BossCodexScreen extends SimpleFDScreen {
             currentOffsetTime = Mth.clamp(currentOffsetTime + 1, 0, offsetTime);
             float p = FDEasings.easeOut((float) currentOffsetTime / offsetTime);
 
+            if (currentOffsetTime >= offsetTime) {
+                blockingOffset = false;
+            }
+
             this.offsetX = FDMathUtil.lerp(offsetXPrev, offsetXTarget, p);
             this.offsetY = FDMathUtil.lerp(offsetYPrev, offsetYTarget, p);
         }else{
+            blockingOffset = false;
             offsetX = offsetXTarget;
             offsetY = offsetYTarget;
         }
@@ -500,12 +504,17 @@ public class BossCodexScreen extends SimpleFDScreen {
     }
 
     public void moveTo(float offsetX, float offsetY, int time){
+        this.moveTo(offsetX, offsetY, time, false);
+    }
+
+    public void moveTo(float offsetX, float offsetY, int time, boolean blocking){
         this.offsetXPrev = this.offsetX;
         this.offsetYPrev = this.offsetY;
         this.offsetXTarget = offsetX;
         this.offsetYTarget = offsetY;
         this.currentOffsetTime = 0;
         this.offsetTime = time;
+        this.blockingOffset = blocking;
     }
 
     @Override
@@ -518,9 +527,6 @@ public class BossCodexScreen extends SimpleFDScreen {
     public boolean mouseScrolled(double mx, double my, double xOffs, double yOffs) {
 
         this.scaleTo((float) (this.getTargetScaleProgress() + yOffs * 0.035f), 2);
-
-        var mousePos = this.getMousePos(0);
-
 
         var realPos = this.getMousePos(0);
         return super.mouseScrolled(realPos.x, realPos.y, xOffs, yOffs);
@@ -552,13 +558,16 @@ public class BossCodexScreen extends SimpleFDScreen {
     public boolean mouseDragged(double mx, double my, int button, double xOffs, double yOffs) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
 
-            float realScale = this.getRealScale(0);
+            if (!blockingOffset){
+                float realScale = this.getRealScale(0);
 
-            this.moveTo(
-                    (float) (offsetXTarget + xOffs / realScale),
-                    (float) (offsetYTarget + yOffs / realScale),
-                    0
-            );
+                this.moveTo(
+                        (float) (offsetXTarget + xOffs / realScale),
+                        (float) (offsetYTarget + yOffs / realScale),
+                        0
+                );
+            }
+
 
         }
         var realPos = this.getMousePos(0);

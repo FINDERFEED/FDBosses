@@ -191,7 +191,10 @@ public class StarButton extends FDWidget {
 
     @Override
     public boolean onMouseClick(float v, float v1, int i) {
-        System.out.println("Zhopa");
+        if (this.widgetOwner instanceof BossCodexScreen bossCodexScreen){
+            bossCodexScreen.moveTo(-(this.getX() + this.getWidth() / 2), -(this.getY() + this.getHeight() / 2), 20, true);
+            bossCodexScreen.scaleTo(0.8f,20);
+        }
         return true;
     }
 
