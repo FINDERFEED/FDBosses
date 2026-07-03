@@ -277,7 +277,7 @@ public class BossCodexScreen extends SimpleFDScreen {
 
         positions[index * 2] = mousePos.x;
         positions[index * 2 + 1] = mousePos.y;
-        radiuses[index] = 11;
+        radiuses[index] = 15;
         index++;
 
 

@@ -6,7 +6,7 @@ uniform vec4 ColorModulator;
 
 #define POINT_COUNT 64
 
-uniform float positions[64];
+uniform float positions[POINT_COUNT * 2];
 uniform float radiuses[POINT_COUNT];
 
 uniform vec2 screenSize;
@@ -217,21 +217,38 @@ void main() {
     float screenPosX = (texCoord0.x - 0.5) * screenSize.x / scale + offsetX;
     float screenPosY = ((1 - texCoord0.y) - 0.5) * screenSize.y / scale - offsetY;
 
+    float shadowRadius = 800;
+
+    float distSqr = screenPosX * screenPosX + screenPosY * screenPosY;
+
+    if (distSqr > shadowRadius * shadowRadius){
+        fragColor = vec4(0,0,0,1);
+        return;
+    }
+
+    float shadowDensityDistance = 200;
 
     vec2 npos = vec2(screenPosX, screenPosY) * 0.01;
 
-    float fog1 = perlinNoise(npos.x + 1000 - time * 2, npos.y + 100, time * 2, 0.6, 5);
+    float fog1 = perlinNoise(npos.x + 1000 - time , npos.y + 100, time * 4, 0.6, 5);
     fog1 = transformNoiseValue(fog1, 0.9);
     fog1 = smoothstep(0,1,fog1);
     fog1 = smoothstep(0,1,fog1);
 
-    float fog2 = perlinNoise(npos.x + 100 - time, npos.y + 100, time, 0.3, 1);
+    float fog2 = perlinNoise(npos.x + 100 - time * 0.5, npos.y + 100, time * 2, 0.3, 1);
     fog2 = transformNoiseValue(fog2, 1);
 
-    float density = clamp(fog1 * fog2, 0, 1) * 0.4 + 0.6;
+    float density = clamp(fog1 * fog2, 0, 1) * 0.6 + 0.4;
+
+    float circularShadow = 0;
+    float distToShadowSqr = (shadowRadius - shadowDensityDistance) * (shadowRadius - shadowDensityDistance);
+
+    if (distSqr > distToShadowSqr){
+        circularShadow = (sqrt(distSqr) - sqrt(distToShadowSqr)) / shadowDensityDistance;
+    }
 
 
-    for (int i = 0; i < POINT_COUNT - 16; i++){
+    for (int i = 0; i < POINT_COUNT; i++){
 
         float posX = positions[i * 2];
         float posY = positions[i * 2 + 1];
@@ -259,6 +276,6 @@ void main() {
     }
 
 
-    fragColor = color * ColorModulator;
+    fragColor = color * ColorModulator + vec4(0,0,0,circularShadow);
 
 }
