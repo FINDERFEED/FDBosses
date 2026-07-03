@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.client.boss_screen;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.BossRenderUtil;
+import com.finderfeed.fdbosses.client.boss_codex.BossCodexScreen;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreenOptions;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossInfo;
 import com.finderfeed.fdbosses.client.boss_screen.widget.*;
@@ -92,30 +93,32 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         this.initDidntReadSkillWarningWidget();
 
-        FDButton startFightButton = new FDButton(this,6,6,112,26)
-                .setTexture(new FDButtonTextures(
-                        new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
-                        new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),0,0)
-                ))
-                .setSound(BossSounds.BUTTON_CLICK.get())
-                .setText(Component.translatable("fdbosses.word.start_fight").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
-                        110,1f,true,0,1)
-                .setOnClickAction(((fdWidget1, v2, v11, i1) -> {
+        if (bossSpawnerId != -1) {
+            FDButton startFightButton = new FDButton(this, 6, 6, 112, 26)
+                    .setTexture(new FDButtonTextures(
+                            new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
+                            new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"), 0, 0)
+                    ))
+                    .setSound(BossSounds.BUTTON_CLICK.get())
+                    .setText(Component.translatable("fdbosses.word.start_fight").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
+                            110, 1f, true, 0, 1)
+                    .setOnClickAction(((fdWidget1, v2, v11, i1) -> {
 
-                    if (wasSkillRead) {
+                        if (wasSkillRead) {
 
-                        Level level = FDClientHelpers.getClientLevel();
-                        if (level.getEntity(bossSpawnerId) instanceof BossSpawnerEntity bossSpawner) {
-                            PacketDistributor.sendToServer(new BossSpawnerStartFight(bossSpawnerId));
+                            Level level = FDClientHelpers.getClientLevel();
+                            if (level.getEntity(bossSpawnerId) instanceof BossSpawnerEntity bossSpawner) {
+                                PacketDistributor.sendToServer(new BossSpawnerStartFight(bossSpawnerId));
+                            }
+
+                        } else {
+                            this.didntReadSkillWarningWidget.setActive(true);
                         }
 
-                    }else{
-                        this.didntReadSkillWarningWidget.setActive(true);
-                    }
-
-                    return true;
-                }));
-        this.addRenderableWidget(startFightButton);
+                        return true;
+                    }));
+            this.addRenderableWidget(startFightButton);
+        }
 
         this.initTLDRButton();
 
@@ -614,6 +617,14 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
 
 
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        if (this.bossSpawnerId == -1){
+            Minecraft.getInstance().setScreen(new BossCodexScreen());
+        }
     }
 
     @Override

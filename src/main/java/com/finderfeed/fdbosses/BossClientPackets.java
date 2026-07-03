@@ -61,6 +61,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
@@ -205,6 +206,13 @@ public class BossClientPackets {
             if (baseBossScreen != null) {
                 Minecraft.getInstance().setScreen(baseBossScreen);
             }
+        }
+    }
+
+    public static void openBossDossierScreenEntityType(EntityType<?> type, List<Item> drops){
+        BaseBossScreen baseBossScreen = BossScreens.getScreen(type, -1, drops);
+        if (baseBossScreen != null) {
+            Minecraft.getInstance().setScreen(baseBossScreen);
         }
     }
 

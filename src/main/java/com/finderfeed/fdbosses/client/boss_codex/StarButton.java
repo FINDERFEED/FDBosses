@@ -2,6 +2,8 @@ package com.finderfeed.fdbosses.client.boss_codex;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.packets.RequestDossierScreenPacket;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
 import com.finderfeed.fdlib.systems.simple_screen.FDWidget;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDButton;
@@ -16,7 +18,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector2f;
 
 import java.util.Random;
@@ -35,8 +39,11 @@ public class StarButton extends FDWidget {
 
     private Random random;
 
-    public StarButton(Screen screen, float x, float y, float width, float height, int startFrame, float startingAngle, int activationTime) {
+    public EntityType<?> entityType;
+
+    public StarButton(EntityType<?> entityType, Screen screen, float x, float y, float width, float height, int startFrame, float startingAngle, int activationTime) {
         super(screen, x, y, width, height);
+        this.entityType = entityType;
         this.currentFrame = Mth.clamp(startFrame,0,10);
         this.startingFrame = currentFrame;
         this.startingAngle = startingAngle;
@@ -192,8 +199,12 @@ public class StarButton extends FDWidget {
     @Override
     public boolean onMouseClick(float v, float v1, int i) {
         if (this.widgetOwner instanceof BossCodexScreen bossCodexScreen){
-            bossCodexScreen.moveTo(-(this.getX() + this.getWidth() / 2), -(this.getY() + this.getHeight() / 2), 20, true);
-            bossCodexScreen.scaleTo(0.8f,20);
+            if (entityType != null) {
+                bossCodexScreen.moveTo(-(this.getX() + this.getWidth() / 2), -(this.getY() + this.getHeight() / 2), 20, true, () -> {
+                    PacketDistributor.sendToServer(new RequestDossierScreenPacket(entityType));
+                });
+                bossCodexScreen.scaleTo(0.8f,20);
+            }
         }
         return true;
     }

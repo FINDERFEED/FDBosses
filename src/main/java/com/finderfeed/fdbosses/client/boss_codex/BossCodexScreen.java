@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.client.boss_codex;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.init.BossCoreShaders;
+import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
 import com.finderfeed.fdlib.systems.screen.screen_particles.ScreenParticleEngine;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
@@ -62,6 +63,7 @@ public class BossCodexScreen extends SimpleFDScreen {
     public int currentOffsetTime = 0;
     private boolean blockingOffset;
 
+    public Runnable offsetEndAction;
 
     private List<LineBetweenStars> lines = new ArrayList<>();
 
@@ -136,16 +138,16 @@ public class BossCodexScreen extends SimpleFDScreen {
         float hOffset = -12;
         int lineTravelTime = 6;
 
-        starMalkuth = new StarButton(this, wOffset,200 + hOffset, 24,24, random.nextInt(6), 0,0);
-        starYesod = new StarButton(this, wOffset,100 + hOffset, 24,24, random.nextInt(6), -30,lineTravelTime);
-        starHod = new StarButton(this, -sideOffset + wOffset,30 + hOffset, 24,24, random.nextInt(6), 23,lineTravelTime * 2);
-        starNetzach = new StarButton(this, sideOffset + wOffset,30 + hOffset, 24,24, random.nextInt(6), -12, lineTravelTime * 2);
-        starTiphereth = new StarButton(this, wOffset,-29 + hOffset, 24,24, random.nextInt(6), 40, lineTravelTime * 3);
-        starGeburah = new StarButton(this, -sideOffset + wOffset,-95 + hOffset, 24,24, random.nextInt(6), -10, lineTravelTime * 4);
-        starChesed = new StarButton(this, sideOffset + wOffset,-95 + hOffset, 24,24, random.nextInt(6), 23, lineTravelTime * 4);
-        starBinah = new StarButton(this, -sideOffset + wOffset,-220 + hOffset, 24,24, random.nextInt(6), -1, lineTravelTime * 5);
-        starHokma = new StarButton(this, sideOffset + wOffset,-220 + hOffset, 24,24, random.nextInt(6),23, lineTravelTime * 5);
-        starKether = new StarButton(this, wOffset,-280 + hOffset, 24,24, random.nextInt(6), -23, lineTravelTime * 6);
+        starMalkuth = new StarButton(BossEntities.MALKUTH.get(), this, wOffset,200 + hOffset, 24,24, random.nextInt(6), 0,0);
+        starYesod = new StarButton(null, this, wOffset,100 + hOffset, 24,24, random.nextInt(6), -30,lineTravelTime);
+        starHod = new StarButton(null, this, -sideOffset + wOffset,30 + hOffset, 24,24, random.nextInt(6), 23,lineTravelTime * 2);
+        starNetzach = new StarButton(null, this, sideOffset + wOffset,30 + hOffset, 24,24, random.nextInt(6), -12, lineTravelTime * 2);
+        starTiphereth = new StarButton(null, this, wOffset,-29 + hOffset, 24,24, random.nextInt(6), 40, lineTravelTime * 3);
+        starGeburah = new StarButton(BossEntities.GEBURAH.get(), this, -sideOffset + wOffset,-95 + hOffset, 24,24, random.nextInt(6), -10, lineTravelTime * 4);
+        starChesed = new StarButton(BossEntities.CHESED.get(), this, sideOffset + wOffset,-95 + hOffset, 24,24, random.nextInt(6), 23, lineTravelTime * 4);
+        starBinah = new StarButton(null, this, -sideOffset + wOffset,-220 + hOffset, 24,24, random.nextInt(6), -1, lineTravelTime * 5);
+        starHokma = new StarButton(null, this, sideOffset + wOffset,-220 + hOffset, 24,24, random.nextInt(6),23, lineTravelTime * 5);
+        starKether = new StarButton(null, this, wOffset,-280 + hOffset, 24,24, random.nextInt(6), -23, lineTravelTime * 6);
 
         int flashTime = 40;
 
@@ -224,11 +226,19 @@ public class BossCodexScreen extends SimpleFDScreen {
 
             if (currentOffsetTime >= offsetTime) {
                 blockingOffset = false;
+                if (offsetEndAction != null){
+                    offsetEndAction.run();
+                    offsetEndAction = null;
+                }
             }
 
             this.offsetX = FDMathUtil.lerp(offsetXPrev, offsetXTarget, p);
             this.offsetY = FDMathUtil.lerp(offsetYPrev, offsetYTarget, p);
         }else{
+            if (offsetEndAction != null){
+                offsetEndAction.run();
+                offsetEndAction = null;
+            }
             blockingOffset = false;
             offsetX = offsetXTarget;
             offsetY = offsetYTarget;
@@ -504,10 +514,10 @@ public class BossCodexScreen extends SimpleFDScreen {
     }
 
     public void moveTo(float offsetX, float offsetY, int time){
-        this.moveTo(offsetX, offsetY, time, false);
+        this.moveTo(offsetX, offsetY, time, false, null);
     }
 
-    public void moveTo(float offsetX, float offsetY, int time, boolean blocking){
+    public void moveTo(float offsetX, float offsetY, int time, boolean blocking, Runnable offsetEndAction){
         this.offsetXPrev = this.offsetX;
         this.offsetYPrev = this.offsetY;
         this.offsetXTarget = offsetX;
@@ -515,6 +525,10 @@ public class BossCodexScreen extends SimpleFDScreen {
         this.currentOffsetTime = 0;
         this.offsetTime = time;
         this.blockingOffset = blocking;
+        if (this.offsetEndAction != null){
+            this.offsetEndAction.run();
+        }
+        this.offsetEndAction = offsetEndAction;
     }
 
     @Override
