@@ -39,6 +39,7 @@ public class BossCodexScreen extends SimpleFDScreen {
     public static final ResourceLocation TREE = FDBosses.location("textures/gui/tree_of_life.png");
     public static final ResourceLocation NAMES = FDBosses.location("textures/gui/names.png");
 
+    // Smooth Scaling
     public float scaleProgressO = 1;
     public float fromScaleProgress = 1;
     public float scaleProgress = 1;
@@ -46,8 +47,24 @@ public class BossCodexScreen extends SimpleFDScreen {
     public int scaleTime = 0;
     public int currentScaleTime = 0;
 
+
+    // Smooth position change
+
+    public float offsetXTarget = 0;
+    public float offsetYTarget = 0;
+
+    public float offsetXPrev = 0;
+    public float offsetYPrev = 0;
+
     public float offsetX = 0;
     public float offsetY = 0;
+
+    public float offsetXO = 0;
+    public float offsetYO = 0;
+
+    public int offsetTime = 0;
+    public int currentOffsetTime = 0;
+
 
     private List<LineBetweenStars> lines = new ArrayList<>();
 
@@ -84,8 +101,16 @@ public class BossCodexScreen extends SimpleFDScreen {
         scaleProgressO = scaleProgress;
         targetScaleProgress = scaleProgress;
         this.offsetY = 40;
+        this.offsetYPrev = this.offsetY;
+        this.offsetYO = this.offsetY;
+        this.offsetYTarget = this.offsetY;
+        this.offsetTime = 0;
+        this.currentOffsetTime = 0;
 
         this.offsetX = 0;
+        this.offsetXO = this.offsetX;
+        this.offsetXPrev = this.offsetX;
+        this.offsetXTarget = this.offsetX;
 
         if (RENDER_TARGET == null) {
             RENDER_TARGET = new TextureTarget(
@@ -192,6 +217,19 @@ public class BossCodexScreen extends SimpleFDScreen {
             scaleProgress = targetScaleProgress;
         }
 
+        this.offsetXO = this.offsetX;
+        this.offsetYO = this.offsetY;
+        if (offsetTime != 0){
+            currentOffsetTime = Mth.clamp(currentOffsetTime + 1, 0, offsetTime);
+            float p = FDEasings.easeOut((float) currentOffsetTime / offsetTime);
+
+            this.offsetX = FDMathUtil.lerp(offsetXPrev, offsetXTarget, p);
+            this.offsetY = FDMathUtil.lerp(offsetYPrev, offsetYTarget, p);
+        }else{
+            offsetX = offsetXTarget;
+            offsetY = offsetYTarget;
+        }
+
         particles.removeIf(FDScreenParticle::isRemoved);
 
         if (time % 4 == 0) {
@@ -270,8 +308,8 @@ public class BossCodexScreen extends SimpleFDScreen {
 
         float ntime =  0.005f * (time + pticks);
         BossCoreShaders.CODEX_UI.safeGetUniform("time").set(ntime);
-        BossCoreShaders.CODEX_UI.safeGetUniform("offsetX").set(-offsetX);
-        BossCoreShaders.CODEX_UI.safeGetUniform("offsetY").set(offsetY);
+        BossCoreShaders.CODEX_UI.safeGetUniform("offsetX").set(-this.getOffsetX(pticks));
+        BossCoreShaders.CODEX_UI.safeGetUniform("offsetY").set(this.getOffsetY(pticks));
         BossCoreShaders.CODEX_UI.safeGetUniform("scale").set(this.getRealScale(pticks));
         BossCoreShaders.CODEX_UI.safeGetUniform("screenSize").set((float) this.width, this.height);
 
@@ -361,6 +399,10 @@ public class BossCodexScreen extends SimpleFDScreen {
 
         float rs = this.getRealScale(FDRenderUtil.tryGetPartialTickIgnorePause());
 
+
+        float offsetX = this.getOffsetX(FDRenderUtil.tryGetPartialTickIgnorePause());
+        float offsetY = this.getOffsetY(FDRenderUtil.tryGetPartialTickIgnorePause());
+
         matrices.translate(this.width / 2f, this.height / 2f, 0);
         matrices.scale(rs,rs,rs);
         matrices.translate(offsetX, offsetY,0);
@@ -449,6 +491,23 @@ public class BossCodexScreen extends SimpleFDScreen {
 
     }
 
+    public float getOffsetX(float partialTicks){
+        return FDMathUtil.lerp(offsetXO, offsetX, partialTicks);
+    }
+
+    public float getOffsetY(float partialTicks){
+        return FDMathUtil.lerp(offsetYO, offsetY, partialTicks);
+    }
+
+    public void moveTo(float offsetX, float offsetY, int time){
+        this.offsetXPrev = this.offsetX;
+        this.offsetYPrev = this.offsetY;
+        this.offsetXTarget = offsetX;
+        this.offsetYTarget = offsetY;
+        this.currentOffsetTime = 0;
+        this.offsetTime = time;
+    }
+
     @Override
     public boolean isMouseOver(double mx, double my) {
         var realPos = this.getMousePos(0);
@@ -457,9 +516,11 @@ public class BossCodexScreen extends SimpleFDScreen {
 
     @Override
     public boolean mouseScrolled(double mx, double my, double xOffs, double yOffs) {
-//        scaleProgress = (float) Mth.clamp((scaleProgress + yOffs * 0.035f) ,0.0f, 1f);
-//
+
         this.scaleTo((float) (this.getTargetScaleProgress() + yOffs * 0.035f), 2);
+
+        var mousePos = this.getMousePos(0);
+
 
         var realPos = this.getMousePos(0);
         return super.mouseScrolled(realPos.x, realPos.y, xOffs, yOffs);
@@ -490,8 +551,15 @@ public class BossCodexScreen extends SimpleFDScreen {
     @Override
     public boolean mouseDragged(double mx, double my, int button, double xOffs, double yOffs) {
         if (button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            this.offsetX += (float) xOffs / this.getRealScale(0);
-            this.offsetY += (float) yOffs / this.getRealScale(0);
+
+            float realScale = this.getRealScale(0);
+
+            this.moveTo(
+                    (float) (offsetXTarget + xOffs / realScale),
+                    (float) (offsetYTarget + yOffs / realScale),
+                    0
+            );
+
         }
         var realPos = this.getMousePos(0);
         return super.mouseDragged(realPos.x, realPos.y, button, xOffs, yOffs);
@@ -506,8 +574,8 @@ public class BossCodexScreen extends SimpleFDScreen {
         float windowY = py * this.height;
         float rs = this.getRealScale(pticks);
 
-        windowX -= this.width / 2f + offsetX * rs;
-        windowY -= this.height / 2f + offsetY * rs;
+        windowX -= this.width / 2f + this.getOffsetX(pticks) * rs;
+        windowY -= this.height / 2f + this.getOffsetY(pticks) * rs;
 
         windowX /= rs;
         windowY /= rs;
