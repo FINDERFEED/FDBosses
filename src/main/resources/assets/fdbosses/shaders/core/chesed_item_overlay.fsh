@@ -31,10 +31,59 @@ vec3 hashwithoutsine33( uvec3 x )
     return vec3(x)*(1.0/float(0xffffffffU));
 }
 
+//https://www.shadertoy.com/view/XlGcRh
+float hashwithoutsine13(vec3 p3)
+{
+    p3  = fract(p3 * .1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+const vec3 GRADIENTS[32] = vec3[](
+
+        vec3( 1, 1, 0), vec3(-1, 1, 0),
+        vec3( 1,-1, 0), vec3(-1,-1, 0),
+
+        vec3( 1, 0, 1), vec3(-1, 0, 1),
+        vec3( 1, 0,-1), vec3(-1, 0,-1),
+
+        vec3( 0, 1, 1), vec3( 0,-1, 1),
+        vec3( 0, 1,-1), vec3( 0,-1,-1),
+
+        vec3( 0.5773503,  0.5773503,  0.5773503),
+        vec3(-0.5773503,  0.5773503,  0.5773503),
+        vec3( 0.5773503, -0.5773503,  0.5773503),
+        vec3(-0.5773503, -0.5773503,  0.5773503),
+
+        vec3( 0.5773503,  0.5773503, -0.5773503),
+        vec3(-0.5773503,  0.5773503, -0.5773503),
+        vec3( 0.5773503, -0.5773503, -0.5773503),
+        vec3(-0.5773503, -0.5773503, -0.5773503),
+
+        vec3( 0.7071068,  0.7071068, 0.0),
+        vec3(-0.7071068,  0.7071068, 0.0),
+        vec3( 0.7071068, -0.7071068, 0.0),
+        vec3(-0.7071068, -0.7071068, 0.0),
+
+        vec3( 0.7071068, 0.0,  0.7071068),
+        vec3(-0.7071068, 0.0,  0.7071068),
+        vec3( 0.7071068, 0.0, -0.7071068),
+        vec3(-0.7071068, 0.0, -0.7071068),
+
+        vec3(0.0,  0.7071068,  0.7071068),
+        vec3(0.0, -0.7071068,  0.7071068),
+        vec3(0.0,  0.7071068, -0.7071068),
+        vec3(0.0, -0.7071068, -0.7071068)
+
+);
+
+
+
 vec3 generateGradientVector(float x,float y,float z){
 
-    return normalize((hashwithoutsine33(uvec3(abs(x)*2329.,abs(y)*1209.,abs(z)*2239.)) -0.5) * 2.);
+    //    return normalize((hashwithoutsine33(uvec3(abs(x)*2329.,abs(y)*1209.,abs(z)*2239.)) -0.5) * 2.);
 
+    return GRADIENTS[uint(hashwithoutsine13(vec3(x, y, z)) * 32) & 31u];
 }
 
 float dotPr(float dx, float dy, float dz,float lx,float ly,float lz,float xo,float yo,float zo){

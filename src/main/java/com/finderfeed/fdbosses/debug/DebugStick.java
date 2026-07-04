@@ -68,7 +68,7 @@ public class DebugStick extends Item {
 
         }else{
 
-            Minecraft.getInstance().setScreen(new BossCodexScreen());
+//            Minecraft.getInstance().setScreen(new BossCodexScreen());
 //            NetzachEffectOverlay.flash(attackTime,10);
 //
 //            level.addParticle(ChesedRayOptions.builder()

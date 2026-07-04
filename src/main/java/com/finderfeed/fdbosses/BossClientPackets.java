@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses;
 
 
 import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdbosses.client.boss_codex.BossCodexScreen;
 import com.finderfeed.fdbosses.client.boss_screen.BaseBossScreen;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreens;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
@@ -79,6 +80,10 @@ import java.util.Random;
 public class BossClientPackets {
 
     private static Random random = new Random();
+
+    public static void openQliphoticCodex(){
+        Minecraft.getInstance().setScreen(new BossCodexScreen());
+    }
 
     public static void geburahSyncRayVisuals(int geburah, boolean rayState){
         if (FDClientHelpers.getClientLevel().getEntity(geburah) instanceof GeburahEntity geburah1){
