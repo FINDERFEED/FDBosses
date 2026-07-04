@@ -101,6 +101,7 @@
   "fdbosses.skills.chesed.crystals_stats": "Кристалл: \n{{(fdlib:image)path=fdbosses:boss_health_heart}}: {{(fdlib:attribute)type=fdbosses:chesed_crystal,attribute=minecraft:generic.max_health}}\n\nЭффективные оружия:\n{{(fdlib:item)item=minecraft:diamond_axe}} \n\nНеэффективные оружия:\n{{(fdlib:item)item=minecraft:diamond_sword}}{{(fdlib:item)item=minecraft:diamond_pickaxe}}{{(fdlib:item)item=minecraft:diamond_shovel}}",
   "fdbosses.skills.chesed.monoliths_stats": "Монолит: \n{{(fdlib:image)path=fdbosses:boss_health_heart}}: {{(fdlib:attribute)type=fdbosses:chesed_monolith,attribute=minecraft:generic.max_health}}",
   "fdbosses.skills.chesed.mightiness_stats": "",
+  "fdbosses.word.not_released": "Босс находится в разработке",
   "fdbosses.word.stats": "Показатели",
   "fdbosses.word.info": "Информация",
   "fdbosses.skills.skill_button": "Нажмите чтобы увидеть детали",

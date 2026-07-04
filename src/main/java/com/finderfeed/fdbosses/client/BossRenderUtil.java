@@ -46,6 +46,27 @@ public class BossRenderUtil {
         matrices.popPose();
 
     }
+    public static void renderLine(GuiGraphics graphics, float x1, float y1, float x2, float y2, float width, float r, float g, float b, float a, float re, float ge, float be, float ae){
+
+        PoseStack matrices = graphics.pose();
+        matrices.pushPose();
+
+        matrices.translate(x1,y1,0);
+
+        float v1 = x2 - x1;
+        float v2 = y2 - y1;
+
+        float angle = (float) Math.atan2(v1,v2 + 0.00001);
+
+        matrices.mulPose(Axis.ZN.rotation(angle));
+
+        float len = new Vector2f(v1,v2).length();
+
+        FDRenderUtil.fill(matrices, -width/2,0,width,len,r,g,b,a, r,g,b,a, re,ge,be,ae, re,ge,be,ae);
+
+        matrices.popPose();
+
+    }
 
     public static Vector2f renderBossScreenTooltip(GuiGraphics graphics, Component component,float x,float y, float desiredTextWidth,int textColor, float textScale) {
         Window window = Minecraft.getInstance().getWindow();

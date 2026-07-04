@@ -54,9 +54,16 @@ public class LineBetweenStars {
         float xt = FDMathUtil.lerp(starButton1.getX() + starButton1.getWidth() / 2, starButton2.getX() + starButton2.getWidth() / 2, p2);
         float yt = FDMathUtil.lerp(starButton1.getY() + starButton1.getHeight() / 2, starButton2.getY() + starButton2.getHeight() / 2, p2);
 
+        float g1 = starButton1.entityType != null ? 1 : 0;
+        float g2 = starButton2.entityType != null ? 1 : 0;
+
+        float b1 = starButton1.entityType != null ? val : 0;
+        float b2 = starButton2.entityType != null ? val : 0;
+
         BossRenderUtil.renderLine(graphics, starButton1.getX() + starButton1.getWidth() / 2, starButton1.getY() + starButton1.getHeight() / 2, xt, yt,
                 2f,
-                1,1,val,1
+                1,g1,b1,1,
+                1,g2,b2,1
         );
 
     }

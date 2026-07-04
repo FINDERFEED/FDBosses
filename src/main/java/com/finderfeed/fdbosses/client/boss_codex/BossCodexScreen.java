@@ -447,16 +447,16 @@ public class BossCodexScreen extends SimpleFDScreen {
         matrices.translate(offsetX, offsetY,0);
 
         FDRenderUtil.bindTexture(NAMES);
-        if (starMalkuth.isActivated())    this.renderName(matrices, 0,6,230, 0);// MALKUTH
-        if (starYesod.isActivated())      this.renderName(matrices, FDMathUtil.FPI * 0.574f,14,70, 1);// YESOD
-        if (starHod.isActivated())      this.renderName(matrices, FDMathUtil.FPI * 0.1574f,-122,10, 2);// HOD
-        if (starTiphereth.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.7574f, 0,-65, 3);// TIPHERETH
-        if (starChesed.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.874f, 155,-120, 4);// CHESED
-        if (starGeburah.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.374f, -146,-120, 5);// GEBURAH
-        if (starBinah.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.274f, -136,-240, 6);// BINAH
-        if (starKether.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.974f, 13,-310, 7);// KETER
-        if (starHokma.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.374f, 155,-240, 8);// HOKMA
-        if (starNetzach.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 1.174f, 155,10, 9);// NETZACH
+        if (starMalkuth.isActivated())    this.renderName(matrices, 0,6,230, 0, true);// MALKUTH
+        if (starYesod.isActivated())      this.renderName(matrices, FDMathUtil.FPI * 0.574f,14,70, 1, false);// YESOD
+        if (starHod.isActivated())      this.renderName(matrices, FDMathUtil.FPI * 0.1574f,-122,10, 2, false);// HOD
+        if (starTiphereth.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.7574f, 0,-65, 3, false);// TIPHERETH
+        if (starChesed.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.874f, 155,-120, 4, true);// CHESED
+        if (starGeburah.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.374f, -146,-120, 5, true);// GEBURAH
+        if (starBinah.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.274f, -136,-240, 6, false);// BINAH
+        if (starKether.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.974f, 13,-310, 7, false);// KETER
+        if (starHokma.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 0.374f, 155,-240, 8, false);// HOKMA
+        if (starNetzach.isActivated())      this.renderName(matrices,FDMathUtil.FPI * 1.174f, 155,10, 9, false);// NETZACH
 
         for (var line : lines) {
             line.render(graphics);
@@ -467,7 +467,6 @@ public class BossCodexScreen extends SimpleFDScreen {
 
         screenParticleEngine.render(graphics,FDRenderUtil.tryGetPartialTickIgnorePause());
 
-        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
 
         matrices.pushPose();
         matrices.translate(mousePos.x,mousePos.y,0);
@@ -486,14 +485,13 @@ public class BossCodexScreen extends SimpleFDScreen {
         for (Renderable renderable : this.renderables) {
             renderable.render(graphics, (int) mousePos.x, (int) mousePos.y, pticks);
         }
-        RenderSystem.defaultBlendFunc();
 
         matrices.popPose();
         RenderSystem.disableBlend();
 
     }
 
-    private void renderName(PoseStack matrices, float offset, float x, float y, float texPosY){
+    private void renderName(PoseStack matrices, float offset, float x, float y, float texPosY, boolean opened){
 
         float t = (time + FDRenderUtil.tryGetPartialTickIgnorePause()) * 0.05f;
 
@@ -501,7 +499,12 @@ public class BossCodexScreen extends SimpleFDScreen {
         float xOffs = (float) Math.sin(t + offset) * ampl;
         float yOffs = (float) Math.sin(t * 1.25f + FDMathUtil.FPI * 0.4235f + offset) * ampl;
 
-        FDRenderUtil.blitWithBlendCentered(matrices, x + xOffs,y + yOffs,66,10,0,texPosY,1,1,1,10,0,1);
+        FDRenderUtil.blitWithBlendRgb(matrices,x + xOffs - 33, y + yOffs - 5, 66, 10, 0, texPosY, 1,1,1,10,0,1,
+                1,
+                opened ?  1 : 0.15f,
+                opened ?  1 : 0.15f);
+
+//        FDRenderUtil.blitWithBlendCentered(matrices, x + xOffs,y + yOffs,66,10,0,texPosY,1,1,1,10,0,1);
 
     }
 

@@ -2,6 +2,8 @@ package com.finderfeed.fdbosses.client.boss_codex;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.BossRenderUtil;
+import com.finderfeed.fdbosses.client.boss_screen.BaseBossScreen;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.packets.RequestDossierScreenPacket;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
@@ -12,22 +14,27 @@ import com.finderfeed.fdlib.util.math.ComplexEasingFunction;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector2f;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 
 import java.util.Random;
 
 public class StarButton extends FDWidget {
 
     public static final ResourceLocation STAR = FDBosses.location("textures/gui/star/star.png");
+    public static final ResourceLocation STAR_NOT_RELEASED = FDBosses.location("textures/gui/star/star_not_released.png");
     public static final ResourceLocation SINGLE_STAR = FDBosses.location("textures/gui/star/singlestar.png");
 
     private int currentFrame;
@@ -61,7 +68,15 @@ public class StarButton extends FDWidget {
 
             Vector2f pos = new Vector2f(this.getX() + this.getWidth() / 2, this.getY() + this.getHeight() / 2);
 
+            float r = 1, g = 1, b = 1;
+            if (this.entityType == null){
+                r = 1;
+                g = 0;
+                b = 0;
+            }
             if (tick == activationTime) {
+
+
 
                 var particle = FlashyTexturedScreenParticle.create(FDRenderUtil.ParticleRenderTypesS.TEXTURES_DEFAULT, SINGLE_STAR)
                         .setFlashFrequency(1f)
@@ -70,7 +85,7 @@ public class StarButton extends FDWidget {
                         .setQuadScaleOptions(ComplexEasingFunction.builder()
                                 .addArea(1f, FDEasings::easeOut)
                                 .build())
-                        .setColor(1f,1f,1f,1f)
+                        .setColor(r,g,b,1f)
                         .setMaxQuadSize(100f)
                         .setPos(pos.x, pos.y,true)
                         .setLifetime(20)
@@ -81,7 +96,7 @@ public class StarButton extends FDWidget {
                         .setQuadScaleOptions(ComplexEasingFunction.builder()
                                 .addArea(1f, FDEasings::quadroHill)
                                 .build())
-                        .setColor(1f,1f,0f,1f)
+                        .setColor(r,g,0f,1f)
                         .setMaxQuadSize(100f)
                         .setPos(pos.x,pos.y,true)
                         .setLifetime(2);
@@ -96,7 +111,7 @@ public class StarButton extends FDWidget {
 
                     FlashyColoredQuadParticle flashyColoredQuadParticle = new FlashyColoredQuadParticle()
                             .setPos(pos.x, pos.y, true)
-                            .setColor(1f,1f,0.25f + random.nextFloat() * 0.25f,1f)
+                            .setColor(r,g,0.25f + random.nextFloat() * 0.25f,1f)
                             .setQuadSize(0.75f)
                             .setFlashOffset(random.nextFloat() * FDMathUtil.FPI)
                             .setFlashFrequency(0.75f)
@@ -116,7 +131,7 @@ public class StarButton extends FDWidget {
 
                 FlashyColoredQuadParticle flashyColoredQuadParticle = new FlashyColoredQuadParticle()
                         .setPos(pos.x, pos.y, true)
-                        .setColor(1f,1f,0.25f + random.nextFloat() * 0.25f,1f)
+                        .setColor(r,g,0.25f + random.nextFloat() * 0.25f,1f)
                         .setQuadSize(0.5f)
                         .setFlashFrequency(0.75f)
                         .setSpeed(rnd.x,rnd.y)
@@ -156,7 +171,13 @@ public class StarButton extends FDWidget {
     @Override
     public void renderWidget(GuiGraphics guiGraphics, float v, float v1, float v2) {
 
-        FDRenderUtil.bindTexture(STAR);
+        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+
+        if (this.entityType != null){
+            FDRenderUtil.bindTexture(STAR);
+        }else{
+            FDRenderUtil.bindTexture(STAR_NOT_RELEASED);
+        }
 
         PoseStack matrices = guiGraphics.pose();
 
@@ -165,40 +186,36 @@ public class StarButton extends FDWidget {
         matrices.translate(this.getX() + this.getWidth() / 2,this.getY() + this.getHeight() / 2, 0);
 
 
-            if (this.tick > activationTime) {
-
-                float t = tick + FDRenderUtil.tryGetPartialTickIgnorePause();
-
-                if (startingAngle > 0) {
-                    matrices.mulPose(Axis.ZP.rotationDegrees(t + startingAngle));
-                } else {
-                    matrices.mulPose(Axis.ZP.rotationDegrees(-t + startingAngle));
-                }
-
-                FDRenderUtil.blitWithBlendCentered(guiGraphics.pose(),
-                        0, 0,
-                        64, 64,
-                        0, currentFrame,
-                        1, 1,
-                        1, 11,
-                        0, 1);
-
+        if (this.tick > activationTime) {
+            float t = tick + FDRenderUtil.tryGetPartialTickIgnorePause();
+            if (startingAngle > 0) {
+                matrices.mulPose(Axis.ZP.rotationDegrees(t + startingAngle));
             } else {
-                FDRenderUtil.blitWithBlendRgb(guiGraphics.pose(),
-                        -32, -32,
-                        64, 64,
-                        0, 0,
-                        1, 1, 1, 11,
-                        0, 1, 0.1f, 0.1f, 0.1f);
+                matrices.mulPose(Axis.ZP.rotationDegrees(-t + startingAngle));
             }
+            FDRenderUtil.blitWithBlendRgb(guiGraphics.pose(), -32, -32, 64, 64, 0,currentFrame,1,1,1,11,0,1,1,1,1);
+        } else {
+            FDRenderUtil.blitWithBlendRgb(guiGraphics.pose(),
+                    -32, -32,
+                    64, 64,
+                    0, 0,
+                    1, 1, 1, 11,
+                    0, 1, 0.1f, 0.1f, 0.1f);
+        }
 
 
         matrices.popPose();
+        RenderSystem.defaultBlendFunc();
+
+        if (entityType == null && this.isHovered()){
+            BossRenderUtil.renderBossScreenTooltip(guiGraphics, Component.translatable("fdbosses.word.not_released"), v, v1, 120, BaseBossScreen.DEFAULT_TEXT_COLOR, 1, -1000, -1000, 1000, 1000);
+        }
+
     }
 
     @Override
     public boolean onMouseClick(float v, float v1, int i) {
-        if (this.widgetOwner instanceof BossCodexScreen bossCodexScreen){
+        if (this.widgetOwner instanceof BossCodexScreen bossCodexScreen && i == GLFW.GLFW_MOUSE_BUTTON_LEFT){
             if (entityType != null) {
                 bossCodexScreen.moveTo(-(this.getX() + this.getWidth() / 2), -(this.getY() + this.getHeight() / 2), 20, true, () -> {
                     PacketDistributor.sendToServer(new RequestDossierScreenPacket(entityType));
