@@ -1,11 +1,14 @@
 package com.finderfeed.fdbosses.client.boss_codex;
 
+import com.finderfeed.fdbosses.BossClientPackets;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.BossRenderUtil;
 import com.finderfeed.fdbosses.client.boss_screen.BaseBossScreen;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.RequestDossierScreenPacket;
+import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
 import com.finderfeed.fdlib.systems.simple_screen.FDWidget;
 import com.finderfeed.fdlib.systems.simple_screen.fdwidgets.FDButton;
@@ -19,6 +22,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -46,16 +50,23 @@ public class StarButton extends FDWidget {
 
     private Random random;
 
+    public float activationPitch;
+
     public EntityType<?> entityType;
 
-    public StarButton(EntityType<?> entityType, Screen screen, float x, float y, float width, float height, int startFrame, float startingAngle, int activationTime) {
+    public StarButton(EntityType<?> entityType, Screen screen, float x, float y, float width, float height, int startFrame, float startingAngle, int activationTime, float activationPitch) {
         super(screen, x, y, width, height);
+        this.activationPitch = activationPitch;
         this.entityType = entityType;
         this.currentFrame = Mth.clamp(startFrame,0,10);
         this.startingFrame = currentFrame;
         this.startingAngle = startingAngle;
         this.activationTime = activationTime;
         this.random = new Random();
+    }
+
+    public void setActivated(){
+        this.tick = activationTime + 1;
     }
 
 
@@ -76,7 +87,9 @@ public class StarButton extends FDWidget {
             }
             if (tick == activationTime) {
 
-
+                if (activationPitch > 0) {
+                    FDClientHelpers.getSoundManager().play(SimpleSoundInstance.forUI(BossSounds.QLIPHOTHIC_CODEX_STAR.get(), activationPitch));
+                }
 
                 var particle = FlashyTexturedScreenParticle.create(FDRenderUtil.ParticleRenderTypesS.TEXTURES_DEFAULT, SINGLE_STAR)
                         .setFlashFrequency(1f)

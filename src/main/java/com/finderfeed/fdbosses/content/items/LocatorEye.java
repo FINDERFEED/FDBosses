@@ -52,6 +52,7 @@ public class LocatorEye<T extends EyeOfEnder> extends Item {
                 eyeofender.setItem(itemstack);
                 eyeofender.signalTo(blockpos);
                 level.gameEvent(GameEvent.PROJECTILE_SHOOT, eyeofender.position(), GameEvent.Context.of(player));
+                eyeofender.surviveAfterDeath = true;
                 level.addFreshEntity(eyeofender);
 
                 float f = Mth.lerp(level.random.nextFloat(), 0.33F, 0.5F);

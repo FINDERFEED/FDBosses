@@ -76,5 +76,7 @@ public class BossSounds {
     public static final Supplier<SoundEvent> GEBURAH_FLOOR_OPENING = SOUNDS.register("geburah_floor_opening",()->SoundEvent.createVariableRangeEvent(FDBosses.location("geburah_floor_opening")));
     public static final Supplier<SoundEvent> GEBURAH_RISE = SOUNDS.register("geburah_rise",()->SoundEvent.createVariableRangeEvent(FDBosses.location("geburah_rise")));
 
+    public static final Supplier<SoundEvent> QLIPHOTHIC_CODEX_STAR = SOUNDS.register("qliphothic_codex_star",()->SoundEvent.createVariableRangeEvent(FDBosses.location("star_light_up")));
+
 
 }

@@ -41,6 +41,10 @@ public class LineBetweenStars {
         time = (time + 1) % flashTime;
     }
 
+    public void setActivated(){
+        this.tick = travelTime + delay;
+    }
+
     public void render(GuiGraphics graphics){
 
         float t = time + FDRenderUtil.tryGetPartialTickIgnorePause();

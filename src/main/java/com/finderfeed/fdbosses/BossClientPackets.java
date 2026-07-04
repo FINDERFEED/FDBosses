@@ -82,7 +82,7 @@ public class BossClientPackets {
     private static Random random = new Random();
 
     public static void openQliphoticCodex(){
-        Minecraft.getInstance().setScreen(new BossCodexScreen());
+        Minecraft.getInstance().setScreen(new BossCodexScreen(true));
     }
 
     public static void geburahSyncRayVisuals(int geburah, boolean rayState){

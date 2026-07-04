@@ -82,8 +82,10 @@ public class BossCodexScreen extends SimpleFDScreen {
 
     private int time = 0;
 
-    public BossCodexScreen(){
+    private boolean playOpenAnimation;
 
+    public BossCodexScreen(boolean playOpenAnimation){
+        this.playOpenAnimation = playOpenAnimation;
     }
 
     @Override
@@ -111,8 +113,20 @@ public class BossCodexScreen extends SimpleFDScreen {
         this.offsetXPrev = this.offsetX;
         this.offsetXTarget = this.offsetX;
 
-        this.scaleTo(0.235f, 42);
-        this.moveTo(0,40,42);
+        if (playOpenAnimation) {
+            this.scaleTo(0.235f, 42);
+            this.moveTo(0, 40, 42);
+        }else{
+            scaleProgress = 0.235f;
+            fromScaleProgress = scaleProgress;
+            scaleProgressO = scaleProgress;
+            targetScaleProgress = scaleProgress;
+
+            this.offsetY = 40;
+            this.offsetYPrev = this.offsetY;
+            this.offsetYO = this.offsetY;
+            this.offsetYTarget = this.offsetY;
+        }
 
         if (RENDER_TARGET == null) {
             RENDER_TARGET = new TextureTarget(
@@ -138,16 +152,29 @@ public class BossCodexScreen extends SimpleFDScreen {
         float hOffset = -12;
         int lineTravelTime = 6;
 
-        starMalkuth = new StarButton(BossEntities.MALKUTH.get(), this, wOffset,200 + hOffset, 24,24, random.nextInt(6), 0,0);
-        starYesod = new StarButton(null, this, wOffset,100 + hOffset, 24,24, random.nextInt(6), -30,lineTravelTime);
-        starHod = new StarButton(null, this, -sideOffset + wOffset,30 + hOffset, 24,24, random.nextInt(6), 23,lineTravelTime * 2);
-        starNetzach = new StarButton(null, this, sideOffset + wOffset,30 + hOffset, 24,24, random.nextInt(6), -12, lineTravelTime * 2);
-        starTiphereth = new StarButton(null, this, wOffset,-29 + hOffset, 24,24, random.nextInt(6), 40, lineTravelTime * 3);
-        starGeburah = new StarButton(BossEntities.GEBURAH.get(), this, -sideOffset + wOffset,-95 + hOffset, 24,24, random.nextInt(6), -10, lineTravelTime * 4);
-        starChesed = new StarButton(BossEntities.CHESED.get(), this, sideOffset + wOffset,-95 + hOffset, 24,24, random.nextInt(6), 23, lineTravelTime * 4);
-        starBinah = new StarButton(null, this, -sideOffset + wOffset,-220 + hOffset, 24,24, random.nextInt(6), -1, lineTravelTime * 5);
-        starHokma = new StarButton(null, this, sideOffset + wOffset,-220 + hOffset, 24,24, random.nextInt(6),23, lineTravelTime * 5);
-        starKether = new StarButton(null, this, wOffset,-280 + hOffset, 24,24, random.nextInt(6), -23, lineTravelTime * 6);
+        starMalkuth = new StarButton(BossEntities.MALKUTH.get(), this, wOffset,200 + hOffset, 24,24, random.nextInt(6), 0,0, 1.3f);
+        starYesod = new StarButton(null, this, wOffset,100 + hOffset, 24,24, random.nextInt(6), -30,lineTravelTime, 1.35f);
+        starHod = new StarButton(null, this, -sideOffset + wOffset,30 + hOffset, 24,24, random.nextInt(6), 23,lineTravelTime * 2, -1.4f);
+        starNetzach = new StarButton(null, this, sideOffset + wOffset,30 + hOffset, 24,24, random.nextInt(6), -12, lineTravelTime * 2, 1.4f);
+        starTiphereth = new StarButton(null, this, wOffset,-29 + hOffset, 24,24, random.nextInt(6), 40, lineTravelTime * 3, 1.45f);
+        starGeburah = new StarButton(BossEntities.GEBURAH.get(), this, -sideOffset + wOffset,-95 + hOffset, 24,24, random.nextInt(6), -10, lineTravelTime * 4, 1.5f);
+        starChesed = new StarButton(BossEntities.CHESED.get(), this, sideOffset + wOffset,-95 + hOffset, 24,24, random.nextInt(6), 23, lineTravelTime * 4, -1.5f);
+        starBinah = new StarButton(null, this, -sideOffset + wOffset,-220 + hOffset, 24,24, random.nextInt(6), -1, lineTravelTime * 5, -1.55f);
+        starHokma = new StarButton(null, this, sideOffset + wOffset,-220 + hOffset, 24,24, random.nextInt(6),23, lineTravelTime * 5, 1.55f);
+        starKether = new StarButton(null, this, wOffset,-280 + hOffset, 24,24, random.nextInt(6), -23, lineTravelTime * 6, 1.6f);
+
+        if (!playOpenAnimation){
+            starMalkuth.setActivated();
+            starYesod.setActivated();
+            starHod.setActivated();
+            starNetzach.setActivated();
+            starTiphereth.setActivated();
+            starGeburah.setActivated();
+            starChesed.setActivated();
+            starBinah.setActivated();
+            starHokma.setActivated();
+            starKether.setActivated();
+        }
 
         int flashTime = 40;
 
@@ -188,6 +215,12 @@ public class BossCodexScreen extends SimpleFDScreen {
         this.lines.add(lineBetweenStars9);
         this.lines.add(lineBetweenStars10);
         this.lines.add(lineBetweenStars11);
+
+        if (!playOpenAnimation) {
+            for (var line : lines) {
+                line.setActivated();
+            }
+        }
 
         this.addRenderableWidget(starMalkuth);
         this.addRenderableWidget(starYesod);

@@ -623,7 +623,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
     public void onClose() {
         super.onClose();
         if (this.bossSpawnerId == -1){
-            Minecraft.getInstance().setScreen(new BossCodexScreen());
+            Minecraft.getInstance().setScreen(new BossCodexScreen(false));
         }
     }
 
