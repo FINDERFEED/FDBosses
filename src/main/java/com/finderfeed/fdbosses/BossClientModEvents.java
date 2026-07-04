@@ -480,7 +480,7 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_SIN_CRYSTAL.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_CHAIN_TRAP.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
-        event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
+        event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.NETZACH_GEAR_CRUSH.get(), NetzachGearCrushAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.SECTOR_ATTACK.get(), SectorAttackRenderer::new);
 

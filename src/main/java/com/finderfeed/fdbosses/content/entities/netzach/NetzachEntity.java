@@ -93,7 +93,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
 //                        .addAttack(BASIC_ATTACK)
 //                        .addAttack(BASIC_ATTACK)
 //                        .addAttack(GEAR_CRUSH)
-                        .addAttack(PENDULUMS_STRIKE)
+//                        .addAttack(PENDULUMS_STRIKE)
                         .build())
 
         ;
@@ -105,6 +105,12 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     @Override
     public void tick() {
         super.tick();
+
+        if (!level().isClientSide()){
+            this.remove(RemovalReason.DISCARDED);
+            return;
+        }
+
         if (!level().isClientSide){
             this.setTarget(this.level().getNearestPlayer(this.getX(),this.getY(),this.getZ(), 120, null));
             this.attackChain.tick();

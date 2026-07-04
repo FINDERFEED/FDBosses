@@ -4,6 +4,7 @@ import com.finderfeed.fdbosses.content.data_components.ItemCoreDataComponent;
 import com.finderfeed.fdbosses.content.entities.IEffectImmune;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_mini_ray.ChesedMiniRay;
+import com.finderfeed.fdbosses.content.entities.geburah.respawn_point_setter_block.GeburahRespiteBlock;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.packets.SetClientMalkuthWeaknessAmountPacket;
@@ -349,6 +350,17 @@ public class BossEvents {
             }
         }
 
+    }
+
+    @SubscribeEvent
+    public static void onClone(PlayerEvent.Clone event){
+        if (!event.getOriginal().level().isClientSide) {
+            var original = event.getOriginal();
+            var clone = event.getEntity();
+            var originalData = original.getPersistentData();
+            var cloneData = clone.getPersistentData();
+            cloneData.putBoolean(BossSpawnerEntity.CODEX_RECEIVED, originalData.getBoolean(BossSpawnerEntity.CODEX_RECEIVED));
+        }
     }
 
     @SubscribeEvent

@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "#": {
+      "item": "minecraft:book"
+    },
+    "X": {
+      "item": "minecraft:glowstone_dust"
+    },
+    "L": {
+      "tag": "minecraft:logs"
+    }
+  },
+  "pattern": [
+    "XLX",
+    "L#L",
+    "XLX"
+  ],
+  "result": {
+    "count": 1,
+    "id": "fdbosses:qliphothic_codex"
+  }
+}
