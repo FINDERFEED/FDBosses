@@ -39,7 +39,7 @@ public class SubscribersScreen extends SimpleFDScreen {
             String subscriber = subscribers.get(i);
 
             float x = this.relX + this.getScreenWidth() / 2;
-            float y = this.relY + 30 + i * (font.lineHeight + 1);
+            float y = this.relY + 30 + i * (font.lineHeight + 2);
 
             FDRenderUtil.renderCenteredText(graphics, x, y, 1f, false, subscriber, BaseBossScreen.DEFAULT_TEXT_COLOR);
 

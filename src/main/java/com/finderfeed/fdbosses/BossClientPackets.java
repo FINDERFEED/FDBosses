@@ -13,6 +13,7 @@ import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptio
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
@@ -2544,6 +2545,12 @@ public class BossClientPackets {
 
     public static Player getClientPlayer(){
         return Minecraft.getInstance().player;
+    }
+
+    public static void spawnRadialEarthquakeShatters(int entityId, int radius) {
+        if (FDClientHelpers.getClientLevel().getEntity(entityId) instanceof RadialEarthquakeEntity radialEarthquakeEntity){
+            radialEarthquakeEntity.spawnEarthShattersOnRadius(radius);
+        }
     }
 
 }

@@ -252,6 +252,7 @@
   "fdbosses.bosses.description.geburah": "{{(fdlib:item)item=minecraft:bow}} §cRanged weapon is recommended!§r\n\nEvery human is born in sin, hence, the judges are needed. To be a judge is to bear an unwavering sense of justice, the one that our hero had. But, like sins of people, hero's life was also fading away. The people needed him, so the hero devoted himself to eternal justice and thus Geburah was born. And so the people lived happily in the world without sin for many many years.\nAs centuries passed and generations changed, more and more people started complaining: “Was it really a good idea to make sinful being – an eternal judge?”\nAs years passed less and less people were complaining, until no one was left to complain.",
   "fdbosses.tldr.geburah": "Each combatant on the arena becomes a {{(fdbosses:effect)id=fdbosses:sinner}}. When attack pattern changes Geburah marks certain actions as sinful, committing too many sins causes immediate death.\n\nCurrent sins are displayed at Geburah's screens.\n\n§lGeburah is capable of commiting sins too.§r\n\n",
   "entity.fdbosses.geburah": "Geburah",
+  "entity.fdbosses.judgement_bird": "Judgement Bird",
   "effect.fdbosses.sinner": "Sinner",
   "effect_description.fdbosses.sinner": "Capable of commiting sins. Commiting too much sins results in immediate death.",
   "fdbosses.skills.geburah.justice_hammer": "Hammer of Justice",
