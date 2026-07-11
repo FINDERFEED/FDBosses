@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.debug;
 import com.finderfeed.fdbosses.client.boss_codex.BossCodexScreen;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEffectOverlay;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
+import com.finderfeed.fdbosses.content.entities.netzach.clock_attack.ClockAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_minigame.NetzachMinigameScreen;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
@@ -31,7 +32,7 @@ public class DebugStick extends Item {
         int attackTime = 100;
 
         if (!level.isClientSide){
-
+            ClockAttack clockAttack = ClockAttack.summon(level, player.position().add(10, 0, 10), 20, 100, player);
 
 //            NetzachClockPendulum.summon(level, player.position(), player.getLookAngle(), 30, 60);
 

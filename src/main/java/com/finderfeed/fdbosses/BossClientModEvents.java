@@ -78,6 +78,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.NetzachEffectOverlay;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
+import com.finderfeed.fdbosses.content.entities.netzach.clock_attack.ClockAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachPendulumTransform;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttackRenderer;
@@ -484,6 +485,60 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.NETZACH_GEAR_CRUSH.get(), NetzachGearCrushAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.SECTOR_ATTACK.get(), SectorAttackRenderer::new);
+
+
+
+        event.registerEntityRenderer(BossEntities.CLOCK_ATTACK.get(), FDEntityRendererBuilder.<ClockAttack>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<ClockAttack>builder()
+                                .renderType(RenderType.entityTranslucentCull(FDBosses.location("textures/entities/netzach/clock_arrow.png")))
+                                .model(BossModels.CLOCK_ATTACK_ARROW)
+                                .transformation(((clockAttack, matrices, partialTicks) -> {
+
+                                    float angle = FDMathUtil.lerp(clockAttack.previousRotationAngle, clockAttack.rotationAngle, partialTicks);
+
+                                    matrices.mulPose(Axis.YP.rotation(angle - FDMathUtil.FPI / 2));
+
+                                }))
+                                .color(((clockAttack, v) -> {
+                                    return new FDColor(0,0,0,0);
+                                }))
+                                .build())
+
+                        .addLayer(FDEntityRenderLayerOptions.<ClockAttack>builder()
+                                .renderType(RenderType.lightning())
+                                .model(BossModels.CLOCK_ATTACK_ARROW)
+                                .transformation(((clockAttack, matrices, partialTicks) -> {
+
+                                    float angle = FDMathUtil.lerp(clockAttack.previousRotationAngle, clockAttack.rotationAngle, partialTicks);
+
+                                    matrices.mulPose(Axis.YP.rotation(angle - FDMathUtil.FPI / 2));
+                                }))
+
+                                .color(((clockAttack, v) -> {
+                                    var attackTimings = clockAttack.getEntityData().get(ClockAttack.ATTACK_TIMINGS);
+
+                                    var percent = attackTimings.getAttackTimingPercent(0, clockAttack.afterRotatedTicks + v);
+
+                                    if (percent != 1){
+
+                                        float p1 = 1 - percent;
+                                        float p2 = Mth.clamp(clockAttack.tickCount / 5f, 0, 1);
+
+                                        float p = p1 * p2;
+
+                                        return new FDColor(1,0.1f,0.1f,p);
+
+                                    }else {
+                                        return new FDColor(0,0,0,0);
+                                    }
+                                }))
+
+                                .build())
+
+                        .shouldRender(((clockAttack, frustum, v, v1, v2) -> {
+                            return true;
+                        }))
+                .build());
 
         event.registerEntityRenderer(BossEntities.NETZACH_CLOCK_PENDULUM.get(), FDEntityRendererBuilder.<NetzachClockPendulum>builder()
                         .addLayer(FDEntityRenderLayerOptions.<NetzachClockPendulum>builder()

@@ -56,6 +56,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
+import com.finderfeed.fdbosses.content.entities.netzach.clock_attack.ClockAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
@@ -467,6 +468,13 @@ public class BossEntities {
             )
             .sized(2F, 2F)
             .build("netzach_clock_pendulum"));
+
+
+    public static final Supplier<EntityType<ClockAttack>> CLOCK_ATTACK = ENTITIES.register("clock_attack",()->EntityType.Builder.of(
+                    ClockAttack::new, MobCategory.MISC
+            )
+            .sized(2F, 2F)
+            .build("clock_attack"));
 
     //ITEMS
     public static final Supplier<EntityType<MalkuthFistChain>> MALKUTH_FIST_CHAIN = ENTITIES.register("malkuth_fist_chain",()->EntityType.Builder.of(
