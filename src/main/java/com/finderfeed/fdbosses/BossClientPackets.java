@@ -27,6 +27,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSi
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_minigame.TimeStabilizerScreen;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.init.BossSounds;
@@ -61,7 +62,6 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -81,6 +81,10 @@ import java.util.Random;
 public class BossClientPackets {
 
     private static Random random = new Random();
+
+    public static void openTimeStabilizerScreen(int timeStabilizer, float currentDisplacement, float targetDisplacement){
+        Minecraft.getInstance().setScreen(new TimeStabilizerScreen(timeStabilizer, currentDisplacement, targetDisplacement));
+    }
 
     public static void openQliphoticCodex(){
         Minecraft.getInstance().setScreen(new BossCodexScreen(true));

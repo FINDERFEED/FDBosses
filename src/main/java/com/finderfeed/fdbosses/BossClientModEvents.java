@@ -83,6 +83,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.N
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachPendulumTransform;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttackRenderer;
+import com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer.TimeStabilizer;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereOverlay;
 import com.finderfeed.fdbosses.content.items.geburah.DivineGear;
@@ -486,7 +487,12 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.NETZACH_GEAR_CRUSH.get(), NetzachGearCrushAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.SECTOR_ATTACK.get(), SectorAttackRenderer::new);
 
-
+        event.registerEntityRenderer(BossEntities.TIME_STABILIZER.get(), FDEntityRendererBuilder.<TimeStabilizer>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<TimeStabilizer>builder()
+                                .model(BossModels.NETZACH)
+                                .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/netzach.png")))
+                                .build())
+                .build());
 
         event.registerEntityRenderer(BossEntities.CLOCK_ATTACK.get(), FDEntityRendererBuilder.<ClockAttack>builder()
                         .addLayer(FDEntityRenderLayerOptions.<ClockAttack>builder()

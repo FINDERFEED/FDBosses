@@ -1,15 +1,8 @@
 package com.finderfeed.fdbosses.debug;
 
-import com.finderfeed.fdbosses.client.boss_codex.BossCodexScreen;
-import com.finderfeed.fdbosses.content.entities.netzach.NetzachEffectOverlay;
-import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.clock_attack.ClockAttack;
-import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
-import com.finderfeed.fdbosses.content.entities.netzach.netzach_minigame.NetzachMinigameScreen;
-import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;

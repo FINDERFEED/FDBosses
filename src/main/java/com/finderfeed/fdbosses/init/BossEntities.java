@@ -60,6 +60,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.clock_attack.ClockAttack
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer.TimeStabilizer;
 import com.finderfeed.fdbosses.content.items.geburah.DivineGear;
 import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistChain;
 import com.finderfeed.fdbosses.content.projectiles.ChesedBlockProjectile;
@@ -475,6 +476,14 @@ public class BossEntities {
             )
             .sized(2F, 2F)
             .build("clock_attack"));
+
+
+
+    public static final Supplier<EntityType<TimeStabilizer>> TIME_STABILIZER = ENTITIES.register("time_stabilizer",()->EntityType.Builder.of(
+                    TimeStabilizer::new, MobCategory.MISC
+            )
+            .sized(2F, 2F)
+            .build("time_stabilizer"));
 
     //ITEMS
     public static final Supplier<EntityType<MalkuthFistChain>> MALKUTH_FIST_CHAIN = ENTITIES.register("malkuth_fist_chain",()->EntityType.Builder.of(

@@ -3,16 +3,14 @@ package com.finderfeed.fdbosses.content.entities.netzach.netzach_minigame;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.SparkScreenParticle;
-import com.finderfeed.fdbosses.init.BossSounds;
+import com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer.TimeStabilizer;
+import com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer.TimeStabilizerScreenClosedPacket;
 import com.finderfeed.fdlib.FDClientHelpers;
-import com.finderfeed.fdlib.systems.screen.screen_particles.FDScreenParticle;
-import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
 import com.finderfeed.fdlib.systems.screen.screen_particles.ScreenParticleEngine;
 import com.finderfeed.fdlib.systems.simple_screen.SimpleFDScreen;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
-import com.github.L_Ender.cataclysm.init.ModSounds;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.Util;
@@ -26,13 +24,15 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector2f;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Random;
 
-public class NetzachMinigameScreen extends SimpleFDScreen {
+// I know this is not protected from cheats, anyone can send a packet that will automatically solve this, but lets be honest,
+// no one will do it lol....Right?
+public class TimeStabilizerScreen extends SimpleFDScreen {
 
     //232 * 232
     public static final ResourceLocation GUI = FDBosses.location("textures/gui/netzach_minigame/netzach_minigame.png");
@@ -58,8 +58,15 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
 
     private ScreenParticleEngine screenParticleEngine = new ScreenParticleEngine();
 
-    public NetzachMinigameScreen(){
-        targetRotation = 1000;
+    private int timeStabilizerId;
+
+
+
+    public TimeStabilizerScreen(int timeStabilizerId, float currentRotation, float targetRotation){
+        this.timeStabilizerId = timeStabilizerId;
+        this.currentRotation = currentRotation;
+        this.oldRotation = currentRotation;
+        this.targetRotation = targetRotation;
     }
 
     @Override
@@ -251,6 +258,15 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
     public void tick() {
         super.tick();
 
+        var level = FDClientHelpers.getClientLevel();
+        if (level.getEntity(timeStabilizerId) instanceof TimeStabilizer timeStabilizer){
+            if (timeStabilizer.distanceTo(FDClientHelpers.getClientPlayer()) > TimeStabilizer.TERMINAL_DISTANCE){
+                Minecraft.getInstance().setScreen(null);
+            }
+        }else{
+            Minecraft.getInstance().setScreen(null);
+        }
+
         this.screenParticleEngine.tick();
 
         tickerForStuff++;
@@ -260,6 +276,12 @@ public class NetzachMinigameScreen extends SimpleFDScreen {
         this.tickRotation();
 
 
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        PacketDistributor.sendToServer(new TimeStabilizerScreenClosedPacket(timeStabilizerId, false, this.currentRotation));
     }
 
     private void tickRotation(){
