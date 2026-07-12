@@ -35,6 +35,10 @@ public class AttackTimings implements AutoSerializable {
         this.timings = new ArrayList<>(attackTimings.timings);
     }
 
+    public int getAttackLength(int attackIndex){
+        return timings.get(attackIndex);
+    }
+
     public boolean isTimeForAttack(int attack, float time){
         int timeBefore = 0;
 

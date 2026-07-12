@@ -8,7 +8,9 @@ import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -19,6 +21,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
@@ -106,11 +109,39 @@ public class ClockAttack extends FDEntity implements AutoSerializable {
             }
 
 
+            this.previousRotationAngle = rotationAngle;
+
             if (this.afterRotatedTicks != -1){
                 this.entityData.set(FINISHED_ROTATION, true);
-                if (this.attackTimings.getAttackTimingPercent(0, afterRotatedTicks) == 1){
+                float rotationPercent = this.attackTimings.getAttackTimingPercent(1, afterRotatedTicks);
+
+                float rotationSpeed = FDEasings.squareHill(rotationPercent) * FDMathUtil.FPI / 14;
+                this.rotationAngle += rotationSpeed;
+                this.getEntityData().set(ROTATION_ANGLE, this.rotationAngle);
+
+                if (rotationSpeed > 0){
+                    float halfAngle = (this.rotationAngle - this.previousRotationAngle) / 2;
+
+                    Vec3 dir = new Vec3(1,0,0).yRot((this.rotationAngle - halfAngle));
+                    var targets = FDTargetFinder.getEntitiesInArc(LivingEntity.class, level(), this.position().add(0,-1,0),
+                            new Vec2((float) dir.x, (float) dir.z),
+                            this.rotationAngle - this.previousRotationAngle,
+                            1.5f,34
+                            );
+
+                    for (var target : targets){
+                        target.hurt(level().damageSources().magic(), 1);
+                    }
+
+                }
+
+                if (rotationPercent >= 1){
                     this.remove(RemovalReason.DISCARDED);
                 }
+
+
+
+                afterRotatedTicks++;
             }else{
                 this.rotateToTarget(FDMathUtil.FPI / 12);
             }
@@ -187,7 +218,9 @@ public class ClockAttack extends FDEntity implements AutoSerializable {
 
         Vec3 b = currentPos.subtract(oldPos);
 
-        return currentPos.add(b.scale(30));
+        var scale = this.attackTimings.getAttackLength(0) * 1.9f;
+
+        return currentPos.add(b.scale(scale));
     }
 
     @Override

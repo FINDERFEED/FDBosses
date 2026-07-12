@@ -498,12 +498,29 @@ public class BossClientModEvents {
 
                                     matrices.mulPose(Axis.YP.rotation(angle - FDMathUtil.FPI / 2));
 
+
+                                    var attackTimings = clockAttack.getEntityData().get(ClockAttack.ATTACK_TIMINGS);
+
+                                    var fallPercent = attackTimings.getAttackTimingPercent(0, clockAttack.afterRotatedTicks + partialTicks);
+                                    fallPercent = FDEasings.easeIn(fallPercent);
+                                    matrices.mulPose(Axis.XP.rotationDegrees((1 - fallPercent) * 90));
+
+
+
+
+
                                 }))
                                 .color(((clockAttack, v) -> {
-                                    return new FDColor(0,0,0,0);
+
+                                    var attackTimings = clockAttack.getEntityData().get(ClockAttack.ATTACK_TIMINGS);
+                                    var percent = attackTimings.getAttackTimingPercent(0, clockAttack.afterRotatedTicks + v);
+
+                                    return new FDColor(1,1,1,percent);
                                 }))
                                 .build())
+                        .freeRender(((clockAttack, v, v1, poseStack, multiBufferSource, i) -> {
 
+                        }))
                         .addLayer(FDEntityRenderLayerOptions.<ClockAttack>builder()
                                 .renderType(RenderType.lightning())
                                 .model(BossModels.CLOCK_ATTACK_ARROW)
