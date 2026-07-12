@@ -1,33 +1,50 @@
 package com.finderfeed.fdbosses.content.entities.netzach.clock_attack;
 
+import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticleOptions;
+import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
 import com.finderfeed.fdbosses.content.util.AttackTimings;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdbosses.init.BossModels;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
+import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
+import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.BoundToEntityProcessor;
+import com.finderfeed.fdlib.systems.shake.FDShakeData;
+import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
+import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDTargetFinder;
+import com.finderfeed.fdlib.util.client.particles.FDBlockParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
-import java.util.List;
 import java.util.UUID;
 
 public class ClockAttack extends FDEntity implements AutoSerializable {
+
+    public static final int RADIUS = 34;
+
+    public static final float ROTATION_SPEED = FDMathUtil.FPI / 14;
 
     private static FDModel model;
 
@@ -115,18 +132,26 @@ public class ClockAttack extends FDEntity implements AutoSerializable {
                 this.entityData.set(FINISHED_ROTATION, true);
                 float rotationPercent = this.attackTimings.getAttackTimingPercent(1, afterRotatedTicks);
 
-                float rotationSpeed = FDEasings.squareHill(rotationPercent) * FDMathUtil.FPI / 14;
+                var rp = FDEasings.squareHill(rotationPercent);
+                float rotationSpeed = rp * ROTATION_SPEED;
                 this.rotationAngle += rotationSpeed;
                 this.getEntityData().set(ROTATION_ANGLE, this.rotationAngle);
 
+                if (this.afterRotatedTicks == this.attackTimings.getAttackLength(0)){
+                    this.serverFallFX();
+                }
+
                 if (rotationSpeed > 0){
+
+                    this.serverRotation(rp);
+
                     float halfAngle = (this.rotationAngle - this.previousRotationAngle) / 2;
 
                     Vec3 dir = new Vec3(1,0,0).yRot((this.rotationAngle - halfAngle));
                     var targets = FDTargetFinder.getEntitiesInArc(LivingEntity.class, level(), this.position().add(0,-1,0),
                             new Vec2((float) dir.x, (float) dir.z),
                             this.rotationAngle - this.previousRotationAngle,
-                            1.5f,34
+                            1.5f,RADIUS
                             );
 
                     for (var target : targets){
@@ -153,12 +178,80 @@ public class ClockAttack extends FDEntity implements AutoSerializable {
             previousRotationAngle = rotationAngle;
             rotationAngle = this.getEntityData().get(ROTATION_ANGLE);
 
+            float rotationPercent = this.attackTimings.getAttackTimingPercent(1, afterRotatedTicks);
+
+            if (rotationPercent != 0 && rotationPercent != 1){
+                float rotationSpeed = FDEasings.squareHill(rotationPercent) * 0.9f + 0.1f;
+                this.rotationFX(rotationSpeed);
+            }
+
+            if (this.afterRotatedTicks == this.attackTimings.getAttackLength(0)){
+                this.clientFallFX();
+            }
+
+
+
             if (this.getEntityData().get(FINISHED_ROTATION)){
                 this.afterRotatedTicks++;
             }
 
         }
     }
+
+
+    private void rotationFX(float strength){
+        Vec3 v = new Vec3(1,0,0).yRot(this.rotationAngle + ROTATION_SPEED * strength / 2);
+
+        for (int i = 0; i < RADIUS / 2; i++) {
+
+            float r = i * 2 + random.nextFloat() * 2;
+
+            Vec3 pos = this.position().add(v.scale(r));
+
+            ColoredJumpingParticleOptions options = new ColoredJumpingParticleOptions.Builder()
+                    .colorStart(new FDColor(1f, 1f, 1f, 1f))
+                    .colorEnd(new FDColor(1f, 0.8f, 0.3f, 1f))
+                    .maxPointsInTrail(2)
+                    .reflectionStrength(0.33f)
+                    .gravity(2.5f)
+                    .lifetime(-1)
+                    .maxJumpAmount(0)
+                    .size(0.02f)
+                    .build();
+
+            float vspeed = strength * (0.25f + random.nextFloat() * 0.25f);
+            float hspeed = strength * (0.15f + random.nextFloat() * 0.35f);
+            Vec3 speed = v.yRot(-FDMathUtil.FPI / 2).scale(hspeed).add(0,vspeed,0);
+
+            level().addParticle(options, true, pos.x, pos.y, pos.z, speed.x, speed.y, speed.z);
+
+            var state = level().getBlockState(new BlockPos(
+                    (int) Math.floor(pos.x),
+                    (int) Math.floor(pos.y - 1),
+                    (int) Math.floor(pos.z)
+            ));
+
+            if (!state.isEmpty()){
+                r = i * 2 + random.nextFloat() * 2;
+                pos = this.position().add(v.scale(r));
+                vspeed = strength * (0.05f + random.nextFloat() * 0.25f);
+                hspeed = strength * (0.15f + random.nextFloat() * 0.35f);
+
+                speed = v.yRot(-FDMathUtil.FPI / 2).scale(hspeed).add(0,vspeed,0);
+
+                FDBlockParticleOptions blockParticle = FDBlockParticleOptions.builder()
+                        .lifetime(10 + random.nextInt(5))
+                        .quadSizeMultiplier(1f)
+                        .state(state)
+                        .build();
+                level().addParticle(blockParticle, true, pos.x, pos.y, pos.z, speed.x, speed.y, speed.z);
+
+            }
+
+        }
+
+    }
+
 
     private Vec3 cachedPos = null;
 
@@ -191,6 +284,7 @@ public class ClockAttack extends FDEntity implements AutoSerializable {
                 if (speedCoefficient < 0.001){
                     this.afterRotatedTicks = 0;
                     this.entityData.set(FINISHED_ROTATION, true);
+
                 }else if (speedCoefficient < 0.9 && cachedPos == null){
                     cachedPos = pos;
                 }
@@ -210,6 +304,108 @@ public class ClockAttack extends FDEntity implements AutoSerializable {
         this.entityData.set(ROTATION_ANGLE, this.rotationAngle);
 
     }
+
+    private void serverRotation(float strength){
+        Vec3 v = new Vec3(1,0,0).yRot(this.rotationAngle);
+
+        Vec3 pos = this.position().add(v.scale(RADIUS / 2f));
+
+
+        level().playSound(null, pos.x, pos.y, pos.z, SoundEvents.MACE_SMASH_AIR, SoundSource.HOSTILE, 3f, 0.25f * strength + 0.75f);
+
+        PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                .frequency(10 * strength)
+                .amplitude(2 * strength)
+                .inTime(0)
+                .stayTime(0)
+                .outTime(4)
+                .build(),pos,40);
+    }
+
+    private void serverFallFX(){
+
+        level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.MACE_SMASH_GROUND_HEAVY, SoundSource.HOSTILE, 3f, 1f);
+        level().playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.MACE_SMASH_GROUND, SoundSource.HOSTILE, 3f, 1f);
+
+        Vec3 v = new Vec3(1,0,0).yRot(this.rotationAngle);
+
+        PositionedScreenShakePacket.send((ServerLevel) level(), FDShakeData.builder()
+                .frequency(10)
+                .amplitude(2f)
+                .inTime(0)
+                .stayTime(0)
+                .outTime(10)
+                .build(),this.position().add(v.scale(RADIUS / 2f)),100);
+
+        for (int i = 0; i < RADIUS / 2; i++){
+
+            float r = i * 2 + random.nextFloat() * 2;
+
+            Vec3 pos = this.position().add(v.scale(r));
+
+            Vec3 dir = v.yRot(FDMathUtil.FPI / 2 * (i % 2 == 0 ? 1 : -1));
+
+            Vec3 speed = dir.scale(random.nextFloat() * 0.35f + 0.2f).add(0,0.25 + random.nextFloat() * 0.5f,0);
+
+            var state = level().getBlockState(new BlockPos(
+                    (int) Math.floor(pos.x),
+                    (int) Math.floor(pos.y - 1),
+                    (int) Math.floor(pos.z)
+            ));
+
+
+            if (!state.isEmpty()) {
+                ChesedFallingBlock chesedFallingBlock = ChesedFallingBlock.summon(level(), state, pos, speed, 0, (float) Player.DEFAULT_BASE_GRAVITY * 0.75f);
+
+                float rnd = random.nextFloat() * 0.05f;
+                FDLibCalls.addParticleEmitter(level(), 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
+                                .color(0.35f - rnd, 0.35f - rnd, 0.35f - rnd)
+                                .lifetime(0, 0, 10)
+                                .size(1.5f)
+                                .build())
+                        .lifetime(200)
+                        .processor(new BoundToEntityProcessor(chesedFallingBlock.getId(), Vec3.ZERO))
+                        .position(pos)
+                        .build());
+            }
+        }
+
+    }
+
+    private void clientFallFX(){
+
+        Vec3 v = new Vec3(1,0,0).yRot(this.rotationAngle);
+
+        for (int i = 0; i < RADIUS * 4; i++){
+
+            float r = i / 4f + random.nextFloat() * 0.25f;
+
+            Vec3 pos = this.position().add(v.scale(r));
+
+            Vec3 dir = v.yRot(FDMathUtil.FPI / 2 * (i % 2 == 0 ? 1 : -1));
+
+            Vec3 speed = dir.scale(random.nextFloat() * 0.35f + 0.2f).add(0,0.25 + random.nextFloat() * 0.5f,0);
+
+            var state = level().getBlockState(new BlockPos(
+                    (int) Math.floor(pos.x),
+                    (int) Math.floor(pos.y - 1),
+                    (int) Math.floor(pos.z)
+            ));
+
+            if (!state.isEmpty()) {
+
+                FDBlockParticleOptions blockParticle = FDBlockParticleOptions.builder()
+                        .lifetime(10 + random.nextInt(10))
+                        .quadSizeMultiplier(1f)
+                        .state(state)
+                        .build();
+                level().addParticle(blockParticle, true, pos.x, pos.y, pos.z, speed.x, speed.y, speed.z);
+
+            }
+        }
+
+    }
+
 
     public Vec3 getApproximatedTargetPos(){
 
