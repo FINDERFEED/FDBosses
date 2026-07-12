@@ -15,6 +15,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.Util;
 import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -24,6 +25,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.levelgen.XoroshiroRandomSource;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.settings.KeyMappingLookup;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Vector3f;
 import org.lwjgl.glfw.GLFW;
@@ -50,6 +52,8 @@ public class TimeStabilizerScreen extends SimpleFDScreen {
     private static final int GAME_ENDING_TICK_TIME = 5;
     private int gameEndingTick = 0;
 
+    private int autoCloseTick = -1;
+
     private int tickerForStuff = 0;
     private int randomnessTicker = 0;
     private Random random = new Random();
@@ -60,7 +64,7 @@ public class TimeStabilizerScreen extends SimpleFDScreen {
 
     private int timeStabilizerId;
 
-
+    private boolean wasSolved = false;
 
     public TimeStabilizerScreen(int timeStabilizerId, float currentRotation, float targetRotation){
         this.timeStabilizerId = timeStabilizerId;
@@ -108,16 +112,17 @@ public class TimeStabilizerScreen extends SimpleFDScreen {
         matrices.translate(anchor.x, anchor.y, 0);
 
 
-        matrices.pushPose();
-        matrices.mulPose(Axis.ZP.rotationDegrees(targetRotation / 12));
-        FDRenderUtil.blitWithBlendRgb(matrices, -hourArrowWidth / 2, -hourArrowOffset - hourArrowWHeight / 2, hourArrowWidth, hourArrowWHeight,232 + 20,114,20,80,512,512,0,0.25f, 1,0,0);
-        matrices.popPose();
+        if (!wasSolved) {
+            matrices.pushPose();
+            matrices.mulPose(Axis.ZP.rotationDegrees(targetRotation / 12));
+            FDRenderUtil.blitWithBlendRgb(matrices, -hourArrowWidth / 2, -hourArrowOffset - hourArrowWHeight / 2, hourArrowWidth, hourArrowWHeight, 232 + 20, 114, 20, 80, 512, 512, 0, 0.25f, 1, 0, 0);
+            matrices.popPose();
 
-        matrices.pushPose();
-        matrices.mulPose(Axis.ZP.rotationDegrees(targetRotation));
-        FDRenderUtil.blitWithBlendRgb(matrices, -minuteArrowWidth / 2, -minuteArrowOffset - minuteArrowWHeight / 2, minuteArrowWidth, minuteArrowWHeight,232 + 44,0,44,114,512,512,0,0.25f,1,0,0);
-        matrices.popPose();
-
+            matrices.pushPose();
+            matrices.mulPose(Axis.ZP.rotationDegrees(targetRotation));
+            FDRenderUtil.blitWithBlendRgb(matrices, -minuteArrowWidth / 2, -minuteArrowOffset - minuteArrowWHeight / 2, minuteArrowWidth, minuteArrowWHeight, 232 + 44, 0, 44, 114, 512, 512, 0, 0.25f, 1, 0, 0);
+            matrices.popPose();
+        }
 
 
         //20 80 hour arrow
@@ -223,10 +228,15 @@ public class TimeStabilizerScreen extends SimpleFDScreen {
 
     @Override
     public boolean keyPressed(int keyCode, int p_96553_, int p_96554_) {
+        var value = Minecraft.getInstance().options.keyInventory.getKey().getValue();
         if (keyCode == GLFW.GLFW_KEY_A || keyCode == GLFW.GLFW_KEY_LEFT){
             rotating = -1;
         }else if (keyCode == GLFW.GLFW_KEY_D || keyCode == GLFW.GLFW_KEY_RIGHT){
             rotating = 1;
+        }else if (keyCode == value){
+            PacketDistributor.sendToServer(new TimeStabilizerScreenClosedPacket(timeStabilizerId, wasSolved, this.currentRotation));
+            Minecraft.getInstance().setScreen(null);
+            return true;
         }
         return super.keyPressed(keyCode, p_96553_, p_96554_);
     }
@@ -258,6 +268,14 @@ public class TimeStabilizerScreen extends SimpleFDScreen {
     public void tick() {
         super.tick();
 
+        if (autoCloseTick >= 0){
+            if (autoCloseTick == 0){
+                PacketDistributor.sendToServer(new TimeStabilizerScreenClosedPacket(timeStabilizerId, wasSolved, this.currentRotation));
+                Minecraft.getInstance().setScreen(null);
+            }
+            autoCloseTick = Mth.clamp(autoCloseTick - 1, 0, Integer.MAX_VALUE);
+        }
+
         var level = FDClientHelpers.getClientLevel();
         if (level.getEntity(timeStabilizerId) instanceof TimeStabilizer timeStabilizer){
             if (timeStabilizer.distanceTo(FDClientHelpers.getClientPlayer()) > TimeStabilizer.TERMINAL_DISTANCE){
@@ -281,10 +299,14 @@ public class TimeStabilizerScreen extends SimpleFDScreen {
     @Override
     public void onClose() {
         super.onClose();
-        PacketDistributor.sendToServer(new TimeStabilizerScreenClosedPacket(timeStabilizerId, false, this.currentRotation));
+        PacketDistributor.sendToServer(new TimeStabilizerScreenClosedPacket(timeStabilizerId, wasSolved, this.currentRotation));
     }
 
     private void tickRotation(){
+
+        if (wasSolved){
+            return;
+        }
 
         if (rotationStrength != 0){
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.MACE_SMASH_GROUND_HEAVY, 1.5f, 0.05f));
@@ -360,13 +382,18 @@ public class TimeStabilizerScreen extends SimpleFDScreen {
         }
     }
 
-    public void gameCompleted(){
-        targetRotation = this.targetRotation + BossUtil.randomPlusMinus() * (500 + FDClientHelpers.getClientLevel().random.nextFloat() * 500);
-        this.rotationStrength = 0;
-        this.gameEndingTick = GAME_ENDING_TICK_TIME;
-        Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.MACE_SMASH_GROUND, 1f));
+    public void gameCompleted() {
+        if (!wasSolved) {
+            this.rotationStrength = 0;
+            this.gameEndingTick = GAME_ENDING_TICK_TIME;
+            Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.MACE_SMASH_GROUND, 1f));
 
-        this.rotationParticles(30, 0, FDMathUtil.FPI / 2, 2f, 10f, 4,10);
+            this.autoCloseTick = 20;
+
+            this.wasSolved = true;
+
+            this.rotationParticles(30, 0, FDMathUtil.FPI / 2, 2f, 10f, 4, 10);
+        }
     }
 
     @Override

@@ -1,9 +1,12 @@
 package com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer;
 
+import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -18,15 +21,13 @@ import net.neoforged.neoforge.network.PacketDistributor;
 
 public class TimeStabilizer extends FDEntity implements AutoSerializable {
 
+    public static final EntityDataAccessor<Boolean> DESTABILIZED = SynchedEntityData.defineId(TimeStabilizer.class, EntityDataSerializers.BOOLEAN);
+
+    public static final int MAX_RECHARGE_TIME = 200;
+
     public static final int TERMINAL_DISTANCE = 5;
 
     private Player interactingPlayer = null;
-
-    public static final int MAX_RECHARGE_TIME = 1200;
-
-    public static final EntityDataAccessor<Boolean> DESTABILIZED = SynchedEntityData.defineId(TimeStabilizer.class, EntityDataSerializers.BOOLEAN);
-
-
 
     @SerializableField
     private int rechargeTime = MAX_RECHARGE_TIME;
@@ -44,8 +45,14 @@ public class TimeStabilizer extends FDEntity implements AutoSerializable {
     @Override
     public InteractionResult interact(Player player, InteractionHand hand) {
         if (!level().isClientSide){
-            if (this.isDestabilized() && interactingPlayer != null){
-                PacketDistributor.sendToPlayer((ServerPlayer) player, new OpenTimeStabilizerScreenPacket(this, currentDisplacement, targetDisplacement));
+            if (this.isDestabilized() && hand == InteractionHand.MAIN_HAND){
+                if (interactingPlayer == null) {
+                    PacketDistributor.sendToPlayer((ServerPlayer) player, new OpenTimeStabilizerScreenPacket(this, currentDisplacement, targetDisplacement));
+                    interactingPlayer = player;
+                    return InteractionResult.CONSUME;
+                }else{
+                    player.sendSystemMessage(Component.translatable("fdbosses.word.already_being_interacted_with"));
+                }
             }
         }
         return super.interact(player, hand);
@@ -64,14 +71,28 @@ public class TimeStabilizer extends FDEntity implements AutoSerializable {
 
             this.getEntityData().set(DESTABILIZED, this.isDestabilized());
             rechargeTime = Mth.clamp(rechargeTime - 1, 0, Integer.MAX_VALUE);
+            if (rechargeTime == 1){
+                this.targetDisplacement = this.currentDisplacement + BossUtil.randomPlusMinus() * 2160 + BossUtil.randomPlusMinus() * random.nextFloat() * 1080f;
+            }
+
+        }else{
+            if (this.isDestabilized()){
+                level().addParticle(ParticleTypes.FLAME, this.getX() + 0.5, this.getY() + 1, this.getZ(), 0, 1, 0);
+            }
         }
     }
 
     public void setRechargeTime(int rechargeTime) {
         this.rechargeTime = Mth.clamp(rechargeTime, 0, Integer.MAX_VALUE);
+        if (this.isDestabilized()){
+            this.setTargetDisplacement();
+        }
         this.getEntityData().set(DESTABILIZED, this.isDestabilized());
     }
 
+    private void setTargetDisplacement(){
+        this.targetDisplacement = this.currentDisplacement + BossUtil.randomPlusMinus() * 2160 + BossUtil.randomPlusMinus() * random.nextFloat() * 1080f;
+    }
 
     public boolean isDestabilized(){
         if (level().isClientSide){
@@ -80,14 +101,18 @@ public class TimeStabilizer extends FDEntity implements AutoSerializable {
         return rechargeTime == 0;
     }
 
-    public void screenWasClosed(float currentDisplacement){
+    public void screenWasClosed(boolean solved, float currentDisplacement){
         this.interactingPlayer = null;
         this.currentDisplacement = currentDisplacement;
+        if (solved){
+            this.setRechargeTime(MAX_RECHARGE_TIME);
+        }
     }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder p_326003_) {
-        this.getEntityData().set(DESTABILIZED, false);
+        p_326003_.define(DESTABILIZED, false);
+
     }
 
     @Override

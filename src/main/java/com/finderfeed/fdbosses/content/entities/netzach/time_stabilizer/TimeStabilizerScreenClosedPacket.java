@@ -44,7 +44,7 @@ public class TimeStabilizerScreenClosedPacket extends FDPacket {
             if (timeStabilizer.distanceTo(player) > TimeStabilizer.TERMINAL_DISTANCE){
                 return;
             }
-            timeStabilizer.screenWasClosed(this.currentRotation);
+            timeStabilizer.screenWasClosed(wasSolved, this.currentRotation);
         }
 
     }

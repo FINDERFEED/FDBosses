@@ -278,5 +278,6 @@
   "fdbosses.word.item_is_not_released_yet": "This item is not released yet!",
   "fdbosses.word.malkuth_fist_description": "Acts as grappling hook for blocks in right hand, for entities in left hand. Using item in left hand, then moving it to the right hand resets its cooldown.",
   "fdbosses.word.phase_sphere_description": "When used allows to phase through blocks for a limited time.",
-  "fdbosses.word.divine_gear_description": "Right click on the block to place down a turret that will attack any mob around it."
+  "fdbosses.word.divine_gear_description": "Right click on the block to place down a turret that will attack any mob around it.",
+  "fdbosses.word.already_being_interacted_with": "Somebody is already stabilizing this one!"
 }
