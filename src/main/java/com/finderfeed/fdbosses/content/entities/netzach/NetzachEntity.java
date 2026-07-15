@@ -953,11 +953,20 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     @Override
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
+
+        var attackChain = tag.getCompound("attackChain");
+        this.attackChain.load(attackChain);
+
         this.autoLoad(tag);
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
         this.autoSave(tag);
+
+        var t = new CompoundTag();
+        this.attackChain.save(t);
+        tag.put("attackChain", t);
     }
 }

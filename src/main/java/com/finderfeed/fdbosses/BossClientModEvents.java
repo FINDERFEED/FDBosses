@@ -490,8 +490,8 @@ public class BossClientModEvents {
 
         event.registerEntityRenderer(BossEntities.TIME_STABILIZER.get(), FDEntityRendererBuilder.<TimeStabilizer>builder()
                         .addLayer(FDEntityRenderLayerOptions.<TimeStabilizer>builder()
-                                .model(BossModels.NETZACH)
-                                .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/netzach.png")))
+                                .model(BossModels.TIME_STABILIZER)
+                                .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/time_stabilizer.png")))
                                 .build())
                 .build());
 

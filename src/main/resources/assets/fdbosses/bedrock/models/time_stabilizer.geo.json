@@ -33,19 +33,17 @@
 					]
 				},
 				{
-					"name": "arrow_minutes",
+					"name": "arrow_hour",
 					"parent": "clock",
 					"pivot": [0.5, 27.5, 7],
-					"rotation": [0, 0, -52.5],
 					"cubes": [
 						{"origin": [-6.5, 20.5, 7.5], "size": [14, 14, 0], "uv": [0, 75]}
 					]
 				},
 				{
-					"name": "arrow_hours",
+					"name": "arrow_minute",
 					"parent": "clock",
 					"pivot": [0.5, 27.5, 7],
-					"rotation": [0, 0, 25],
 					"cubes": [
 						{"origin": [-6.5, 20.5, 7.25], "size": [14, 14, 0], "uv": [76, 73]}
 					]

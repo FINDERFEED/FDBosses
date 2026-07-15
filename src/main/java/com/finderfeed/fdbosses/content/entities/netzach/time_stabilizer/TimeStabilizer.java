@@ -1,8 +1,10 @@
 package com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer;
 
 import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -63,6 +65,7 @@ public class TimeStabilizer extends FDEntity implements AutoSerializable {
         super.tick();
         if (!level().isClientSide()){
 
+
             if (interactingPlayer != null){
                 if (interactingPlayer.isRemoved() || interactingPlayer.isDeadOrDying() || !this.isDestabilized() || interactingPlayer.distanceTo(this) > TERMINAL_DISTANCE){
                     interactingPlayer = null;
@@ -76,9 +79,41 @@ public class TimeStabilizer extends FDEntity implements AutoSerializable {
             }
 
         }else{
+
+            var animSystem = this.getAnimationSystem();
+
             if (this.isDestabilized()){
                 level().addParticle(ParticleTypes.FLAME, this.getX() + 0.5, this.getY() + 1, this.getZ(), 0, 1, 0);
+
+                animSystem.stopAnimation("gears");
+                animSystem.stopAnimation("clock");
+
+                animSystem.startAnimation("gears_broken", AnimationTicker.builder(BossAnims.TIME_STABILIZER_GEARS_BROKEN)
+                        .setToNullTransitionTime(0)
+                        .build());
+
+                animSystem.startAnimation("clock_broken", AnimationTicker.builder(BossAnims.TIME_STABILIZER_CLOCK_BROKEN)
+                        .setToNullTransitionTime(0)
+                        .build());
+
+
+            }else{
+
+
+                animSystem.stopAnimation("gears_broken");
+                animSystem.stopAnimation("clock_broken");
+
+
+                animSystem.startAnimation("gears", AnimationTicker.builder(BossAnims.TIME_STABILIZER_GEARS)
+                        .setToNullTransitionTime(0)
+                        .build());
+
+                animSystem.startAnimation("clock", AnimationTicker.builder(BossAnims.TIME_STABILIZER_CLOCK)
+                        .setToNullTransitionTime(0)
+                        .build());
+
             }
+
         }
     }
 

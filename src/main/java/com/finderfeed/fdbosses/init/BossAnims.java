@@ -342,6 +342,22 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
     });
 
+    public static DeferredHolder<Animation,Animation> TIME_STABILIZER_GEARS = ANIMATIONS.register("time_stabilizer_gears_rotate", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"time_stabilizer"));
+    });
+
+    public static DeferredHolder<Animation,Animation> TIME_STABILIZER_GEARS_BROKEN = ANIMATIONS.register("time_stabilizer_gears_broken", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"time_stabilizer"));
+    });
+
+    public static DeferredHolder<Animation,Animation> TIME_STABILIZER_CLOCK = ANIMATIONS.register("time_stabilizer_clock_rotate", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"time_stabilizer"));
+    });
+
+    public static DeferredHolder<Animation,Animation> TIME_STABILIZER_CLOCK_BROKEN = ANIMATIONS.register("time_stabilizer_clock_broken", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"time_stabilizer"));
+    });
+
 
 
 }
