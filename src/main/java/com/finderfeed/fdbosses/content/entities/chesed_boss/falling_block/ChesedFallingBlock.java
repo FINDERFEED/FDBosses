@@ -44,6 +44,7 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
     public float damage;
 
 
+    public boolean lessParticles = false;
     public boolean softerSound = false;
 
     public ChesedFallingBlock(EntityType<? extends AbstractHurtingProjectile> type, Level level) {
@@ -113,7 +114,7 @@ public class ChesedFallingBlock extends FDProjectile implements AutoSerializable
                                 .maxSpeed(0.3f)
                                 .collectRadius(2)
                                 .maxParticleLifetime(30)
-                                .count(5)
+                                .count(lessParticles ? 2 : 5)
                                 .maxVerticalSpeedEdges(0.15f)
                                 .maxVerticalSpeedCenter(0.15f)
                 );

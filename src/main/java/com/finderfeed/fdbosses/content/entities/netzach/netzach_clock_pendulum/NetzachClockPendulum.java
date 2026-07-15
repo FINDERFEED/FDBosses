@@ -9,6 +9,8 @@ import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
 import com.finderfeed.fdlib.ClientMixinHandler;
+import com.finderfeed.fdlib.nbt.AutoSerializable;
+import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShake;
@@ -32,7 +34,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
-public class NetzachClockPendulum extends FDEntity {
+public class NetzachClockPendulum extends FDEntity implements AutoSerializable {
 
     public static final int PENDULUM_APPEAR = 0;
     public static final int PENDULUM_WAIT_1 = 1;
@@ -43,11 +45,16 @@ public class NetzachClockPendulum extends FDEntity {
     public static final EntityDataAccessor<Float> PENDULUM_ATTACK_LENGTH = SynchedEntityData.defineId(NetzachClockPendulum.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<AttackTimings> PENDULUM_ATTACK_TIMINGS = SynchedEntityData.defineId(NetzachClockPendulum.class, BossEntityDataSerializers.ATTACK_TIMINGS.get());
 
-    public static void summon(Level level, Vec3 startPos, Vec3 direction, float attackLength, int attackDuration){
+    @SerializableField
+    private float attackWidth;
+
+    public static void summon(Level level, Vec3 startPos, Vec3 direction, float attackLength, float attackWidth, int attackDuration){
         NetzachClockPendulum pendulum = new NetzachClockPendulum(BossEntities.NETZACH_CLOCK_PENDULUM.get(), level);
         pendulum.setAttackLength(attackLength);
         pendulum.setPos(startPos);
         pendulum.lookAt(EntityAnchorArgument.Anchor.FEET, startPos.add(direction));
+
+        pendulum.attackWidth = attackWidth;
 
         AttackTimings attackTimings = new AttackTimings(60)
                 .addAttackTiming(0)
@@ -96,7 +103,7 @@ public class NetzachClockPendulum extends FDEntity {
             Vec3 pos = this.getCurrentPendulumWorldPos();
 
             ClientMixinHandler.addShake(new PositionedScreenShake(FDShakeData.builder()
-                    .amplitude(1f)
+                    .amplitude(0.5f)
                     .frequency(5)
                     .outTime(5)
                     .build(), pos, 50));
@@ -116,25 +123,26 @@ public class NetzachClockPendulum extends FDEntity {
                     .size(0.02f)
                     .build();
 
+            if (tickCount % 2 == 0){
+                for (int i = 0; i < 2; i++){
 
-            for (int i = 0; i < 4; i++){
+                    Vec3 r = left.scale(BossUtil.randomPlusMinus()).scale(0.5f + random.nextFloat() * 0.2f);
 
-                Vec3 r = left.scale(BossUtil.randomPlusMinus()).scale(0.5f + random.nextFloat() * 0.2f);
+                    Vec3 offset = dir.scale(random.nextFloat())
+                            .add(r);
 
-                Vec3 offset = dir.scale(random.nextFloat())
-                        .add(r);
+                    Vec3 ppos = pos.add(offset);
 
-                Vec3 ppos = pos.add(offset);
+                    Vec3 pspeed = dir
+                            .scale(1 + random.nextFloat())
+                            .add(r)
+                            .add(0,1,0)
+                            .normalize()
+                            .scale(random.nextFloat() * 0.25 + 0.25f);
 
-                Vec3 pspeed = dir
-                        .scale(1 + random.nextFloat())
-                        .add(r)
-                        .add(0,1,0)
-                        .normalize()
-                        .scale(random.nextFloat() * 0.25 + 0.25f);
+                    level().addParticle(options, true, ppos.x, ppos.y, ppos.z, pspeed.x, pspeed.y, pspeed.z);
 
-                level().addParticle(options, true, ppos.x, ppos.y, ppos.z, pspeed.x, pspeed.y, pspeed.z);
-
+                }
             }
 
         }
@@ -148,7 +156,7 @@ public class NetzachClockPendulum extends FDEntity {
 
             if (tickCount % 2 == 0) {
                 Vec3 dir = this.getLookAngle().multiply(-1, 0, -1).normalize();
-                BossUtil.createOnEarthBlockExplosionEffect(level(), pos, dir, 1, 0.8f, Blocks.STONE.defaultBlockState());
+                BossUtil.createOnEarthBlockExplosionEffect(level(), pos, dir, 1, 0.8f, Blocks.STONE.defaultBlockState(), true);
             }
 
             level().playSound(null, pos.x, pos.y, pos.z, SoundEvents.BASALT_BREAK, SoundSource.HOSTILE, 4f, 0.65f);
@@ -242,7 +250,7 @@ public class NetzachClockPendulum extends FDEntity {
             float l1 = FDMathUtil.lerp(-length,length,p1);
             float l2 = FDMathUtil.lerp(-length,length,p2);
 
-            float width = 6f;
+            float width = attackWidth * 2;
             Vec3 startPos = dir.scale(l1 - width / 2).add(this.position().add(0,-1,0));
 
 
@@ -251,7 +259,7 @@ public class NetzachClockPendulum extends FDEntity {
             });
 
             for (var entity : entities){
-                entity.hurt(level().damageSources().magic(), 20);
+                entity.hurt(level().damageSources().magic(), 1);
             }
 
         }
@@ -291,6 +299,8 @@ public class NetzachClockPendulum extends FDEntity {
         attackTimings.autoSave(compoundTag);
         tag.put("attackTimings", compoundTag);
 
+        this.autoSave("autoSaved",tag);
+
     }
 
     @Override
@@ -305,6 +315,8 @@ public class NetzachClockPendulum extends FDEntity {
         }else{
             this.getEntityData().set(PENDULUM_ATTACK_TIMINGS, this.defaultTimings());
         }
+
+        this.autoLoad("autoSaved", tag);
     }
 
     @Override

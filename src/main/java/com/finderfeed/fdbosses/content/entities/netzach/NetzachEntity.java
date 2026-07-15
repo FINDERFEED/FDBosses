@@ -26,6 +26,7 @@ import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -53,10 +54,13 @@ import java.util.ArrayList;
 
 public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable, AutoSerializable {
 
+    public static final int VISIBILITY_TIME = 3;
+
     public static final int ARENA_HEIGHT = 40;
     public static final int ARENA_RADIUS = 40;
 
     public static final EntityDataAccessor<Boolean> SPAWN_GHOSTS = SynchedEntityData.defineId(NetzachEntity.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> VISIBLE = SynchedEntityData.defineId(NetzachEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Float> GRAVITY = SynchedEntityData.defineId(NetzachEntity.class, EntityDataSerializers.FLOAT);
 
     public static final String MAIN_LAYER = "main";
@@ -69,6 +73,10 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     public static final String JUMP_CRUSH = "jump_crush";
     public static final String GEAR_CRUSH = "gear_crush";
     public static final String PENDULUMS_STRIKE = "pendulums_strike";
+    public static final String DISAPPEAR = "disappear";
+    public static final String APPEAR = "appear";
+
+    private int visibilityTicks = 10;
 
     public AttackChain attackChain;
 
@@ -83,6 +91,8 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                 .registerAttack(JUMP_CRUSH, this::jumpAndCrush)
                 .registerAttack(GEAR_CRUSH, this::gearCrush)
                 .registerAttack(PENDULUMS_STRIKE, this::pendulumsStrike)
+                .registerAttack(DISAPPEAR, this::disappear)
+                .registerAttack(APPEAR, this::appear)
                 .attackListener(this::attackListener)
                 .addAttack(0, AttackOptions.chainOptionsBuilder()
 //                        .addAttack(ATTACK_SERIES_1)
@@ -93,7 +103,9 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
 //                        .addAttack(BASIC_ATTACK)
 //                        .addAttack(BASIC_ATTACK)
 //                        .addAttack(GEAR_CRUSH)
-//                        .addAttack(PENDULUMS_STRIKE)
+                        .addAttack(DISAPPEAR)
+                        .addAttack(PENDULUMS_STRIKE)
+                        .addAttack(APPEAR)
                         .build())
 
         ;
@@ -106,17 +118,33 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     public void tick() {
         super.tick();
 
-        if (!level().isClientSide()){
-            this.remove(RemovalReason.DISCARDED);
-            return;
-        }
-
         if (!level().isClientSide){
             this.setTarget(this.level().getNearestPlayer(this.getX(),this.getY(),this.getZ(), 120, null));
             this.attackChain.tick();
         }else{
-
+            this.handleVisibility();
             this.handleGhostSpawning();
+        }
+    }
+
+    private void handleVisibility(){
+        if (this.isVisible()){
+            this.visibilityTicks = Mth.clamp(visibilityTicks + 1, 0, VISIBILITY_TIME);
+        }else{
+            this.visibilityTicks = Mth.clamp(visibilityTicks - 1, 0, VISIBILITY_TIME);
+        }
+    }
+
+    public float getVisibilityPercent(float pticks){
+        if (!this.isVisible()){
+            pticks = -pticks;
+        }
+        float p = Mth.clamp(visibilityTicks + pticks,0, VISIBILITY_TIME) / VISIBILITY_TIME;
+
+        if (this.isVisible()) {
+            return FDEasings.easeIn(p);
+        }else{
+            return FDEasings.easeOut(p);
         }
     }
 
@@ -140,6 +168,55 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         }
         return AttackAction.PROCEED;
     }
+
+    private boolean appear(AttackInstance attackInstance) {
+
+        var anims = this.getAnimationSystem();
+
+        int tick = attackInstance.tick;
+        int stage = attackInstance.stage;
+
+        if (stage == 0) {
+            anims.startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_PUSH_AWAY)
+                    .startTime(30)
+                    .important()
+                    .build());
+            this.setVisible(true);
+            BossUtil.netzachDisappearEffect(level(), this.position());
+            attackInstance.nextStage();
+        }else{
+            return tick >= 20;
+        }
+
+        return false;
+    }
+
+    private boolean disappear(AttackInstance attackInstance) {
+        var anims = this.getAnimationSystem();
+
+        int tick = attackInstance.tick;
+        int stage = attackInstance.stage;
+
+        if (stage == 0) {
+            anims.startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_PUSH_AWAY)
+                            .important()
+                    .build());
+
+            attackInstance.nextStage();
+        }else if (stage == 1){
+
+            if (tick >= 18){
+                this.setVisible(false);
+                BossUtil.netzachDisappearEffect(level(), this.position());
+                return true;
+            }
+
+        }
+
+        return false;
+    }
+
+
 
     private boolean pendulumsStrike(AttackInstance attackInstance){
 
@@ -180,14 +257,15 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
 
     private void pendulumStrike(int tick, int tickDelay, int chargeTime, int attackDuration, float xOffset, float zOffset, float xDirection, float zDirection, float length){
         tick -= tickDelay;
+        float width = 2.5f;
         if (tick == 0){
-            RectanglePreparationParticleOptions options = new RectanglePreparationParticleOptions(new Vec3(xDirection,0,zDirection), length, 1.5f, chargeTime, chargeTime / 2, chargeTime / 2, 1f, 0.5f, 0.2f, 0.25f);
+            RectanglePreparationParticleOptions options = new RectanglePreparationParticleOptions(new Vec3(xDirection,0,zDirection), length, width * 0.9f, chargeTime * 2, chargeTime, chargeTime, 1f, 0.5f, 0.2f, 0.25f);
             FDLibCalls.sendParticles((ServerLevel) level(), options, this.position().add(xOffset, 0.01f, zOffset), 120);
         }else if (tick == chargeTime){
             Vec3 dir = new Vec3(xDirection, 0, zDirection);
             Vec3 pos = this.position().add(xOffset, 0, zOffset)
                     .add(dir.normalize().scale(length / 2));
-            NetzachClockPendulum.summon(level(), pos, dir, length / 2, attackDuration);
+            NetzachClockPendulum.summon(level(), pos, dir, length / 2, width, attackDuration);
         }
     }
 
@@ -841,11 +919,20 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         return this.entityData.get(SPAWN_GHOSTS);
     }
 
+    public boolean isVisible(){
+        return this.entityData.get(VISIBLE);
+    }
+
+    public void setVisible(boolean visible){
+        this.entityData.set(VISIBLE, visible);
+    }
+
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         super.defineSynchedData(builder);
         builder.define(GRAVITY, (float) Mob.DEFAULT_BASE_GRAVITY);
         builder.define(SPAWN_GHOSTS, false);
+        builder.define(VISIBLE, true);
     }
 
     @Override

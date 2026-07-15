@@ -84,7 +84,12 @@ public class BossUtil {
     public static final int NETZACH_GEAR_SLAM = 23;
     public static final int NETZACH_PUSH_AWAY = 24;
     public static final int NETZACH_CRUSH = 25;
+    public static final int NETZACH_DISAPPEAR = 26;
 
+
+    public static void netzachDisappearEffect(Level serverLevel, Vec3 pos){
+        posEvent((ServerLevel) serverLevel, pos, NETZACH_DISAPPEAR, 0, 60);
+    }
 
     public static int calculateNeededStepCountOnCircle(float circleRadius, float circleSectorAngle, float desiredStepLength){
         float circleLength = FDMathUtil.FPI * 2 * circleRadius;
@@ -282,7 +287,12 @@ public class BossUtil {
         createOnEarthBlockExplosionEffect(level, position, attackDirection, intensity, 1, fallback);
     }
 
+
     public static void createOnEarthBlockExplosionEffect(Level level, Vec3 position, Vec3 attackDirection, int intensity,float speedModifier, BlockState fallback){
+        createOnEarthBlockExplosionEffect(level, position, attackDirection, intensity, speedModifier, fallback, false);
+    }
+
+    public static void createOnEarthBlockExplosionEffect(Level level, Vec3 position, Vec3 attackDirection, int intensity,float speedModifier, BlockState fallback, boolean lessParticles){
 
         attackDirection = attackDirection.normalize();
 
@@ -316,6 +326,7 @@ public class BossUtil {
 
             ChesedFallingBlock fallingBlock = ChesedFallingBlock.summon(level, states.get(level.random.nextInt(states.size())), spawnOffset, speed.scale(speedModifier), 0, 0.05f);
 
+            fallingBlock.lessParticles = lessParticles;
 
             float rnd = level.random.nextFloat() * 0.05f;
             FDLibCalls.addParticleEmitter(level, 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()

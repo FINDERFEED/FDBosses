@@ -600,7 +600,14 @@ public class BossClientModEvents {
                         .addLayer(FDEntityRenderLayerOptions.<NetzachEntity>builder()
                                 .model(BossModels.NETZACH)
                                 .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/netzach.png")))
+                                .color(((netzachEntity, v) -> {
+                                    return new FDColor(1,1,1,netzachEntity.getVisibilityPercent(v));
+                                }))
+                                .renderCondition((netzachEntity -> {
+                                    return netzachEntity.getVisibilityPercent(0) > 0;
+                                }))
                                 .build())
+
                 .build());
 
         event.registerEntityRenderer(BossEntities.NETZACH_ROLLING_GEAR.get(), FDEntityRendererBuilder.<NetzachRollingGearAttack>builder()

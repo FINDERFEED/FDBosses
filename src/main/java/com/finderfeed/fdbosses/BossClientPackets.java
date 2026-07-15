@@ -446,7 +446,61 @@ public class BossClientPackets {
             case BossUtil.NETZACH_CRUSH -> {
                 netzachCrush(pos, data);
             }
+            case BossUtil.NETZACH_DISAPPEAR -> {
+                netzachDisappear(pos, data);
+            }
         }
+    }
+
+    public static void netzachDisappear(Vec3 pos, int data){
+
+        var level = FDClientHelpers.getClientLevel();
+
+
+        SpriteParticleOptions options = SpriteParticleOptions.builder(BossParticles.BIG_GEAR)
+                .size(8f)
+                .particleLookDirection(0,1,0)
+                .xyzRotationSpeed(0,5,0)
+                .frictionAffectsRotation()
+                .quadSizeIncreasing()
+                .quadSizeEaseOut()
+                .alphaDecreasing()
+                .lightenedUp()
+                .build();
+
+        BallParticleOptions flash = BallParticleOptions.builder()
+                .color(1f,0.8f,0.4f)
+                .scalingOptions(1,0,1)
+                .brightness(2)
+                .size(3.5f)
+                .build();
+
+        level.addParticle(flash,true,pos.x,pos.y,pos.z,0,0,0);
+
+        level.addParticle(options, true, pos.x, pos.y + 0.01, pos.z, 0,0,0);
+
+
+        for (int i = 0; i < 5; i ++) {
+            for (var dir : new HorizontalCircleRandomDirections(level.random, 16, 0.5f)) {
+
+                Vec3 ppos = pos.add(dir.scale(level.random.nextFloat() * 0.25f + 0.25f));
+
+                float hmod = 0.5f * (random.nextFloat() * 0.1f + 0.9f);
+
+                level.addParticle(SpriteParticleOptions.builder(BossParticles.YELLOW_SPARK)
+                                .size(0.2f)
+                                .lightenedUp()
+                                .friction(0.8f)
+                                .alphaDecreasing()
+                                .lifetime(20 + random.nextInt(10))
+                                .frictionAffectsRotation()
+                                .xyzRotationSpeed(20 * BossUtil.randomPlusMinus(), 0, 0)
+                        .build(), ppos.x, ppos.y, ppos.z, dir.x * hmod,FDEasings.easeIn(random.nextFloat()),dir.z * hmod);
+
+            }
+        }
+
+
     }
 
     private static void netzachCrush(Vec3 pos, int data) {
