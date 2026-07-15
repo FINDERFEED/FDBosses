@@ -9,7 +9,9 @@ import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignabl
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer.TimeStabilizer;
 import com.finderfeed.fdbosses.init.BossAnims;
+import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDLibCalls;
@@ -57,7 +59,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     public static final int VISIBILITY_TIME = 3;
 
     public static final int ARENA_HEIGHT = 40;
-    public static final int ARENA_RADIUS = 40;
+    public static final int ARENA_RADIUS = 20;
 
     public static final EntityDataAccessor<Boolean> SPAWN_GHOSTS = SynchedEntityData.defineId(NetzachEntity.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> VISIBLE = SynchedEntityData.defineId(NetzachEntity.class, EntityDataSerializers.BOOLEAN);
@@ -79,6 +81,9 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     private int visibilityTicks = 10;
 
     public AttackChain attackChain;
+
+    @SerializableField
+    private Vec3 spawnPos;
 
     public NetzachEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
@@ -119,6 +124,13 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         super.tick();
 
         if (!level().isClientSide){
+
+            if (spawnPos == null){
+                this.spawnPos = this.position();
+            }
+
+            this.handleTimeStabilizersRestore();
+
             this.setTarget(this.level().getNearestPlayer(this.getX(),this.getY(),this.getZ(), 120, null));
             this.attackChain.tick();
         }else{
@@ -126,6 +138,46 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
             this.handleGhostSpawning();
         }
     }
+
+
+    private static Vec3[] TIME_STABILIZER_OFFSETS = {
+            new Vec3(ARENA_RADIUS, 0,0),
+            new Vec3(0, 0,ARENA_RADIUS),
+            new Vec3(0, 0,-ARENA_RADIUS),
+            new Vec3(-ARENA_RADIUS, 0,0)
+    };
+
+    private void handleTimeStabilizersRestore(){
+
+        if (this.isDeadOrDying()) return;
+
+        if (tickCount % 20 == 0){
+            for (var offset : TIME_STABILIZER_OFFSETS){
+                Vec3 pos = this.spawnPos.add(offset);
+
+                var stabilizers = level().getEntitiesOfClass(TimeStabilizer.class, new AABB(pos,pos).inflate(5));
+                if (stabilizers.isEmpty()){
+                    TimeStabilizer timeStabilizer = new TimeStabilizer(BossEntities.TIME_STABILIZER.get(), level());
+                    timeStabilizer.setPos(pos);
+                    timeStabilizer.lookAt(EntityAnchorArgument.Anchor.FEET, this.position());
+                    level().addFreshEntity(timeStabilizer);
+                }
+
+            }
+        }
+    }
+
+    @Override
+    protected void tickDeath() {
+        if (deathTime == 0){
+            var box = this.constructArenaBox().inflate(10);
+            for (var timeStabilizer : level().getEntitiesOfClass(TimeStabilizer.class, box)){
+                timeStabilizer.remove(RemovalReason.DISCARDED);
+            }
+        }
+        super.tickDeath();
+    }
+
 
     private void handleVisibility(){
         if (this.isVisible()){

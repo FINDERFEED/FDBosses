@@ -1,11 +1,14 @@
 package com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer;
 
 import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticleOptions;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
+import com.finderfeed.fdlib.util.FDColor;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -19,6 +22,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 public class TimeStabilizer extends FDEntity implements AutoSerializable {
@@ -83,7 +87,70 @@ public class TimeStabilizer extends FDEntity implements AutoSerializable {
             var animSystem = this.getAnimationSystem();
 
             if (this.isDestabilized()){
-                level().addParticle(ParticleTypes.FLAME, this.getX() + 0.5, this.getY() + 1, this.getZ(), 0, 1, 0);
+
+                if (tickCount % 10 == 0) {
+                    for (int i = 0; i < 4; i++) {
+                        Vec3 lookAngle = this.getLookAngle();
+
+                        ColoredJumpingParticleOptions options = new ColoredJumpingParticleOptions.Builder()
+                                .colorStart(new FDColor(1f, 1f, 1f, 1f))
+                                .colorEnd(new FDColor(1f, 0.8f, 0.3f, 1f))
+                                .maxPointsInTrail(2)
+                                .reflectionStrength(0.33f)
+                                .gravity(1.5f)
+                                .lifetime(4 + random.nextInt(4))
+                                .maxJumpAmount(0)
+                                .size(0.005f)
+                                .build();
+
+                        Vec3 rotated = lookAngle.yRot(-FDMathUtil.FPI / 2);
+                        Vec3 ppos = this.position()
+                                .add(rotated.scale(0.5f))
+                                .add(0, 0.75f, 0);
+
+                        float hmod = random.nextFloat() * 0.2f + 0.2f;
+                        level().addParticle(options, true, ppos.x, ppos.y, ppos.z,
+                                rotated.x * hmod + random.nextFloat() * 0.1f - 0.05f,
+                                0.1f + random.nextFloat() * 0.4f,
+                                rotated.z * hmod + random.nextFloat() * 0.1f - 0.05f
+                        );
+                    }
+
+
+
+                }
+
+                if (tickCount % 15 == 0) {
+                    for (int i = 0; i < 4; i++) {
+                        Vec3 lookAngle = this.getLookAngle();
+
+                        ColoredJumpingParticleOptions options = new ColoredJumpingParticleOptions.Builder()
+                                .colorStart(new FDColor(1f, 1f, 1f, 1f))
+                                .colorEnd(new FDColor(1f, 0.8f, 0.3f, 1f))
+                                .maxPointsInTrail(2)
+                                .reflectionStrength(0.33f)
+                                .gravity(1.5f)
+                                .lifetime(4 + random.nextInt(4))
+                                .maxJumpAmount(0)
+                                .size(0.005f)
+                                .build();
+
+                        Vec3 rotated = lookAngle.yRot(FDMathUtil.FPI / 2);
+                        Vec3 ppos = this.position()
+                                .add(rotated.scale(0.4f))
+                                .add(0, 1.25f, 0);
+
+                        float hmod = random.nextFloat() * 0.1f + 0.1f;
+                        level().addParticle(options, true, ppos.x, ppos.y, ppos.z,
+                                rotated.x * hmod + random.nextFloat() * 0.1f - 0.05f,
+                                0.2f + random.nextFloat() * 0.2f,
+                                rotated.z * hmod + random.nextFloat() * 0.1f - 0.05f
+                        );
+                    }
+
+
+
+                }
 
                 animSystem.stopAnimation("gears");
                 animSystem.stopAnimation("clock");
@@ -126,7 +193,7 @@ public class TimeStabilizer extends FDEntity implements AutoSerializable {
     }
 
     private void setTargetDisplacement(){
-        this.targetDisplacement = this.currentDisplacement + BossUtil.randomPlusMinus() * 2160 + BossUtil.randomPlusMinus() * random.nextFloat() * 1080f;
+        this.targetDisplacement = this.currentDisplacement + BossUtil.randomPlusMinus() * 1080 + BossUtil.randomPlusMinus() * random.nextFloat() * 1080f;
     }
 
     public boolean isDestabilized(){

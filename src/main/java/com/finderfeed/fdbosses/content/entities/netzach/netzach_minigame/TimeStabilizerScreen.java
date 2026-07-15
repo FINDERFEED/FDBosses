@@ -332,7 +332,7 @@ public class TimeStabilizerScreen extends SimpleFDScreen {
         float rotationStr = (float) rotationStrength / maxRotationStrengthTick;
 
         oldRotation = currentRotation;
-        float rotationSpeed = 20;
+        float rotationSpeed = 40;
         float nextRotation = currentRotation + rotationSpeed * rotationStr;
 
         float nrmrTarget = this.normalizeRotation(targetRotation);
