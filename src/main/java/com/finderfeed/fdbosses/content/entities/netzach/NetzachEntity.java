@@ -87,6 +87,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
 
     public NetzachEntity(EntityType<? extends Mob> type, Level level) {
         super(type, level);
+
         attackChain = new AttackChain(level.random)
                 .registerAttack(ATTACK_SERIES_1, this::attackSeriesOne)
                 .registerAttack(THROW_GEAR, this::throwGear)
