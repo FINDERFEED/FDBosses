@@ -550,49 +550,18 @@ public class BossClientModEvents {
                             matrices.pushPose();
                             matrices.translate(0,0.1f,0);
                             matrices.mulPose(Axis.YP.rotation(angle));
-                            matrices.translate(ClockAttack.RADIUS / 2,0,0);
+                            matrices.translate(ClockAttack.RADIUS / 2f,0,0);
 
                             QuadRenderer.start(multiBufferSource.getBuffer(RenderType.text(tex)))
                                     .pose(matrices)
                                     .direction(new Vec3(0,1,0))
-                                    .sizeX(ClockAttack.RADIUS / 2)
-                                    .sizeY(ClockAttack.RADIUS / 20f)
+                                    .sizeX(ClockAttack.RADIUS / 2f)
+                                    .sizeY(ClockAttack.RADIUS / 2f / 6.153f)
                                     .color(color.r, color.g, color.b, color.a)
                                     .render();
 
                             matrices.popPose();
                         }))
-//                        .addLayer(FDEntityRenderLayerOptions.<ClockAttack>builder()
-//                                .renderType(RenderType.lightning())
-//                                .model(BossModels.CLOCK_ATTACK_ARROW)
-//                                .transformation(((clockAttack, matrices, partialTicks) -> {
-//
-//                                    float angle = FDMathUtil.lerp(clockAttack.previousRotationAngle, clockAttack.rotationAngle, partialTicks);
-//
-//                                    matrices.mulPose(Axis.YP.rotation(angle - FDMathUtil.FPI / 2));
-//                                }))
-//
-//                                .color(((clockAttack, v) -> {
-//                                    var attackTimings = clockAttack.getEntityData().get(ClockAttack.ATTACK_TIMINGS);
-//
-//                                    var percent = attackTimings.getAttackTimingPercent(0, clockAttack.afterRotatedTicks + v);
-//
-//                                    if (percent != 1){
-//
-//                                        float p1 = 1 - percent;
-//                                        float p2 = Mth.clamp(clockAttack.tickCount / 5f, 0, 1);
-//
-//                                        float p = p1 * p2;
-//
-//                                        return new FDColor(1,0.1f,0.1f,p);
-//
-//                                    }else {
-//                                        return new FDColor(0,0,0,0);
-//                                    }
-//                                }))
-//
-//                                .build())
-
                         .shouldRender(((clockAttack, frustum, v, v1, v2) -> {
                             return true;
                         }))

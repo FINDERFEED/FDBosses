@@ -1,8 +1,12 @@
 package com.finderfeed.fdbosses.content.entities.netzach.clock_attack;
 
+import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
+import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
+import com.finderfeed.fdbosses.content.entities.netzach.NetzachEntity;
 import com.finderfeed.fdbosses.content.util.AttackTimings;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdbosses.init.BossEntityDataSerializers;
@@ -42,7 +46,7 @@ import java.util.UUID;
 
 public class ClockAttack extends FDEntity implements AutoSerializable {
 
-    public static final int RADIUS = 34;
+    public static final int RADIUS = NetzachEntity.ARENA_RADIUS;
 
     public static final float ROTATION_SPEED = FDMathUtil.FPI / 14;
 
@@ -168,7 +172,7 @@ public class ClockAttack extends FDEntity implements AutoSerializable {
 
                 afterRotatedTicks++;
             }else{
-                this.rotateToTarget(FDMathUtil.FPI / 12);
+                this.rotateToTarget(FDMathUtil.FPI / 6);
             }
 
 
@@ -277,7 +281,7 @@ public class ClockAttack extends FDEntity implements AutoSerializable {
                 var modded = transformedAngle % (FDMathUtil.FPI * 2);
                 var diff = FDMathUtil.FPI * 2 - modded;
 
-                float speedCoefficient = (float) (1 - Math.exp(-2 * diff));
+                float speedCoefficient = (float) (1 - Math.exp(-1 * diff));
 
                 this.rotationAngle += rotationSpeed * speedCoefficient;
 
@@ -402,6 +406,46 @@ public class ClockAttack extends FDEntity implements AutoSerializable {
                 level().addParticle(blockParticle, true, pos.x, pos.y, pos.z, speed.x, speed.y, speed.z);
 
             }
+        }
+
+    }
+
+    @Override
+    public void onRemovedFromLevel() {
+        super.onRemovedFromLevel();
+        if (level().isClientSide) {
+            this.disappearFX();
+        }
+
+    }
+
+    private void disappearFX(){
+
+        Vec3 v = new Vec3(1,0,0).yRot(this.rotationAngle);
+
+        for (int i = 0; i < RADIUS * 4; i++){
+
+            float r = i / 4 + random.nextFloat() * 0.25f;
+
+            Vec3 pos = this.position().add(v.scale(r));
+
+            Vec3 dir = v.yRot(FDMathUtil.FPI / 2 * (i % 2 == 0 ? 1 : -1));
+
+            Vec3 speed = dir.scale(random.nextFloat() * 0.5f + 0.05f).add(0, FDEasings.easeIn(random.nextFloat()) * 0.5f,0);
+
+            SpriteParticleOptions options = SpriteParticleOptions.builder(BossParticles.YELLOW_SPARK.get())
+                    .lifetime(10 + random.nextInt(10))
+                    .alphaDecreasing()
+                    .xyzRotation(BossUtil.randomPlusMinus() * 20, 0, 0)
+                    .frictionAffectsRotation()
+                    .friction(0.6f)
+                    .size(0.15f)
+                    .lightenedUp()
+                    .build();
+
+            level().addParticle(options, true, pos.x, pos.y, pos.z, speed.x, speed.y, speed.z);
+
+
         }
 
     }
