@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.client.particles.square_preparation_particle.Rect
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
+import com.finderfeed.fdbosses.content.entities.netzach.clock_attack.ClockAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer.TimeStabilizer;
@@ -75,6 +76,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     public static final String JUMP_CRUSH = "jump_crush";
     public static final String GEAR_CRUSH = "gear_crush";
     public static final String PENDULUMS_STRIKE = "pendulums_strike";
+    public static final String CLOCK_ATTACK = "clock_attack";
     public static final String DISAPPEAR = "disappear";
     public static final String APPEAR = "appear";
 
@@ -97,6 +99,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                 .registerAttack(JUMP_CRUSH, this::jumpAndCrush)
                 .registerAttack(GEAR_CRUSH, this::gearCrush)
                 .registerAttack(PENDULUMS_STRIKE, this::pendulumsStrike)
+                .registerAttack(CLOCK_ATTACK, this::clockAttack)
                 .registerAttack(DISAPPEAR, this::disappear)
                 .registerAttack(APPEAR, this::appear)
                 .attackListener(this::attackListener)
@@ -109,9 +112,11 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
 //                        .addAttack(BASIC_ATTACK)
 //                        .addAttack(BASIC_ATTACK)
 //                        .addAttack(GEAR_CRUSH)
-                        .addAttack(DISAPPEAR)
-                        .addAttack(PENDULUMS_STRIKE)
-                        .addAttack(APPEAR)
+//                        .addAttack(DISAPPEAR)
+//                        .addAttack(PENDULUMS_STRIKE)
+//                        .addAttack(CLOCK_ATTACK)
+//                        .addAttack(CLOCK_ATTACK)
+//                        .addAttack(APPEAR)
                         .build())
 
         ;
@@ -123,6 +128,10 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     @Override
     public void tick() {
         super.tick();
+
+        if (tickCount < 100){
+            return;
+        }
 
         if (!level().isClientSide){
 
@@ -222,6 +231,17 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         return AttackAction.PROCEED;
     }
 
+    private boolean clockAttack(AttackInstance attackInstance) {
+
+        var tick = attackInstance.tick;
+
+        if (tick == 0){
+            ClockAttack.summon(level(), this.spawnPos, 20, 100, this.getTarget());
+        }
+
+        return tick >= 120;
+    }
+
     private boolean appear(AttackInstance attackInstance) {
 
         var anims = this.getAnimationSystem();
@@ -258,9 +278,11 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
             attackInstance.nextStage();
         }else if (stage == 1){
 
-            if (tick >= 18){
+            if (tick == 18){
                 this.setVisible(false);
                 BossUtil.netzachDisappearEffect(level(), this.position());
+            }else if (tick >= 18 + VISIBILITY_TIME + 1){
+                this.teleportTo(spawnPos.x, spawnPos.y, spawnPos.z);
                 return true;
             }
 
@@ -300,7 +322,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                 attackInstance.nextStage();
             }
         }else if (stage == 2){
-            if (tick >= 100){
+            if (tick >= 60){
                 return true;
             }
         }
