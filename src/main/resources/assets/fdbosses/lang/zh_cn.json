@@ -23,6 +23,9 @@
   "item.fdbosses.eye_of_geburah": "严厉之眼",
   "item.fdbosses.malkuth_fire_warrior_spawn_egg": "火焰王国战士刷怪蛋",
   "item.fdbosses.malkuth_ice_warrior_spawn_egg": "冰霜王国战士刷怪蛋",
+  "item.fdbosses.phase_sphere": "相位球体",
+  "item.fdbosses.malkuth_fist": "烬霜护手",
+  "item.fdbosses.divine_gear": "神圣齿轮",
 
   "death.attack.geburah_judgement_ball": "%s的脸上写满了罪行",
   "death.attack.geburah_ray_strike": "%s的罪已赦免",
@@ -66,6 +69,7 @@
   "entity.fdbosses.chesed_crystal": "慈悲水晶",
   "entity.fdbosses.chesed_electric_sphere": "球状闪电",
   "entity.fdbosses.chesed_ray_reflector": "射线反射器",
+  "entity.fdbosses.divine_gear": "神圣齿轮",
   "effect.fdbosses.chesed_gaze": "慈悲凝视",
   "effect.fdbosses.knight": "骑士印记",
   "effect.fdbosses.coward": "懦夫印记",
@@ -127,7 +131,9 @@
 
   "fdbosses.boss_drop.fdbosses.chesed.fdbosses.lightning_core.info": "「慈悲」汲取能量的核心。\n\n可在工作台中与任意武器结合。\n\n使用强化武器攻击时，有概率召唤武器幻影攻击目标，造成固定比例的武器伤害并施加 {{(fdbosses:effect)id=fdbosses:shocked}} 效果。",
   "fdbosses.boss_drop.fdbosses.chesed.fdbosses.lightning_core.stats": "感电：\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=effectConfig, value=shockDamageReductionPercent}}% 输出伤害减免。\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=lightningStrikeShockDuration}} 游戏刻。\n\n闪电：\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=lightningStrikeDamagePercent}}% 的武器伤害。\n\n召唤概率：{{(fdbosses:config_float) config=itemConfig, value=chanceToSummonLightningStrike}}%",
-  "fdbosses.boss_drop.fdbosses.chesed.fdbosses.chesed_trophy.info": "「慈悲」，用以彰的奖杯显你的英雄事迹",
+  "fdbosses.boss_drop.fdbosses.chesed.fdbosses.chesed_trophy.info": "「慈悲」的奖杯，用以彰显你的英雄事迹",
+  "fdbosses.boss_drop.fdbosses.chesed.fdbosses.phase_sphere.info": "高速移动时可以穿过方块。\n\n§c警告！§r\n\n生物仍然能够伤害你，你只能免疫在方块中的窒息伤害。",
+  "fdbosses.boss_drop.fdbosses.chesed.fdbosses.phase_sphere.stats": "穿墙持续时间：\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=phaseSphereUseDuration}} 游戏刻。\n\n冷却时间：\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=phaseSphereCooldown}} 游戏刻。",
 
   "fdbosses.skills.chesed.electrified_air": "电离空域",
   "fdbosses.skills.chesed.electrified_air_description": "「慈悲」上方的空气充满电离能量，接触者将受到伤害。",
@@ -201,6 +207,9 @@
   "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.fire_and_ice_core.stats": "伤害：\n{{(fdlib:image)path=fdbosses:boss_damage}}：武器伤害的 {{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballToolDamagePercent}}%。\n\n物品技能冷却：\n{{(fdlib:image)path=fdbosses:boss_duration}}：{{(fdbosses:config_float) config=itemConfig, value=playerMalkuthFireballAbilityCooldown}} tick",
   "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.fire_and_ice_core.info": "「王国」的核心。\n\n可在工作台中与任意武器结合，使其能够召唤「王国」的火球，造成固定比例的武器伤害。\n\n使用物品可释放火球，点燃目标。\n\n潜行使用物品可释放冰球，减速目标。",
   "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.malkuth_trophy.info": "「王国」的奖杯，用以彰显你的英雄事迹",
+  "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.malkuth_fist.stats": "粉碎伤害：\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=iceFireGauntletCrushDamage}}。\n\n冷却时间：\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=iceFireGauntletCooldown}} 游戏刻。",
+  "fdbosses.boss_drop.fdbosses.malkuth.fdbosses.malkuth_fist.info": "§6置于主手时：§r\n\n充当抓钩。抓取方块，在抓取位置释放粉碎攻击。\n若面朝下方对地面使用，则会将使用者推至空中。\n\n§6置于副手时：§r\n\n充当抓钩。抓取实体，攻击目标后将使用者弹开。\n\n§6连携效果：§r\n\n在副手使用物品后，将其移回主手会重置其冷却时间。",
+
 
   "fdbosses.tldr.malkuth": "「王国」无法被直接攻击。\n\n当玩家的弱点是§c火焰§r时，\n减少受到的§b冰霜§r伤害；\n当玩家的弱点是§b冰霜§r时，\n减少受到的§c火焰§r伤害。\n\n可在准星上查看当前弱点。\n\n只能通过竞技场内的火炮攻击「王国」，\n只能使用与当前弱点属性相同的火炮。",
   "fdbosses.word.patrons": "赞助者",
@@ -259,7 +268,17 @@
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.justice_core.stats": "伤害减免：\n{{(fdlib:image)path=fdbosses:boss_protection}}: {{(fdbosses:config_float) config=itemConfig, value=justiceCoreDamageReduction}}% 伤害减免。",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.polished_justicestone.info": "大量的正义石。",
   "fdbosses.boss_drop.fdbosses.geburah.fdbosses.geburah_trophy.info": "「严厉」的奖杯，用以彰显你的英雄事迹",
+  "fdbosses.boss_drop.fdbosses.geburah.fdbosses.divine_gear.stats": "伤害：\n{{(fdlib:image)path=fdbosses:boss_damage}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearDamage}}。\n\n攻击间隔：\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearAttackCooldown}} 游戏刻。\n\n持续时间：\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearLifetime}} 游戏刻。\n\n充能恢复时间：\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearChargeReplenishTime}} 游戏刻。\n\n攻击半径：\n{{(fdlib:image)path=fdbosses:boss_duration}}: {{(fdbosses:config_float) config=itemConfig, value=divineGearAttackRadius}} 格。",
+  "fdbosses.boss_drop.fdbosses.geburah.fdbosses.divine_gear.info": "可以放置一座炮塔，它将攻击周围的 §c任何§r 生物。\n\n优先攻击你最后攻击过的生物。\n\n最多可储存 {{(fdbosses:config_float) config=itemConfig, value=divineGearCharges}} 次充能。",
+
+
+
   "fdbosses.word.cant_find_arena": "无法在该维度中找到该结构",
   "fdbosses.skills.geburah.sin_stay_still_sin": "静止之罪",
-  "fdbosses.skills.geburah.sin_stay_still_sin_description": "当此罪处于激活状态时，战斗者禁止保持静止。"
+  "fdbosses.skills.geburah.sin_stay_still_sin_description": "当此罪处于激活状态时，战斗者禁止保持静止。",
+  "fdbosses.word.set_special_respawn_point": "特殊重生点已设置",
+  "fdbosses.word.item_is_not_released_yet": "该物品尚未发布！",
+  "fdbosses.word.malkuth_fist_description": "置于主手时可充当抓钩攀附方块，置于副手时则抓取实体。在副手使用后将其移至主手，可重置其冷却时间。",
+  "fdbosses.word.phase_sphere_description": "使用时，可在有限时间内穿过方块。",
+  "fdbosses.word.divine_gear_description": "右键点击方块以放置一座炮塔，它将攻击周围的任何生物。"
 }
