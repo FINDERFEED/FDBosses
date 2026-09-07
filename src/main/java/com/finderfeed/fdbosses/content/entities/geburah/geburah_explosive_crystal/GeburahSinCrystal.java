@@ -70,6 +70,7 @@ public class GeburahSinCrystal extends FDEntity implements AutoSerializable {
         var player = this.getTargetPlayer();
         if (player == null || player.isDeadOrDying()){
             this.setRemoved(RemovalReason.DISCARDED);
+            return;
         }
 
         Vec3 targetPos = this.getTargetPos(player);
@@ -77,6 +78,7 @@ public class GeburahSinCrystal extends FDEntity implements AutoSerializable {
         if (this.position().distanceTo(targetPos) < 1){
             this.putCrystalInPlayersInventory(player);
             this.remove(RemovalReason.DISCARDED);
+            return;
         }
 
         float p = FDEasings.easeOut(Mth.clamp(this.tickCount / 100f, 0, 1));
