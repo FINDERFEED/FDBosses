@@ -81,6 +81,8 @@ import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.Backtra
 import com.finderfeed.fdbosses.content.entities.netzach.clock_attack.ClockAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachPendulumTransform;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvern;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvernRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer.TimeStabilizer;
@@ -487,6 +489,14 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.NETZACH_GEAR_CRUSH.get(), NetzachGearCrushAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.SECTOR_ATTACK.get(), SectorAttackRenderer::new);
+
+        event.registerEntityRenderer(BossEntities.CLOCK_WYVERN.get(), FDEntityRendererBuilder.<ClockWyvern>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<ClockWyvern>builder()
+                                .model(BossModels.CLOCK_WYVERN)
+                                .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/clock_dragon1.png")))
+                                .build())
+                        .freeRender(new ClockWyvernRenderer())
+                .build());
 
         event.registerEntityRenderer(BossEntities.TIME_STABILIZER.get(), FDEntityRendererBuilder.<TimeStabilizer>builder()
                         .addLayer(FDEntityRenderLayerOptions.<TimeStabilizer>builder()

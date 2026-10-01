@@ -58,6 +58,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.clock_attack.ClockAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvern;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer.TimeStabilizer;
@@ -497,6 +498,12 @@ public class BossEntities {
             )
             .sized(2f,3f)
             .build("divine_gear"));
+
+    public static final Supplier<EntityType<ClockWyvern>> CLOCK_WYVERN = ENTITIES.register("clock_wyvern",()->EntityType.Builder.of(
+                    ClockWyvern::new, MobCategory.MISC
+            )
+            .sized(2f,2f)
+            .build("clock_wyvern"));
 
 
 

@@ -68,6 +68,7 @@ public class BossModels {
     public static final Supplier<FDModelInfo> CLOCK_PENDULUM = INFOS.register("clock_pendulum",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_pendulum"),1.0f));
     public static final Supplier<FDModelInfo> CLOCK_ATTACK_ARROW = INFOS.register("clock_arrow",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_arrow"),1.0f));
     public static final Supplier<FDModelInfo> TIME_STABILIZER = INFOS.register("time_stabilizer",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"time_stabilizer"),1.0f));
+    public static final Supplier<FDModelInfo> CLOCK_WYVERN = INFOS.register("clock_wyvern",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_dragon"),1.0f));
 
 
 }

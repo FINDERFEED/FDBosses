@@ -9,6 +9,7 @@ import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class BossRenderTypes extends RenderType{
@@ -16,6 +17,20 @@ public class BossRenderTypes extends RenderType{
     public BossRenderTypes(String p_173178_, VertexFormat p_173179_, VertexFormat.Mode p_173180_, int p_173181_, boolean p_173182_, boolean p_173183_, Runnable p_173184_, Runnable p_173185_) {
         super(p_173178_, p_173179_, p_173180_, p_173181_, p_173182_, p_173183_, p_173184_, p_173185_);
     }
+
+    public static final BiFunction<ResourceLocation, Boolean, RenderType> ENTITY_TRANSLUCENT_TRIANGLES = Util.memoize(
+            (p_286156_, p_286157_) -> {
+                RenderType.CompositeState rendertype$compositestate = RenderType.CompositeState.builder()
+                        .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+                        .setTextureState(new RenderStateShard.TextureStateShard(p_286156_, false, false))
+                        .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
+                        .setCullState(NO_CULL)
+                        .setLightmapState(LIGHTMAP)
+                        .setOverlayState(OVERLAY)
+                        .createCompositeState(p_286157_);
+                return create("entity_translucent_triangles", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.TRIANGLES, 1536, true, true, rendertype$compositestate);
+            }
+    );
 
     public static final RenderType LIGHTNING_NO_CULL = create(
             "lightning_no_cull",

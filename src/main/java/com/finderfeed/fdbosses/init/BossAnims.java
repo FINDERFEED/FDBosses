@@ -358,6 +358,26 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"time_stabilizer"));
     });
 
+    public static DeferredHolder<Animation,Animation> CLOCK_WYVERN_IDLE = ANIMATIONS.register("clock_wyvern_idle", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern"));
+    });
+
+    public static DeferredHolder<Animation,Animation> CLOCK_WYVERN_SPINNING_GEARS = ANIMATIONS.register("clock_wyvern_spinning_gears", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern"));
+    });
+
+    public static DeferredHolder<Animation,Animation> CLOCK_WYVERN_FLYING = ANIMATIONS.register("clock_wyvern_flying", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern"));
+    });
+
+    public static DeferredHolder<Animation,Animation> CLOCK_WYVERN_WALK = ANIMATIONS.register("clock_wyvern_walk", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern"));
+    });
+
+    public static DeferredHolder<Animation,Animation> CLOCK_WYVERN_BITE_EARTH = ANIMATIONS.register("clock_wyvern_bite_earth", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern"));
+    });
+
 
 
 }
