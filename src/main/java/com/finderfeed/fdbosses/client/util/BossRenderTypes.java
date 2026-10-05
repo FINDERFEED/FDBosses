@@ -24,7 +24,7 @@ public class BossRenderTypes extends RenderType{
                         .setShaderState(RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
                         .setTextureState(new RenderStateShard.TextureStateShard(p_286156_, false, false))
                         .setTransparencyState(TRANSLUCENT_TRANSPARENCY)
-                        .setCullState(NO_CULL)
+                        .setCullState(CULL)
                         .setLightmapState(LIGHTMAP)
                         .setOverlayState(OVERLAY)
                         .createCompositeState(p_286157_);

@@ -11,12 +11,14 @@ import net.minecraft.world.level.Level;
 
 public class ClockWyvern extends FDEntity {
 
-    public static FDModel clientModel;
+    public static FDModel animatedModel;
+    public static FDModel model;
 
     public ClockWyvern(EntityType<?> type, Level level) {
         super(type, level);
-        if (clientModel == null){
-            clientModel = new FDModel(BossModels.CLOCK_WYVERN.get());
+        if (animatedModel == null){
+            animatedModel = new FDModel(BossModels.CLOCK_WYVERN.get());
+            model = new FDModel(BossModels.CLOCK_WYVERN.get());
         }
     }
 
