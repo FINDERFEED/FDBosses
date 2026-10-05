@@ -84,7 +84,7 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
 
         Vector3f b1 = part1.sub(part3, new Vector3f());
         Vector3f b2 = part1.sub(part2, new Vector3f());
-        Vector3f normal = b1.cross(b2).normalize(); // TODO: Normal
+        Vector3f normal = b1.cross(b2).normalize();
 
         Matrix4f mat = matrices.last().pose();
 

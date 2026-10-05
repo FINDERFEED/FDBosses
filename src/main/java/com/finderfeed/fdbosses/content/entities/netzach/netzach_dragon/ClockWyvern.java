@@ -26,7 +26,7 @@ public class ClockWyvern extends FDEntity {
     public void tick() {
         super.tick();
         if (!level().isClientSide){
-            this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.CLOCK_WYVERN_FLYING)
+            this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.CLOCK_WYVERN_IDLE)
                     .setToNullTransitionTime(20)
                     .build());
         }
