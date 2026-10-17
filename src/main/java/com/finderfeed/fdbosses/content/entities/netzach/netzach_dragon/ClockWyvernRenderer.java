@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.util.BossRenderTypes;
+import com.finderfeed.fdlib.data_structures.Pair;
 import com.finderfeed.fdlib.data_structures.SOTriple;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDFreeEntityRenderer;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
@@ -10,6 +11,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
 import org.joml.Vector3f;
 
 import java.util.HashMap;
