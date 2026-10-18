@@ -370,6 +370,10 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern"));
     });
 
+    public static DeferredHolder<Animation,Animation> CLOCK_WYVERN_FLYING_STATIONARY = ANIMATIONS.register("clock_wyvern_flying_stationary", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern"));
+    });
+
     public static DeferredHolder<Animation,Animation> CLOCK_WYVERN_WALK = ANIMATIONS.register("clock_wyvern_walk", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern"));
     });
