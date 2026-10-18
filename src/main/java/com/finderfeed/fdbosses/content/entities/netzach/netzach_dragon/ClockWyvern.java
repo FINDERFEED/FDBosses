@@ -26,17 +26,17 @@ public class ClockWyvern extends FDEntity {
     public void tick() {
         super.tick();
         if (!level().isClientSide){
-            if (this.level().getGameTime() % 400 > 200){
-                this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.CLOCK_WYVERN_FLYING_STATIONARY)
+//            if (this.level().getGameTime() % 400 > 200){
+                this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.CLOCK_WYVERN_WALK)
                                 .setSpeed(2.5f)
                         .setToNullTransitionTime(20)
                         .build());
-            }else{
-                this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.CLOCK_WYVERN_FLYING)
-                        .setSpeed(2.5f)
-                        .setToNullTransitionTime(20)
-                        .build());
-            }
+//            }else{
+//                this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.CLOCK_WYVERN_FLYING)
+//                        .setSpeed(2.5f)
+//                        .setToNullTransitionTime(20)
+//                        .build());
+//            }
         }
     }
 
