@@ -27,6 +27,7 @@ public class ClockWyvern extends FDEntity {
         super.tick();
         if (!level().isClientSide){
             int limit = 300;
+
             long repeatedTime = this.level().getGameTime() % limit;
             this.getAnimationSystem().startAnimation("IDLE", AnimationTicker.builder(BossAnims.CLOCK_WYVERN_SPINNING_GEARS)
                     .build());
