@@ -31,19 +31,15 @@ public class ClockWyvern extends FDEntity {
             long repeatedTime = this.level().getGameTime() % limit;
             this.getAnimationSystem().startAnimation("IDLE", AnimationTicker.builder(BossAnims.CLOCK_WYVERN_SPINNING_GEARS)
                     .build());
-            if (repeatedTime < 20){
+            if (repeatedTime < 30){
                 this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.CLOCK_WYVERN_START_FLYING)
-                                .setSpeed(1.5f)
-                                .nextAnimation(AnimationTicker.builder(BossAnims.CLOCK_WYVERN_FLYING_STATIONARY)
-                                        .setSpeed(2.5f)
-                                        .setToNullTransitionTime(20)
-                                        .build())
-                        .setToNullTransitionTime(20)
+                                .setSpeed(1f)
+                        .setTransitionTime(20)
                         .build());
             }else if (repeatedTime < limit - 100){
                 this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.CLOCK_WYVERN_FLYING)
                         .setSpeed(2.5f)
-                        .setToNullTransitionTime(20)
+                        .setTransitionTime(20)
                         .build());
             }else{
                 this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.CLOCK_WYVERN_IDLE).build());

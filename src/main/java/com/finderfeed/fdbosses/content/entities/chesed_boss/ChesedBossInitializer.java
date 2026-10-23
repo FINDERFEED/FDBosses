@@ -12,7 +12,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.Animatio
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.cutscenes.CurveType;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
-import com.finderfeed.fdlib.systems.cutscenes.EasingType;
+import com.finderfeed.fdlib.util.math.EasingType;
 import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
@@ -85,7 +85,7 @@ public class ChesedBossInitializer extends BossInitializer<ChesedEntity> {
         }
         chesedEntity.getAnimationSystem().startAnimation("APPEAR", AnimationTicker.builder(BossAnims.CHESED_APPEAR)
                 .setLoopMode(Animation.LoopMode.ONCE)
-                .setToNullTransitionTime(0)
+                .setTransitionTime(0)
                 .build());
 
     }

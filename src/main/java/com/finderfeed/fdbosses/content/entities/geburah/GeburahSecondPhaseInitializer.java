@@ -15,7 +15,7 @@ import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.init.FDScreenEffects;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
-import com.finderfeed.fdlib.systems.cutscenes.EasingType;
+import com.finderfeed.fdlib.util.math.EasingType;
 import com.finderfeed.fdlib.systems.impact_frames.ImpactFrame;
 import com.finderfeed.fdlib.systems.screen.screen_effect.instances.chromatic_abberation.ChromaticAbberationData;
 import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;

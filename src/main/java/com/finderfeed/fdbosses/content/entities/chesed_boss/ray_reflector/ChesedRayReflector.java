@@ -199,7 +199,7 @@ public class ChesedRayReflector extends FDEntity {
             if (animTicker == null){
                 system.startAnimation(ACTIVE_LAYER, AnimationTicker.builder(BossAnims.RAY_REFLECTOR_ACTIVATE)
                                 .setSpeed(ANIMATION_SPEED)
-                                .setToNullTransitionTime(0)
+                                .setTransitionTime(0)
                         .build());
             }
             activeTicker = Mth.clamp(activeTicker + 1, 0, activationAnimLength);
@@ -211,7 +211,7 @@ public class ChesedRayReflector extends FDEntity {
                     system.startAnimation(ACTIVE_LAYER, AnimationTicker.builder(BossAnims.RAY_REFLECTOR_ACTIVATE)
                             .setSpeed(ANIMATION_SPEED)
 
-                            .setToNullTransitionTime(0)
+                            .setTransitionTime(0)
                                     .reversed()
                                     .setLoopMode(Animation.LoopMode.ONCE)
                             .build());

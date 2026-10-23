@@ -41,13 +41,13 @@ public class MalkuthRepairCrystal extends FDEntity implements AutoSerializable {
         if (hidden){
             this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.MALKUTH_REPAIR_CRYSTAL_SUMMON)
                     .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
-                            .setToNullTransitionTime(0)
+                            .setTransitionTime(0)
                     .reversed()
                     .build());
         }else{
             this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.MALKUTH_REPAIR_CRYSTAL_SUMMON)
                     .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
-                    .setToNullTransitionTime(0)
+                    .setTransitionTime(0)
                     .build());
         }
     }

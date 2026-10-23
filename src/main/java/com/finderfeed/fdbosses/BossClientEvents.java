@@ -334,7 +334,7 @@ public class BossClientEvents {
 
         var anim = BossAnims.DIVINE_GEAR_ITEM_IDLE.get();
 
-        anim.applyAnimation(new AnimationContext(),DIVINE_GEAR_MODEL, time % anim.getAnimTime());
+        anim.applyAnimation(new AnimationContext(), DIVINE_GEAR_MODEL, time % anim.getAnimTime(), 1);
 
         var vertex = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
         RenderSystem.setShader(GameRenderer::getPositionTexColorShader);

@@ -35,7 +35,7 @@ public class ChesedCrystalEntity extends FDLivingEntity implements ChesedBossBud
     public ChesedCrystalEntity(EntityType<? extends FDLivingEntity> type, Level level) {
         super(type, level);
         this.getAnimationSystem().startAnimation("SPAWN", AnimationTicker.builder(BossAnims.CHESED_CRYSTAL_SPAWN.get())
-                .setToNullTransitionTime(0)
+                .setTransitionTime(0)
                 .build());
     }
 

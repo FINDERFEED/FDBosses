@@ -46,7 +46,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.model_sy
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
-import com.finderfeed.fdlib.systems.cutscenes.EasingType;
+import com.finderfeed.fdlib.util.math.EasingType;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
@@ -523,7 +523,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
         }
 
         this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_FLOAT)
-                .setToNullTransitionTime(0).build());
+                .setTransitionTime(0).build());
         this.getAnimationSystem().stopAnimation(MAIN_LAYER);
 
         Vec3 teleportPos = this.spawnPosition.add(WALL_OFFSET);
@@ -589,7 +589,9 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 }
             } else if (this.deathTime == animStartTime) {
 
-                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_DEATH).build());
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_DEATH)
+                        .setInFadeTime(5)
+                        .build());
 
             } else if (deathTime == animEndtime - 38){
                 DefaultShakePacket.send((ServerLevel) level(), spawnPosition, 40, FDShakeData.builder()
@@ -600,7 +602,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                     PacketDistributor.sendToPlayer(player, new PlaySoundInEarsPacket(BossSounds.MALKUTH_HIT.get(),0.75f,1f));
                     PacketDistributor.sendToPlayer(player, new PlaySoundInEarsPacket(BossSounds.MALKUTH_VOLCANO_ERRUPTION.get(),1.75f,1f));
                 }
-            }else if (this.deathTime == animEndtime - 37) {
+            }else if (this.deathTime == animEndtime - 36) {
                 BossUtil.malkuthSwordsInsertParticles((ServerLevel) level(), this.spawnPosition, 100, this.getId());
 
             } else if (this.deathTime == animEndtime + 15) {
@@ -750,6 +752,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         if (stage == 0){
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_CRUSH)
+                    .setInFadeTime(5)
                     .setSpeed(1.25f).build());
 
             Vec3 between = this.spawnPosition.subtract(this.position());
@@ -818,6 +821,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             if (tick == 0) {
                 this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_TO_FLOAT)
+                        .setInFadeTime(5)
                         .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_FLOAT).build())
                         .build());
             }
@@ -881,6 +885,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
                 if (ticksToEnd == 7){
                     this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SUMMON_AND_FIRE_FIREBALLS)
+                            .setInFadeTime(5)
                             .important()
                             .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_FLOAT).build())
                             .build());
@@ -1080,13 +1085,15 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
             if (earthquakeToSummon.isFire()){
                 this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SINGLE_EARTHQUAKE_FIRE)
-                                .important()
-                                .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
+                        .setInFadeTime(5)
+                        .important()
+                        .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
                         .build());
             }else{
                 this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SINGLE_EARTHQUAKE_ICE)
-                                .important()
-                                .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
+                        .setInFadeTime(5)
+                        .important()
+                        .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
                         .build());
             }
             inst.nextStage();
@@ -1319,9 +1326,11 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 jumpBackOnSpawnCrushType = MalkuthAttackType.getRandom(random);
                 if (!crush) {
                     this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
+                            .setInFadeTime(5)
                             .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
                 }else{
                     this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_CRUSH)
+                            .setInFadeTime(5)
                             .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
                 }
 //                this.lookAt(EntityAnchorArgument.Anchor.FEET, lastpos);
@@ -1455,6 +1464,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             Animation animation = this.getSlashAttackAnimation(this.slashAttackType);
 
             AnimationTicker ticker = AnimationTicker.builder(animation)
+                    .setInFadeTime(5)
                     .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
                     .important()
                     .build();
@@ -1536,6 +1546,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
         if (stage == 0){
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_CRUSH_ATTACK_FULL)
+                            .setInFadeTime(5)
                             .setLoopMode(Animation.LoopMode.ONCE)
                     .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build())
                     .build());
@@ -1870,6 +1881,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_JUMP_AND_LAND)
+                            .setInFadeTime(5)
                             .important()
                     .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
             this.jumpOnWallPath = this.makeJumpOnWallPath(23,false);
@@ -1897,7 +1909,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 this.teleportTo(last.x,last.y,last.z);
                 attackInstance.nextStage();
                 this.getAnimationSystem().startAnimation(MAIN_LAYER,AnimationTicker.builder(BossAnims.MALKUTH_SWORD_FORWARD)
-                                .setToNullTransitionTime(0)
+                        .setInFadeTime(5)
                         .build());
             }
         }else if (stage == 2){
@@ -2089,6 +2101,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             this.hideRepairCrystals(true);
 
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_CAROUSEL_SLASH_1)
+                            .setInFadeTime(5)
                             .important()
                     .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_IDLE).build()).build());
 
@@ -2251,6 +2264,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
 
 
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_GIANT_SWORD_ATTACK)
+                    .setInFadeTime(5)
                     .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
                     .build());
 

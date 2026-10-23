@@ -34,7 +34,7 @@ public class PhaseSphere extends Item implements AnimatedItem {
         if (!level.isClientSide) {
             if (PhaseSphereHandler.canContinueUsingChesedItem(player)) {
                 FDServerItemAnimations.startItemAnimation(player, "USE", AnimationTicker.builder(BossAnims.CHESED_ITEM_USE)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                         .build(), hand);
                 player.startUsingItem(hand);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.RESPAWN_ANCHOR_CHARGE, SoundSource.PLAYERS, 1f, 0.9f);

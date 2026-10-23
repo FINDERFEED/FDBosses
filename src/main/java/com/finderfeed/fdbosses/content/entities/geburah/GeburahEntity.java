@@ -48,7 +48,6 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.F
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
-import com.finderfeed.fdlib.systems.cutscenes.EasingType;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
@@ -67,6 +66,7 @@ import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
+import com.finderfeed.fdlib.util.math.EasingType;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;

@@ -77,6 +77,7 @@ public class MalkuthBossScreen extends BaseBossScreen{
             }
         };
         animationSystem.startAnimation("APPEAR", AnimationTicker.builder(BossAnims.MALKUTH_SCREEN_APPEAR)
+                        .setInFadeTime(5)
                         .setSpeed(0.75f)
                 .build());
     }

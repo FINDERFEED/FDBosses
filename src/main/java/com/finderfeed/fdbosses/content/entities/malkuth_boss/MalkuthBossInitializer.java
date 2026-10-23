@@ -14,7 +14,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.Animatio
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.head.HeadControllerContainer;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
-import com.finderfeed.fdlib.systems.cutscenes.EasingType;
+import com.finderfeed.fdlib.util.math.EasingType;
 import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
 import com.finderfeed.fdlib.systems.shake.DefaultShakePacket;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
@@ -208,7 +208,7 @@ public class MalkuthBossInitializer extends BossInitializer<MalkuthEntity> {
                 boss.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.ANIMATION);
                 boss.getAnimationSystem().startAnimation(MalkuthEntity.MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SUMMON_ANIM)
                         .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
-                                .setToNullTransitionTime(0)
+                                .setTransitionTime(0)
                         .build());
             }else if (tick == bossJumpStart + movePathTime + 3){
                 DefaultShakePacket.send((ServerLevel) boss.level(), boss.spawnPosition, 30, FDShakeData.builder()

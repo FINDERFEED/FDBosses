@@ -47,7 +47,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.F
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
-import com.finderfeed.fdlib.systems.cutscenes.EasingType;
+import com.finderfeed.fdlib.util.math.EasingType;
 import com.finderfeed.fdlib.systems.cutscenes.packets.StartCutscenePacket;
 import com.finderfeed.fdlib.systems.cutscenes.packets.StopCutscenePacket;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
@@ -468,7 +468,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             this.stopAllNonIdleAnimations();
 
             this.getAnimationSystem().startAnimation("PREPARE_SECOND_PHASE", AnimationTicker.builder(CHESED_SECOND_PHASE_PREPARE)
-                            .setToNullTransitionTime(0)
+                            .setTransitionTime(0)
                             .startTime(2)
                             .setSpeed(0.75f)
                     .build());
@@ -516,7 +516,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                         .build()));
 
                 this.getAnimationSystem().startAnimation("PREPARE_SECOND_PHASE", AnimationTicker.builder(CHESED_SECOND_PHASE_PREPARE)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                         .build());
 
                 CutsceneData cutsceneData = new CutsceneData()
@@ -530,7 +530,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             }
         } else if (this.secondPhaseTicker == tickerTime - 30 - fullOffset){
             this.getAnimationSystem().startAnimation("SECOND_PHASE_START", AnimationTicker.builder(CHESED_SECOND_PHASE_STRIKE_WALLS)
-                    .setToNullTransitionTime(0)
+                    .setTransitionTime(0)
                     .build());
 
         }else if (this.secondPhaseTicker == tickerTime - firstRayOffset - fullOffset){
@@ -1121,7 +1121,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 this.setMonolithsImmunity(true);
                 this.setMonolithDrainPercent(0);
                 this.getAnimationSystem().startAnimation(FINAL_ATTACK_LAYER, AnimationTicker.builder(CHESED_BOOM_ATTACK)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                         .build());
             }else if (instance.tick == chargeStartTime - 5){
                 this.level().playSound(null, this.getX(), this.getY(), this.getZ(), BossSounds.CHESED_FINAL_ATTACK_CHARGE.get(), SoundSource.HOSTILE, 5f, 1f);
@@ -1491,7 +1491,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
                 level().playSound(null,this.getX(),this.getY(),this.getZ(), soundEvent, SoundSource.HOSTILE, 5f ,1f);
 
                 this.getAnimationSystem().startAnimation(RAY_ATTACK_LAYER, AnimationTicker.builder(CHESED_ATTACK)
-                                .setToNullTransitionTime(0)
+                                .setTransitionTime(0)
                                 .setSpeed(animationSpeed)
                         .build());
 
@@ -1717,7 +1717,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
             if (tick == 0) {
                 this.getAnimationSystem().startAnimation("CAST", AnimationTicker.builder(CHESED_CAST)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                         .build());
 
             }else if (tick > 15) {
@@ -1828,7 +1828,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         int rad = 36;
         if (stage == 0){
             this.getAnimationSystem().startAnimation(ROCKFALL_TICKER, AnimationTicker.builder(CHESED_ROCKFALL_CAST)
-                            .setToNullTransitionTime(0)
+                            .setTransitionTime(0)
                     .build());
 
             if (tick > 10 && tick < 30) {
@@ -2033,7 +2033,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
                 if (t == 0) {
                     this.getAnimationSystem().startAnimation(EARTHQUAKE_ATTACK_LAYER, AnimationTicker.builder(CHESED_EARTHQUAKE_CAST)
-                            .setToNullTransitionTime(0)
+                            .setTransitionTime(0)
                             .build());
                 }
 //                if (t % 2 == 0) {
@@ -2193,7 +2193,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             if (blockAttackProjectiles.isEmpty()){
                 if (!this.trySearchProjectiles()) {
                     this.getAnimationSystem().startAnimation("blockAttack", AnimationTicker.builder(CHESED_CAST)
-                            .setToNullTransitionTime(0)
+                            .setTransitionTime(0)
                             .setSpeed(1.2f)
                             .build());
 
@@ -2381,12 +2381,12 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             if (system.getTickerAnimation("ROLL_AROUND") != CHESED_ROLL.get()){
                 system.startAnimation("ROLL_AROUND",AnimationTicker.builder(CHESED_ROLL)
                         .startTime(tick)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                         .build());
             }
             if (system.getTickerAnimation("ROLLING") != CHESED_ROLL_ROLL.get()){
                 system.startAnimation("ROLLING",AnimationTicker.builder(CHESED_ROLL_ROLL)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                         .startTime(tick)
                         .build());
             }
@@ -2413,7 +2413,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
             this.setRolling(false);
             system.stopAnimation("ROLL_UP");
             system.startAnimation("ROLL_UP_END",AnimationTicker.builder(CHESED_ROLL_UP_JUST_END)
-                    .setToNullTransitionTime(0)
+                    .setTransitionTime(0)
                     .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
                     .build());
             if (tick >= CHESED_ROLL_UP_JUST_END.get().getAnimTime() + 20){

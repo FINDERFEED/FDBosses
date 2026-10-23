@@ -110,7 +110,7 @@ public class ChesedBossScreen extends BaseBossScreen {
         };
         animationSystem.startAnimation("APPEAR", AnimationTicker.builder(BossAnims.CHESED_SCREEN_APPEAR)
                         .setLoopMode(Animation.LoopMode.ONCE)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                 .build());
 
         var anchor = this.getAnchor(0, 0.5f);

@@ -156,11 +156,11 @@ public class TimeStabilizer extends FDEntity implements AutoSerializable {
                 animSystem.stopAnimation("clock");
 
                 animSystem.startAnimation("gears_broken", AnimationTicker.builder(BossAnims.TIME_STABILIZER_GEARS_BROKEN)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                         .build());
 
                 animSystem.startAnimation("clock_broken", AnimationTicker.builder(BossAnims.TIME_STABILIZER_CLOCK_BROKEN)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                         .build());
 
 
@@ -172,11 +172,11 @@ public class TimeStabilizer extends FDEntity implements AutoSerializable {
 
 
                 animSystem.startAnimation("gears", AnimationTicker.builder(BossAnims.TIME_STABILIZER_GEARS)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                         .build());
 
                 animSystem.startAnimation("clock", AnimationTicker.builder(BossAnims.TIME_STABILIZER_CLOCK)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                         .build());
 
             }

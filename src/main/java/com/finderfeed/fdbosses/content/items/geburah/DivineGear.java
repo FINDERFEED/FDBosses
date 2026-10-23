@@ -60,10 +60,10 @@ public class DivineGear extends FDEntity implements AutoSerializable {
     public DivineGear(EntityType<?> type, Level level) {
         super(type, level);
         this.getAnimationSystem().startAnimation("SUMMON", AnimationTicker.builder(BossAnims.DIVINE_GEAR_SUMMON)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                 .build());
         this.getAnimationSystem().startAnimation("IDLE", AnimationTicker.builder(BossAnims.DIVINE_GEAR_IDLE)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                 .build());
     }
 
@@ -141,7 +141,7 @@ public class DivineGear extends FDEntity implements AutoSerializable {
             if (age > lifetime && age < lifetime + animTime){
                 this.getAnimationSystem().startAnimation("SUMMON", AnimationTicker.builder(BossAnims.DIVINE_GEAR_DEATH)
                         .setLoopMode(Animation.LoopMode.HOLD_ON_LAST_FRAME)
-                        .setToNullTransitionTime(0)
+                        .setTransitionTime(0)
                         .build());
             }else if (age >= lifetime + animTime){
                 BallParticleOptions ballParticle = BallParticleOptions.builder()

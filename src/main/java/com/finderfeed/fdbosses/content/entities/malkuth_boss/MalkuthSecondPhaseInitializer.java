@@ -10,7 +10,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.Animatio
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.head.HeadControllerContainer;
 import com.finderfeed.fdlib.systems.cutscenes.CameraPos;
 import com.finderfeed.fdlib.systems.cutscenes.CutsceneData;
-import com.finderfeed.fdlib.systems.cutscenes.EasingType;
+import com.finderfeed.fdlib.util.math.EasingType;
 import com.finderfeed.fdlib.systems.screen.screen_effect.instances.datas.ScreenColorData;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.server.level.ServerPlayer;
@@ -112,8 +112,8 @@ public class MalkuthSecondPhaseInitializer extends BossInitializer<MalkuthEntity
         if (tick == start){
 
             boss.getAnimationSystem().startAnimation(MalkuthEntity.MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_SWORD_FORWARD)
-                            .setSpeed(0.75f)
-                            .setToNullTransitionTime(0)
+                    .setSpeed(0.75f)
+                    .setInFadeTime(5)
                     .build());
 
         }else if (tick == cannonShootTick){

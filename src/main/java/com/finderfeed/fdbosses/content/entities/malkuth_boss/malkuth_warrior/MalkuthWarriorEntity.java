@@ -316,7 +316,7 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
                     if (anim == BossAnims.MALKUTH_WARRIOR_IDLE.get()) {
                         if (this.walkAnimation.speed() > 0.05f) {
                             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_WALK)
-                                    .setToNullTransitionTime(5)
+                                    .setTransitionTime(5)
                                     .setSpeed(2f)
                                     .build());
                         }
