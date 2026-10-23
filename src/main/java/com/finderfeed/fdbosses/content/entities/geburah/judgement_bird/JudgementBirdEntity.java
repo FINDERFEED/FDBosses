@@ -147,11 +147,10 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable, Gebu
 
             }
 
-            this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(animation).build());
+            this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(animation)
+                            .setInFadeTime(5)
+                    .build());
         }else{
-
-
-
             LivingEntity target = this.getTarget();
 
             if (castingTicker > 30 && target != null){
@@ -160,7 +159,8 @@ public class JudgementBirdEntity extends FDMob implements AutoSerializable, Gebu
 
             castingTicker = Mth.clamp(castingTicker - 1,0,Integer.MAX_VALUE);
             this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.JUDGEMENT_BIRD_CAST)
-                            .nextAnimation(AnimationTicker.builder(BossAnims.JUDGEMENT_BIRD_FLY).build())
+                    .setInFadeTime(5)
+                    .nextAnimation(AnimationTicker.builder(BossAnims.JUDGEMENT_BIRD_FLY).build())
                     .build());
 
             this.lookAt(EntityAnchorArgument.Anchor.FEET, castingTargetPos);

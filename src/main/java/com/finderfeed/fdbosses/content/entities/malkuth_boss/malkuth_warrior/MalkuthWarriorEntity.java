@@ -98,8 +98,11 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
 
             this.lookAt(EntityAnchorArgument.Anchor.EYES, target.position());
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_SLAM_EARTH)
-                            .important()
-                            .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build())
+                    .setTransitionTime(5)
+                    .important()
+                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE)
+                            .setTransitionTime(5)
+                            .build())
                     .build());
             instance.nextStage();
             this.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.ANIMATION);
@@ -193,8 +196,11 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
                     this.getNavigation().stop();
                     this.getHeadControllerContainer().setControllersMode(HeadControllerContainer.Mode.ANIMATION);
                     this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_ATTACK)
-                                    .important()
-                                    .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build())
+                            .setTransitionTime(5)
+                            .important()
+                            .nextAnimation(AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE)
+                                    .setOutFadeTime(5)
+                                    .build())
                             .build());
 
                     attackInstance.nextStage();
@@ -304,14 +310,12 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
                 var ticker = this.getAnimationSystem().getTicker(MAIN_LAYER);
 
                 if (ticker == null) {
-                    this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build());
+                    this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE)
+                            .setTransitionTime(5)
+                            .build());
                 } else {
 
                     Animation anim = ticker.getAnimation();
-
-                    if (anim instanceof TransitionAnimation tr) {
-                        anim = tr.getTransitionTo();
-                    }
 
                     if (anim == BossAnims.MALKUTH_WARRIOR_IDLE.get()) {
                         if (this.walkAnimation.speed() > 0.05f) {
@@ -322,7 +326,9 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
                         }
                     } else if (anim == BossAnims.MALKUTH_WARRIOR_WALK.get()) {
                         if (this.walkAnimation.speed() < 0.05f) {
-                            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE).build());
+                            this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_IDLE)
+                                    .setTransitionTime(5)
+                                    .build());
                         }
                     }
                 }
@@ -352,6 +358,7 @@ public class MalkuthWarriorEntity extends BossMonsterMob implements IHasHead<Mal
         super.die(p_21014_);
         if (!level().isClientSide){
             this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.MALKUTH_WARRIOR_DIE)
+                    .setInFadeTime(5)
                     .build());
         }
     }
