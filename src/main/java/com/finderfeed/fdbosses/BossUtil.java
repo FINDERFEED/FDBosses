@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.mixin.LootTableAccessor;
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.network.FDPacketHandler;
@@ -486,7 +487,7 @@ public class BossUtil {
 
         List<Item> items = new ArrayList<>();
 
-        for (var pool : lootTable.pools){
+        for (var pool : ((LootTableAccessor) lootTable).getPools()){
 
             for (var entry : pool.entries){
 

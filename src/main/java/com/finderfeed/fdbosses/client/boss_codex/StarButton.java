@@ -1,0 +1,263 @@
+package com.finderfeed.fdbosses.client.boss_codex;
+
+import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.BossRenderUtil;
+import com.finderfeed.fdbosses.client.boss_screen.BaseBossScreen;
+import com.finderfeed.fdbosses.init.BossSounds;
+import com.finderfeed.fdbosses.packets.RequestDossierScreenPacket;
+import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdlib.network.FDPacketHandler;
+import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
+import com.finderfeed.fdlib.systems.simple_screen.FDWidget;
+import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticle;
+import com.finderfeed.fdlib.util.math.ComplexEasingFunction;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
+import com.finderfeed.fdlib.util.rendering.FDEasings;
+import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.phys.Vec3;
+import org.joml.Vector2f;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
+
+import java.util.Random;
+
+public class StarButton extends FDWidget {
+
+    public static final ResourceLocation STAR = FDBosses.location("textures/gui/star/star.png");
+    public static final ResourceLocation STAR_NOT_RELEASED = FDBosses.location("textures/gui/star/star_not_released.png");
+    public static final ResourceLocation SINGLE_STAR = FDBosses.location("gui/star/singlestar");
+
+    private int currentFrame;
+    private int tick = 0;
+    private float startingAngle = 0;
+    private int startingFrame;
+
+    private int activationTime;
+
+    private Random random;
+
+    public float activationPitch;
+
+    public EntityType<?> entityType;
+
+    public StarButton(EntityType<?> entityType, Screen screen, float x, float y, float width, float height, int startFrame, float startingAngle, int activationTime, float activationPitch) {
+        super(screen, x, y, width, height);
+        this.activationPitch = activationPitch;
+        this.entityType = entityType;
+        this.currentFrame = Mth.clamp(startFrame,0,10);
+        this.startingFrame = currentFrame;
+        this.startingAngle = startingAngle;
+        this.activationTime = activationTime;
+        this.random = new Random();
+    }
+
+    public void setActivated(){
+        this.tick = activationTime + 1;
+    }
+
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (tick >= activationTime) {
+            BossCodexScreen bossCodexScreen = (BossCodexScreen) this.widgetOwner;
+            var particleEngine = bossCodexScreen.screenParticleEngine;
+
+            Vector2f pos = new Vector2f(this.getX() + this.getWidth() / 2, this.getY() + this.getHeight() / 2);
+
+            float r = 1, g = 1, b = 1;
+            if (this.entityType == null){
+                r = 1;
+                g = 0;
+                b = 0;
+            }
+            if (tick == activationTime) {
+
+                if (activationPitch > 0) {
+                    FDClientHelpers.getSoundManager().play(SimpleSoundInstance.forUI(BossSounds.QLIPHOTHIC_CODEX_STAR.get(), activationPitch));
+                }
+
+                var particle = FlashyTexturedScreenParticle.create(FDRenderUtil.ParticleRenderTypesS.TEXTURES_DEFAULT, SINGLE_STAR)
+                        .setFlashFrequency(1f)
+                        .setFlashOffset(FDMathUtil.FPI / 4)
+                        .setRollFriction(0.8f)
+                        .setQuadScaleOptions(ComplexEasingFunction.builder()
+                                .addArea(1f, FDEasings::easeOut)
+                                .build())
+                        .setColor(r,g,b,1f)
+                        .setMaxQuadSize(100f)
+                        .setPos(pos.x, pos.y,true)
+                        .setLifetime(20)
+                        .setRollSpeed((10 + random.nextFloat() * 10) * (startingAngle > 0 ? -1 : 1))
+                        .setRoll(random.nextFloat() * 45, true);
+
+                var particle2 = FDTexturedSParticle.create(FDRenderUtil.ParticleRenderTypesS.TEXTURES_BLUR_ADDITIVE, BallParticle.LOCATION)
+                        .setQuadScaleOptions(ComplexEasingFunction.builder()
+                                .addArea(1f, FDEasings::quadroHill)
+                                .build())
+                        .setColor(r,g,0f,1f)
+                        .setMaxQuadSize(100f)
+                        .setPos(pos.x,pos.y,true)
+                        .setLifetime(2);
+
+
+                particleEngine.addParticle(particle);
+                particleEngine.addParticle(particle2);
+
+                for (int i = 0; i < 40; i++){
+                    float speed = random.nextFloat() * 16f + 2f;
+                    Vec3 rnd = new Vec3(speed,0,0).zRot(random.nextFloat() * FDMathUtil.FPI * 2);
+
+                    FlashyColoredQuadParticle flashyColoredQuadParticle = new FlashyColoredQuadParticle()
+                            .setPos(pos.x, pos.y, true)
+                            .setColor(r,g,0.25f + random.nextFloat() * 0.25f,1f)
+                            .setQuadSize(0.75f)
+                            .setFlashOffset(random.nextFloat() * FDMathUtil.FPI)
+                            .setFlashFrequency(0.75f)
+                            .setSpeed(rnd.x,rnd.y)
+                            .setFriction(0.8f)
+                            .setLifetime(40);
+
+                    particleEngine.addParticle(flashyColoredQuadParticle);
+                }
+
+            }
+
+
+            if (tick % 2 == 0) {
+                float speed = random.nextFloat() * 0.5f + 0.5f;
+                Vec3 rnd = new Vec3(speed,0,0).zRot(random.nextFloat() * FDMathUtil.FPI * 2);
+
+                FlashyColoredQuadParticle flashyColoredQuadParticle = new FlashyColoredQuadParticle()
+                        .setPos(pos.x, pos.y, true)
+                        .setColor(r,g,0.25f + random.nextFloat() * 0.25f,1f)
+                        .setQuadSize(0.5f)
+                        .setFlashFrequency(0.75f)
+                        .setSpeed(rnd.x,rnd.y)
+                        .setFriction(0.95f)
+                        .setLifetime(40);
+
+                particleEngine.addParticle(flashyColoredQuadParticle);
+
+            }
+        }
+        tick++;
+        if (tick % 2 == 0){
+            currentFrame = (currentFrame + 1) % 11;
+        }
+    }
+
+    public boolean isActivated(){
+        return this.tick > activationTime;
+    }
+
+    public int getTick() {
+        return tick;
+    }
+
+    public int getActivationTime() {
+        return activationTime;
+    }
+
+    public int getCurrentFrame() {
+        return currentFrame;
+    }
+
+    public int getStartingFrame() {
+        return startingFrame;
+    }
+
+    @Override
+    public void renderWidget(GuiGraphics guiGraphics, float v, float v1, float v2) {
+
+        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+
+        if (this.entityType != null){
+            FDRenderUtil.bindTexture(STAR);
+        }else{
+            FDRenderUtil.bindTexture(STAR_NOT_RELEASED);
+        }
+
+        PoseStack matrices = guiGraphics.pose();
+
+        matrices.pushPose();
+
+        matrices.translate(this.getX() + this.getWidth() / 2,this.getY() + this.getHeight() / 2, 0);
+
+
+        if (this.tick > activationTime) {
+            float t = tick + FDRenderUtil.tryGetPartialTickIgnorePause();
+            if (startingAngle > 0) {
+                matrices.mulPose(Axis.ZP.rotationDegrees(t + startingAngle));
+            } else {
+                matrices.mulPose(Axis.ZP.rotationDegrees(-t + startingAngle));
+            }
+            FDRenderUtil.blitWithBlendRgb(guiGraphics.pose(), -32, -32, 64, 64, 0,currentFrame,1,1,1,11,0,1,1,1,1);
+        } else {
+            FDRenderUtil.blitWithBlendRgb(guiGraphics.pose(),
+                    -32, -32,
+                    64, 64,
+                    0, 0,
+                    1, 1, 1, 11,
+                    0, 1, 0.1f, 0.1f, 0.1f);
+        }
+
+
+        matrices.popPose();
+        RenderSystem.defaultBlendFunc();
+
+        if (entityType == null && this.isHovered()){
+            BossRenderUtil.renderBossScreenTooltip(guiGraphics, Component.translatable("fdbosses.word.not_released"), v, v1, 120, BaseBossScreen.DEFAULT_TEXT_COLOR, 1, -1000, -1000, 1000, 1000);
+        }
+
+    }
+
+    @Override
+    public boolean onMouseClick(float v, float v1, int i) {
+        if (this.widgetOwner instanceof BossCodexScreen bossCodexScreen && i == GLFW.GLFW_MOUSE_BUTTON_LEFT){
+            if (entityType != null) {
+                bossCodexScreen.moveTo(-(this.getX() + this.getWidth() / 2), -(this.getY() + this.getHeight() / 2), 20, true, () -> {
+                    FDPacketHandler.INSTANCE.sendToServer(new RequestDossierScreenPacket(entityType));
+                });
+                bossCodexScreen.scaleTo(0.8f,20);
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public boolean onMouseRelease(float v, float v1, int i) {
+        return false;
+    }
+
+    @Override
+    public boolean onMouseScroll(float v, float v1, float v2) {
+        return false;
+    }
+
+    @Override
+    public boolean onCharTyped(char c, int i) {
+        return false;
+    }
+
+    @Override
+    public boolean onKeyPress(int i, int i1, int i2) {
+        return false;
+    }
+
+    @Override
+    public boolean onKeyRelease(int i, int i1, int i2) {
+        return false;
+    }
+
+}

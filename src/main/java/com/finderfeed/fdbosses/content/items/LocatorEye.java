@@ -53,6 +53,7 @@ public class LocatorEye<T extends EyeOfEnder> extends Item {
                 eyeofender.signalTo(blockpos);
                 level.gameEvent(GameEvent.PROJECTILE_SHOOT, eyeofender.position(), GameEvent.Context.of(player));
                 level.addFreshEntity(eyeofender);
+                eyeofender.surviveAfterDeath = true;
 
                 float f = Mth.lerp(level.random.nextFloat(), 0.33F, 0.5F);
                 level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.ENDER_EYE_LAUNCH, SoundSource.NEUTRAL, 1.0F, f);

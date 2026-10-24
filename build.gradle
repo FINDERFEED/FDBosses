@@ -113,6 +113,7 @@ dependencies {
 
 //    implementation fg.deobf("curse.maven:cyanide-541676:5778405")
 
+    print("Including libraries...")
     if (file("build/jarmods").isDirectory()) {
         file("build/jarmods").eachFile { file ->
             def splitPos = file.name.lastIndexOf("-")

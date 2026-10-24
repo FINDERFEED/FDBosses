@@ -107,12 +107,16 @@ public class BossItems {
     public static final Supplier<Item> DIVINE_GEAR = ITEMS.register("divine_gear",
             ()->new DivineGearItem(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
 
+    public static final Supplier<Item> QLIPHOTHIC_CODEX = ITEMS.register("qliphothic_codex",
+            ()->new QliphothicCodex(new Item.Properties().rarity(Rarity.EPIC).stacksTo(1)));
+
     @Mod.EventBusSubscriber(modid = FDBosses.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class AddToCreativeTabs{
 
         @SubscribeEvent
         public static void addToCreativeTabs(BuildCreativeModeTabContentsEvent event){
             if (event.getTab().equals(BossCreativeTabs.MAIN.get())){
+                event.accept(QLIPHOTHIC_CODEX.get());
                 event.accept(GEBURAH_EXPLOSIVE_CRYSTAL.get());
                 event.accept(LIGHTNING_CORE.get());
                 event.accept(FIRE_AND_ICE_CORE.get());

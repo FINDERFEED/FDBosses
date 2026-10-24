@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.base;
 
 import com.finderfeed.fdbosses.BossClientPackets;
+import com.finderfeed.fdbosses.init.BossItems;
 import com.finderfeed.fdbosses.packets.OpenBossDossierPacket;
 import com.finderfeed.fdlib.network.FDPacket;
 import com.finderfeed.fdlib.network.FDPacketHandler;
@@ -17,6 +18,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -24,6 +26,8 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.PacketDistributor;
 
 public abstract class BossSpawnerEntity extends FDEntity {
+
+    public static final String CODEX_RECEIVED = "fdbosses_boss_codex_received";
 
     public static final EntityDataAccessor<Boolean> ACTIVE = SynchedEntityData.defineId(BossSpawnerEntity.class, EntityDataSerializers.BOOLEAN);
 
@@ -38,8 +42,23 @@ public abstract class BossSpawnerEntity extends FDEntity {
             return InteractionResult.PASS;
         }
 
-        if (!level().isClientSide && hand == InteractionHand.MAIN_HAND && this.isActive()){
-            FDPacketHandler.INSTANCE.sendTo(new OpenBossDossierPacket(this), ((ServerPlayer)player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+        if (hand == InteractionHand.MAIN_HAND && this.isActive()){
+            if (!level().isClientSide) {
+                var persistentData = player.getPersistentData();
+
+                if (!persistentData.getBoolean(CODEX_RECEIVED)){
+                    persistentData.putBoolean(CODEX_RECEIVED, true);
+
+                    if (!player.getInventory().add(BossItems.QLIPHOTHIC_CODEX.get().getDefaultInstance())){
+                        ItemEntity itemEntity = new ItemEntity(level(), player.getX(), player.getY() + 1, player.getZ(), BossItems.QLIPHOTHIC_CODEX.get().getDefaultInstance());
+                        level().addFreshEntity(itemEntity);
+                    }
+
+                }
+
+                FDPacketHandler.INSTANCE.sendTo(new OpenBossDossierPacket(this), ((ServerPlayer)player).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
+            }
+            return InteractionResult.SUCCESS;
         }
 
         return super.interact(player, hand);

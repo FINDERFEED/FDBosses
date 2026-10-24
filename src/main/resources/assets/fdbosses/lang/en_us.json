@@ -14,6 +14,7 @@
   "block.fdbosses.polished_justicestone_slab": "Polished Justicestone Slab",
   "block.fdbosses.justicestone_bricks_slab": "Justicestone Bricks Slab",
   "block.fdbosses.geburah_respite_point": "Respite Point",
+  "item.fdbosses.qliphothic_codex": "Qliphothic Codex",
   "item.fdbosses.lightning_core": "Lightning Core",
   "item.fdbosses.justice_core": "Justice Core",
   "item.fdbosses.geburah_explosive_crystal": "Crystal Of Sin",
@@ -273,6 +274,7 @@
   "fdbosses.skills.geburah.sin_stay_still_sin_description": "When this sin is active, standing still is forbidden for humans.",
   "fdbosses.word.set_special_respawn_point": "Special respawn position set",
   "fdbosses.word.item_is_not_released_yet": "This item is not released yet!",
+  "fdbosses.word.not_released": "Boss is in development",
   "fdbosses.word.malkuth_fist_description": "Acts as grappling hook for blocks in right hand, for entities in left hand. Using item in left hand, then moving it to the right hand resets its cooldown.",
   "fdbosses.word.phase_sphere_description": "When used allows to phase through blocks for a limited time.",
   "fdbosses.word.divine_gear_description": "Right click on the block to place down a turret that will attack any mob around it."

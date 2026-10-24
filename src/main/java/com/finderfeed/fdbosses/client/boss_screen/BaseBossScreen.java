@@ -2,6 +2,7 @@ package com.finderfeed.fdbosses.client.boss_screen;
 
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.BossRenderUtil;
+import com.finderfeed.fdbosses.client.boss_codex.BossCodexScreen;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreenOptions;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossInfo;
 import com.finderfeed.fdbosses.client.boss_screen.widget.*;
@@ -42,7 +43,7 @@ import java.util.Random;
 
 public abstract class BaseBossScreen extends SimpleFDScreen {
 
-    public static final int DEFAULT_TEXT_COLOR = 0x55ccff;
+    public static final int DEFAULT_TEXT_COLOR = 0xda9462;
 
     public static boolean wasSkillRead = false;
 
@@ -94,30 +95,32 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         this.initDidntReadSkillWarningWidget();
 
-        FDButton startFightButton = new FDButton(this,6,6,110,24)
-                .setTexture(new FDButtonTextures(
-                        new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
-                        new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
-                ))
-                .setSound(BossSounds.BUTTON_CLICK.get())
-                .setText(Component.translatable("fdbosses.word.start_fight").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
-                        110,1f,true,0,1)
-                .setOnClickAction(((fdWidget1, v2, v11, i1) -> {
+        if (bossSpawnerId != -1){
+            FDButton startFightButton = new FDButton(this, 6, 6, 112, 26)
+                    .setTexture(new FDButtonTextures(
+                            new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
+                            new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),0,0)
+                    ))
+                    .setSound(BossSounds.BUTTON_CLICK.get())
+                    .setText(Component.translatable("fdbosses.word.start_fight").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
+                            110,1f,true,0,1)
+                    .setOnClickAction(((fdWidget1, v2, v11, i1) -> {
 
-                    if (wasSkillRead) {
+                        if (wasSkillRead) {
 
-                        Level level = FDClientHelpers.getClientLevel();
-                        if (level.getEntity(bossSpawnerId) instanceof BossSpawnerEntity bossSpawner) {
-                            FDPacketHandler.INSTANCE.sendToServer(new BossSpawnerStartFight(bossSpawnerId));
+                            Level level = FDClientHelpers.getClientLevel();
+                            if (level.getEntity(bossSpawnerId) instanceof BossSpawnerEntity bossSpawner) {
+                                FDPacketHandler.INSTANCE.sendToServer(new BossSpawnerStartFight(bossSpawnerId));
+                            }
+
+                        }else{
+                            this.didntReadSkillWarningWidget.setActive(true);
                         }
 
-                    }else{
-                        this.didntReadSkillWarningWidget.setActive(true);
-                    }
-
-                    return true;
-                }));
-        this.addRenderableWidget(startFightButton);
+                        return true;
+                    }));
+            this.addRenderableWidget(startFightButton);
+        }
 
         this.initTLDRButton();
 
@@ -132,10 +135,10 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         this.didntReadSkillWarningWidget = didntReadSkillWarningWidget;
 
-        FDButton yes = new FDButton(this,20,didntReadSkillWarningWidget.getHeight() - 25,110,24)
+        FDButton yes = new FDButton(this,20,didntReadSkillWarningWidget.getHeight() - 25,112,26)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
-                        new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
+                        new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),0,0)
                 ))
                 .setSound(BossSounds.BUTTON_CLICK.get())
                 .setText(Component.translatable("fdbosses.word.yes").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
@@ -149,10 +152,10 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                 }));
 
 
-        FDButton no = new FDButton(this,didntReadSkillWarningWidget.getWidth() - 120,didntReadSkillWarningWidget.getHeight() - 25,110,24)
+        FDButton no = new FDButton(this,didntReadSkillWarningWidget.getWidth() - 120,didntReadSkillWarningWidget.getHeight() - 25,112,26)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/medium_button.png")),
-                        new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),1,1)
+                        new WidgetTexture(FDBosses.location("textures/gui/medium_button_selected.png"),0,0)
                 ))
                 .setSound(BossSounds.BUTTON_CLICK.get())
                 .setText(Component.translatable("fdbosses.word.no").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
@@ -178,7 +181,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         float bossInfoWidth = 237;
         float bossInfoHeight = 130;
 
-        float bossInfoYs = 0;
+        float bossInfoYs = -5;
 
         BossDetailsWidget widget = new BossDetailsWidget(this,  anchor.x, bossInfoYs, bossInfoWidth, bossInfoHeight);
         widget.setBossInfo(this.options.getEntityType().getDescription(),this.getBaseStringColor());
@@ -202,19 +205,19 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         SkillInfoWidget widget = new SkillInfoWidget(this,-200,2,200,anchor.y - 4,Component.literal("TTT"),this.getBaseStringColor());
 
 
-        FDButton fdButtonStats = new FDButton(this,108,79,73,24)
+        FDButton fdButtonStats = new FDButton(this,107,79,75,26)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
-                        new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
+                        new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),0,0)
                 ))
                 .setSound(BossSounds.BUTTON_CLICK.get())
                 .setText(Component.translatable("fdbosses.word.stats").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
                         61,1f,true,0,1);
 
-        FDButton fdButtonInfo = new FDButton(this,30,79,73,24)
+        FDButton fdButtonInfo = new FDButton(this,29,79,75,26)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
-                        new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
+                        new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),0,0)
                 ))
                 .setSound(BossSounds.BUTTON_CLICK.get())
                 .setText(Component.translatable("fdbosses.word.info").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
@@ -242,7 +245,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
         Vector2f anchorEnd = this.getAnchor(1f,1f);
 
-        BossAbilitesWidget bossAbilitesWidget = new BossAbilitesWidget(this,anchorEnd.x - 237, anchorEnd.y,this.getBaseStringColor());
+        BossAbilitesWidget bossAbilitesWidget = new BossAbilitesWidget(this,anchorEnd.x - 233, anchorEnd.y,this.getBaseStringColor());
 
         List<BossInfo> skills = options.getSkills();
 
@@ -257,10 +260,10 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
     private void initAbilitiesWidgetModeChangeButtons(BossAbilitesWidget bossAbilitesWidget){
 
-        FDButton fdButtonSkills = new FDButton(this,34,1,73,24)
+        FDButton fdButtonSkills = new FDButton(this,34,1,75,26)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
-                        new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
+                        new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),0,0)
                 ))
                 .setSound(BossSounds.BUTTON_CLICK.get())
                 .setText(Component.translatable("fdbosses.word.abilities").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
@@ -270,10 +273,10 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
                     return true;
                 });
 
-        FDButton fdButtonDrops = new FDButton(this,197-73,1,73,24)
+        FDButton fdButtonDrops = new FDButton(this,197-73,1,75,26)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/small_button.png")),
-                        new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),1,1)
+                        new WidgetTexture(FDBosses.location("textures/gui/small_button_selected.png"),0,0)
                 ))
                 .setSound(BossSounds.BUTTON_CLICK.get())
                 .setText(Component.translatable("fdbosses.word.drops").withStyle(Style.EMPTY.withColor(this.getBaseStringColor())),
@@ -348,10 +351,10 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
         socialsWidget = new QliphothAwakeningSocialsWidget(this, x - 60, y - 35, 120, 70);
 
 
-        FDButton button = new FDButtonWithTexture(this, anchor.x + 4,anchor.y - 36 * 2, 32, 32, FDBosses.location("textures/gui/link.png"))
+        FDButton button = new FDButtonWithTexture(this, anchor.x + 4,anchor.y - 37 * 2, 34, 34, FDBosses.location("textures/gui/link.png"))
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),
-                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),1,1)
+                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),0,0)
                 ))
                 .setSound(BossSounds.BUTTON_CLICK.get())
                 .setOnHoverAction(((fdWidget, guiGraphics, v, v1, v2) -> {
@@ -378,10 +381,10 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
 
         BossInfo bossInfo = new BossInfo(ResourceLocation.tryParse("minecraft:textures/item/book.png"),Component.translatable("fdbosses.word.short_description"),null,this.options.getTLDRComponent());
-        FDButton skill = new FDSkillButton(this,anchor.x + 4,anchor.y - 36,32,32, bossInfo)
+        FDButton skill = new FDSkillButton(this,anchor.x + 4,anchor.y - 37,34,34, bossInfo)
                 .setTexture(new FDButtonTextures(
                         new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),
-                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),1,1)
+                        new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),0,0)
                 ))
                 .setOnHoverAction(((fdWidget, guiGraphics, v, v1, v2) -> {
                     if (!this.skillOpened) {
@@ -441,10 +444,10 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
             float x = offsx + (i % 5) * 39;
             float y = offsy + (i / 5) * 35;
 
-            FDButton skill = new FDSkillButton(this,x,y,32,32, bossSkill)
+            FDButton skill = new FDSkillButton(this,x,y,34,34, bossSkill)
                     .setTexture(new FDButtonTextures(
                             new WidgetTexture(FDBosses.location("textures/gui/ability_button_unselected.png"),0,0),
-                            new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),1,1)
+                            new WidgetTexture(FDBosses.location("textures/gui/ability_button_selected.png"),0,0)
                     ))
                     .setOnHoverAction(((fdWidget, guiGraphics, v, v1, v2) -> {
                         if (!this.skillOpened) {
@@ -504,7 +507,7 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
             this.skillInfoWidget.setSkillImage(info.getInfoIcon());
 
-            this.skillInfoWidget.moveWidgetTo(OPEN_TIME,0,2, FDEasings::easeOutBounce);
+            this.skillInfoWidget.moveWidgetTo(OPEN_TIME,-5,2, FDEasings::easeOutBounce);
             skillOpened = true;
         }else if (skillOpened && !state){
             this.skillInfoWidget.moveWidgetTo(OPEN_TIME / 2,-this.skillInfoWidget.getWidth(),2, FDEasings::easeIn);
@@ -619,6 +622,14 @@ public abstract class BaseBossScreen extends SimpleFDScreen {
 
 
 
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        if (this.bossSpawnerId == -1){
+            Minecraft.getInstance().setScreen(new BossCodexScreen(false));
+        }
     }
 
     @Override

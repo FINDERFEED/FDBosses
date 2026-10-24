@@ -200,5 +200,8 @@
         "stream": true
       }
     ]
+  },
+  "star_light_up": {
+    "sounds": [ "fdbosses:star_light_up" ]
   }
 }
