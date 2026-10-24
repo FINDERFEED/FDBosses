@@ -1203,7 +1203,10 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
                     for (LivingEntity livingEntity : affectedEntities){
                         livingEntity.invulnerableTime = 0;
-                        livingEntity.hurt(source, livingEntity.getMaxHealth() * damagePercent);
+
+                        var totalHealth = livingEntity.getMaxHealth() + livingEntity.getAbsorptionAmount();
+
+                        livingEntity.hurt(source, totalHealth * damagePercent);
                     }
 
                 }

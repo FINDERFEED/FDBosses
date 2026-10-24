@@ -329,7 +329,7 @@ public class BossCodexScreen extends SimpleFDScreen {
 
         Window window = Minecraft.getInstance().getWindow();
         FDRenderUtil.fill(graphics.pose(), 0,0,window.getWidth(),window.getHeight(),0,0,0,0.5f);
-        //this.renderBackground(graphics);
+        this.renderBackground(graphics);
 
 
         this.renderTree(graphics, mx, my, pticks);
@@ -424,7 +424,7 @@ public class BossCodexScreen extends SimpleFDScreen {
 
         RenderSystem.setShaderTexture(0, RENDER_TARGET.getColorTextureId());
         RenderSystem.enableBlend();
-
+        RenderSystem.defaultBlendFunc();
 
         var vertex = Tesselator.getInstance().getBuilder();
         vertex.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);

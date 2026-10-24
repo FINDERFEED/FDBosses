@@ -1,4 +1,9 @@
 {
+    "blend": {
+        "func": "add",
+        "srcrgb": "srcalpha",
+        "dstrgb": "1-srcalpha"
+    },
     "vertex": "position_tex_color",
     "fragment": "fdbosses:boss_codex_ui",
     "samplers": [

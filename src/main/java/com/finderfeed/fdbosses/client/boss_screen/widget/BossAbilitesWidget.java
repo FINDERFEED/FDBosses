@@ -53,7 +53,7 @@ public class BossAbilitesWidget extends FDWidget {
             float time = tickCount + pticks;
             float offsetY = (float) Math.sin(time / 2f);
 
-            this.renderArrow(matrices, 15,95 + offsetY);
+            this.renderArrow(matrices, 14,95 + offsetY);
 
         }
 
@@ -64,6 +64,8 @@ public class BossAbilitesWidget extends FDWidget {
         FDRenderUtil.fill(matrices, this.getX() + offsetX + 1, this.getY() + offsetY + 1, 1,1,1f,1f,1f,1f);
         FDRenderUtil.fill(matrices, this.getX() + offsetX + 2, this.getY() + offsetY, 1,1,1f,1f,1f,1f);
 
+        FDRenderUtil.fill(matrices, this.getX() + offsetX + 3, this.getY() + offsetY - 1, 1,1,1f,1f,1f,1f);
+        FDRenderUtil.fill(matrices, this.getX() + offsetX - 1, this.getY() + offsetY - 1, 1,1,1f,1f,1f,1f);
     }
 
     @Override
