@@ -101,7 +101,6 @@ public class BossEvents {
                 }
             }
 
-
             Component message = null;
             for (BossSpawnerEntity bossSpawnerEntity : spawners){
                 if (!bossSpawnerEntity.canInteractWithBlockPos(pos)){

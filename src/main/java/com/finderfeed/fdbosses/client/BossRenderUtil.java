@@ -18,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
+import org.joml.Vector3f;
 
 import java.util.List;
 
@@ -66,6 +67,13 @@ public class BossRenderUtil {
 
         matrices.popPose();
 
+    }
+
+    public static Vector3f planeNormal(Vector3f a, Vector3f b, Vector3f c) {
+        Vector3f ab = new Vector3f(b).sub(a);
+        Vector3f ac = new Vector3f(c).sub(a);
+
+        return ab.cross(ac).normalize();
     }
 
     public static Vector2f renderBossScreenTooltip(GuiGraphics graphics, Component component,float x,float y, float desiredTextWidth,int textColor, float textScale) {

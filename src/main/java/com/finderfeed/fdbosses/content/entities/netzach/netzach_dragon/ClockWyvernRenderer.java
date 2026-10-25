@@ -1,11 +1,13 @@
 package com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.BossRenderUtil;
 import com.finderfeed.fdbosses.client.util.BossRenderTypes;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDFreeEntityRenderer;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.joml.Matrix4f;
@@ -70,31 +72,49 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
                 wing1_start, wlev9, wlev8
         );
 
-//
-//        renderTriangle(matrices, vertex, model, animatedModel, "wing1_start","wing1_mid", "wlev9", i, -1, boneTransforms);
-//        renderTriangle(matrices, vertex, model, animatedModel, "wing1_start","wlev9", "wlev8", i, -1, boneTransforms);
-//
-//
-//
-//
-//
-//
-//
-//        renderTriangle(matrices, vertex, model, animatedModel, "wing1_end2","wright2", "wright1", i, -1, boneTransforms);
-//        renderTriangle(matrices, vertex, model, animatedModel, "wright3","wright2", "wright1", i, -1, boneTransforms);
-//
-//        renderTriangle(matrices, vertex, model, animatedModel, "wing1_end2","wright2", "wright4", i, -1, boneTransforms);
-//        renderTriangle(matrices, vertex, model, animatedModel, "wright3","wright2", "wright4", i, -1, boneTransforms);
-//        renderTriangle(matrices, vertex, model, animatedModel, "wright3","wright4", "wright5", i, -1, boneTransforms);
-//
-//        renderTriangle(matrices, vertex, model, animatedModel, "wing1_end2","wright4", "wright6", i, -1, boneTransforms);
-//        renderTriangle(matrices, vertex, model, animatedModel, "wright5","wright4", "wright6", i, -1, boneTransforms);
-//        renderTriangle(matrices, vertex, model, animatedModel, "wright7", "wright5","wright6", i, -1, boneTransforms);
-//
-//        renderTriangle(matrices, vertex, model, animatedModel, "wing1_mid2","wing1_end2", "wright6", i, -1, boneTransforms);
-//        renderTriangle(matrices, vertex, model, animatedModel, "wright6","wing1_mid2", "wright9", i, -1, boneTransforms);
-//        renderTriangle(matrices, vertex, model, animatedModel, "wright6","wright7", "wright9", i, -1, boneTransforms);
-//
+
+
+        WingBone wing1_end2 = WingBone.make("wing1_end2", true);
+        WingBone wright1 = WingBone.make("wright1", true);
+        WingBone wright2 = WingBone.make("wright2", false);
+        WingBone wright3 = WingBone.make("wright3", false);
+
+        renderWingPart(matrices, vertex, animatedModel, model,
+                wing1_end2, wright2, wright1,
+                wright3, wright2, wright1
+        );
+
+        WingBone wright4 = WingBone.make("wright4", false);
+        WingBone wright5 = WingBone.make("wright5", false);
+        renderWingPart(matrices, vertex, animatedModel, model,
+                wright3, wright2, wright4,
+                wing1_end2, wright2, wright4,
+                wright3, wright4, wright5
+        );
+
+        WingBone wright6 = WingBone.make("wright6", false);
+        WingBone wright7 = WingBone.make("wright7", false);
+        renderWingPart(matrices, vertex, animatedModel, model,
+                wright6, wright5, wright4,
+                wing1_end2, wright4, wright6,
+                wright7, wright5, wright6
+        );
+
+        WingBone wing1_mid2 = WingBone.make("wing1_mid2", false);
+        WingBone wright9 = WingBone.make("wright9", false);
+        renderWingPart(matrices, vertex, animatedModel, model,
+                wright7, wright6, wright9,
+                wright9, wright6, wing1_mid2,
+                wing1_mid2, wing1_end2, wright6
+        );
+        wright9.fixed = false;
+
+        WingBone wing1_start2 = WingBone.make("wing1_start2", true);
+        WingBone wright8 = WingBone.make("wright8", false);
+        renderWingPart(matrices, vertex, animatedModel, model,
+                wing1_start2, wing1_mid2, wright9,
+                wing1_start2, wright9, wright8
+        );
 //        renderTriangle(matrices, vertex, model, animatedModel, "wing1_start2","wing1_mid2", "wright9", i, -1, boneTransforms);
 //        renderTriangle(matrices, vertex, model, animatedModel, "wing1_start2","wright9", "wright8", i, -1, boneTransforms);
 
@@ -174,13 +194,15 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
             Vector2f uv2 = uv.get(b2);
             Vector2f uv3 = uv.get(b3);
 
-            vertex.addVertex(mat, globalPos1.x, globalPos1.y, globalPos1.z).setColor(1f,1f,1f,1f).setUv(uv1.x, uv1.y).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 0,1,0);
-            vertex.addVertex(mat, globalPos2.x, globalPos2.y, globalPos2.z).setColor(1f,1f,1f,1f).setUv(uv2.x, uv2.y).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 0,1,0);
-            vertex.addVertex(mat, globalPos3.x, globalPos3.y, globalPos3.z).setColor(1f,1f,1f,1f).setUv(uv3.x, uv3.y).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 0,1,0);
+            Vector3f nrm = BossRenderUtil.planeNormal(globalPos1, globalPos2, globalPos3);
 
-            vertex.addVertex(mat, globalPos3.x, globalPos3.y, globalPos3.z).setColor(1f,1f,1f,1f).setUv(uv3.x, uv3.y).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 0,1,0);
-            vertex.addVertex(mat, globalPos2.x, globalPos2.y, globalPos2.z).setColor(1f,1f,1f,1f).setUv(uv2.x, uv2.y).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 0,1,0);
-            vertex.addVertex(mat, globalPos1.x, globalPos1.y, globalPos1.z).setColor(1f,1f,1f,1f).setUv(uv1.x, uv1.y).setLight(i).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), 0,1,0);
+            vertex.addVertex(mat, globalPos1.x, globalPos1.y, globalPos1.z).setColor(1f,1f,1f,1f).setUv(uv1.x, uv1.y).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(nrm.x, nrm.y, nrm.z);
+            vertex.addVertex(mat, globalPos2.x, globalPos2.y, globalPos2.z).setColor(1f,1f,1f,1f).setUv(uv2.x, uv2.y).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(nrm.x, nrm.y, nrm.z);
+            vertex.addVertex(mat, globalPos3.x, globalPos3.y, globalPos3.z).setColor(1f,1f,1f,1f).setUv(uv3.x, uv3.y).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(nrm.x, nrm.y, nrm.z);
+
+            vertex.addVertex(mat, globalPos3.x, globalPos3.y, globalPos3.z).setColor(1f,1f,1f,1f).setUv(uv3.x, uv3.y).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(-nrm.x, -nrm.y, -nrm.z);
+            vertex.addVertex(mat, globalPos2.x, globalPos2.y, globalPos2.z).setColor(1f,1f,1f,1f).setUv(uv2.x, uv2.y).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(-nrm.x, -nrm.y, -nrm.z);
+            vertex.addVertex(mat, globalPos1.x, globalPos1.y, globalPos1.z).setColor(1f,1f,1f,1f).setUv(uv1.x, uv1.y).setLight(LightTexture.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(-nrm.x, -nrm.y, -nrm.z);
         }
     }
 

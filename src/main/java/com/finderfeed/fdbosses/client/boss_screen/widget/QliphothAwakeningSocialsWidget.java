@@ -26,7 +26,9 @@ public class QliphothAwakeningSocialsWidget extends FDWidget {
 
     public static final List<String> PATRONS = List.of(
             "Veem Valentine",
-            "翼 入江"
+            "翼 入江",
+            "noam",
+            "Krishna Lord"
     );
 
     public QliphothAwakeningSocialsWidget(Screen screen, float x, float y, float width, float height) {
