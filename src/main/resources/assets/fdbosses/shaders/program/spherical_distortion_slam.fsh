@@ -132,6 +132,7 @@ void main(){
 
 
     float randomRadiusPickMod = 12 / noiseTextureSize;
+    float sphereDensity = 0.0;
     for (int i = 0; i < totalSteps; i++) {
 
         vec3 pos = rayDir * (currentDistance);
@@ -154,27 +155,41 @@ void main(){
         vec3 smokePos = (rp + direction * radiusOffset) * 0.5;
         float densitySmoke = noiseSlice(smokePos.x, smokePos.y, smokePos.z, 0.6, 1.0);
 
-        overallSmokeDensity += densitySmoke * modifier * modifier;
+        float distMod = max(0.0, min(1.0, rpLength - sphereRadius * (1 - effectStrength * effectStrength)));
+        overallSmokeDensity += densitySmoke * modifier * modifier * distMod;
 
         currentDistance += insideStep;
+
+
+        float outerRadius = sphereRadius * 0.5;
+        float innerRadius = max(0.0, outerRadius - 1);
+        float shellWidth = max(outerRadius - innerRadius, 0.0001);
+        float t = clamp((rpLength - innerRadius) / shellWidth, 0.0, 1.0);
+        float sphereDensityMod = 1.0 - abs(t * 2.0 - 1.0);
+        sphereDensityMod = smoothstep(0.0, 1.0, sphereDensityMod);
+        sphereDensityMod *= clamp(-dist, 0.0, 1.0);
+        sphereDensity += 0.25 * sphereDensityMod * insideStep;
 
     }
 
     float finalDensity = 1.0 - exp(-0.5 * overallDistortionDensity);
     float finalDensitySmoke = 1.0 - exp(-overallSmokeDensity);
+    float finalSphereDensity = 1.0 - exp(-sphereDensity);
 
-    float uvShiftStrength = exp(-0.05 * length(sphereRelativePosition)) * 0.1;
+    float uvShiftStrength = exp(-0.05 * length(sphereRelativePosition)) * 0.05;
     vec2 uvShift = vec2(cos(finalDensity * PI * 2) * finalDensity, sin(finalDensity  * PI * 2) * finalDensity) * uvShiftStrength * effectStrength;
     vec4 shiftedBG = texture(DiffuseSampler, texCoord + uvShift);
 
     vec4 smoke = vec4(0.8, 0.6, 0.3, finalDensitySmoke);
-    vec4 smoke2 = vec4(0.7, 0.4, 0.2, finalDensitySmoke);
-    vec4 smoke3 = vec4(0.6, 0.6, 0.1, finalDensitySmoke);
+    vec4 smoke2 = vec4(0.7, 0.4, 0.3, finalDensitySmoke);
+    vec4 smoke3 = vec4(0.6, 0.6, 0.3, finalDensitySmoke);
     smoke = srcOneSrcAlpha(smoke, smoke2);
     smoke = srcOneSrcAlpha(smoke, smoke3);
+    vec4 sphere = vec4(0.7, 0.6, 0.3, finalSphereDensity);
 
-    vec4 finalColor = srcAlphaOneMinusSrcAlpha(smoke, shiftedBG);
+    smoke += sphere;
 
+    vec4 finalColor = srcAlphaOneMinusSrcAlpha(smoke * effectStrength * effectStrength, shiftedBG);
+    fragColor = vec4(finalColor.rgb, 1.0);
 
-    fragColor = finalColor;
 }
