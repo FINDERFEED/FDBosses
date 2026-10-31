@@ -5,6 +5,7 @@ uniform sampler2D DiffuseSampler;
 uniform mat4 inverseProjection;
 uniform mat4 inverseModelview;
 uniform vec3 sphereRelativePosition;
+uniform float maxSphereRadius;
 uniform float sphereRadius;
 uniform float effectStrength;
 
@@ -18,18 +19,6 @@ in vec2 texCoord;
 out vec4 fragColor;
 
 #define PI 3.14
-
-
-float makeSmooth(float p) {
-    return smoothstep(0,1,p);
-}
-
-mat2 rotationMatrix(float angle) {
-    return mat2(
-            cos(angle), -sin(angle),
-            sin(angle), cos(angle)
-    );
-}
 
 
 float distanceToSphere(vec3 currentPos, vec3 spherePos, float sphereRadius) {
@@ -137,10 +126,12 @@ void main(){
     }
 
     float insideStep = 0.35;
-    float overallDensity = 0;
-    float overallSteps = 0;
+    float overallDistortionDensity = 0;
+    float overallSmokeDensity = 0;
     int totalSteps = int(ceil(2.0 * sphereRadius / insideStep)) + 2;
 
+
+    float randomRadiusPickMod = 12 / noiseTextureSize;
     for (int i = 0; i < totalSteps; i++) {
 
         vec3 pos = rayDir * (currentDistance);
@@ -151,27 +142,39 @@ void main(){
         }
 
         vec3 rp = pos - spherePos;
-        float density = noiseSlice(rp.x, rp.y, rp.z, 0.4, 1.0);
+        float rpLength = length(rp);
 
-        float modifier = (1 - length(rp) / sphereRadius) * min(-dist / 2.0, 1.0);
+        float distortionDensity = noiseSlice(rp.x, rp.y, rp.z, 0.4, 1.0);
+        float modifier = (1 - rpLength / sphereRadius) * min(-dist / 2.0, 1.0);
+        overallDistortionDensity += distortionDensity * modifier;
 
-        overallDensity += density * modifier;
+
+        vec3 direction = normalize(rp);
+        float radiusOffset = maxSphereRadius * 2 - sphereRadius;
+        vec3 smokePos = (rp + direction * radiusOffset) * 0.5;
+        float densitySmoke = noiseSlice(smokePos.x, smokePos.y, smokePos.z, 0.6, 1.0);
+
+        overallSmokeDensity += densitySmoke * modifier * modifier;
+
         currentDistance += insideStep;
-        overallSteps++;
+
     }
 
-    float finalDensity = 1.0 - exp(-0.5 * overallDensity);
+    float finalDensity = 1.0 - exp(-0.5 * overallDistortionDensity);
+    float finalDensitySmoke = 1.0 - exp(-overallSmokeDensity);
 
-//    vec4 smokeColor = vec4(0.2, 0.2, 0.2, finalDensity);
-
-    float uvShiftStrength = exp(-0.05 * length(sphereRelativePosition)) * 0.05;
-    vec2 uvShift = vec2(cos(finalDensity * PI * 2) * finalDensity, sin(finalDensity  * PI * 2) * finalDensity) * uvShiftStrength;
-
+    float uvShiftStrength = exp(-0.05 * length(sphereRelativePosition)) * 0.1;
+    vec2 uvShift = vec2(cos(finalDensity * PI * 2) * finalDensity, sin(finalDensity  * PI * 2) * finalDensity) * uvShiftStrength * effectStrength;
     vec4 shiftedBG = texture(DiffuseSampler, texCoord + uvShift);
 
-//    vec4 finalColor = srcAlphaOneMinusSrcAlpha(smokeColor, background);
+    vec4 smoke = vec4(0.8, 0.6, 0.3, finalDensitySmoke);
+    vec4 smoke2 = vec4(0.7, 0.4, 0.2, finalDensitySmoke);
+    vec4 smoke3 = vec4(0.6, 0.6, 0.1, finalDensitySmoke);
+    smoke = srcOneSrcAlpha(smoke, smoke2);
+    smoke = srcOneSrcAlpha(smoke, smoke3);
 
-    vec4 finalColor = shiftedBG;
+    vec4 finalColor = srcAlphaOneMinusSrcAlpha(smoke, shiftedBG);
+
 
     fragColor = finalColor;
 }

@@ -12,7 +12,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
 public class GeneratedPerlinNoise3D {
-    private static final int SIZE = 512;
+    private static final int SIZE = 256;
     private static final int SEED = 1761130;
 
     private static int textureId = 0;

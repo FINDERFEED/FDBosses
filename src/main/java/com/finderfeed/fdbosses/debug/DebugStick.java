@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.debug;
 
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
+import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffect;
 import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffectHandler;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -64,7 +65,7 @@ public class DebugStick extends Item {
         }else{
 
             Vec3 pos = player.getEyePosition().add(player.getLookAngle().scale(20));
-            DistortedSlamEffectHandler.setDistortionSlamEffect(new DistortionSphereEffect(pos, 200, 20, 1, (float) pos.y));
+            DistortedSlamEffectHandler.setDistortionSlamEffect(new DistortedSlamEffect(pos, 15, 20, (float) pos.y));
 
 //            Minecraft.getInstance().setScreen(new BossCodexScreen());
 //            NetzachEffectOverlay.flash(attackTime,10);

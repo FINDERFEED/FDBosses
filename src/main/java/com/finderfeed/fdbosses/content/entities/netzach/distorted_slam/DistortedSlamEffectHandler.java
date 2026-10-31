@@ -26,13 +26,13 @@ public class DistortedSlamEffectHandler {
 
     private static PostChain distortedSlamEffect;
 
-    private static DistortionSphereEffect currentEffect;
+    private static DistortedSlamEffect currentEffect;
 
-    public static void setDistortionSlamEffect(DistortionSphereEffect effect){
+    public static void setDistortionSlamEffect(DistortedSlamEffect effect){
         currentEffect = effect;
     }
 
-    public static DistortionSphereEffect getCurrentEffect() {
+    public static DistortedSlamEffect getCurrentEffect() {
         return currentEffect;
     }
 
@@ -90,7 +90,6 @@ public class DistortedSlamEffectHandler {
         float pticks = event.getPartialTick().getGameTimeDeltaPartialTick(false);
 
         float radius = currentEffect.getSphereRadius(pticks);
-        float innerRadius = currentEffect.getInnerSphereRadius(pticks);
         float strength = currentEffect.getEffectStrength(pticks);
 
         float y = currentEffect.yFloorPos;
@@ -104,9 +103,10 @@ public class DistortedSlamEffectHandler {
             effect.safeGetUniform("inverseProjection").set(invertedProjection);
             effect.safeGetUniform("inverseModelview").set(invertedModelview);
             effect.safeGetUniform("sphereRelativePosition").set(relativeSpherePos);
+            effect.safeGetUniform("maxSphereRadius").set(currentEffect.sphereRadius);
             effect.safeGetUniform("sphereRadius").set(radius);
             effect.safeGetUniform("floorOffset").set(floorOffset);
-            effect.safeGetUniform("effectStrength").set(strength * 2);
+            effect.safeGetUniform("effectStrength").set(strength);
             effect.safeGetUniform("generatedNoise").set(1);
             effect.safeGetUniform("noiseTextureSize").set(32f);
         }
