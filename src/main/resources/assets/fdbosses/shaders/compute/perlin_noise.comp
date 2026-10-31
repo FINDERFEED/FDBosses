@@ -1,0 +1,169 @@
+#version 430 core
+#define PI 3.14
+
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
+
+layout(r8, binding = 0) uniform writeonly image3D outNoise;
+
+uniform int size;
+uniform uint seed;
+uniform float sections;
+uniform float octaves;
+
+float hash1(float p){
+    p *= 434.0;
+    p = fract(p * .1031);
+    p *= p + 33.33;
+    p *= p + p;
+    return fract(p);
+}
+
+const uint k = 1103515245U;
+
+vec3 hashwithoutsine33( uvec3 x )
+{
+    x = ((x>>8U)^x.yzx)*k;
+    x = ((x>>8U)^x.yzx)*k;
+    x = ((x>>8U)^x.yzx)*k;
+
+    return vec3(x)*(1.0/float(0xffffffffU));
+}
+
+//https://www.shadertoy.com/view/XlGcRh
+float hashwithoutsine13(vec3 p3)
+{
+    p3  = fract(p3 * .1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+const vec3 GRADIENTS[32] = vec3[](
+
+        vec3( 1, 1, 0), vec3(-1, 1, 0),
+        vec3( 1,-1, 0), vec3(-1,-1, 0),
+
+        vec3( 1, 0, 1), vec3(-1, 0, 1),
+        vec3( 1, 0,-1), vec3(-1, 0,-1),
+
+        vec3( 0, 1, 1), vec3( 0,-1, 1),
+        vec3( 0, 1,-1), vec3( 0,-1,-1),
+
+        vec3( 0.5773503,  0.5773503,  0.5773503),
+        vec3(-0.5773503,  0.5773503,  0.5773503),
+        vec3( 0.5773503, -0.5773503,  0.5773503),
+        vec3(-0.5773503, -0.5773503,  0.5773503),
+
+        vec3( 0.5773503,  0.5773503, -0.5773503),
+        vec3(-0.5773503,  0.5773503, -0.5773503),
+        vec3( 0.5773503, -0.5773503, -0.5773503),
+        vec3(-0.5773503, -0.5773503, -0.5773503),
+
+        vec3( 0.7071068,  0.7071068, 0.0),
+        vec3(-0.7071068,  0.7071068, 0.0),
+        vec3( 0.7071068, -0.7071068, 0.0),
+        vec3(-0.7071068, -0.7071068, 0.0),
+
+        vec3( 0.7071068, 0.0,  0.7071068),
+        vec3(-0.7071068, 0.0,  0.7071068),
+        vec3( 0.7071068, 0.0, -0.7071068),
+        vec3(-0.7071068, 0.0, -0.7071068),
+
+        vec3(0.0,  0.7071068,  0.7071068),
+        vec3(0.0, -0.7071068,  0.7071068),
+        vec3(0.0,  0.7071068, -0.7071068),
+        vec3(0.0, -0.7071068, -0.7071068)
+
+);
+
+vec3 generateGradientVector(float x,float y,float z){
+    return GRADIENTS[uint(hashwithoutsine13(vec3(x, y, z)) * 32) & 31u];
+}
+
+float dotPr(float dx, float dy, float dz, float lx, float ly, float lz, float xo, float yo, float zo) {
+
+    vec3 gradient = generateGradientVector(
+            dx + xo,
+            dy + yo,
+            dz + zo
+    );
+
+    vec3 toLocal = vec3(
+            lx - xo,
+            ly - yo,
+            lz - zo
+    );
+
+    return dot(toLocal,gradient);
+}
+
+float fade(float t) {
+    return t * t * t * (t * (t * 6.0 - 15.0) + 10.0);
+}
+
+
+float perlinNoise3d(float x, float y, float z, float sections) {
+
+    vec3 pos = fract(vec3(x, y, z)) * sections;
+
+    vec3 cell = floor(pos);
+    vec3 local = fract(pos);
+
+    vec3 wrappedCell = cell - sections * step(vec3(sections), cell + 1.0);
+
+    float val1 = dotPr(cell.x, cell.y, cell.z, local.x, local.y, local.z, 0., 0., 0.);
+    float val2 = dotPr(wrappedCell.x, cell.y, cell.z, local.x, local.y, local.z, 1., 0., 0.);
+
+    float val3 = dotPr(cell.x, wrappedCell.y, cell.z, local.x, local.y, local.z, 0., 1., 0.);
+    float val4 = dotPr(wrappedCell.x, wrappedCell.y, cell.z, local.x, local.y, local.z, 1., 1., 0.);
+
+    float val5 = dotPr(cell.x, cell.y, wrappedCell.z, local.x, local.y, local.z, 0., 0., 1.);
+    float val6 = dotPr(wrappedCell.x, cell.y, wrappedCell.z, local.x, local.y, local.z, 1., 0., 1.);
+
+    float val7 = dotPr(cell.x, wrappedCell.y, wrappedCell.z, local.x, local.y, local.z, 0., 1., 1.);
+    float val8 = dotPr(wrappedCell.x, wrappedCell.y, wrappedCell.z, local.x, local.y, local.z, 1., 1., 1.);
+
+    vec3 t = vec3(fade(local.x), fade(local.y), fade(local.z));
+
+    float val9 = mix(val1, val2, t.x);
+    float val10 = mix(val3, val4, t.x);
+    float val11 = mix(val5, val6, t.x);
+    float val12 = mix(val7, val8, t.x);
+
+    float val13 = mix(val9, val10, t.y);
+    float val14 = mix(val11, val12, t.y);
+
+    return mix(val13, val14, t.z);
+}
+
+
+float perlinNoise(float x,float y,float z,float sections,float octaves){
+
+    float val = 0;
+
+    float mod = 1;
+
+
+    for (float i = 0; i < octaves;i++){
+        float v = perlinNoise3d(x,y,z,sections);
+        sections *= 2.0;
+        val += v * mod;
+        mod /= 2.0;
+    }
+
+    return val;
+}
+
+void main() {
+    ivec3 id = ivec3(gl_GlobalInvocationID.xyz);
+
+    if (any(greaterThanEqual(id, ivec3(size)))) {
+        return;
+    }
+
+    vec3 uv = (vec3(id) + 0.5) / float(size);
+
+    float noise = perlinNoise(uv.x + 0.01, uv.y + 0.01, uv.z + 0.01, sections, octaves);
+    noise = (noise + 1.0) / 2.0;
+
+    imageStore(outNoise, id, vec4(noise, 0.0, 0.0, 1.0));
+}
