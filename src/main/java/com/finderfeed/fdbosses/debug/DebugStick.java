@@ -65,7 +65,7 @@ public class DebugStick extends Item {
         }else{
 
             Vec3 pos = player.getEyePosition().add(player.getLookAngle().scale(15));
-            DistortedSlamEffectHandler.setDistortionSlamEffect(new DistortedSlamEffect(pos, 15, 15, (float) pos.y));
+            DistortedSlamEffectHandler.setDistortionSlamEffect(new DistortedSlamEffect(pos, 18, 15, (float) pos.y));
 
 //            Minecraft.getInstance().setScreen(new BossCodexScreen());
 //            NetzachEffectOverlay.flash(attackTime,10);

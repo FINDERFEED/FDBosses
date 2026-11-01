@@ -85,7 +85,12 @@ public class BossUtil {
     public static final int NETZACH_PUSH_AWAY = 24;
     public static final int NETZACH_CRUSH = 25;
     public static final int NETZACH_DISAPPEAR = 26;
+    public static final int CLOCK_WYVERN_SLAM = 27;
 
+
+    public static void clockWyvernSlam(Level serverLevel, Vec3 pos){
+        posEvent((ServerLevel) serverLevel, pos, CLOCK_WYVERN_SLAM, 0, 60);
+    }
 
     public static void netzachDisappearEffect(Level serverLevel, Vec3 pos){
         posEvent((ServerLevel) serverLevel, pos, NETZACH_DISAPPEAR, 0, 60);

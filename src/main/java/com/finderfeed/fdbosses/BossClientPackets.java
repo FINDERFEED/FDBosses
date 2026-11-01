@@ -27,6 +27,8 @@ import com.finderfeed.fdbosses.content.entities.geburah.sins.attachment.PlayerSi
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthWeaknessHandler;
+import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffect;
+import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffectHandler;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_minigame.TimeStabilizerScreen;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
@@ -62,6 +64,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -74,8 +77,7 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.*;
 
 import java.lang.Math;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.Random;
 
 public class BossClientPackets {
@@ -449,7 +451,98 @@ public class BossClientPackets {
             case BossUtil.NETZACH_DISAPPEAR -> {
                 netzachDisappear(pos, data);
             }
+            case BossUtil.CLOCK_WYVERN_SLAM -> {
+                clockWyvernSlam(pos, data);
+            }
         }
+    }
+
+    public static void clockWyvernSlam(Vec3 pos, int data) {
+        DistortedSlamEffectHandler.setDistortionSlamEffect(new DistortedSlamEffect(
+                pos, 20, 18, (float) pos.y
+        ));
+
+        float radius = 6.0f;
+        int minParticles = 0;
+        int maxParticles = 10;
+
+        double minHorizontalSpeed = 0.15;
+        double maxHorizontalSpeed = 0.35;
+
+        double minVerticalSpeed = 0.4;
+        double maxVerticalSpeed = 0.7;
+
+        Level level = Minecraft.getInstance().level;
+        if (level == null) return;
+
+        List<BlockPos> validPositions = new ArrayList<>();
+
+        int blockRadius = Mth.ceil(radius);
+        int centerX = Mth.floor(pos.x);
+        int centerY = Mth.floor(pos.y);
+        int centerZ = Mth.floor(pos.z);
+
+        for (int dx = -blockRadius; dx <= blockRadius; dx++) {
+            for (int dz = -blockRadius; dz <= blockRadius; dz++) {
+                int x = centerX + dx;
+                int z = centerZ + dz;
+
+                double offsetX = x + 0.5 - pos.x;
+                double offsetZ = z + 0.5 - pos.z;
+
+                if (offsetX * offsetX + offsetZ * offsetZ > radius * radius) {
+                    continue;
+                }
+
+                for (int y = centerY + 3; y >= centerY - 5; y--) {
+                    BlockPos blockPos = new BlockPos(x, y, z);
+                    BlockState state = level.getBlockState(blockPos);
+
+                    if (state.isAir()) continue;
+                    if (state.getCollisionShape(level, blockPos).isEmpty()) continue;
+                    if (!level.getBlockState(blockPos.above()).isAir()) continue;
+
+                    validPositions.add(blockPos);
+                    break;
+                }
+            }
+        }
+
+        if (validPositions.isEmpty()) return;
+
+        for (BlockPos blockPos : validPositions) {
+            int particleCount = minParticles + random.nextInt(maxParticles - minParticles + 1);
+            for (int i = 0; i < particleCount; i++) {
+                BlockState state = level.getBlockState(blockPos);
+
+                double x = blockPos.getX() + random.nextDouble();
+                double y = blockPos.getY() + 0.05;
+                double z = blockPos.getZ() + random.nextDouble();
+
+                double angle = Math.atan2(z - pos.z, x - pos.x) + (random.nextDouble() - 0.5) * 0.7;
+                double horizontalSpeed = minHorizontalSpeed + random.nextDouble() * (maxHorizontalSpeed - minHorizontalSpeed);
+                double verticalSpeed = minVerticalSpeed + random.nextDouble() * (maxVerticalSpeed - minVerticalSpeed);
+
+                Vec3 speed = new Vec3(
+                        Math.cos(angle) * horizontalSpeed,
+                        verticalSpeed,
+                        Math.sin(angle) * horizontalSpeed
+                );
+
+                FDBlockParticleOptions options = FDBlockParticleOptions.builder()
+                        .lifetime(18 + random.nextInt(12))
+                        .state(state)
+                        .quadSizeMultiplier(0.8f + random.nextFloat() * 0.4f)
+                        .build();
+
+                level.addParticle(
+                        options,
+                        x, y, z,
+                        speed.x, speed.y, speed.z
+                );
+            }
+        }
+
     }
 
     public static void netzachDisappear(Vec3 pos, int data){

@@ -178,7 +178,15 @@ void main(){
 
     float uvShiftStrength = exp(-0.05 * length(sphereRelativePosition)) * 0.05;
     vec2 uvShift = vec2(cos(finalDensity * PI * 2) * finalDensity, sin(finalDensity  * PI * 2) * finalDensity) * uvShiftStrength * effectStrength;
-    vec4 shiftedBG = texture(DiffuseSampler, texCoord + uvShift);
+
+    float shiftStr = effectStrength * 0.01 * finalDensitySmoke;
+    vec2 redShift = vec2(0.0, shiftStr);
+    vec2 greenShift = vec2(shiftStr, -shiftStr);
+    vec2 blueShift = vec2(-shiftStr, -shiftStr);
+
+    vec4 shiftedBGR = texture(DiffuseSampler, texCoord + uvShift + redShift);
+    vec4 shiftedBGG = texture(DiffuseSampler, texCoord + uvShift + greenShift);
+    vec4 shiftedBGB = texture(DiffuseSampler, texCoord + uvShift + blueShift);
 
     vec4 smoke = vec4(0.8, 0.6, 0.3, finalDensitySmoke);
     vec4 smoke2 = vec4(0.7, 0.4, 0.3, finalDensitySmoke);
@@ -186,10 +194,11 @@ void main(){
     smoke = srcOneSrcAlpha(smoke, smoke2);
     smoke = srcOneSrcAlpha(smoke, smoke3);
     vec4 sphere = vec4(0.7, 0.6, 0.3, finalSphereDensity);
+    sphere = srcOneSrcAlpha(sphere, sphere);
 
     smoke += sphere;
 
-    vec4 finalColor = srcAlphaOneMinusSrcAlpha(smoke * effectStrength * effectStrength, shiftedBG);
+    vec4 finalColor = srcAlphaOneMinusSrcAlpha(smoke * effectStrength * effectStrength, vec4(shiftedBGR.r, shiftedBGG.g, shiftedBGB.b, shiftedBGR.a));
     fragColor = vec4(finalColor.rgb, 1.0);
 
 }
