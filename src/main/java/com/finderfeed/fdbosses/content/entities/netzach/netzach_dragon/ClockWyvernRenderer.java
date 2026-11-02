@@ -7,6 +7,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.r
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -26,6 +27,10 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
         clockWyvern.getAnimationSystem().applyAnimations(animatedModel, pticks);
 
         VertexConsumer vertex = src.getBuffer(BossRenderTypes.ENTITY_TRANSLUCENT_TRIANGLES.apply(FDBosses.location("textures/entities/netzach/clock_wyvern_scale.png"), false));
+
+        matrices.pushPose();
+
+        matrices.mulPose(Axis.YP.rotationDegrees(-yaw));
 
         // This is....VERY UGLYYYYYYYY. But the result is pretty :>
         WingBone wing1_end = WingBone.make("wing1_end", true);
@@ -118,6 +123,7 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
 //        renderTriangle(matrices, vertex, model, animatedModel, "wing1_start2","wing1_mid2", "wright9", i, -1, boneTransforms);
 //        renderTriangle(matrices, vertex, model, animatedModel, "wing1_start2","wright9", "wright8", i, -1, boneTransforms);
 
+        matrices.popPose();
 
     }
 

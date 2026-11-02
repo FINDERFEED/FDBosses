@@ -34,13 +34,16 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.common.util.AttributeUtil;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.joml.Matrix3f;
@@ -104,6 +107,12 @@ public class BossUtil {
         return (int) Math.ceil(steps);
     }
 
+    public static Vec3 targetGroundPos(Level level, Vec3 pos, float verticalLimit){
+        Vec3 end = pos.add(0, -verticalLimit, 0);
+        ClipContext clipContext = new ClipContext(pos, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+        BlockHitResult result = level.clip(clipContext);
+        return result.getLocation();
+    }
 
     //accepts xz plane only
     //basically a raycast into infinite x

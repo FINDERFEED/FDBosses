@@ -513,7 +513,7 @@ public class BossEntities {
     public static void registerAttributes(EntityAttributeCreationEvent event){
 
         event.put(NETZACH.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,20).build());
-
+        event.put(CLOCK_WYVERN.get(), Mob.createMobAttributes().add(Attributes.MAX_HEALTH,20).build());
 
         event.put(GEBURAH_BELL.get(), LivingEntity.createLivingAttributes()
                         .add(Attributes.MAX_HEALTH, 2)
