@@ -30,6 +30,9 @@ public class PhaseSphereHandler {
     public static int clientsideChesedItemUseTick = -1;
 
     public static void onChesedItemUse(Player player){
+        if (player.level().isClientSide && !player.isLocalPlayer()) {
+            return;
+        }
         if (!player.isPassenger()) {
 
             if (player instanceof ServerPlayer serverPlayer) {
