@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
@@ -20,6 +21,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
@@ -29,6 +31,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 public class ClockWyvern extends FDMob implements AutoSerializable {
 
     public static final String MAIN = "main";
+    public static final String TURNING = "turning";
 
     public static final String DO_NOTHING = "do_nothing";
     public static final String FLY_UP_AND_SLAM = "fly_up_and_slam";
@@ -50,17 +53,48 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
         attackChain.addAttack(0, DO_NOTHING);
         attackChain.addAttack(0, FLY_UP_AND_SLAM);
         this.getAnimationSystem().setAnimationsApplyListener(this::onAnimationsApply);
+        this.lookControl = new ClockWyvernLookControl(this);
     }
 
     @Override
     public void tick() {
         super.tick();
         if (!level().isClientSide){
+//            attackChain.tick();
             this.setTarget(this.level().getNearestPlayer(this.getX(), this.getY(), this.getZ(), 100, false));
-            attackChain.tick();
+            if (this.getTarget() != null){
+                this.getLookControl().setLookAt(this.getTarget());
+            }
+
+            this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_IDLE)
+                            .setTransitionTime(5)
+                    .build());
             this.setYRot(this.yBodyRot);
+            this.rotationAnimations();
+        }else{
+
+        }
+
+    }
+
+    private void rotationAnimations(){
+        var mainAnimation = this.getAnimationSystem().getTickerAnimation(MAIN);
+        if (mainAnimation == BossAnims.CLOCK_WYVERN_IDLE.get()){
+            float rot = yRotO - this.getYRot();
+            if (rot > 0){
+                this.getAnimationSystem().startAnimation(TURNING, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_TURN_LEFT)
+                        .setLoopMode(Animation.LoopMode.ONCE)
+                        .setTransitionTime(5)
+                        .build());
+            }else if (rot < 0){
+                this.getAnimationSystem().startAnimation(TURNING, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_TURN_RIGHT)
+                        .setTransitionTime(5)
+                        .setLoopMode(Animation.LoopMode.ONCE)
+                        .build());
+            }
         }
     }
+
 
     @SerializableField
     private ProjectileMovementPath flyUpAndSlamPath;
@@ -129,6 +163,7 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
                 flyUpAndSlamPath.tick(this);
             }else{
                 this.noPhysics = false;
+                this.setDeltaMovement(0, 0, 0);
                 this.teleportTo(pos.x, pos.y, pos.z);
                 attackInstance.nextStage();
             }
@@ -136,7 +171,7 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
             this.noPhysics = false;
             if (tick > 20){
                 return true;
-            }else if (tick == 0){
+            }else if (tick == 1){
                 this.slam();
             }
         }
@@ -179,6 +214,11 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
     }
 
     @Override
+    protected BodyRotationControl createBodyControl() {
+        return new ClockWyvernBodyRotationControl(this);
+    }
+
+    @Override
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
         this.autoSave(tag);
@@ -192,7 +232,7 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
 
     @Override
     public int getHeadRotSpeed() {
-        return 20;
+        return 10;
     }
 
 }
