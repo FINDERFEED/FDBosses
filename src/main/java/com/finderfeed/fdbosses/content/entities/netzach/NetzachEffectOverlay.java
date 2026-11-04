@@ -60,8 +60,6 @@ public class NetzachEffectOverlay implements LayeredDraw.Layer {
             Matrix4f mat = graphics.pose().last().pose();
 
             float pticks = tracker.getGameTimeDeltaPartialTick(false);
-            float time = Minecraft.getInstance().level.getGameTime() + pticks;
-
 
             float ptime = Mth.clamp(1 - (effectActiveTime - pticks) / maxEffectTime,0,1);
 
@@ -80,17 +78,16 @@ public class NetzachEffectOverlay implements LayeredDraw.Layer {
             float u = width / tapeDimensions / 2;
 
 
-            vertex.addVertex(mat, 0, tapeDimensions, 0).setUv(0 + uMove, 1).setColor(1f, 1f, 1f, 1f);
-            vertex.addVertex(mat, width, tapeDimensions, 0).setUv(u + uMove, 1).setColor(1f, 1f, 1f, 1f);
-            vertex.addVertex(mat, width, -tapeDimensions, 0).setUv(u + uMove, 0).setColor(1f, 1f, 1f, 1f);
-            vertex.addVertex(mat, 0, -tapeDimensions, 0).setUv(0 + uMove, 0).setColor(1f, 1f, 1f, 1f);
+            float a = 0.8f;
+            vertex.addVertex(mat, 0, tapeDimensions, 0).setUv(0 + uMove, 1).setColor(1f, 1f, 1f, a);
+            vertex.addVertex(mat, width, tapeDimensions, 0).setUv(u + uMove, 1).setColor(1f, 1f, 1f, a);
+            vertex.addVertex(mat, width, -tapeDimensions, 0).setUv(u + uMove, 0).setColor(1f, 1f, 1f, a);
+            vertex.addVertex(mat, 0, -tapeDimensions, 0).setUv(0 + uMove, 0).setColor(1f, 1f, 1f, a);
 
-
-
-            vertex.addVertex(mat, 0, tapeDimensions + height, 0).setUv(0 - uMove, 1).setColor(1f, 1f, 1f, 1f);
-            vertex.addVertex(mat, width, tapeDimensions + height, 0).setUv(u - uMove, 1).setColor(1f, 1f, 1f, 1f);
-            vertex.addVertex(mat, width, -tapeDimensions + height, 0).setUv(u - uMove, 0).setColor(1f, 1f, 1f, 1f);
-            vertex.addVertex(mat, 0, -tapeDimensions + height, 0).setUv(0 - uMove, 0).setColor(1f, 1f, 1f, 1f);
+            vertex.addVertex(mat, 0, tapeDimensions + height, 0).setUv(0 - uMove, 1).setColor(1f, 1f, 1f, a);
+            vertex.addVertex(mat, width, tapeDimensions + height, 0).setUv(u - uMove, 1).setColor(1f, 1f, 1f, a);
+            vertex.addVertex(mat, width, -tapeDimensions + height, 0).setUv(u - uMove, 0).setColor(1f, 1f, 1f, a);
+            vertex.addVertex(mat, 0, -tapeDimensions + height, 0).setUv(0 - uMove, 0).setColor(1f, 1f, 1f, a);
 
             BufferUploader.drawWithShader(vertex.build());
 

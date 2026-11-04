@@ -244,9 +244,11 @@ vec4 mexicofy(vec4 color){
     float intensity = max(1,lengthIntensity);
     intensity = pow(intensity, 1) + percent;
 
-    color = resultCol * brightness * intensity;
+    vec4 result = resultCol * brightness * intensity;
 
-    return color;
+    result = color * 0.1 + result * 0.9;
+
+    return result;
 }
 
 

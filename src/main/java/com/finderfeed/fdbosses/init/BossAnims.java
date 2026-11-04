@@ -402,4 +402,8 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern"));
     });
 
+    public static DeferredHolder<Animation,Animation> CLOCK_WYVERN_TIMED_RAY_ATTACK = ANIMATIONS.register("clock_wyvern_timed_ray_attack", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern"));
+    });
+
 }

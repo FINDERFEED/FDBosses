@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.client;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -16,15 +17,39 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.util.List;
 
 public class BossRenderUtil {
 
     public static final ResourceLocation BOSS_TOOLTIP = FDBosses.location("textures/gui/boss_screen_tooltip.png");
+
+    public static void rotateRay(PoseStack matrices, Vec3 camera, Vec3 dir){
+        FDRenderUtil.applyMovementMatrixRotations(matrices,dir);
+
+        Vec3 n = FDMathUtil.getNormalVectorFromLineToPoint(Vec3.ZERO,dir,camera);
+
+        Matrix4f mt2 = new Matrix4f();
+        FDRenderUtil.applyMovementMatrixRotations(mt2,dir);
+        Vector4f up = new Vector4f(0,0,1,1); mt2.transform(up);
+        Vector4f left = new Vector4f(1,0,0,1); mt2.transform(left);
+        Vec3 vup = new Vec3(up.x / up.w,up.y / up.w,up.z / up.w);
+        Vec3 vleft = new Vec3(left.x,left.y,left.z);
+
+
+        float betweenVectors = (float) FDMathUtil.angleBetweenVectors(n,vup);
+
+        if (vleft.dot(n) > 0) {
+            matrices.mulPose(Axis.YP.rotation(betweenVectors));
+        }else{
+            matrices.mulPose(Axis.YP.rotation(-betweenVectors));
+        }
+    }
 
     public static void renderLine(GuiGraphics graphics, float x1, float y1, float x2, float y2, float width, float r, float g, float b, float a){
 

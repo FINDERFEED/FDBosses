@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.Chesed
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
+import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEffectPacket;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
 import com.finderfeed.fdlib.FDLibCalls;
@@ -19,6 +20,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
@@ -90,6 +92,9 @@ public class BossUtil {
     public static final int NETZACH_DISAPPEAR = 26;
     public static final int CLOCK_WYVERN_SLAM = 27;
 
+    public static void netzachBacktrackEffectFor(ServerPlayer player, int effectTime, int flashTime){
+        PacketDistributor.sendToPlayer(player, new BacktrackEffectPacket(effectTime, flashTime));
+    }
 
     public static void clockWyvernSlam(Level serverLevel, Vec3 pos){
         posEvent((ServerLevel) serverLevel, pos, CLOCK_WYVERN_SLAM, 0, 60);
@@ -109,7 +114,7 @@ public class BossUtil {
 
     public static Vec3 targetGroundPos(Level level, Vec3 pos, float verticalLimit){
         Vec3 end = pos.add(0, -verticalLimit, 0);
-        ClipContext clipContext = new ClipContext(pos, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
+        ClipContext clipContext = new ClipContext(pos.add(0,0.1f,0), end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty());
         BlockHitResult result = level.clip(clipContext);
         return result.getLocation();
     }

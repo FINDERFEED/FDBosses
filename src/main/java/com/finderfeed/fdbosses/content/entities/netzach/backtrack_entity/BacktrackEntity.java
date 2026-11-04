@@ -14,6 +14,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.HashSet;
 import java.util.UUID;
@@ -23,9 +24,13 @@ public class BacktrackEntity extends FDOwnableEntity implements AutoSerializable
     @SerializableField
     private int backtrackTime;
 
-    public static void summon(LivingEntity entityToBacktrack, int backtrackTime){
+    public static void summon(LivingEntity entityToBacktrack, int backtrackTime, Vec3 posOverride){
         BacktrackEntity backtrackEntity = new BacktrackEntity(BossEntities.BACKTRACK_ENTITY.get(), entityToBacktrack.level());
-        backtrackEntity.setPos(entityToBacktrack.position());
+        if (posOverride != null) {
+            backtrackEntity.setPos(posOverride);
+        }else{
+            backtrackEntity.setPos(entityToBacktrack.position());
+        }
         backtrackEntity.backtrackTime = backtrackTime;
         backtrackEntity.setOwner(entityToBacktrack);
         backtrackEntity.setYRot(entityToBacktrack.getYRot());
@@ -52,7 +57,7 @@ public class BacktrackEntity extends FDOwnableEntity implements AutoSerializable
                     return;
                 }
                 if (this.backtrackTime-- < 0) {
-                    livingEntity.teleportTo((ServerLevel) this.level(), this.getX(), this.getY(), this.getZ(), new HashSet<>(), livingEntity.getYRot() + 180,livingEntity.getXRot());
+                    livingEntity.teleportTo((ServerLevel) this.level(), this.getX(), this.getY(), this.getZ(), new HashSet<>(), livingEntity.getYRot(),livingEntity.getXRot());
                     this.remove(RemovalReason.DISCARDED);
                 }
             }
