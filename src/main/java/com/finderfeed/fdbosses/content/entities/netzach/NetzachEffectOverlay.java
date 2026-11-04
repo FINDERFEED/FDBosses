@@ -8,10 +8,8 @@ import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferUploader;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.*;
+import com.mojang.math.Axis;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -32,6 +30,9 @@ import java.io.IOException;
 public class NetzachEffectOverlay implements LayeredDraw.Layer {
 
     public static final ResourceLocation TAPE = FDBosses.location("textures/entities/netzach/tape.png");
+    public static final ResourceLocation BIG_GEAR = FDBosses.location("textures/gui/netzach_minigame/netzach_gear_big.png");
+    public static final ResourceLocation MEDIUM_GEAR = FDBosses.location("textures/gui/netzach_minigame/netzach_gear_medium.png");
+    public static final ResourceLocation SMALL_GEAR = FDBosses.location("textures/gui/netzach_minigame/netzach_gear_small.png");
 
     public static PostChain EFFECT;
 
@@ -72,9 +73,10 @@ public class NetzachEffectOverlay implements LayeredDraw.Layer {
 
             var guiScale = (float) screen.getGuiScale();
 
+            float guiScaleMultiplier = 5 / guiScale;
 
             float uMove = effectTimeP * 20;
-            float tapeDimensions = 16 * (5 / guiScale);
+            float tapeDimensions = 16 * guiScaleMultiplier;
             float u = width / tapeDimensions / 2;
 
 
@@ -91,8 +93,38 @@ public class NetzachEffectOverlay implements LayeredDraw.Layer {
 
             BufferUploader.drawWithShader(vertex.build());
 
+            float bigGearSize = 128 * guiScaleMultiplier;
+            float mediumGearSize = 64 * guiScaleMultiplier;
+            float smallGearSize = 32 * guiScaleMultiplier;
+
+            addGear(MEDIUM_GEAR, graphics, 80 * guiScaleMultiplier, height, mediumGearSize, mediumGearSize, effectTimeP, -2400);
+            addGear(MEDIUM_GEAR, graphics, width - 80 * guiScaleMultiplier, height, mediumGearSize, mediumGearSize, effectTimeP, 2400);
+
+            addGear(BIG_GEAR, graphics, 0, height, bigGearSize, bigGearSize, effectTimeP, 1200);
+            addGear(BIG_GEAR, graphics, width, height, bigGearSize, bigGearSize, effectTimeP, -1200);
+
+
+            addGear(MEDIUM_GEAR, graphics, 0, 0, mediumGearSize, mediumGearSize, effectTimeP, 1200);
+            addGear(MEDIUM_GEAR, graphics, width, 0, mediumGearSize, mediumGearSize, effectTimeP, -1200);
+
+            addGear(SMALL_GEAR, graphics, 40 * guiScaleMultiplier, 0, smallGearSize, smallGearSize, effectTimeP, -1200);
+            addGear(SMALL_GEAR, graphics, width - 40 * guiScaleMultiplier, 0, smallGearSize, smallGearSize, effectTimeP, 1200);
+
+
             RenderSystem.disableBlend();
         }
+    }
+
+    private void addGear(ResourceLocation texture, GuiGraphics graphics, float x, float y, float w, float h, float effectTimeP, float angle){
+        PoseStack matrices = graphics.pose();
+
+        matrices.pushPose();
+        FDRenderUtil.bindTexture(texture);
+        matrices.translate(x, y, 0);
+        matrices.mulPose(Axis.ZP.rotationDegrees(effectTimeP * angle));
+        FDRenderUtil.blitWithBlendCentered(matrices, 0, 0, w, h, 0, 0, 1, 1, 1, 1, 0, 1);
+
+        matrices.popPose();
     }
 
     @SubscribeEvent
