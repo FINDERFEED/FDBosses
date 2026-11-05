@@ -86,8 +86,20 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
     public void tick() {
         super.tick();
         if (!level().isClientSide){
+            this.getAnimationSystem().startAnimation(TURNING, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_SPINNING_GEARS.get())
+                    .setTransitionTime(5)
+                    .build());
+
+            if (tickCount % 500 < 250){
+                this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_IDLE)
+                        .build());
+            }else{
+                this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_FLYING)
+                        .build());
+            }
+
             this.setTarget(this.level().getNearestPlayer(this.getX(), this.getY(), this.getZ(), 100, false));
-            attackChain.tick();
+//            attackChain.tick();
             this.setYRot(this.yBodyRot);
             this.rotationAnimations();
         }else{
