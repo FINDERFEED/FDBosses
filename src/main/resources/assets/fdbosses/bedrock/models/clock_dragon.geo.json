@@ -258,7 +258,7 @@
 				{
 					"name": "wright3",
 					"parent": "wing1_end_bone4",
-					"pivot": [108.5, 24.5, -22.75]
+					"pivot": [105.5, 24.5, -19.75]
 				},
 				{
 					"name": "wing1_end_bone5",
@@ -277,7 +277,7 @@
 				{
 					"name": "wright5",
 					"parent": "wing1_end_bone5",
-					"pivot": [85.5, 24.5, -42.75]
+					"pivot": [85, 24.5, -38.75]
 				},
 				{
 					"name": "wing1_end_bone6",
@@ -296,12 +296,12 @@
 				{
 					"name": "wright7",
 					"parent": "wing1_end_bone6",
-					"pivot": [55.25, 24.5, -44.25]
+					"pivot": [57.75, 24.5, -39.25]
 				},
 				{
 					"name": "wright1",
 					"parent": "wing1_end2",
-					"pivot": [115, 24.5, 5]
+					"pivot": [112, 24.5, 5]
 				},
 				{
 					"name": "wing_claw_2",
@@ -345,7 +345,7 @@
 				{
 					"name": "wright9",
 					"parent": "wing2_mid_bone",
-					"pivot": [35.25, 24.5, -16.75]
+					"pivot": [36.25, 24.5, -11.5]
 				},
 				{
 					"name": "body_back",

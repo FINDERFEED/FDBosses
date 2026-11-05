@@ -46,20 +46,22 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
 
         matrices.mulPose(Axis.YP.rotationDegrees(-yaw));
 
+        float endDark = 0.6f;
+
         // This is....VERY UGLYYYYYYYY. But the result is pretty :>
         WingBone wing1_end = WingBone.make("wing1_end", true);
         WingBone wlev1 = WingBone.make("wlev1", true);
         WingBone wlev2 = WingBone.make("wlev2", false);
         WingBone wlev3 = WingBone.make("wlev3", false);
 
-        renderWingPart(matrices, vertex, animatedModel, model, light,
+        renderWingPart(matrices, vertex, animatedModel, model, wing1_end, 2, endDark, light,
                 wing1_end, wlev2, wlev1,
                 wlev3, wlev2, wlev1
         );
 
         WingBone wlev4 = WingBone.make("wlev4", false);
         WingBone wlev5 = WingBone.make("wlev5", false);
-        renderWingPart(matrices, vertex, animatedModel, model, light,
+        renderWingPart(matrices, vertex, animatedModel, model, wing1_end, 2, endDark, light,
                 wing1_end, wlev2, wlev4,
                 wlev3, wlev2, wlev4,
                 wlev4,wlev3, wlev5
@@ -67,7 +69,7 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
 
         WingBone wlev6 = WingBone.make("wlev6", false);
         WingBone wlev7 = WingBone.make("wlev7", false);
-        renderWingPart(matrices, vertex, animatedModel, model, light,
+        renderWingPart(matrices, vertex, animatedModel, model, wing1_end, 2, endDark, light,
                 wing1_end, wlev4, wlev6,
                 wlev5, wlev4, wlev6,
                 wlev7, wlev6, wlev5
@@ -76,7 +78,7 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
         WingBone wlev9 = WingBone.make("wlev9", false);
         WingBone wing1_mid = WingBone.make("wing1_mid", false);
 
-        renderWingPart(matrices, vertex, animatedModel, model, light,
+        renderWingPart(matrices, vertex, animatedModel, model, wing1_end, 2, endDark, light,
                 wing1_mid, wing1_end, wlev6,
                 wlev6, wlev7, wlev9,
                 wlev6, wing1_mid, wlev9
@@ -86,7 +88,7 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
         WingBone wing1_start = WingBone.make("wing1_start", true);
         WingBone wlev8 = WingBone.make("wlev8", false);
 
-        renderWingPart(matrices, vertex, animatedModel, model, light,
+        renderWingPart(matrices, vertex, animatedModel, model, wing1_mid, 2, endDark, light,
                 wing1_start, wing1_mid, wlev9,
                 wing1_start, wlev9, wlev8
         );
@@ -96,14 +98,14 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
         WingBone wright2 = WingBone.make("wright2", false);
         WingBone wright3 = WingBone.make("wright3", false);
 
-        renderWingPart(matrices, vertex, animatedModel, model, light,
+        renderWingPart(matrices, vertex, animatedModel, model, wing1_end2, 2.9f, endDark, light,
                 wing1_end2, wright2, wright1,
                 wright3, wright2, wright1
         );
 
         WingBone wright4 = WingBone.make("wright4", false);
         WingBone wright5 = WingBone.make("wright5", false);
-        renderWingPart(matrices, vertex, animatedModel, model, light,
+        renderWingPart(matrices, vertex, animatedModel, model,  wing1_end2, 2.9f, endDark, light,
                 wright3, wright2, wright4,
                 wing1_end2, wright2, wright4,
                 wright3, wright4, wright5
@@ -111,7 +113,7 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
 
         WingBone wright6 = WingBone.make("wright6", false);
         WingBone wright7 = WingBone.make("wright7", false);
-        renderWingPart(matrices, vertex, animatedModel, model, light,
+        renderWingPart(matrices, vertex, animatedModel, model,  wing1_end2, 2.9f, endDark, light,
                 wright6, wright5, wright4,
                 wing1_end2, wright4, wright6,
                 wright7, wright5, wright6
@@ -119,7 +121,7 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
 
         WingBone wing1_mid2 = WingBone.make("wing1_mid2", false);
         WingBone wright9 = WingBone.make("wright9", false);
-        renderWingPart(matrices, vertex, animatedModel, model, light,
+        renderWingPart(matrices, vertex, animatedModel, model,  wing1_end2, 2.9f, endDark, light,
                 wright7, wright6, wright9,
                 wright9, wright6, wing1_mid2,
                 wing1_mid2, wing1_end2, wright6
@@ -128,17 +130,25 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
 
         WingBone wing1_start2 = WingBone.make("wing1_start2", true);
         WingBone wright8 = WingBone.make("wright8", false);
-        renderWingPart(matrices, vertex, animatedModel, model, light,
+        renderWingPart(matrices, vertex, animatedModel, model,  wing1_mid2, 1, endDark, light,
                 wing1_start2, wing1_mid2, wright9,
                 wing1_start2, wright9, wright8
         );
 
         vertex = src.getBuffer(BossRenderTypes.entityTranslucentCull(FDBosses.location("textures/entities/netzach/clock_wyvern_scale_end.png")));
-        renderWingEnds(matrices, vertex, animatedModel, model, light, "wright3", "wright1", "wing1_end2");
-        renderWingEnds(matrices, vertex, animatedModel, model, light, "wright5", "wright3", "wing1_end2");
-        renderWingEnds(matrices, vertex, animatedModel, model, light, "wright7", "wright5", "wing1_end2");
-        renderWingEnds(matrices, vertex, animatedModel, model, light, "wright9", "wright7", "wing1_end2");
-        renderWingEnds(matrices, vertex, animatedModel, model, light, "wright8", "wright9", "wing1_start2");
+        renderWingEnds(matrices, vertex, animatedModel, light, "wright1", "wright3", "wing1_end2", endDark);
+        renderWingEnds(matrices, vertex, animatedModel, light, "wright3", "wright5", "wing1_end2", endDark);
+        renderWingEnds(matrices, vertex, animatedModel, light, "wright5", "wright7", "wing1_end2", endDark);
+        renderWingEnds(matrices, vertex, animatedModel, light, "wright7", "wright9" , "wing1_end2", endDark);
+
+        renderWingEnds(matrices, vertex, animatedModel, light, "wlev1", "wlev3", "wing1_end", endDark);
+        renderWingEnds(matrices, vertex, animatedModel, light, "wlev3", "wlev5", "wing1_end", endDark);
+        renderWingEnds(matrices, vertex, animatedModel, light, "wlev5", "wlev7", "wing1_end", endDark);
+        renderWingEnds(matrices, vertex, animatedModel, light, "wlev7", "wlev9" , "wing1_end", endDark);
+
+        vertex = src.getBuffer(BossRenderTypes.entityTranslucentCull(FDBosses.location("textures/entities/netzach/clock_wyvern_scale_end2.png")));
+        renderWingEnds(matrices, vertex, animatedModel, light, "wlev9", "wlev8", "wing1_start", endDark);
+        renderWingEnds(matrices, vertex, animatedModel, light, "wright9", "wright8", "wing1_start2", endDark);
 
         matrices.popPose();
 
@@ -315,7 +325,7 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
         matrices.popPose();
     }
 
-    public static void renderWingEnds(PoseStack matrices, VertexConsumer vertex, FDModel animatedModel, FDModel staticModel, int light, String bone1, String bone2, String supportingBone){
+    public static void renderWingEnds(PoseStack matrices, VertexConsumer vertex, FDModel animatedModel, int light, String bone1, String bone2, String supportingBone, float darkenPercent){
         Vector3f bone1pos = animatedModel.getModelPartTransformation(bone1).transformPosition(new Vector3f());
         Vector3f bone2pos = animatedModel.getModelPartTransformation(bone2).transformPosition(new Vector3f());
         Vector3f supportingBonePos = animatedModel.getModelPartTransformation(supportingBone).transformPosition(new Vector3f());
@@ -324,40 +334,38 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
 
         Vector3f between = bone2pos.sub(bone1pos, new Vector3f());
         Quaternionf quaternionf = new Quaternionf().rotateAxis(-FDMathUtil.FPI / 2, normal);
-        Vector3f center = bone1pos.add(between.mul(0.5f, new Vector3f()), new Vector3f());
 
-        float length = between.length();
+        float length = between.length() * 0.5f;
 
         between.normalize();
 
         Vector3f rbetween = between.rotate(quaternionf, new Vector3f());
 
-
         float md = 2;
         Matrix4f mat = matrices.last().pose();
 
-        float textureHalfLength = 1;
-        float realLength = Math.min(textureHalfLength, length / 2);
+        float pos1X = bone1pos.x;
+        float pos1Y = bone1pos.y;
+        float pos1Z = bone1pos.z;
 
-        float pos1X = center.x - between.x * realLength;
-        float pos1Y = center.y - between.y * realLength;
-        float pos1Z = center.z - between.z * realLength;
+        float pos2X = bone2pos.x;
+        float pos2Y = bone2pos.y;
+        float pos2Z = bone2pos.z;
 
-        float pos2X = center.x + between.x * realLength;
-        float pos2Y = center.y + between.y * realLength;
-        float pos2Z = center.z + between.z * realLength;
+        vertex.addVertex(mat, pos1X + rbetween.x * md, pos1Y + rbetween.y * md, pos1Z + rbetween.z * md).setColor(darkenPercent, darkenPercent, darkenPercent, 1f).setUv(0,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), normal.x, normal.y, normal.z);
+        vertex.addVertex(mat, pos2X + rbetween.x * md, pos2Y + rbetween.y * md, pos2Z + rbetween.z * md).setColor(darkenPercent, darkenPercent, darkenPercent, 1f).setUv(length,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), normal.x, normal.y, normal.z);
+        vertex.addVertex(mat, pos2X, pos2Y, pos2Z).setColor(darkenPercent, darkenPercent, darkenPercent, 1f).setUv(length,1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), normal.x, normal.y, normal.z);
+        vertex.addVertex(mat, pos1X, pos1Y, pos1Z).setColor(darkenPercent, darkenPercent, darkenPercent, 1f).setUv(0, 1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), normal.x, normal.y, normal.z);
 
-        float u1 = 0.5f - realLength / textureHalfLength * 0.5f;
-        float u2 = 0.5f + realLength / textureHalfLength * 0.5f;
+        vertex.addVertex(mat, pos1X, pos1Y, pos1Z).setColor(darkenPercent, darkenPercent, darkenPercent, 1f).setUv(0, 1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), -normal.x, -normal.y, -normal.z);
+        vertex.addVertex(mat, pos2X, pos2Y, pos2Z).setColor(darkenPercent, darkenPercent, darkenPercent, 1f).setUv(length,1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), -normal.x, -normal.y, -normal.z);
+        vertex.addVertex(mat, pos2X + rbetween.x * md, pos2Y + rbetween.y * md, pos2Z + rbetween.z * md).setColor(darkenPercent, darkenPercent, darkenPercent, 1f).setUv(length,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), -normal.x, -normal.y, -normal.z);
+        vertex.addVertex(mat, pos1X + rbetween.x * md, pos1Y + rbetween.y * md, pos1Z + rbetween.z * md).setColor(darkenPercent, darkenPercent, darkenPercent, 1f).setUv(0,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), -normal.x, -normal.y, -normal.z);
 
-        //TODO: Fix triangles bug
-        vertex.addVertex(mat, pos1X + rbetween.x * md, pos1Y + rbetween.y * md, pos1Z + rbetween.z * md).setColor(1f, 1f, 1f, 1f).setUv(u1,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), normal.x, normal.y, normal.z);
-        vertex.addVertex(mat, pos2Y + rbetween.x * md, pos2Y + rbetween.y * md, pos2Z + rbetween.z * md).setColor(1f, 1f, 1f, 1f).setUv(u2,0).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), normal.x, normal.y, normal.z);
-        vertex.addVertex(mat, pos2X, pos2Y, pos2Z).setColor(1f, 1f, 1f, 1f).setUv(u2,1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), normal.x, normal.y, normal.z);
-        vertex.addVertex(mat, pos1X, pos1Y, pos1Z).setColor(1f, 1f, 1f, 1f).setUv(u1, 1).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), normal.x, normal.y, normal.z);
+
     }
 
-    private static void renderWingPart(PoseStack matrices, VertexConsumer vertex, FDModel animatedModel, FDModel staticModel, int light, WingBone... wingBones){
+    private static void renderWingPart(PoseStack matrices, VertexConsumer vertex, FDModel animatedModel, FDModel staticModel, WingBone darkenStartBone, float darkenSphereRadius, float darkenPercent, int light, WingBone... wingBones){
 
         if (wingBones.length % 3 != 0) {
             System.out.println("Not enough wing bones! Everything is in triangles!");
@@ -419,6 +427,8 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
             i = 0;
         }
 
+        Vector3f v = globalPositions.get(darkenStartBone);
+
         for (int i = 0; i < wingBones.length; i += 3){
             WingBone b1 = wingBones[i];
             WingBone b2 = wingBones[i + 1];
@@ -432,13 +442,17 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
 
             Vector3f nrm = BossRenderUtil.planeNormal(globalPos1, globalPos2, globalPos3);
 
-            vertex.addVertex(mat, globalPos1.x, globalPos1.y, globalPos1.z).setColor(1f,1f,1f,1f).setUv(uv1.x, uv1.y).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), nrm.x, nrm.y, nrm.z);
-            vertex.addVertex(mat, globalPos2.x, globalPos2.y, globalPos2.z).setColor(1f,1f,1f,1f).setUv(uv2.x, uv2.y).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), nrm.x, nrm.y, nrm.z);
-            vertex.addVertex(mat, globalPos3.x, globalPos3.y, globalPos3.z).setColor(1f,1f,1f,1f).setUv(uv3.x, uv3.y).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), nrm.x, nrm.y, nrm.z);
+            float p1 = FDMathUtil.lerp(darkenPercent, 1,1 - Math.min(1, globalPos1.distance(v) / darkenSphereRadius));
+            float p2 = FDMathUtil.lerp(darkenPercent, 1,1 - Math.min(1, globalPos2.distance(v) / darkenSphereRadius));
+            float p3 = FDMathUtil.lerp(darkenPercent, 1,1 - Math.min(1, globalPos3.distance(v) / darkenSphereRadius));
 
-            vertex.addVertex(mat, globalPos3.x, globalPos3.y, globalPos3.z).setColor(1f,1f,1f,1f).setUv(uv3.x, uv3.y).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), -nrm.x, -nrm.y, -nrm.z);
-            vertex.addVertex(mat, globalPos2.x, globalPos2.y, globalPos2.z).setColor(1f,1f,1f,1f).setUv(uv2.x, uv2.y).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), -nrm.x, -nrm.y, -nrm.z);
-            vertex.addVertex(mat, globalPos1.x, globalPos1.y, globalPos1.z).setColor(1f,1f,1f,1f).setUv(uv1.x, uv1.y).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), -nrm.x, -nrm.y, -nrm.z);
+            vertex.addVertex(mat, globalPos1.x, globalPos1.y, globalPos1.z).setColor(p1, p1, p1, 1f).setUv(uv1.x, uv1.y).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), nrm.x, nrm.y, nrm.z);
+            vertex.addVertex(mat, globalPos2.x, globalPos2.y, globalPos2.z).setColor(p2, p2, p2, 1f).setUv(uv2.x, uv2.y).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), nrm.x, nrm.y, nrm.z);
+            vertex.addVertex(mat, globalPos3.x, globalPos3.y, globalPos3.z).setColor(p3, p3, p3, 1f).setUv(uv3.x, uv3.y).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), nrm.x, nrm.y, nrm.z);
+
+            vertex.addVertex(mat, globalPos3.x, globalPos3.y, globalPos3.z).setColor(p3, p3, p3, 1f).setUv(uv3.x, uv3.y).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), -nrm.x, -nrm.y, -nrm.z);
+            vertex.addVertex(mat, globalPos2.x, globalPos2.y, globalPos2.z).setColor(p2, p2, p2, 1f).setUv(uv2.x, uv2.y).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), -nrm.x, -nrm.y, -nrm.z);
+            vertex.addVertex(mat, globalPos1.x, globalPos1.y, globalPos1.z).setColor(p1, p1, p1, 1f).setUv(uv1.x, uv1.y).setLight(light).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(matrices.last(), -nrm.x, -nrm.y, -nrm.z);
         }
     }
 
