@@ -47,6 +47,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
+import java.util.UUID;
+
 public class ClockWyvern extends FDMob implements AutoSerializable {
 
     public static final EntityDataAccessor<Vec3> WYVERN_RAY_TARGET = SynchedEntityData.defineId(ClockWyvern.class, FDEDataSerializers.VEC3.get());
@@ -58,21 +60,48 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
     public static final String FLY_UP_AND_SLAM = "fly_up_and_slam";
     public static final String TIMED_RAY_ATTACK = "delayed_ray_attack";
 
+    public static FDModel serverAnimatedModel;
     public static FDModel animatedModel;
     public static FDModel model;
 
+    public static FDModel getAnimatedModel(){
+        if (animatedModel == null){
+            animatedModel = new FDModel(BossModels.CLOCK_WYVERN.get());
+        }
+        return animatedModel;
+    }
+
+    public static FDModel getServerAnimatedModel(){
+        if (serverAnimatedModel == null){
+            serverAnimatedModel = new FDModel(BossModels.CLOCK_WYVERN.get());
+        }
+        return serverAnimatedModel;
+    }
+
+    public static FDModel getModel(){
+        if (model == null){
+            model = new FDModel(BossModels.CLOCK_WYVERN.get());
+        }
+        return model;
+    }
+
     private AttackChain attackChain;
+
+    @SerializableField
+    private UUID chargingSpotAlive = null;
 
     public ClockWyvern(EntityType<? extends FDMob> type, Level level) {
         super(type, level);
         if (animatedModel == null){
             animatedModel = new FDModel(BossModels.CLOCK_WYVERN.get());
+            serverAnimatedModel = new FDModel(BossModels.CLOCK_WYVERN.get());
             model = new FDModel(BossModels.CLOCK_WYVERN.get());
         }
         attackChain = new AttackChain(level.random);
         attackChain.registerAttack(DO_NOTHING, (e) -> this.doNothing(e, 60));
         attackChain.registerAttack(FLY_UP_AND_SLAM, this::flyUpAndSlamAttack);
         attackChain.registerAttack(TIMED_RAY_ATTACK, this::timedRayAttack);
+
         attackChain.addAttack(0, DO_NOTHING);
 //        attackChain.addAttack(1, FLY_UP_AND_SLAM);
         attackChain.addAttack(2, TIMED_RAY_ATTACK);
@@ -89,17 +118,8 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
             this.getAnimationSystem().startAnimation(TURNING, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_SPINNING_GEARS.get())
                     .setTransitionTime(5)
                     .build());
-
-            if (tickCount % 500 < 250){
-                this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_IDLE)
-                        .build());
-            }else{
-                this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_FLYING)
-                        .build());
-            }
-
             this.setTarget(this.level().getNearestPlayer(this.getX(), this.getY(), this.getZ(), 100, false));
-//            attackChain.tick();
+            attackChain.tick();
             this.setYRot(this.yBodyRot);
             this.rotationAnimations();
         }else{
@@ -109,19 +129,26 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
     }
 
     private boolean timedRayAttack(AttackInstance inst){
-        if (this.getTarget() == null){
+        int stage = inst.stage;
+        int tick = inst.tick;
+
+        if (this.getTarget() == null || (chargingSpotAlive == null && stage > 0)){
             this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_IDLE.get())
                     .setTransitionTime(5)
                     .build());
             return true;
         }
 
-        int stage = inst.stage;
-        int tick = inst.tick;
+        var chargingSpot = this.getClockWyvernChargingSpot();
+        if (chargingSpot != null){
+            chargingSpot.feedWatchdog();
+        }
 
         int backtrackTime = 117;
 
         if (stage == 0) {
+            chargingSpotAlive = ClockWyvernChargingSpot.summon(this).getUUID();
+
             var target = this.getTarget();
 
             Vec3 groundPos = BossUtil.targetGroundPos(level(), target.position(), 60);
@@ -141,16 +168,54 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
             inst.nextStage();
         }else if (stage == 1) {
             this.getLookControl().setLookAt(this.getWyvernRayTarget());
+            float p = (float) tick / backtrackTime;
+            PositionedScreenShakePacket.send((ServerLevel) level(),FDShakeData.builder()
+                    .frequency(4)
+                    .amplitude(0.5f * p)
+                    .inTime(0)
+                    .stayTime(0)
+                    .outTime(4)
+                    .build(),this.position(),10);
             if (tick > backtrackTime){
                 inst.nextStage();
             }
         }else if (stage == 2){
-            if (tick > 10){
+            if (tick < 15){
+                PositionedScreenShakePacket.send((ServerLevel) level(),FDShakeData.builder()
+                        .frequency(4)
+                        .amplitude(2f)
+                        .inTime(0)
+                        .stayTime(0)
+                        .outTime(4)
+                        .build(),this.getWyvernRayTarget(),60);
+            }
+            if (tick > 40){
+                chargingSpot.setRemoved(RemovalReason.DISCARDED);
+                chargingSpotAlive = null;
                 return true;
             }
         }
 
         return false;
+    }
+
+    private void chargingSmoke(float p){
+        p = FDEasings.easeOut(p);
+        for (var direction : new HorizontalCircleRandomDirections(level().random, Math.round(p * 24), 1f)){
+            float color = 0.2f + random.nextFloat() * 0.2f;
+            float size = 0.5f + random.nextFloat() * 0.5f;
+            BigSmokeParticleOptions smoke = BigSmokeParticleOptions.builder()
+                    .size(size * p)
+                    .color(color, color, color, 1f)
+                    .lifetime(2,0,13)
+                    .minSpeed(0.05f)
+                    .friction(0.8f)
+                    .build();
+            float speed = 0.5f + random.nextFloat();
+            level().addParticle(smoke, true, this.getX(), this.getY() + size / 4, this.getZ(),
+                    direction.x * speed, direction.y * speed, direction.z * speed
+            );
+        }
     }
 
     private void chargeTimedRayAttackBallParticles(){
@@ -162,7 +227,12 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
 
         var time = ticker.getTime(0);
 
-        if (time > 25 && time < 100){
+        float startTime1 = 25;
+        float endTime1 = 100;
+        if (time > startTime1 && time < endTime1){
+
+            float p = (time - startTime1) / (endTime1 - startTime1);
+            this.chargingSmoke(p);
 
             Matrix4f t = this.getModelPartTransformation(this, "head", animatedModel, 0);
             Vector3f pos = t.transformPosition(new Vector3f(ClockWyvernRenderer.BALL_OFFSET));
@@ -200,6 +270,8 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
 
 
         }else if (time >= 120 && time <= 135){
+            this.chargingSmoke(1);
+
             Vec3 explosionPos = this.getWyvernRayTarget();
 
             if (time == 120){
@@ -310,10 +382,7 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
 
                 }
             }
-
         }
-
-
     }
 
     @SerializableField
@@ -327,6 +396,8 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
             this.noPhysics = false;
             return true;
         }
+
+
 
         int stage = attackInstance.stage;
         int tick = attackInstance.tick;
@@ -457,6 +528,25 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
 
     public Vec3 getWyvernRayTarget(){
         return this.entityData.get(WYVERN_RAY_TARGET);
+    }
+
+    public ClockWyvernChargingSpot getClockWyvernChargingSpot(){
+        if (((ServerLevel)level()).getEntity(chargingSpotAlive) instanceof ClockWyvernChargingSpot chargingSpot){
+            return chargingSpot;
+        }
+        return null;
+    }
+
+    public void destroyChargingSpot(){
+        var spot = this.getClockWyvernChargingSpot();
+        if (spot != null){
+            spot.setRemoved(RemovalReason.DISCARDED);
+        }
+        chargingSpotAlive = null;
+    }
+
+    public boolean isChargingSpotAlive() {
+        return chargingSpotAlive != null;
     }
 
     @Override

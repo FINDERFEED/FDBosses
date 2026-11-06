@@ -59,6 +59,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.Backtra
 import com.finderfeed.fdbosses.content.entities.netzach.clock_attack.ClockAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvern;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvernChargingSpot;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer.TimeStabilizer;
@@ -478,8 +479,6 @@ public class BossEntities {
             .sized(2F, 2F)
             .build("clock_attack"));
 
-
-
     public static final Supplier<EntityType<TimeStabilizer>> TIME_STABILIZER = ENTITIES.register("time_stabilizer",()->EntityType.Builder.of(
                     TimeStabilizer::new, MobCategory.MISC
             )
@@ -500,14 +499,16 @@ public class BossEntities {
             .build("divine_gear"));
 
     public static final Supplier<EntityType<ClockWyvern>> CLOCK_WYVERN = ENTITIES.register("clock_wyvern",()->EntityType.Builder.of(
-                    ClockWyvern::new, MobCategory.MISC
+                    ClockWyvern::new, MobCategory.MONSTER
             )
             .sized(2f,2f)
             .build("clock_wyvern"));
 
-
-
-
+    public static final Supplier<EntityType<ClockWyvernChargingSpot>> CLOCK_WYVERN_CHARGING_SPOT = ENTITIES.register("clock_wyvern_charging_spot",()->EntityType.Builder.of(
+                    ClockWyvernChargingSpot::new, MobCategory.MISC
+            )
+            .sized(1.5f,1.5f)
+            .build("clock_wyvern_charging_spot"));
 
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event){
@@ -549,7 +550,5 @@ public class BossEntities {
                         .add(Attributes.KNOCKBACK_RESISTANCE, 1f)
                 .build());
     }
-
-
 
 }

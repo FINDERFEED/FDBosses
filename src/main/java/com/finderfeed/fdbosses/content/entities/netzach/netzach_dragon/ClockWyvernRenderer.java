@@ -36,8 +36,8 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
     @Override
     public void render(ClockWyvern clockWyvern, float yaw, float pticks, PoseStack matrices, MultiBufferSource src, int light) {
 
-        FDModel model = ClockWyvern.model;
-        FDModel animatedModel = ClockWyvern.animatedModel;
+        FDModel model = ClockWyvern.getModel();
+        FDModel animatedModel = ClockWyvern.getAnimatedModel();
         clockWyvern.getAnimationSystem().applyAnimations(animatedModel, pticks);
 
         VertexConsumer vertex = src.getBuffer(BossRenderTypes.ENTITY_TRANSLUCENT_TRIANGLES.apply(FDBosses.location("textures/entities/netzach/clock_wyvern_scale.png"), false));

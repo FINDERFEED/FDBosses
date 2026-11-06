@@ -82,6 +82,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.clock_attack.ClockAttack
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachPendulumTransform;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvern;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvernChargingSpot;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvernRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttackRenderer;
@@ -130,6 +131,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -144,6 +146,7 @@ import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import org.joml.Matrix4f;
 import org.joml.Random;
 import org.joml.Vector3f;
 
@@ -489,6 +492,45 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.NETZACH_GEAR_CRUSH.get(), NetzachGearCrushAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.SECTOR_ATTACK.get(), SectorAttackRenderer::new);
+
+        event.registerEntityRenderer(BossEntities.CLOCK_WYVERN_CHARGING_SPOT.get(), FDEntityRendererBuilder.<ClockWyvernChargingSpot>builder()
+                        .addLayer(FDEntityRenderLayerOptions.<ClockWyvernChargingSpot>builder()
+                                .model(BossModels.CLOCK_WYVERN_CHARGING_SPOT)
+                                .renderType(RenderType.eyes(FDBosses.location("textures/entities/netzach/clock_wyvern_charging_body.png")))
+                                .transformation(((clockWyvernChargingSpot, matrices, v) -> {
+                                    Entity owner = clockWyvernChargingSpot.getOwner();
+                                    if (!(owner instanceof ClockWyvern clockWyvern)) return;
+
+                                    Vec3 p1 = clockWyvernChargingSpot.getPosition(v);
+                                    Vec3 p2 = owner.getPosition(v);
+                                    Vec3 b = p2.subtract(p1);
+
+                                    var animatedModel = ClockWyvern.getAnimatedModel();
+                                    Matrix4f transform = clockWyvern.getModelPartTransformation(clockWyvern, "body_back", animatedModel, v);
+
+                                    matrices.translate(b.x, b.y, b.z);
+                                    matrices.mulPose(transform);
+                                }))
+                                .build())
+                        .addLayer(FDEntityRenderLayerOptions.<ClockWyvernChargingSpot>builder()
+                                .model(BossModels.CLOCK_WYVERN_CHARGING_SPOT)
+                                .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/clock_wyvern_charging_body.png")))
+                                .transformation(((clockWyvernChargingSpot, matrices, v) -> {
+                                    Entity owner = clockWyvernChargingSpot.getOwner();
+                                    if (!(owner instanceof ClockWyvern clockWyvern)) return;
+
+                                    Vec3 p1 = clockWyvernChargingSpot.getPosition(v);
+                                    Vec3 p2 = owner.getPosition(v);
+                                    Vec3 b = p2.subtract(p1);
+
+                                    var animatedModel = ClockWyvern.getAnimatedModel();
+                                    Matrix4f transform = clockWyvern.getModelPartTransformation(clockWyvern, "body_back", animatedModel, v);
+
+                                    matrices.translate(b.x, b.y, b.z);
+                                    matrices.mulPose(transform);
+                                }))
+                                .build())
+                .build());
 
         event.registerEntityRenderer(BossEntities.CLOCK_WYVERN.get(), FDEntityRendererBuilder.<ClockWyvern>builder()
                         .addLayer(FDEntityRenderLayerOptions.<ClockWyvern>builder()
