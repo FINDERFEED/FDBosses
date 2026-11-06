@@ -190,7 +190,9 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
                         .build(),this.getWyvernRayTarget(),60);
             }
             if (tick > 40){
-                chargingSpot.setRemoved(RemovalReason.DISCARDED);
+                if (chargingSpot != null){
+                    chargingSpot.kill();
+                }
                 chargingSpotAlive = null;
                 return true;
             }
@@ -540,7 +542,7 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
     public void destroyChargingSpot(){
         var spot = this.getClockWyvernChargingSpot();
         if (spot != null){
-            spot.setRemoved(RemovalReason.DISCARDED);
+            spot.kill();
         }
         chargingSpotAlive = null;
     }
