@@ -406,9 +406,14 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern"));
     });
 
+    public static DeferredHolder<Animation,Animation> CLOCK_WYVERN_STUNNED = ANIMATIONS.register("clock_wyvern_stun", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern"));
+    });
+
     public static DeferredHolder<Animation,Animation> CLOCK_WYVERN_CHARGING_BODY_WROOM_WROOM = ANIMATIONS.register("clock_wyvern_charging_body_car_wroom_wroom", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern_charging_body"));
     });
+
 
     public static DeferredHolder<Animation,Animation> CLOCK_WYVERN_CHARGING_BODY_START = ANIMATIONS.register("clock_wyvern_charging_body_start", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern_charging_body"));

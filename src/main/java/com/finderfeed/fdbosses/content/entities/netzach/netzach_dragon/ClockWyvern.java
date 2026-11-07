@@ -3,7 +3,6 @@ package com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
-import com.finderfeed.fdbosses.client.particles.vanilla_like.ASParticleType;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
@@ -23,7 +22,6 @@ import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.ProjectileMovementPath;
 import com.finderfeed.fdlib.util.client.particles.FDBlockParticleOptions;
-import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticle;
 import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOptions;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
@@ -90,6 +88,9 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
     @SerializableField
     private UUID chargingSpotAlive = null;
 
+    @SerializableField
+    private int stunnedTime = 0;
+
     public ClockWyvern(EntityType<? extends FDMob> type, Level level) {
         super(type, level);
         if (animatedModel == null){
@@ -119,7 +120,20 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
                     .setTransitionTime(5)
                     .build());
             this.setTarget(this.level().getNearestPlayer(this.getX(), this.getY(), this.getZ(), 100, false));
-            attackChain.tick();
+            if (stunnedTime == 0){
+                attackChain.tick();
+            }else{
+                stunnedTime = Mth.clamp(stunnedTime - 1, 0, Integer.MAX_VALUE);
+                if (stunnedTime == 0){
+                    this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_IDLE.get())
+                                    .setOutFadeTime(5)
+                            .build());
+                }else{
+                    this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_STUNNED.get())
+                                    .setInFadeTime(5)
+                            .build());
+                }
+            }
             this.setYRot(this.yBodyRot);
             this.rotationAnimations();
         }else{
@@ -132,10 +146,15 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
         int stage = inst.stage;
         int tick = inst.tick;
 
-        if (this.getTarget() == null || (chargingSpotAlive == null && stage > 0)){
+        if (this.getTarget() == null){
             this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_IDLE.get())
                     .setTransitionTime(5)
                     .build());
+            return true;
+        }
+
+        if (chargingSpotAlive == null && stage == 1){
+            this.stunnedTime = 100;
             return true;
         }
 
@@ -180,6 +199,12 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
                 inst.nextStage();
             }
         }else if (stage == 2){
+
+            if (chargingSpot != null){
+                chargingSpot.kill();
+            }
+            chargingSpotAlive = null;
+
             if (tick < 15){
                 PositionedScreenShakePacket.send((ServerLevel) level(),FDShakeData.builder()
                         .frequency(4)
@@ -190,10 +215,6 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
                         .build(),this.getWyvernRayTarget(),60);
             }
             if (tick > 40){
-                if (chargingSpot != null){
-                    chargingSpot.kill();
-                }
-                chargingSpotAlive = null;
                 return true;
             }
         }
