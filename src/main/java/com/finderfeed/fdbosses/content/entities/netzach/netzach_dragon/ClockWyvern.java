@@ -104,8 +104,8 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
         attackChain.registerAttack(TIMED_RAY_ATTACK, this::timedRayAttack);
 
         attackChain.addAttack(0, DO_NOTHING);
-//        attackChain.addAttack(1, FLY_UP_AND_SLAM);
-        attackChain.addAttack(2, TIMED_RAY_ATTACK);
+        attackChain.addAttack(1, FLY_UP_AND_SLAM);
+//        attackChain.addAttack(2, TIMED_RAY_ATTACK);
 
 
         this.getAnimationSystem().setAnimationsApplyListener(this::onAnimationsApply);
@@ -433,7 +433,7 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
                                     .build())
                     .build());
             this.getLookControl().setLookAt(this.getTarget());
-            if (tick > 7){
+            if (tick > 13){
                 this.noPhysics = true;
                 flyUpAndSlamPath = new ProjectileMovementPath(20, false)
                         .addPos(this.position())
@@ -451,7 +451,7 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
                 attackInstance.nextStage();
             }
         }else if (stage == 2){
-            if (tick >= 10){
+            if (tick >= 7){
                 attackInstance.nextStage();
             }
         }else if (stage == 3){
