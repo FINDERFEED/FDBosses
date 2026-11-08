@@ -60,6 +60,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.clock_attack.ClockAttack
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvern;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvernChargingSpot;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_ball.ClockWyvernClockOBall;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer.TimeStabilizer;
@@ -509,6 +510,12 @@ public class BossEntities {
             )
             .sized(1.5f,1.5f)
             .build("clock_wyvern_charging_spot"));
+
+    public static final Supplier<EntityType<ClockWyvernClockOBall>> CLOCK_WYVERN_CLOCK_O_BALL = ENTITIES.register("clock_wyvern_clock_o_ball",()->EntityType.Builder.of(
+                    ClockWyvernClockOBall::new, MobCategory.MISC
+            )
+            .sized(0.75f,0.75f)
+            .build("clock_wyvern_clock_o_ball"));
 
     @SubscribeEvent
     public static void registerAttributes(EntityAttributeCreationEvent event){

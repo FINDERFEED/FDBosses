@@ -59,7 +59,9 @@ public abstract class BossSimpleProjectile extends FDOwnableEntity {
             this.onBlockHit(result);
         }else{
             var eresult = ProjectileUtil.getEntityHitResult(level(), this, start, end, new AABB(start,end), (entity)->true);
-            this.onEntityHit(eresult);
+            if (eresult != null){
+                this.onEntityHit(eresult);
+            }
         }
     }
 

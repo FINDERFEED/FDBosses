@@ -104,8 +104,8 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
         attackChain.registerAttack(TIMED_RAY_ATTACK, this::timedRayAttack);
 
         attackChain.addAttack(0, DO_NOTHING);
-        attackChain.addAttack(1, FLY_UP_AND_SLAM);
-//        attackChain.addAttack(2, TIMED_RAY_ATTACK);
+//        attackChain.addAttack(1, FLY_UP_AND_SLAM);
+        attackChain.addAttack(2, TIMED_RAY_ATTACK);
 
 
         this.getAnimationSystem().setAnimationsApplyListener(this::onAnimationsApply);
@@ -175,7 +175,7 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
             this.setWyvernRayTarget(groundPos);
 
             if (target instanceof ServerPlayer player) {
-                BossUtil.netzachBacktrackEffectFor(player, backtrackTime, 40);
+//                BossUtil.netzachBacktrackEffectFor(player, backtrackTime, 40);
             }
 
             this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_TIMED_RAY_ATTACK)

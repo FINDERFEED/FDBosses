@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses.debug;
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
 import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffect;
 import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffectHandler;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_ball.ClockWyvernClockOBall;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.BlockPos;
@@ -27,6 +28,9 @@ public class DebugStick extends Item {
         int attackTime = 100;
 
         if (!level.isClientSide){
+
+            ClockWyvernClockOBall.summon(player, player.getEyePosition(), player.getLookAngle().scale(1f));
+
 //            ClockAttack clockAttack = ClockAttack.summon(level, player.position().add(10, 0, 10), 20, 100, player);
 
 //            NetzachClockPendulum.summon(level, player.position(), player.getLookAngle(), 30, 60);
@@ -64,8 +68,8 @@ public class DebugStick extends Item {
 
         }else{
 
-            Vec3 pos = player.getEyePosition().add(player.getLookAngle().scale(15));
-            DistortedSlamEffectHandler.setDistortionSlamEffect(new DistortedSlamEffect(pos, 18, 15, (float) pos.y));
+//            Vec3 pos = player.getEyePosition().add(player.getLookAngle().scale(15));
+//            DistortedSlamEffectHandler.setDistortionSlamEffect(new DistortedSlamEffect(pos, 18, 15, (float) pos.y));
 
 //            Minecraft.getInstance().setScreen(new BossCodexScreen());
 //            NetzachEffectOverlay.flash(attackTime,10);

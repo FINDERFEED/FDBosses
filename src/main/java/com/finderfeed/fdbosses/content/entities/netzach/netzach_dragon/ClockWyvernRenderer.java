@@ -197,12 +197,7 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
 
             float baseCubeSize = 0.85f;
 
-            renderCube(matrices, vertex, (baseCubeSize - 0.25f) * cubeSizeMod, 1f, 1f, 1f, 1f, 1, false);
-            renderCube(matrices, vertex, (baseCubeSize - 0.15f) * cubeSizeMod, 0.8f, 0.6f, 0.2f, 1f, 1, false);
-
-            vertex = src.getBuffer(RenderType.text(WYVERN_FIREBALL));
-            renderCube(matrices, vertex, baseCubeSize * cubeSizeMod, 1f, 1f, 1f, 1f, 1, true);
-
+            renderClockOBall(matrices, src, baseCubeSize * cubeSizeMod);
 
             matrices.popPose();
 
@@ -210,6 +205,15 @@ public class ClockWyvernRenderer implements FDFreeEntityRenderer<ClockWyvern> {
 
             renderRay(wyvern, matrices, src, mat, pticks, yaw, 0.5f * raySizeMod);
         }
+    }
+
+    public static void renderClockOBall(PoseStack matrices, MultiBufferSource source, float size){
+        VertexConsumer vertex = source.getBuffer(RenderType.lightning());
+        renderCube(matrices, vertex, size * 0.6f, 1f, 1f, 1f, 0.7f, 1, false);
+        renderCube(matrices, vertex, size * 0.8f, 0.9f, 0.7f, 0.2f, 1f, 1, false);
+
+        vertex = source.getBuffer(RenderType.text(WYVERN_FIREBALL));
+        renderCube(matrices, vertex, size, 1f, 1f, 1f, 1f, 1, true);
     }
 
     public static void renderRay(ClockWyvern clockWyvern, PoseStack matrices, MultiBufferSource src, Matrix4f headTransformation, float pticks, float yaw, float raySize){
