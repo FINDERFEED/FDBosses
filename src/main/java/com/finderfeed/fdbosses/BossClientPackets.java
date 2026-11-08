@@ -454,6 +454,73 @@ public class BossClientPackets {
             case BossUtil.CLOCK_WYVERN_SLAM -> {
                 clockWyvernSlam(pos, data);
             }
+            case BossUtil.CLOCK_O_BALL_EXPLOSION -> {
+                clockOBallExplosion(pos, data);
+            }
+        }
+    }
+
+    public static void clockOBallExplosion(Vec3 hitPos, int data){
+
+        Level level = FDClientHelpers.getClientLevel();
+
+        BallParticleOptions flash = BallParticleOptions.builder()
+                .color(1f,0.8f,0.4f)
+                .scalingOptions(1,0,2)
+                .brightness(2)
+                .size(3.5f)
+                .build();
+        level.addParticle(flash,true,hitPos.x,hitPos.y,hitPos.z,0,0,0);
+
+        SpriteParticleOptions gear = SpriteParticleOptions.builder(BossParticles.BIG_GEAR)
+                .lifetime(15)
+                .size(3f)
+                .xyzRotationSpeed(20,0,0)
+                .friction(0.8f)
+                .frictionAffectsRotation()
+                .quadSizeIncreasing()
+                .quadSizeEaseOut()
+                .alphaDecreasing()
+                .lightenedUp()
+                .build();
+        level.addParticle(gear,true,hitPos.x,hitPos.y,hitPos.z,0,0,0);
+
+        int particleCount = 45;
+
+        double minSpeed = 0.25;
+        double maxSpeed = 0.55;
+
+        float friction = 0.8f;
+
+        for (int i = 0; i < particleCount; i++) {
+
+            Vec3 direction = new Vec3(
+                    random.nextGaussian(),
+                    random.nextGaussian(),
+                    random.nextGaussian()
+            ).normalize();
+
+            double speed = minSpeed + random.nextDouble() * (maxSpeed - minSpeed);
+            Vec3 velocity = direction.scale(speed);
+
+            SpriteParticleOptions options = SpriteParticleOptions.builder(BossParticles.YELLOW_SPARK)
+                    .lifetime(12 + random.nextInt(14))
+                    .size(0.15f + random.nextFloat() * 0.2f)
+                    .xyzRotationSpeed(40 * BossUtil.randomPlusMinus(), 0, 0)
+                    .frictionAffectsRotation()
+                    .friction(friction)
+                    .alphaDecreasing()
+                    .build();
+
+            level.addParticle(
+                    options, true,
+                    hitPos.x,
+                    hitPos.y,
+                    hitPos.z,
+                    velocity.x,
+                    velocity.y,
+                    velocity.z
+            );
         }
     }
 

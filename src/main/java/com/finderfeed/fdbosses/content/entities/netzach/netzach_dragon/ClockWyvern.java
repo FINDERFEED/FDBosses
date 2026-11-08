@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_ball.ClockWyvernClockOBall;
 import com.finderfeed.fdbosses.content.util.HorizontalCircleRandomDirections;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossModels;
@@ -17,6 +18,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.F
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
+import com.finderfeed.fdlib.systems.entity.action_chain.AttackOptions;
 import com.finderfeed.fdlib.systems.shake.FDShakeData;
 import com.finderfeed.fdlib.systems.shake.PositionedScreenShakePacket;
 import com.finderfeed.fdlib.util.FDColor;
@@ -34,6 +36,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.control.BodyRotationControl;
 import net.minecraft.world.level.ClipContext;
@@ -57,6 +60,12 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
     public static final String DO_NOTHING = "do_nothing";
     public static final String FLY_UP_AND_SLAM = "fly_up_and_slam";
     public static final String TIMED_RAY_ATTACK = "delayed_ray_attack";
+    public static final String CLOCK_O_BALLS_0 = "clock_o_balls_0";
+    public static final String CLOCK_O_BALLS_1 = "clock_o_balls_1";
+    public static final String CLOCK_O_BALLS_2 = "clock_o_balls_2";
+    public static final String CLOCK_O_BALLS_3 = "clock_o_balls_3";
+    public static final String CLOCK_O_BALLS_4 = "clock_o_balls_4";
+    public static final String CLOCK_O_BALLS_5 = "clock_o_balls_5";
 
     public static FDModel serverAnimatedModel;
     public static FDModel animatedModel;
@@ -102,11 +111,24 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
         attackChain.registerAttack(DO_NOTHING, (e) -> this.doNothing(e, 60));
         attackChain.registerAttack(FLY_UP_AND_SLAM, this::flyUpAndSlamAttack);
         attackChain.registerAttack(TIMED_RAY_ATTACK, this::timedRayAttack);
+        attackChain.registerAttack(CLOCK_O_BALLS_0, (inst) -> clockOBalls(inst, 0));
+        attackChain.registerAttack(CLOCK_O_BALLS_1, (inst) -> clockOBalls(inst, 1));
+        attackChain.registerAttack(CLOCK_O_BALLS_2, (inst) -> clockOBalls(inst, 2));
+        attackChain.registerAttack(CLOCK_O_BALLS_3, (inst) -> clockOBalls(inst, 3));
+        attackChain.registerAttack(CLOCK_O_BALLS_4, (inst) -> clockOBalls(inst, 4));
+        attackChain.registerAttack(CLOCK_O_BALLS_5, (inst) -> clockOBalls(inst, 5));
 
         attackChain.addAttack(0, DO_NOTHING);
-//        attackChain.addAttack(1, FLY_UP_AND_SLAM);
-        attackChain.addAttack(2, TIMED_RAY_ATTACK);
-
+        attackChain.addAttack(2, FLY_UP_AND_SLAM);
+        attackChain.addAttack(3, AttackOptions.chainOptionsBuilder()
+                        .addAttack(CLOCK_O_BALLS_0)
+                        .addAttack(CLOCK_O_BALLS_1)
+                        .addAttack(CLOCK_O_BALLS_2)
+                        .addAttack(CLOCK_O_BALLS_3)
+                        .addAttack(CLOCK_O_BALLS_4)
+                        .addAttack(CLOCK_O_BALLS_5)
+                .build());
+        attackChain.addAttack(4, TIMED_RAY_ATTACK);
 
         this.getAnimationSystem().setAnimationsApplyListener(this::onAnimationsApply);
         this.lookControl = new ClockWyvernLookControl(this);
@@ -116,7 +138,7 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
     public void tick() {
         super.tick();
         if (!level().isClientSide){
-            this.getAnimationSystem().startAnimation(TURNING, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_SPINNING_GEARS.get())
+            this.getAnimationSystem().startAnimation("GEARS", AnimationTicker.builder(BossAnims.CLOCK_WYVERN_SPINNING_GEARS.get())
                     .setTransitionTime(5)
                     .build());
             this.setTarget(this.level().getNearestPlayer(this.getX(), this.getY(), this.getZ(), 100, false));
@@ -135,11 +157,89 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
                 }
             }
             this.setYRot(this.yBodyRot);
-            this.rotationAnimations();
         }else{
+            this.rotationAnimations();
             this.chargeTimedRayAttackBallParticles();
         }
 
+    }
+
+    private boolean clockOBalls(AttackInstance inst, int type){
+        int stage = inst.stage;
+        int tick = inst.tick;
+
+        if (this.getTarget() == null){
+            this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_IDLE.get())
+                    .setTransitionTime(5)
+                    .build());
+            return true;
+        }
+
+        this.getLookControl().setLookAt(this.getTarget());
+
+        if (stage == 0){
+            if (this.looksAtTarget(this.getTarget(), 0.9f)){
+                inst.nextStage();
+            }
+        }else if (stage == 1){
+            this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_CLOCK_O_BALL)
+                    .important()
+                    .setTransitionTime(5)
+                    .build());
+            inst.nextStage();
+        } else if (stage == 2){
+            if (tick == 15){
+                this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_IDLE.get())
+                        .setTransitionTime(5)
+                        .build());
+                this.spawnClockOBalls(this.getTarget(), type);
+            }
+            return tick > BossAnims.CLOCK_WYVERN_CLOCK_O_BALL.get().getAnimTime();
+        }
+
+        return false;
+    }
+
+    private void spawnClockOBalls(Entity target, int type) {
+        if (this.level().isClientSide) return;
+
+        Matrix4f transform = this.getModelPartTransformation(
+                this, "head", getServerAnimatedModel(), 1
+        );
+
+        Vector3f pos = transform.transformPosition(new Vector3f());
+        Vec3 worldPos = new Vec3(pos.x, pos.y, pos.z).add(this.position());
+
+        int ballCount = 3 + Math.max(0, type);
+
+        double angleStep = Math.toRadians(15.0);
+        double speed = 1;
+
+        Vec3 forward = target.position().add(0, target.getBbHeight() / 2, 0).subtract(worldPos);
+
+        for (int i = 0; i < ballCount; i++) {
+            double angle = (i - (ballCount - 1) / 2.0) * angleStep;
+
+            double cos = Math.cos(angle);
+            double sin = Math.sin(angle);
+
+            Vec3 direction = new Vec3(
+                    forward.x * cos - forward.z * sin,
+                    forward.y,
+                    forward.x * sin + forward.z * cos
+            ).normalize();
+
+            ClockWyvernClockOBall.summon(
+                    this,
+                    worldPos,
+                    direction.scale(speed)
+            );
+        }
+    }
+
+    private boolean looksAtTarget(Entity target, float dot){
+        Vec3 between = target.getEyePosition().subtract(this.getEyePosition());
+        return between.normalize().dot(this.getLookAngle().normalize()) > dot;
     }
 
     private boolean timedRayAttack(AttackInstance inst){
@@ -175,7 +275,7 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
             this.setWyvernRayTarget(groundPos);
 
             if (target instanceof ServerPlayer player) {
-//                BossUtil.netzachBacktrackEffectFor(player, backtrackTime, 40);
+                BossUtil.netzachBacktrackEffectFor(player, backtrackTime, 40);
             }
 
             this.getAnimationSystem().startAnimation(MAIN, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_TIMED_RAY_ATTACK)
@@ -494,9 +594,9 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
 
     private void rotationAnimations(){
         var mainAnimation = this.getAnimationSystem().getTickerAnimation(MAIN);
-        if (mainAnimation == BossAnims.CLOCK_WYVERN_IDLE.get()){
+        if (mainAnimation == BossAnims.CLOCK_WYVERN_IDLE.get() || mainAnimation == BossAnims.CLOCK_WYVERN_CLOCK_O_BALL.get()){
             float rot = yRotO - this.getYRot();
-            float terminalRotation = 0.4f;
+            float terminalRotation = 1f;
             if (rot > terminalRotation){
                 this.getAnimationSystem().startAnimation(TURNING, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_TURN_LEFT)
                         .setLoopMode(Animation.LoopMode.ONCE)

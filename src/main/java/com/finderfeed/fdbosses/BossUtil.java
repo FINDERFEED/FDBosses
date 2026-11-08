@@ -91,6 +91,11 @@ public class BossUtil {
     public static final int NETZACH_CRUSH = 25;
     public static final int NETZACH_DISAPPEAR = 26;
     public static final int CLOCK_WYVERN_SLAM = 27;
+    public static final int CLOCK_O_BALL_EXPLOSION = 28;
+
+    public static void clockOBallExplosion(Level level, Vec3 hitPos){
+        posEvent((ServerLevel) level, hitPos, CLOCK_O_BALL_EXPLOSION, 0, 60);
+    }
 
     public static void netzachBacktrackEffectFor(ServerPlayer player, int effectTime, int flashTime){
         PacketDistributor.sendToPlayer(player, new BacktrackEffectPacket(effectTime, flashTime));
