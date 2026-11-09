@@ -9,6 +9,7 @@ import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
+import com.finderfeed.fdbosses.client.particles.vanilla_like.ASParticleType;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
@@ -79,6 +80,7 @@ import org.joml.*;
 import java.lang.Math;
 import java.util.*;
 import java.util.Random;
+import java.util.function.Supplier;
 
 public class BossClientPackets {
 
@@ -609,6 +611,51 @@ public class BossClientPackets {
                 );
             }
         }
+
+        spawnSpikeParticles(pos, 10);
+
+    }
+
+    public static void spawnSpikeParticles(Vec3 pos, float radius){
+        Level level = FDClientHelpers.getClientLevel();
+
+        float step = 0.5f;
+        for (float i = 0.5f; i < radius; i+= step){
+            int count = (int) Math.ceil(i);
+            float angleOffset = i * FDMathUtil.FPI / 4;
+            for (var dir : new HorizontalCircleRandomDirections(level.random, count, 0.5f)){
+                Vec3 realDir = dir.yRot(angleOffset);
+
+                float size;
+                float md = 1;
+
+                Supplier<ASParticleType> particle;
+                if (level.random.nextFloat() > 0.25f){
+                    particle = BossParticles.EARTH_SPIKE;
+                    size = 2;
+                    md = -1;
+                }else{
+                    size = 4;
+                    particle = BossParticles.NETZACH_CRUSH;
+                }
+
+                SpriteParticleOptions spriteParticleOptions = SpriteParticleOptions.builder(particle)
+                        .lifetime(8)
+                        .size(size)
+                        .particleLookDirection(realDir.yRot(md * FDMathUtil.FPI / 2))
+                        .lightenedUp()
+                        .build();
+
+                level.addParticle(spriteParticleOptions, true,
+                        pos.x + realDir.x * i,
+                        pos.y + realDir.y * i,
+                        pos.z + realDir.z * i,
+                        0,0,0
+                );
+
+            }
+        }
+
 
     }
 

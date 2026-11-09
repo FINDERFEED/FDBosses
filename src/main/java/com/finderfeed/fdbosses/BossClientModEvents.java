@@ -480,6 +480,7 @@ public class BossClientModEvents {
         event.registerSpriteSet(BossParticles.NETZACH_POKE.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.EARTH_CRACK.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.BIG_GEAR.get(), AnimatedSpriteParticle.Factory::new);
+        event.registerSpriteSet(BossParticles.EARTH_SPIKE.get(), AnimatedSpriteParticle.Factory::new);
     }
 
     @SubscribeEvent

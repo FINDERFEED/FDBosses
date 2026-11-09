@@ -120,15 +120,15 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
 
         attackChain.addAttack(0, DO_NOTHING);
         attackChain.addAttack(2, FLY_UP_AND_SLAM);
-        attackChain.addAttack(3, AttackOptions.chainOptionsBuilder()
-                        .addAttack(CLOCK_O_BALLS_0)
-                        .addAttack(CLOCK_O_BALLS_1)
-                        .addAttack(CLOCK_O_BALLS_2)
-                        .addAttack(CLOCK_O_BALLS_3)
-                        .addAttack(CLOCK_O_BALLS_4)
-                        .addAttack(CLOCK_O_BALLS_5)
-                .build());
-        attackChain.addAttack(4, TIMED_RAY_ATTACK);
+//        attackChain.addAttack(3, AttackOptions.chainOptionsBuilder()
+//                        .addAttack(CLOCK_O_BALLS_0)
+//                        .addAttack(CLOCK_O_BALLS_1)
+//                        .addAttack(CLOCK_O_BALLS_2)
+//                        .addAttack(CLOCK_O_BALLS_3)
+//                        .addAttack(CLOCK_O_BALLS_4)
+//                        .addAttack(CLOCK_O_BALLS_5)
+//                .build());
+//        attackChain.addAttack(4, TIMED_RAY_ATTACK);
 
         this.getAnimationSystem().setAnimationsApplyListener(this::onAnimationsApply);
         this.lookControl = new ClockWyvernLookControl(this);
@@ -138,6 +138,7 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
     public void tick() {
         super.tick();
         if (!level().isClientSide){
+
             this.getAnimationSystem().startAnimation("GEARS", AnimationTicker.builder(BossAnims.CLOCK_WYVERN_SPINNING_GEARS.get())
                     .setTransitionTime(5)
                     .build());
