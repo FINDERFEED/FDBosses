@@ -1,5 +1,7 @@
 package com.finderfeed.fdbosses.content.entities.netzach.train_attack;
 
+import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
@@ -11,13 +13,20 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWithComplexSpawn {
 
     private static final EntityDataAccessor<Boolean> WAITING = SynchedEntityData.defineId(DoomTrain.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Float> PATH_DISTANCE = SynchedEntityData.defineId(DoomTrain.class, EntityDataSerializers.FLOAT);
 
     @SerializableField
     private String patternId = TrainAttackPatterns.STRAIGHT;
@@ -57,6 +66,7 @@ public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWith
     @Override
     public void tick(){
         super.tick();
+
         if (!this.level().isClientSide){
             if (this.departureDelay > 0){
                 this.departureDelay--;
@@ -68,7 +78,9 @@ public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWith
 
         if (!this.isWaiting()){
             TrainAttackPattern pattern = this.getPattern();
+            double previousDistance = this.traveledDistance;
             this.traveledDistance = Math.min(this.traveledDistance + this.trainSpeed, pattern.getPathLength());
+
             Vec3 nextPosition = this.pathOrigin.add(pattern.getPosition(this.getProgress()));
             Vec3 movement = nextPosition.subtract(this.position());
             this.setDeltaMovement(movement);
@@ -76,12 +88,63 @@ public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWith
                 float targetYaw = FDMathUtil.yRotFromVector(movement);
                 this.setYRot(this.yRotO + FDMathUtil.convertMCYRotationToNormal(targetYaw - this.yRotO));
             }
+
+            if (!this.level().isClientSide){
+                this.damageEntities(previousDistance);
+            }
             this.setPos(nextPosition);
         }
 
         if (!this.level().isClientSide){
+            this.entityData.set(PATH_DISTANCE, (float)this.traveledDistance);
             if (this.traveledDistance >= this.getPattern().getPathLength()){
                 this.discard();
+            }
+        }
+
+    }
+
+    private void damageEntities(double previousDistance){
+        Set<Entity> targets = new HashSet<>();
+        Vec3 from = this.position();
+        TrainAttackPattern pattern = this.getPattern();
+
+        float boxStep = 0.45f;
+
+        for (double distance = previousDistance; distance < this.traveledDistance;){
+            double nextDistance = Math.min(distance + 1, this.traveledDistance);
+
+            Vec3 to = this.pathOrigin.add(pattern.getPosition(nextDistance / pattern.getPathLength()));
+            Vec3 movement = to.subtract(from);
+            AABB box = this.getBoundingBox().move(from.subtract(this.position()));
+            targets.addAll(this.level().getEntitiesOfClass(LivingEntity.class, box, LivingEntity::isAlive));
+
+            for (double x = box.minX + 0.1; x < box.maxX; x += boxStep){
+                for (double y = box.minY + 0.5; y < box.maxY; y++){
+                    for (double z = box.minZ + 0.1; z < box.maxZ; z += boxStep){
+                        Vec3 start = new Vec3(x,y,z);
+                        targets.addAll(FDHelpers.traceEntities(this.level(), start, start.add(movement), 0.1,
+                                entity -> entity instanceof LivingEntity && entity.isAlive()));
+                    }
+                }
+            }
+
+            distance = nextDistance;
+            from = to;
+        }
+
+        for (Entity entity : targets){
+            entity.hurt(this.damageSources().magic(), 1);
+        }
+    }
+
+    @Override
+    public void onSyncedDataUpdated(EntityDataAccessor<?> accessor){
+        super.onSyncedDataUpdated(accessor);
+        if (this.level().isClientSide){
+            if (accessor == PATH_DISTANCE){
+                this.traveledDistance = this.entityData.get(PATH_DISTANCE);
+                this.setPos(this.pathOrigin.add(this.getPattern().getPosition(this.getProgress())));
             }
         }
     }
@@ -128,6 +191,7 @@ public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWith
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder){
         builder.define(WAITING, true);
+        builder.define(PATH_DISTANCE, 0.0f);
     }
 
     @Override
@@ -145,4 +209,5 @@ public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWith
         }
         this.entityData.set(WAITING, this.departureDelay > 0);
     }
+
 }
