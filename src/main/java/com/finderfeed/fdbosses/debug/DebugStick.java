@@ -4,9 +4,12 @@ import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.Distor
 import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffect;
 import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffectHandler;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_ball.ClockWyvernClockOBall;
+import com.finderfeed.fdbosses.content.entities.netzach.train_attack.TrainAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.train_attack.TrainAttackPatterns;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -28,111 +31,13 @@ public class DebugStick extends Item {
         int attackTime = 100;
 
         if (!level.isClientSide){
-
-            ClockWyvernClockOBall.summon(player, player.getEyePosition(), player.getLookAngle().scale(1f));
-
-//            ClockAttack clockAttack = ClockAttack.summon(level, player.position().add(10, 0, 10), 20, 100, player);
-
-//            NetzachClockPendulum.summon(level, player.position(), player.getLookAngle(), 30, 60);
-
-//
-//            if (player.isCrouching()) {
-//                SectorAttack.summon(player, SectorAttack.ShapesRegistry.SIMPLE_TWO_SECTORS_ID, attackTime - 1);
-//            }else{
-//                SectorAttack.summon(player, SectorAttack.ShapesRegistry.SIMPLE_CHECKERBOARD_2_ID, attackTime - 1);
-//            }
-//            ServerLevel serverLevel = (ServerLevel) level;
-//
-//            Vec3 ppos = player.position().add(0, 0, 0).add(player.getLookAngle().scale(0.5));
-//
-//            BacktrackEntity.summon(player, attackTime);
-
-
-//            serverLevel.sendParticles(SpriteParticleOptions.builder(BossParticles.NETZACH_SLASH)
-//                    .particleLookDirection(player.getLookAngle())
-////                            .xyzRotation(0,20,0)
-//                    .lifetime(4)
-//
-//                    .frictionAffectsRotation()
-//                    .friction(0.95f)
-//                            .size(2f)
-////                    .flipSprite()
-//                    .verticalRendering()
-//
-//                    .build(), ppos.x,ppos.y,ppos.z,1,0,0,0,0);
-
-
-//            NetzachRollingGearAttack.summon(player, ppos, player.getLookAngle().multiply(1,0,1).normalize().scale(2));
-
-//            NetzachGearCrushAttack.summon(player, player, player.getLookAngle());
-
+            TrainAttack.summon(level, player.position(), TrainAttackPatterns.MANY_TURNS, 0.5f, 40, 200);
         }else{
 
-//            Vec3 pos = player.getEyePosition().add(player.getLookAngle().scale(15));
-//            DistortedSlamEffectHandler.setDistortionSlamEffect(new DistortedSlamEffect(pos, 18, 15, (float) pos.y));
-
-//            Minecraft.getInstance().setScreen(new BossCodexScreen());
-//            NetzachEffectOverlay.flash(attackTime,10);
-//
-//            level.addParticle(ChesedRayOptions.builder()
-//                            .color(1f,0f,0f,1f)
-//                            .in(10)
-//                            .out(10)
-//                            .width(1)
-//                            .end(player.getEyePosition().add(player.getLookAngle().scale(10)))
-//                    .build(), player.getX(), player.getY(), player.getZ(), 0,0,0);
-
-//            Minecraft.getInstance().setScreen(new testscreers());
         }
 
         return super.use(level, player, hand);
     }
 
-    private static void createGeburahArenaCircleAtPos(Level level, BlockPos pos, int endRadius, float percent, int wholeRadius){
-
-        float startRadius = percent * endRadius;
-
-        for (int x = -wholeRadius; x <= wholeRadius; x++){
-            for (int z = -wholeRadius; z <= wholeRadius; z++){
-
-                Vec3 v = new Vec3(x + 0.001f,0,z + 0.001f);
-                double len = v.length();
-
-                float angle = (float) FDMathUtil.angleBetweenVectors(v.normalize(),new Vec3(1,0,0)) % (FDMathUtil.FPI / 2);
-
-
-                float p;
-                if (angle < FDMathUtil.FPI / 4){
-                    p = angle / (FDMathUtil.FPI / 4);
-                }else{
-                    p = 1 - (angle - FDMathUtil.FPI / 4) / (FDMathUtil.FPI / 4);
-                }
-
-
-                float currentRadius = FDMathUtil.lerp(startRadius,endRadius, FDEasings.easeInOut(1 - p));
-
-                BlockPos offsetPos = pos.offset(x,0,z);
-
-                if (len < currentRadius){
-                    if (level.getBlockState(offsetPos).isAir()) {
-                        level.setBlock(offsetPos, Blocks.END_STONE.defaultBlockState(), 2);
-                    }
-//                    if (level.random.nextFloat() > 0.7f){
-//                        for (int i = 1; i < 4 + level.random.nextInt(2); i++){
-//                            level.setBlock(pos.offset(x,-i,z), Blocks.END_STONE.defaultBlockState(), 2);
-//                        }
-//                    }
-                }else{
-//                    if (!level.getBlockState(offsetPos).is(Blocks.END_STONE)){
-//                        level.setBlock(offsetPos, Blocks.STRUCTURE_VOID.defaultBlockState(),2);
-//                    }
-                }
-
-
-            }
-        }
-
-
-    }
 
 }

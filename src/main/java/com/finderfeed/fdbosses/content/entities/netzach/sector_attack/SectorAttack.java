@@ -43,8 +43,6 @@ public class SectorAttack extends OwnableEntity implements AutoSerializable {
 
     protected int ticksAfterAttack = 0;
 
-
-
     protected List<FD2DShape> triangulatedForRendering = new ArrayList<>();
 
     protected List<Vector2f> attackVisualOffsets = null;

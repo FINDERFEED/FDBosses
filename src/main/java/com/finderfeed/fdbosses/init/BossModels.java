@@ -70,6 +70,11 @@ public class BossModels {
     public static final Supplier<FDModelInfo> TIME_STABILIZER = INFOS.register("time_stabilizer",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"time_stabilizer"),1.0f));
     public static final Supplier<FDModelInfo> CLOCK_WYVERN = INFOS.register("clock_wyvern",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_dragon"),1.0f));
     public static final Supplier<FDModelInfo> CLOCK_WYVERN_CHARGING_SPOT = INFOS.register("clock_wyvern_charging_body",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern_charging_body"),1.0f));
+    public static final Supplier<FDModelInfo> DOOM_TRAIN_TUNNEL = INFOS.register("doom_train_tunnel",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"doom_train_tunnel"),1.0f));
+    public static final Supplier<FDModelInfo> DOOM_TRAIN = INFOS.register("doom_train",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"doom_train"),1.0f));
+    public static final Supplier<FDModelInfo> DOOM_TRAIN_WAGON = INFOS.register("doom_train_wagon",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"doom_train_wagon"),1.0f));
+    public static final Supplier<FDModelInfo> DOOM_TRAIN_RAILS = INFOS.register("doom_train_rails",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"doom_train_rails"),1.0f));
+    public static final Supplier<FDModelInfo> DOOM_TRAIN_RAILS_TURN = INFOS.register("doom_train_rails_turn",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"doom_trrain_rails_turn"),1.0f));
 
 
 }

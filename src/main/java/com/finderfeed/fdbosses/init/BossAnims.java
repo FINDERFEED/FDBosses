@@ -422,4 +422,8 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_wyvern"));
     });
 
+    public static DeferredHolder<Animation,Animation> DOOM_TRAIN_TUNNEL_APPEAR = ANIMATIONS.register("doom_train_tunnel_appear", ()->{
+        return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"doom_train_tunnel"));
+    });
+
 }
