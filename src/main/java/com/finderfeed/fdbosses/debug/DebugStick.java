@@ -31,7 +31,7 @@ public class DebugStick extends Item {
         int attackTime = 100;
 
         if (!level.isClientSide){
-            TrainAttack.summon(level, player.position(), TrainAttackPatterns.MANY_TURNS, 0.5f, 40, 200);
+            TrainAttack.summon(level, player.position(), TrainAttackPatterns.MANY_TURNS, 0.75f, 40, 10);
         }else{
 
         }

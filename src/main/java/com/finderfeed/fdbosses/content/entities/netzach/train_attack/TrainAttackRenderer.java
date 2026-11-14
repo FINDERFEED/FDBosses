@@ -41,9 +41,10 @@ public class TrainAttackRenderer extends EntityRenderer<TrainAttack> {
         if (pattern == null) return;
         float tick = entity.tickCount + partialTick;
         int tunnelAnimationTime = entity.getTunnelAnimationTime();
+        float disappearTick = TrainAttack.RAILS_DISAPPEAR_TIME + tunnelAnimationTime - entity.getDisappearTicksLeft() + partialTick;
         float tunnelProgress = Mth.clamp(tick / tunnelAnimationTime, 0, 1);
-        if (tick >= entity.getTunnelDisappearStart()){
-            tunnelProgress = 1 - Mth.clamp((tick - entity.getTunnelDisappearStart()) / tunnelAnimationTime, 0, 1);
+        if (entity.isDisappearing()){
+            tunnelProgress = 1 - Mth.clamp((disappearTick - TrainAttack.RAILS_DISAPPEAR_TIME) / tunnelAnimationTime, 0, 1);
         }
         this.renderTunnel(pattern.getPoints().getFirst(), pattern.getExitDirection(), tunnelProgress, matrices, buffers, light);
         this.renderTunnel(pattern.getPoints().getLast(), pattern.getEntranceDirection(), tunnelProgress, matrices, buffers, light);
@@ -64,9 +65,9 @@ public class TrainAttackRenderer extends EntityRenderer<TrainAttack> {
             float progress = Mth.clamp((tick - delay) / appearDuration, 0, 1);
             float scale = progress;
             float height = RAIL_HEIGHT.apply(progress);
-            if (tick >= entity.getRailsDisappearStart()){
+            if (entity.isDisappearing()){
                 float disappearDelay = (1 - order) * (TrainAttack.RAILS_DISAPPEAR_TIME - disappearDuration);
-                float disappear = Mth.clamp((tick - entity.getRailsDisappearStart() - disappearDelay) / disappearDuration, 0, 1);
+                float disappear = Mth.clamp((disappearTick - disappearDelay) / disappearDuration, 0, 1);
                 scale = 1 - FDEasings.easeIn(disappear);
                 height = 0;
             }

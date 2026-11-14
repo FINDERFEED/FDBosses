@@ -88,6 +88,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_b
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.train_attack.TrainAttackRenderer;
+import com.finderfeed.fdbosses.content.entities.netzach.train_attack.DoomTrain;
 import com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer.TimeStabilizer;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereHandler;
 import com.finderfeed.fdbosses.content.items.chesed.PhaseSphereOverlay;
@@ -496,6 +497,23 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.NETZACH_GEAR_CRUSH.get(), NetzachGearCrushAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.SECTOR_ATTACK.get(), SectorAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.TRAIN_ATTACK.get(), TrainAttackRenderer::new);
+
+        event.registerEntityRenderer(BossEntities.DOOM_TRAIN.get(), FDEntityRendererBuilder.<DoomTrain>builder()
+                .addLayer(FDEntityRenderLayerOptions.<DoomTrain>builder()
+                        .model(BossModels.DOOM_TRAIN)
+                        .renderType(RenderType.entityCutoutNoCull(FDBosses.location("textures/entities/netzach/doom_train.png")))
+                        .renderCondition(train->!train.isWaiting())
+                        .build())
+                .build());
+
+        event.registerEntityRenderer(BossEntities.DOOM_TRAIN_WAGON.get(), FDEntityRendererBuilder.<DoomTrain>builder()
+                .addLayer(FDEntityRenderLayerOptions.<DoomTrain>builder()
+                        .model(BossModels.DOOM_TRAIN_WAGON)
+                        .renderType(RenderType.entityCutoutNoCull(FDBosses.location("textures/entities/netzach/doom_train_wagon.png")))
+                        .renderCondition(train->!train.isWaiting())
+                        .build())
+                .build());
+
         event.registerEntityRenderer(BossEntities.CLOCK_WYVERN_CLOCK_O_BALL.get(), ClockWyvernClockOBallRenderer::new);
 
         event.registerEntityRenderer(BossEntities.CLOCK_WYVERN_CHARGING_SPOT.get(), FDEntityRendererBuilder.<ClockWyvernChargingSpot>builder()

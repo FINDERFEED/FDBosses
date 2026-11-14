@@ -64,6 +64,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_b
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.train_attack.TrainAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.train_attack.DoomTrain;
 import com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer.TimeStabilizer;
 import com.finderfeed.fdbosses.content.items.geburah.DivineGear;
 import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFistChain;
@@ -493,6 +494,22 @@ public class BossEntities {
             .clientTrackingRange(16)
             .sized(1f,1f)
             .build("train_attack"));
+
+    public static final Supplier<EntityType<DoomTrain>> DOOM_TRAIN = ENTITIES.register("doom_train",()->EntityType.Builder.of(
+                    DoomTrain::new, MobCategory.MISC
+            )
+            .clientTrackingRange(16)
+            .updateInterval(1)
+            .sized(2f,3f)
+            .build("doom_train"));
+
+    public static final Supplier<EntityType<DoomTrain>> DOOM_TRAIN_WAGON = ENTITIES.register("doom_train_wagon",()->EntityType.Builder.of(
+                    DoomTrain::new, MobCategory.MISC
+            )
+            .clientTrackingRange(16)
+            .updateInterval(1)
+            .sized(2f,3f)
+            .build("doom_train_wagon"));
 
     //ITEMS
     public static final Supplier<EntityType<MalkuthFistChain>> MALKUTH_FIST_CHAIN = ENTITIES.register("malkuth_fist_chain",()->EntityType.Builder.of(
