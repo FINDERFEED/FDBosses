@@ -6,14 +6,16 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.F
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
 
-public class DoomTrain extends FDEntity implements AutoSerializable {
+public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWithComplexSpawn {
 
     private static final EntityDataAccessor<Boolean> WAITING = SynchedEntityData.defineId(DoomTrain.class, EntityDataSerializers.BOOLEAN);
 
@@ -56,33 +58,55 @@ public class DoomTrain extends FDEntity implements AutoSerializable {
     public void tick(){
         super.tick();
         if (!this.level().isClientSide){
-            TrainAttackPattern pattern = this.getPattern();
             if (this.departureDelay > 0){
                 this.departureDelay--;
                 this.setDeltaMovement(Vec3.ZERO);
                 return;
             }
             this.entityData.set(WAITING, false);
-            this.traveledDistance = Math.min(this.traveledDistance + this.trainSpeed, pattern.getPathLength());
-            Vec3 nextPosition = this.pathOrigin.add(pattern.getPosition(this.getProgress()));
-            this.setDeltaMovement(nextPosition.subtract(this.position()));
-
-            if (this.traveledDistance >= this.getPattern().getPathLength()){
-                this.discard();
-            }
         }
 
         if (!this.isWaiting()){
-            Vec3 nextPosition = this.position().add(this.getDeltaMovement());
-            float targetYaw = FDMathUtil.yRotFromVector(this.getDeltaMovement());
-            this.setYRot(this.yRotO + FDMathUtil.convertMCYRotationToNormal(targetYaw - this.yRotO));
+            TrainAttackPattern pattern = this.getPattern();
+            this.traveledDistance = Math.min(this.traveledDistance + this.trainSpeed, pattern.getPathLength());
+            Vec3 nextPosition = this.pathOrigin.add(pattern.getPosition(this.getProgress()));
+            Vec3 movement = nextPosition.subtract(this.position());
+            this.setDeltaMovement(movement);
+            if (movement.x != 0 || movement.z != 0){
+                float targetYaw = FDMathUtil.yRotFromVector(movement);
+                this.setYRot(this.yRotO + FDMathUtil.convertMCYRotationToNormal(targetYaw - this.yRotO));
+            }
             this.setPos(nextPosition);
+        }
+
+        if (!this.level().isClientSide){
+            if (this.traveledDistance >= this.getPattern().getPathLength()){
+                this.discard();
+            }
         }
     }
 
     @Override
     public void lerpTo(double x, double y, double z, float yaw, float pitch, int steps){
-        super.lerpTo(x, y, z, this.getYRot(), pitch, steps);
+
+    }
+
+    @Override
+    public void writeSpawnData(RegistryFriendlyByteBuf buffer){
+        buffer.writeUtf(this.patternId);
+        buffer.writeDouble(this.pathOrigin.x);
+        buffer.writeDouble(this.pathOrigin.y);
+        buffer.writeDouble(this.pathOrigin.z);
+        buffer.writeFloat(this.trainSpeed);
+        buffer.writeDouble(this.traveledDistance);
+    }
+
+    @Override
+    public void readSpawnData(RegistryFriendlyByteBuf buffer){
+        this.patternId = buffer.readUtf();
+        this.pathOrigin = new Vec3(buffer.readDouble(), buffer.readDouble(), buffer.readDouble());
+        this.trainSpeed = buffer.readFloat();
+        this.traveledDistance = buffer.readDouble();
     }
 
     public TrainAttackPattern getPattern(){

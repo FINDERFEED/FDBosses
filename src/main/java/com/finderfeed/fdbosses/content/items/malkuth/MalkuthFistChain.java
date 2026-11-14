@@ -184,7 +184,7 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
                             owner.stopRiding();
 
 
-                            int cooldownIKnowYouAreLookingHereToChangeThisField = BossConfigs.BOSS_CONFIG.get().itemConfig.iceFireGauntletCooldown;
+                            int cooldownIKnowYouAreLookingHereToChangeThisField = owner.isCreative() ? 10 : BossConfigs.BOSS_CONFIG.get().itemConfig.iceFireGauntletCooldown;
                             owner.getCooldowns().addCooldown(BossItems.MALKUTH_FIST.get(), cooldownIKnowYouAreLookingHereToChangeThisField);
 
                             this.setRemoved(RemovalReason.DISCARDED);
@@ -360,7 +360,7 @@ public class MalkuthFistChain extends FDEntity implements Undismountable {
 
                                 level().playSound(null,this.getX(),this.getY(),this.getZ(), BossSounds.MALKUTH_SWORD_EARTH_IMPACT.get(), SoundSource.HOSTILE, 2f, 1f);
 
-                                int cooldown = BossConfigs.BOSS_CONFIG.get().itemConfig.iceFireGauntletCooldown;
+                                int cooldown = owner.isCreative() ? 10 : BossConfigs.BOSS_CONFIG.get().itemConfig.iceFireGauntletCooldown;
 
                                 var item = owner.getUseItem();
                                 if (owner.getUseItem().is(BossItems.MALKUTH_FIST.get())){

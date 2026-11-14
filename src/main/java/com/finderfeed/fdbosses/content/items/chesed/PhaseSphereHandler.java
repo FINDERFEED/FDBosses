@@ -113,7 +113,7 @@ public class PhaseSphereHandler {
                         .build(), player.getUsedItemHand());
 
                 player.stopUsingItem();
-                player.getCooldowns().addCooldown(BossItems.PHASE_SPHERE.get(), BossConfigs.BOSS_CONFIG.get().itemConfig.phaseSphereCooldown);
+                player.getCooldowns().addCooldown(BossItems.PHASE_SPHERE.get(), player.isCreative() ? 10 : BossConfigs.BOSS_CONFIG.get().itemConfig.phaseSphereCooldown);
             }
             perdata.remove(dataname);
         }
