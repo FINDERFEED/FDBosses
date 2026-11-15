@@ -1,6 +1,7 @@
 package com.finderfeed.fdbosses.debug;
 
 import com.finderfeed.fdbosses.client.overlay.BossNoteOverlay;
+import com.finderfeed.fdbosses.content.boss_notes.BossNote;
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
 import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffect;
 import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffectHandler;
@@ -35,7 +36,7 @@ public class DebugStick extends Item {
         if (!level.isClientSide){
 //            TrainAttack.summon(level, player.position(), TrainAttackPatterns.TRACK_MANIA_2_PATH_1, 0.75f, 40, 10);
         }else{
-            BossNoteOverlay.show(Component.literal("Разрушайте кристаллы!"));
+            BossNoteOverlay.show(Component.literal("Разрушайте кристаллы!"), BossNote.Boss.CHESED);
         }
 
         return super.use(level, player, hand);

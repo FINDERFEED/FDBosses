@@ -100,20 +100,20 @@ public class BossUtil {
     public static final int CLOCK_WYVERN_SLAM = 27;
     public static final int CLOCK_O_BALL_EXPLOSION = 28;
 
-    public static void sendBossNote(ServerPlayer player, BossNote bossNote){
+    public static void sendBossNote(ServerPlayer player, BossNote bossNote, BossNote.Boss boss){
         var persistentData = player.getPersistentData();
         var receivedNotes = persistentData.getCompound(BOSS_NOTES_RECEIVED);
         String noteId = BossRegistries.BOSS_NOTES.getKey(bossNote).toString();
         if (!receivedNotes.getBoolean(noteId)){
             receivedNotes.putBoolean(noteId, true);
             persistentData.put(BOSS_NOTES_RECEIVED, receivedNotes);
-            PacketDistributor.sendToPlayer(player, new BossNotePacket(bossNote));
+            PacketDistributor.sendToPlayer(player, new BossNotePacket(bossNote, boss));
         }
     }
 
-    public static void sendBossNoteToPlayers(Level level, AABB area, BossNote bossNote){
+    public static void sendBossNoteToPlayers(Level level, AABB area, BossNote bossNote, BossNote.Boss boss){
         for (ServerPlayer player : level.getEntitiesOfClass(ServerPlayer.class, area, player -> !player.isSpectator())){
-            sendBossNote(player, bossNote);
+            sendBossNote(player, bossNote, boss);
         }
     }
 

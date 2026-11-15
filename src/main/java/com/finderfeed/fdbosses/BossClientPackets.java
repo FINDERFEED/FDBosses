@@ -88,8 +88,8 @@ public class BossClientPackets {
 
     private static Random random = new Random();
 
-    public static void showBossNote(BossNote bossNote){
-        BossNoteOverlay.show(bossNote.getComponent());
+    public static void showBossNote(BossNote bossNote, BossNote.Boss boss){
+        BossNoteOverlay.show(bossNote.getComponent(), boss);
     }
 
     public static void openTimeStabilizerScreen(int timeStabilizer, float currentDisplacement, float targetDisplacement){

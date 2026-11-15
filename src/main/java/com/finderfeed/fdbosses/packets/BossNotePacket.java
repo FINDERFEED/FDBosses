@@ -16,23 +16,27 @@ public class BossNotePacket extends FDPacket {
     private static final StreamCodec<RegistryFriendlyByteBuf, BossNote> CODEC = ByteBufCodecs.registry(BossRegistries.BOSS_NOTE);
 
     private final BossNote bossNote;
+    private final BossNote.Boss boss;
 
-    public BossNotePacket(BossNote bossNote){
+    public BossNotePacket(BossNote bossNote, BossNote.Boss boss){
         this.bossNote = bossNote;
+        this.boss = boss;
     }
 
     public BossNotePacket(RegistryFriendlyByteBuf buf){
         this.bossNote = CODEC.decode(buf);
+        this.boss = buf.readEnum(BossNote.Boss.class);
     }
 
     @Override
     public void write(RegistryFriendlyByteBuf buf){
         CODEC.encode(buf, this.bossNote);
+        buf.writeEnum(this.boss);
     }
 
     @Override
     public void clientAction(IPayloadContext context){
-        BossClientPackets.showBossNote(this.bossNote);
+        BossClientPackets.showBossNote(this.bossNote, this.boss);
     }
 
     @Override
