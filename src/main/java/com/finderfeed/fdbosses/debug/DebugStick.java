@@ -1,5 +1,6 @@
 package com.finderfeed.fdbosses.debug;
 
+import com.finderfeed.fdbosses.client.overlay.BossNoteOverlay;
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
 import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffect;
 import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffectHandler;
@@ -9,6 +10,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.train_attack.TrainAttack
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -31,9 +33,9 @@ public class DebugStick extends Item {
         int attackTime = 100;
 
         if (!level.isClientSide){
-            TrainAttack.summon(level, player.position(), TrainAttackPatterns.TRACK_MANIA_2_PATH_1, 0.75f, 40, 10);
+//            TrainAttack.summon(level, player.position(), TrainAttackPatterns.TRACK_MANIA_2_PATH_1, 0.75f, 40, 10);
         }else{
-
+            BossNoteOverlay.show(Component.literal("Разрушайте кристаллы!"));
         }
 
         return super.use(level, player, hand);

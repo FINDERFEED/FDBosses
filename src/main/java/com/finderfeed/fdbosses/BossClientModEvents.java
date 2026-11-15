@@ -3,6 +3,7 @@ package com.finderfeed.fdbosses;
 import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.boss_screen.text_block_processors.BossConfigFloatValueProcessor;
 import com.finderfeed.fdbosses.client.boss_screen.text_block_processors.MobEffectTextProcessor;
+import com.finderfeed.fdbosses.client.overlay.BossNoteOverlay;
 import com.finderfeed.fdbosses.client.overlay.ElectrifiedOverlay;
 import com.finderfeed.fdbosses.client.overlay.GeburahSinsOverlay;
 import com.finderfeed.fdbosses.client.overlay.MalkuthWeaknessOverlay;
@@ -105,6 +106,7 @@ import com.finderfeed.fdbosses.ik_2d.InverseKinematics2BoneTransform;
 import com.finderfeed.fdbosses.init.*;
 import com.finderfeed.fdbosses.content.projectiles.renderers.BlockProjectileRenderer;
 import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdlib.FDLib;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.head.HeadBoneTransformation;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRenderLayerOptions;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.renderer.FDEntityRendererBuilder;
@@ -452,6 +454,7 @@ public class BossClientModEvents {
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("chesed_item_overlay"),new PhaseSphereOverlay());
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("geburah_sin_overlay"),new GeburahSinsOverlay());
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("netzach_overlay"),new NetzachEffectOverlay());
+        event.registerAbove(FDLib.location("boss_bars"),FDBosses.location("boss_note"),new BossNoteOverlay());
     }
 
 

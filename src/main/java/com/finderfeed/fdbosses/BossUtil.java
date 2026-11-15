@@ -1,13 +1,17 @@
 package com.finderfeed.fdbosses;
 
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
+import com.finderfeed.fdbosses.content.boss_notes.BossNote;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEffectPacket;
 import com.finderfeed.fdbosses.init.BossConfigs;
+import com.finderfeed.fdbosses.init.BossRegistries;
+import com.finderfeed.fdbosses.packets.BossNotePacket;
 import com.finderfeed.fdbosses.packets.PosLevelEventPacket;
+import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.BoundToEntityProcessor;
@@ -43,6 +47,7 @@ import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.NestedLootTable;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -59,6 +64,8 @@ import java.util.function.Predicate;
 public class BossUtil {
 
     public static final int JUST_ENOUGH_DAMAGE = 9000000;
+
+    public static final String BOSS_NOTES_RECEIVED = "boss_notes_received";
 
     public static final Random random = new Random();
 
@@ -92,6 +99,23 @@ public class BossUtil {
     public static final int NETZACH_DISAPPEAR = 26;
     public static final int CLOCK_WYVERN_SLAM = 27;
     public static final int CLOCK_O_BALL_EXPLOSION = 28;
+
+    public static void sendBossNote(ServerPlayer player, BossNote bossNote){
+        var persistentData = player.getPersistentData();
+        var receivedNotes = persistentData.getCompound(BOSS_NOTES_RECEIVED);
+        String noteId = BossRegistries.BOSS_NOTES.getKey(bossNote).toString();
+        if (!receivedNotes.getBoolean(noteId)){
+            receivedNotes.putBoolean(noteId, true);
+            persistentData.put(BOSS_NOTES_RECEIVED, receivedNotes);
+            PacketDistributor.sendToPlayer(player, new BossNotePacket(bossNote));
+        }
+    }
+
+    public static void sendBossNoteToPlayers(Level level, AABB area, BossNote bossNote){
+        for (ServerPlayer player : level.getEntitiesOfClass(ServerPlayer.class, area, player -> !player.isSpectator())){
+            sendBossNote(player, bossNote);
+        }
+    }
 
     public static void clockOBallExplosion(Level level, Vec3 hitPos){
         posEvent((ServerLevel) level, hitPos, CLOCK_O_BALL_EXPLOSION, 0, 60);

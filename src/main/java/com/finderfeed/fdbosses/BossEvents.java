@@ -359,6 +359,7 @@ public class BossEvents {
             var originalData = original.getPersistentData();
             var cloneData = clone.getPersistentData();
             cloneData.putBoolean(BossSpawnerEntity.CODEX_RECEIVED, originalData.getBoolean(BossSpawnerEntity.CODEX_RECEIVED));
+            cloneData.put(BossUtil.BOSS_NOTES_RECEIVED, originalData.getCompound(BossUtil.BOSS_NOTES_RECEIVED).copy());
         }
     }
 

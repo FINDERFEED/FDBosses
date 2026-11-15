@@ -5,12 +5,14 @@ import com.finderfeed.fdbosses.client.BossParticles;
 import com.finderfeed.fdbosses.client.boss_codex.BossCodexScreen;
 import com.finderfeed.fdbosses.client.boss_screen.BaseBossScreen;
 import com.finderfeed.fdbosses.client.boss_screen.screen_definitions.BossScreens;
+import com.finderfeed.fdbosses.client.overlay.BossNoteOverlay;
 import com.finderfeed.fdbosses.client.particles.GravityParticleOptions;
 import com.finderfeed.fdbosses.client.particles.colored_jumping_particles.ColoredJumpingParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.ASParticleType;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
+import com.finderfeed.fdbosses.content.boss_notes.BossNote;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
@@ -85,6 +87,10 @@ import java.util.function.Supplier;
 public class BossClientPackets {
 
     private static Random random = new Random();
+
+    public static void showBossNote(BossNote bossNote){
+        BossNoteOverlay.show(bossNote.getComponent());
+    }
 
     public static void openTimeStabilizerScreen(int timeStabilizer, float currentDisplacement, float targetDisplacement){
         Minecraft.getInstance().setScreen(new TimeStabilizerScreen(timeStabilizer, currentDisplacement, targetDisplacement));

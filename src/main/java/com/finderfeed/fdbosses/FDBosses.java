@@ -30,6 +30,7 @@ public class FDBosses {
         BossConfigs.CONFIGS.register(bus);
         BossAnims.ANIMATIONS.register(bus);
         GeburahSins.SINS.register(bus);
+        BossNotes.BOSS_NOTES.register(bus);
         BossEntities.ENTITIES.register(bus);
         BossEffects.MOB_EFFECTS.register(bus);
         BossParticles.PARTICLES.register(bus);
