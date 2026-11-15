@@ -184,7 +184,7 @@ public class TrainAttack extends OwnableEntity implements AutoSerializable {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder){
         super.defineSynchedData(builder);
-        builder.define(PATTERN_ID, TrainAttackPatterns.STRAIGHT);
+        builder.define(PATTERN_ID, TrainAttackPatterns.DIRECT_ROWS_A_PATH_1);
         builder.define(TRAIN_SPEED, DEFAULT_TRAIN_SPEED);
         builder.define(RAILS_APPEAR_TIME, DEFAULT_RAILS_APPEAR_TIME);
         builder.define(READY_TIME, DEFAULT_READY_TIME);
@@ -213,7 +213,7 @@ public class TrainAttack extends OwnableEntity implements AutoSerializable {
         int readyTime = tag.getInt("ready_time");
 
         if (!TrainAttackPatterns.PATTERNS.containsKey(id)){
-            id = TrainAttackPatterns.STRAIGHT;
+            id = TrainAttackPatterns.DIRECT_ROWS_A_PATH_1;
         }
 
         entityData.set(PATTERN_ID, id);

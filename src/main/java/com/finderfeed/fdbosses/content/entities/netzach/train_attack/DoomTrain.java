@@ -1,10 +1,9 @@
 package com.finderfeed.fdbosses.content.entities.netzach.train_attack;
 
-import com.finderfeed.fdbosses.BossUtil;
-import com.finderfeed.fdlib.FDHelpers;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
+import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
@@ -16,8 +15,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
 
 import java.util.HashSet;
@@ -29,7 +28,7 @@ public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWith
     private static final EntityDataAccessor<Float> PATH_DISTANCE = SynchedEntityData.defineId(DoomTrain.class, EntityDataSerializers.FLOAT);
 
     @SerializableField
-    private String patternId = TrainAttackPatterns.STRAIGHT;
+    private String patternId = TrainAttackPatterns.DIRECT_ROWS_A_PATH_1;
 
     @SerializableField
     private Vec3 pathOrigin = Vec3.ZERO;
@@ -105,28 +104,21 @@ public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWith
     }
 
     private void damageEntities(double previousDistance){
-        Set<Entity> targets = new HashSet<>();
+        Set<LivingEntity> targets = new HashSet<>();
         Vec3 from = this.position();
         TrainAttackPattern pattern = this.getPattern();
-
-        float boxStep = 0.45f;
 
         for (double distance = previousDistance; distance < this.traveledDistance;){
             double nextDistance = Math.min(distance + 1, this.traveledDistance);
 
             Vec3 to = this.pathOrigin.add(pattern.getPosition(nextDistance / pattern.getPathLength()));
             Vec3 movement = to.subtract(from);
-            AABB box = this.getBoundingBox().move(from.subtract(this.position()));
-            targets.addAll(this.level().getEntitiesOfClass(LivingEntity.class, box, LivingEntity::isAlive));
-
-            for (double x = box.minX + 0.1; x < box.maxX; x += boxStep){
-                for (double y = box.minY + 0.5; y < box.maxY; y++){
-                    for (double z = box.minZ + 0.1; z < box.maxZ; z += boxStep){
-                        Vec3 start = new Vec3(x,y,z);
-                        targets.addAll(FDHelpers.traceEntities(this.level(), start, start.add(movement), 0.1,
-                                entity -> entity instanceof LivingEntity && entity.isAlive()));
-                    }
-                }
+            double length = Math.sqrt(movement.x * movement.x + movement.z * movement.z);
+            if (length > 0){
+                float width = this.getBbWidth();
+                Vec3 start = from.subtract(movement.scale(width / (2 * length)));
+                targets.addAll(FDTargetFinder.getEntitiesInHorizontalBox(LivingEntity.class, this.level(), start,
+                        new Vec2((float)movement.x, (float)movement.z), (float)length + width, width, this.getBbHeight(), LivingEntity::isAlive));
             }
 
             distance = nextDistance;
@@ -205,7 +197,7 @@ public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWith
         super.readAdditionalSaveData(tag);
         this.autoLoad(tag);
         if (!TrainAttackPatterns.PATTERNS.containsKey(this.patternId)){
-            this.patternId = TrainAttackPatterns.STRAIGHT;
+            this.patternId = TrainAttackPatterns.DIRECT_ROWS_A_PATH_1;
         }
         this.entityData.set(WAITING, this.departureDelay > 0);
     }

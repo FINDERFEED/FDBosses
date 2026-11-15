@@ -31,8 +31,9 @@ public class TrainAttackPattern {
             int dx = to.getX() - from.getX();
             int dz = to.getZ() - from.getZ();
             int length = Math.abs(dx) + Math.abs(dz);
+            int railLength = i == points.size() - 1 ? (length + RAIL_SIZE - 1) / RAIL_SIZE * RAIL_SIZE : length;
             Direction direction = direction(from, to);
-            for (int distance = RAIL_SIZE; distance <= length; distance += RAIL_SIZE){
+            for (int distance = RAIL_SIZE; distance <= railLength; distance += RAIL_SIZE){
                 centers.add(from.offset(direction.getStepX() * distance, 0, direction.getStepZ() * distance));
             }
         }
