@@ -29,6 +29,33 @@ public class BossRenderUtil {
 
     public static final ResourceLocation BOSS_TOOLTIP = FDBosses.location("textures/gui/boss_screen_tooltip.png");
 
+    public static void renderCenteredShadowedBox(GuiGraphics graphics, float x, float y, float w, float h, float shadowSize, int shadowDetail){
+        renderShadowedBox(graphics, x - w / 2, y - h / 2, w, h, shadowSize, shadowDetail);
+    }
+
+    public static void renderShadowedBox(GuiGraphics graphics, float x, float y, float w, float h, float shadowSize, int shadowDetail){
+        PoseStack matrices = graphics.pose();
+
+        FDRenderUtil.fill(matrices, x, y, w, h, 0,0,0,1);
+
+        float shadowStart = 0.75f;
+
+        float oneEdgeDimension = shadowSize / shadowDetail;
+
+        for (int i = 0; i < shadowDetail; i++){
+            float p = i / (float) shadowDetail;
+            float alpha = (1 - p)  * shadowStart;
+            float edgeSize = oneEdgeDimension * (i + 1);
+
+            FDRenderUtil.fill(matrices, x - edgeSize, y - edgeSize, w + edgeSize * 2, oneEdgeDimension, 0, 0, 0, alpha);
+            FDRenderUtil.fill(matrices, x - edgeSize, y + edgeSize + h - oneEdgeDimension, w + edgeSize * 2, oneEdgeDimension, 0, 0, 0, alpha);
+
+            FDRenderUtil.fill(matrices, x - edgeSize, y - edgeSize + oneEdgeDimension, oneEdgeDimension, edgeSize * 2 + h - oneEdgeDimension * 2, 0, 0, 0, alpha);
+            FDRenderUtil.fill(matrices, x + edgeSize + w - oneEdgeDimension, y - edgeSize + oneEdgeDimension, oneEdgeDimension, edgeSize * 2 + h - oneEdgeDimension * 2, 0, 0, 0, alpha);
+        }
+
+    }
+
     public static void rotateRay(PoseStack matrices, Vec3 camera, Vec3 dir){
         FDRenderUtil.applyMovementMatrixRotations(matrices,dir);
 

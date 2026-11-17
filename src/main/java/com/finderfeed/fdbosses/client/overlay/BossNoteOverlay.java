@@ -1,9 +1,11 @@
 package com.finderfeed.fdbosses.client.overlay;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdbosses.client.BossRenderUtil;
 import com.finderfeed.fdbosses.content.boss_notes.BossNote;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
+import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -41,12 +43,12 @@ public class BossNoteOverlay implements LayeredDraw.Layer {
         Minecraft minecraft = Minecraft.getInstance();
         if (text == null || minecraft.player == null) return;
 
-        int textureWidth = 75;
-        int textureHeight = 30;
-        int frameSize = 15;
+        int textureWidth = 174;
+        int textureHeight = 87;
+        int frameSize = 29;
+        int fillTextureWidth = textureWidth;
         int frameCount = 5;
         int frameTime = 1;
-        int stripFrameTime = 1;
 
         int maxWidth = 180;
         int padding = 2;
@@ -67,6 +69,10 @@ public class BossNoteOverlay implements LayeredDraw.Layer {
         }
         if (minecraft.options.hideGui) return;
 
+        Window window = Minecraft.getInstance().getWindow();
+        float windowWidth = window.getGuiScaledWidth();
+        float windowHeight = window.getGuiScaledHeight();
+
         float time = age + tracker.getGameTimeDeltaPartialTick(false);
         float closing = Mth.clamp((time - closeStart) / closeTime, 0, 1);
         float expansion = FDEasings.easeOut(Mth.clamp((time - iconTime) / openTime, 0, 1)) * (1 - FDEasings.easeIn(closing));
@@ -77,19 +83,30 @@ public class BossNoteOverlay implements LayeredDraw.Layer {
         }else if (age >= reverseStart){
             iconFrame = frameCount - 1 - (age - reverseStart) / frameTime;
         }
-        int stripFrame = Math.min(frameCount - 1, Math.max(0, age - iconTime) / stripFrameTime);
 
-        float width = Math.min(maxWidth, graphics.guiWidth() - frameSize - padding * 2);
-        float centerX = graphics.guiWidth() / 2f;
-        float top = graphics.guiHeight() - offsetFromBottom;
+        float width = Math.min(maxWidth, windowWidth - frameSize - padding * 2);
+        float centerX = windowWidth / 2f;
+        float top = windowHeight - offsetFromBottom;
         float halfWidth = width * expansion / 2;
         float leftX = centerX - frameSize / 2f - halfWidth;
         float rightX = centerX - frameSize / 2f + halfWidth;
 
+        float shadowScale = (iconFrame + 1f) / frameCount;
+        float shadowWidth = width * expansion + shadowScale * frameSize / 2f;
+        float shadowHeight = shadowScale * frameSize / 1.75f;
+        BossRenderUtil.renderCenteredShadowedBox(graphics, centerX, top + frameSize / 2f, shadowWidth, shadowHeight, shadowScale * 10, Math.round(shadowScale * 6));
+
         FDRenderUtil.bindTexture(boss.getTexture());
 
         if (age >= iconTime && age < reverseStart){
-            FDRenderUtil.blitWithBlend(graphics.pose(), centerX - halfWidth, top, halfWidth * 2, frameSize, frameSize + stripFrame, frameSize, 1, frameSize, textureWidth, textureHeight, 0, 1);
+            float fillLeft = centerX - halfWidth;
+            float fillRight = centerX + halfWidth;
+            float firstTileX = centerX - (float)Math.ceil(halfWidth / fillTextureWidth) * fillTextureWidth;
+            for (float tileX = firstTileX; tileX < fillRight; tileX += fillTextureWidth){
+                float partX = Math.max(tileX, fillLeft);
+                float partWidth = Math.min(tileX + fillTextureWidth, fillRight) - partX;
+                FDRenderUtil.blitWithBlend(graphics.pose(), partX, top, partWidth, frameSize, partX - tileX, textureHeight - frameSize, partWidth, frameSize, textureWidth, textureHeight, 0, 1);
+            }
             FDRenderUtil.blitWithBlend(graphics.pose(), rightX, top, frameSize, frameSize, 0, frameSize, frameSize, frameSize, textureWidth, textureHeight, 0, 1);
         }
         FDRenderUtil.blitWithBlend(graphics.pose(), leftX, top, frameSize, frameSize, iconFrame * frameSize, 0, frameSize, frameSize, textureWidth, textureHeight, 0, 1);
@@ -105,7 +122,7 @@ public class BossNoteOverlay implements LayeredDraw.Layer {
 
         FDRenderUtil.Scissor.pushScissors(graphics.pose(), clipLeft, top + padding, Math.max(0, clipRight - clipLeft), frameSize - padding * 2);
 
-        FDRenderUtil.renderFullyCenteredText(graphics, centerX, top + frameSize / 2f, textWidth, textScale, false, (textAlpha << 24) | boss.getTextColor(), text);
+        FDRenderUtil.renderFullyCenteredText(graphics, centerX, top + frameSize / 2f + 0.5f, textWidth, textScale, true, (textAlpha << 24) | boss.getTextColor(), text);
 
         FDRenderUtil.Scissor.popScissors();
 

@@ -10,6 +10,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.train_attack.TrainAttack
 import com.finderfeed.fdbosses.content.entities.netzach.train_attack.TrainAttackPatterns;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -36,7 +37,7 @@ public class DebugStick extends Item {
         if (!level.isClientSide){
 //            TrainAttack.summon(level, player.position(), TrainAttackPatterns.TRACK_MANIA_2_PATH_1, 0.75f, 40, 10);
         }else{
-            BossNoteOverlay.show(Component.literal("Разрушайте кристаллы!"), BossNote.Boss.CHESED);
+            BossNoteOverlay.show(Component.literal("Destroy the crystals!"), BossNote.Boss.CHESED);
         }
 
         return super.use(level, player, hand);

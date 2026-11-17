@@ -18,7 +18,7 @@ public class BossNote {
 
     public enum Boss {
 
-        CHESED(FDBosses.location("textures/gui/chesed_note.png"), 0x222222);
+        CHESED(FDBosses.location("textures/gui/chesed_note.png"), 0x63ffef);
 
         private final ResourceLocation texture;
         private final int textColor;
