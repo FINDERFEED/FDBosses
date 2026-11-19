@@ -18,14 +18,17 @@ public class BossNote {
 
     public enum Boss {
 
-        CHESED(FDBosses.location("textures/gui/chesed_note.png"), 0x63ffef);
+        CHESED(FDBosses.location("textures/gui/chesed_note.png"), 0x63ffef, 0xffffff),
+        MALKUTH(FDBosses.location("textures/gui/malkuth_note.png"), 0x0077de, 0xff860b);
 
         private final ResourceLocation texture;
         private final int textColor;
+        private final int secondaryTextColor;
 
-        Boss(ResourceLocation texture, int textColor){
+        Boss(ResourceLocation texture, int textColor, int secondaryTextColor){
             this.texture = texture;
             this.textColor = textColor;
+            this.secondaryTextColor = secondaryTextColor;
         }
 
         public ResourceLocation getTexture(){
@@ -34,6 +37,10 @@ public class BossNote {
 
         public int getTextColor(){
             return this.textColor;
+        }
+
+        public int getSecondaryTextColor(){
+            return this.secondaryTextColor;
         }
 
     }

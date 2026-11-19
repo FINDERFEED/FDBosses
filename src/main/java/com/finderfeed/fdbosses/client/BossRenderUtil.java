@@ -1,22 +1,23 @@
 package com.finderfeed.fdbosses.client;
 
 import com.finderfeed.fdbosses.FDBosses;
+import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.StringDecomposer;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import org.joml.Vector2f;
@@ -24,10 +25,36 @@ import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class BossRenderUtil {
 
     public static final ResourceLocation BOSS_TOOLTIP = FDBosses.location("textures/gui/boss_screen_tooltip.png");
+
+    public static FDColor lerpColor(FDColor from, FDColor to, float p){
+        return new FDColor(
+                FDMathUtil.lerp(from.r, to.r, p),
+                FDMathUtil.lerp(from.g, to.g, p),
+                FDMathUtil.lerp(from.b, to.b, p),
+                FDMathUtil.lerp(from.a, to.a, p)
+        );
+    }
+
+    public static MutableComponent textColorWave(Component component, float time, float frequency, int fromColor, int toColor){
+        MutableComponent result = Component.empty();
+        FDColor from = FDColor.decode(fromColor | 0xff000000);
+        FDColor to = FDColor.decode(toColor | 0xff000000);
+        AtomicInteger index = new AtomicInteger(0);
+
+        StringDecomposer.iterateFormatted(component, Style.EMPTY, (position, style, codePoint) -> {
+            float p = (float) (Math.sin(time - index.getAndIncrement() * frequency) * 0.5 + 0.5);
+            int color = lerpColor(from, to, p).encode() & 0xffffff;
+            result.append(Component.literal(Character.toString(codePoint)).setStyle(style.withColor(color)));
+            return true;
+        });
+
+        return result;
+    }
 
     public static void renderCenteredShadowedBox(GuiGraphics graphics, float x, float y, float w, float h, float shadowSize, int shadowDetail){
         renderShadowedBox(graphics, x - w / 2, y - h / 2, w, h, shadowSize, shadowDetail);

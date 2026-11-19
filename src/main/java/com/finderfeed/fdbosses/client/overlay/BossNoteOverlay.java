@@ -53,7 +53,7 @@ public class BossNoteOverlay implements LayeredDraw.Layer {
         int maxWidth = 180;
         int padding = 2;
         int offsetFromBottom = 70;
-        float textScale = 0.755f;
+        float textScale = 0.75f;
 
         int iconTime = frameCount * frameTime;
         int openTime = 12;
@@ -109,6 +109,7 @@ public class BossNoteOverlay implements LayeredDraw.Layer {
             }
             FDRenderUtil.blitWithBlend(graphics.pose(), rightX, top, frameSize, frameSize, 0, frameSize, frameSize, frameSize, textureWidth, textureHeight, 0, 1);
         }
+
         FDRenderUtil.blitWithBlend(graphics.pose(), leftX, top, frameSize, frameSize, iconFrame * frameSize, 0, frameSize, frameSize, textureWidth, textureHeight, 0, 1);
 
         float appear = Mth.clamp((time - openTime) / textAppearTime, 0, 1);
@@ -122,7 +123,8 @@ public class BossNoteOverlay implements LayeredDraw.Layer {
 
         FDRenderUtil.Scissor.pushScissors(graphics.pose(), clipLeft, top + padding, Math.max(0, clipRight - clipLeft), frameSize - padding * 2);
 
-        FDRenderUtil.renderFullyCenteredText(graphics, centerX, top + frameSize / 2f + 0.5f, textWidth, textScale, true, (textAlpha << 24) | boss.getTextColor(), text);
+        Component coloredText = BossRenderUtil.textColorWave(text, time * 0.4f, 0.25f,0x4488de, 0xffa60a);
+        FDRenderUtil.renderFullyCenteredText(graphics, centerX, top + frameSize / 2f + 0.5f, textWidth, textScale, true, (textAlpha << 24) | 0xffffff, coloredText);
 
         FDRenderUtil.Scissor.popScissors();
 
