@@ -5,6 +5,7 @@ import com.finderfeed.fdbosses.BossTargetFinder;
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
+import com.finderfeed.fdbosses.content.boss_notes.BossNote;
 import com.finderfeed.fdbosses.content.entities.BossDespawner;
 import com.finderfeed.fdbosses.content.entities.FDDespawnable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
@@ -708,6 +709,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         return playerPositionsCollector;
     }
 
+    public void sendNoteToCombatants(BossNote bossNote){
+        for (var player : this.getPlayerPositionsCollector().getPlayers()){
+            BossUtil.sendBossNote((ServerPlayer) player, bossNote, BossNote.Boss.GEBURAH);
+        }
+    }
+
     public Player pickRandomCombatant(){
         var positionsCollector = this.getPlayerPositionsCollector();
 
@@ -796,6 +803,9 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
         var scalesController = this.getScalesController();
 
         if (stage == 0){
+
+            this.sendNoteToCombatants(BossNotes.GEBURAH_BELLS.get());
+
             int random = (3 + level().random.nextInt(3)) * BossUtil.randomPlusMinus();
 
             if (this.sinnedHalfTimes()){
@@ -965,6 +975,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public boolean noKillEntitiesAttack(AttackInstance inst){
 
+        this.sendNoteToCombatants(BossNotes.GEBURAH_KILLING_SIN.get());
+
         if (!this.sinnedHalfTimes()){
             this.propagateSins(0, GeburahSins.KILL_ENTITY_SIN.get());
         }else{
@@ -1054,6 +1066,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public boolean sinCrystalsLasersAndCannons(AttackInstance inst){
 
+        this.sendNoteToCombatants(BossNotes.GEBURAH_CRYSTALS_SIN.get());
+
         this.propagateSins(0, GeburahSins.CRYSTAL_OF_SIN.get());
 
         int stage = inst.stage;
@@ -1113,9 +1127,12 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public boolean noJumpEarthquakesProjectilesRays(AttackInstance inst){
 
+
         if (!this.sinnedHalfTimes()) {
+            this.sendNoteToCombatants(BossNotes.GEBURAH_JUMP_SIN.get());
             this.propagateSins(30, GeburahSins.JUMPING_SIN.get());
         }else{
+            this.sendNoteToCombatants(BossNotes.GEBURAH_STILLNESS_SIN.get());
             this.propagateSins(30, GeburahSins.JUMPING_SIN.get(), GeburahSins.STAY_STILL_SIN.get());
         }
 
@@ -1234,6 +1251,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
 
     public boolean limitedButtonsRotatingLasers(AttackInstance attackInstance){
 
+        this.sendNoteToCombatants(BossNotes.GEBURAH_BUTTONS_SIN.get());
+
         this.propagateSins(60, GeburahSins.PRESSED_TOO_MANY_BUTTONS_SIN.get());
 
         int tick = attackInstance.tick;
@@ -1314,6 +1333,7 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     private boolean clockwise = true;
 
     public boolean runClockwiseProjectilesHammersRay(AttackInstance attackInstance){
+        this.sendNoteToCombatants(BossNotes.GEBURAH_CLOCKMOVE_SIN.get());
         if (!this.sinnedHalfTimes()) {
             if (clockwise) {
                 this.propagateSins(20, GeburahSins.MOVE_CLOCKWISE_SIN.get());
@@ -1374,6 +1394,8 @@ public class GeburahEntity extends FDLivingEntity implements AutoSerializable, G
     private int stompAmount = 2;
 
     public boolean simpleNoSinAttackSecondPhase(AttackInstance attackInstance){
+
+        this.sendNoteToCombatants(BossNotes.GEBURAH_STILLNESS_SIN.get());
 
         this.propagateSins(40, GeburahSins.STAY_STILL_SIN.get());
 

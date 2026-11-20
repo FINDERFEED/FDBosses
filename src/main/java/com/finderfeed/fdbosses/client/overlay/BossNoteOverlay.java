@@ -51,7 +51,7 @@ public class BossNoteOverlay implements LayeredDraw.Layer {
         int frameTime = 1;
 
         int maxWidth = 180;
-        int padding = 2;
+        int padding = 0;
         int offsetFromBottom = 70;
         float textScale = 0.75f;
 
@@ -123,7 +123,7 @@ public class BossNoteOverlay implements LayeredDraw.Layer {
 
         FDRenderUtil.Scissor.pushScissors(graphics.pose(), clipLeft, top + padding, Math.max(0, clipRight - clipLeft), frameSize - padding * 2);
 
-        Component coloredText = BossRenderUtil.textColorWave(text, time * 0.4f, 0.25f,0x4488de, 0xffa60a);
+        Component coloredText = BossRenderUtil.textColorWave(text, time * 0.4f, 0.25f,boss.getTextColor(), boss.getSecondaryTextColor());
         FDRenderUtil.renderFullyCenteredText(graphics, centerX, top + frameSize / 2f + 0.5f, textWidth, textScale, true, (textAlpha << 24) | 0xffffff, coloredText);
 
         FDRenderUtil.Scissor.popScissors();

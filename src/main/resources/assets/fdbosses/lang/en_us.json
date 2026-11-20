@@ -279,5 +279,18 @@
   "fdbosses.word.malkuth_fist_description": "Acts as grappling hook for blocks in right hand, for entities in left hand. Using item in left hand, then moving it to the right hand resets its cooldown.",
   "fdbosses.word.phase_sphere_description": "When used allows to phase through blocks for a limited time.",
   "fdbosses.word.divine_gear_description": "Right click on the block to place down a turret that will attack any mob around it.",
-  "fdbosses.word.already_being_interacted_with": "Somebody is already stabilizing this one!"
+  "fdbosses.word.already_being_interacted_with": "Somebody is already stabilizing this one!",
+  "note.chesed_note_kill_crystals": "Destroy the crystals!",
+  "note.chesed_note_evade_ray": "Chesed leads its shots. Evade!",
+  "note.chesed_run_to_reflector": "Make Chesed hit the ray reflector!",
+  "note.malkuth_fire_cannons": "Fire the cannons!",
+  "note.malkuth_slash_crystals": "Make Malkuth slash the crystals!",
+  "note.geburah_jump": "Jumping is prohibited",
+  "note.geburah_clockmove": "Move in arrows direction!",
+  "note.geburah_buttons": "Only 5 button presses is allowed",
+  "note.geburah_crystals": "Drop the crystals from your inventory!",
+  "note.geburah_killing": "Killing is not allowed for both parties",
+  "note.geburah_stillness": "Staying still is prohibited",
+  "note.chesed_note_monoliths": "Disable monoliths until its not too late!",
+  "note.geburah_bells": "Balance the scales!"
 }

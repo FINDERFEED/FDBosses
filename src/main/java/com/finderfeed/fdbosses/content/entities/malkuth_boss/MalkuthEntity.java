@@ -6,6 +6,7 @@ import com.finderfeed.fdbosses.FDBosses;
 import com.finderfeed.fdbosses.client.particles.arc_preparation_particle.ArcAttackPreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.stripe_particle.StripeParticleOptions;
+import com.finderfeed.fdbosses.content.boss_notes.BossNote;
 import com.finderfeed.fdbosses.content.entities.BossDespawner;
 import com.finderfeed.fdbosses.content.entities.FDDespawnable;
 import com.finderfeed.fdbosses.content.entities.IEffectImmune;
@@ -1598,6 +1599,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
                 Vec3 actualPos = this.findGroundPosForCrush(basePos);
 
                 if (this.isBelowHalfHP()){
+                    this.sendNoteToCombatants(BossNotes.MALKUTH_NOTE_SLASH_CRYSTALS.get());
                     this.summonRepairCrystal(actualPos);
                 }
 
@@ -1902,6 +1904,7 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
             }
 
             if (this.jumpOnWallPath.isFinished()){
+                this.sendNoteToCombatants(BossNotes.MALKUTH_NOTE_FIRE_CANNONS.get());
                 this.lookAt(EntityAnchorArgument.Anchor.EYES, this.position().add(0,0,-100));
                 Vec3 last = this.jumpOnWallPath.getPositions().getLast();
                 this.setNoGravity(false);
@@ -2652,6 +2655,12 @@ public class MalkuthEntity extends FDMob implements IHasHead<MalkuthEntity>, Mal
     @Override
     protected void playBlockFallSound() {
 
+    }
+
+    public void sendNoteToCombatants(BossNote bossNote){
+        for (var player : this.getCombatants(false)){
+            BossUtil.sendBossNote((ServerPlayer) player, bossNote, BossNote.Boss.MALKUTH);
+        }
     }
 
     @Override

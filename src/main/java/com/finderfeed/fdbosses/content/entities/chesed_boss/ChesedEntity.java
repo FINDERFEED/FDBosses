@@ -9,6 +9,7 @@ import com.finderfeed.fdbosses.client.particles.particle_processors.ChesedRayCir
 import com.finderfeed.fdbosses.client.particles.rush_particle.RushParticleOptions;
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.client.particles.sonic_particle.SonicParticleOptions;
+import com.finderfeed.fdbosses.content.boss_notes.BossNote;
 import com.finderfeed.fdbosses.content.entities.BossDespawner;
 import com.finderfeed.fdbosses.content.entities.BossInitializer;
 import com.finderfeed.fdbosses.content.entities.FDDespawnable;
@@ -1471,7 +1472,7 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
 
         if (localStage == 1) {
 
-
+            this.sendNoteToCombatants(BossNotes.CHESED_NOTE_EVADE_RAY.get());
 
             float animationSpeed = 1;
             int rayAttackTick = 35;
@@ -1715,6 +1716,8 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         var stage = instance.stage;
         if (stage == 0) {
 
+            this.sendNoteToCombatants(BossNotes.CHESED_NOTE_MONOLITHS.get());
+
             if (tick == 0) {
                 this.getAnimationSystem().startAnimation("CAST", AnimationTicker.builder(CHESED_CAST)
                         .setTransitionTime(0)
@@ -1827,6 +1830,9 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
         int height = 32;
         int rad = 36;
         if (stage == 0){
+
+            this.sendNoteToCombatants(BossNotes.CHESED_NOTE_MONOLITHS.get());
+
             this.getAnimationSystem().startAnimation(ROCKFALL_TICKER, AnimationTicker.builder(CHESED_ROCKFALL_CAST)
                             .setTransitionTime(0)
                     .build());
@@ -3188,6 +3194,12 @@ public class ChesedEntity extends FDMob implements ChesedBossBuddy, BossSpawnerC
     public void sendPacketToCombatants(CustomPacketPayload customPacketPayload){
         for (Player player : this.getCombatants(true)){
             PacketDistributor.sendToPlayer((ServerPlayer) player,customPacketPayload);
+        }
+    }
+
+    public void sendNoteToCombatants(BossNote bossNote){
+        for (var player : this.getCombatants(false)){
+            BossUtil.sendBossNote((ServerPlayer) player, bossNote, BossNote.Boss.CHESED);
         }
     }
 

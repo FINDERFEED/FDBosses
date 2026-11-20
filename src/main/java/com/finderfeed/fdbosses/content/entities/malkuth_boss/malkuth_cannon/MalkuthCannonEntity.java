@@ -68,6 +68,7 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
         malkuthCannonType = MalkuthAttackType.ICE;
         this.setNoGravity(true);
         this.getAnimationSystem().startAnimation("SUMMON", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_SUMMON)
+                        .setTransitionTime(0)
                         .setSpeed(0.75f)
                 .build());
         if (level.isClientSide){
@@ -126,7 +127,9 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
             if (!shootTargets.isEmpty()){
 
                 if (shootTickCount == 20){
-                    this.getAnimationSystem().startAnimation("SHOOT", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_SHOOT).build());
+                    this.getAnimationSystem().startAnimation("SHOOT", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_SHOOT)
+                            .setTransitionTime(0)
+                            .build());
                 }else if (shootTickCount == 16){
 
                     Vec3 frwd = this.getForward().multiply(1,0,1).normalize();
@@ -243,14 +246,18 @@ public class MalkuthCannonEntity extends FDLivingEntity implements AutoSerializa
     public void setBrokenRequiresMaterials(boolean broken){
         if (broken) {
             if (!this.isBroken()) {
-                this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_BREAK).build());
+                this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_BREAK)
+                        .setTransitionTime(0)
+                        .build());
             }
             this.entityData.set(BROKEN, false);
             this.entityData.set(BROKEN_REQUIRES_MATERIALS, true);
         }else{
             if (this.requiresRepair()){
                 if (this.isBroken()) {
-                    this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_REPAIR).build());
+                    this.getAnimationSystem().startAnimation("BROKE", AnimationTicker.builder(BossAnims.MALKUTH_CANNON_REPAIR)
+                            .setTransitionTime(0)
+                            .build());
                 }
                 this.entityData.set(BROKEN_REQUIRES_MATERIALS, false);
             }

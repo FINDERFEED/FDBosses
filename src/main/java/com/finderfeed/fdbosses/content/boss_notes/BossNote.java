@@ -19,7 +19,8 @@ public class BossNote {
     public enum Boss {
 
         CHESED(FDBosses.location("textures/gui/chesed_note.png"), 0x63ffef, 0xffffff),
-        MALKUTH(FDBosses.location("textures/gui/malkuth_note.png"), 0x0077de, 0xff860b);
+        MALKUTH(FDBosses.location("textures/gui/malkuth_note.png"), 0x4488de, 0xffa60a),
+        GEBURAH(FDBosses.location("textures/gui/geburah_note.png"), 0x1bf5f5, 0xffffff);
 
         private final ResourceLocation texture;
         private final int textColor;

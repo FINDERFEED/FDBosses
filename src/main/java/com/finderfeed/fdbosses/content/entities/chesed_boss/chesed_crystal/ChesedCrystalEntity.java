@@ -1,8 +1,11 @@
 package com.finderfeed.fdbosses.content.entities.chesed_boss.chesed_crystal;
 
+import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdbosses.content.boss_notes.BossNote;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.ChesedBossBuddy;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossEffects;
+import com.finderfeed.fdbosses.init.BossNotes;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdlib.init.FDEDataSerializers;
 import com.finderfeed.fdlib.systems.bedrock.animations.Animation;
@@ -12,6 +15,7 @@ import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.F
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.damagesource.DamageTypes;
@@ -57,6 +61,7 @@ public class ChesedCrystalEntity extends FDLivingEntity implements ChesedBossBud
         if (!level().isClientSide){
             if (this.lastHurtByPlayer != null){
                 this.lastHurtByPlayer.addEffect(new MobEffectInstance(BossEffects.CHESED_ENERGIZED,400,1,false,true));
+                BossUtil.sendBossNote((ServerPlayer) lastHurtByPlayer, BossNotes.CHESED_NOTE_RUN_TO_REFLECTOR.get(), BossNote.Boss.CHESED);
             }
             dead = true;
             deathTime = 10;

@@ -27,6 +27,7 @@ public class GeburahAttackFireDefaultProjectiles extends GeburahWeaponAttack {
     @Override
     public void onAttackStart() {
         geburah.getAnimationSystem().startAnimation(GeburahEntity.GEBURAH_CANNONS_LAYER, AnimationTicker.builder(BossAnims.GEBURAH_FIRE_CANNONS)
+                        .setTransitionTime(0)
                         .setSpeed(speed)
                 .build());
     }

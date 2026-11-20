@@ -16,6 +16,7 @@ import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
 import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.BoundToEntityProcessor;
 import com.finderfeed.fdlib.systems.shapes.FD2DShape;
+import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.FDUtil;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import net.minecraft.core.BlockPos;
@@ -111,9 +112,11 @@ public class BossUtil {
         }
     }
 
-    public static void sendBossNoteToPlayers(Level level, AABB area, BossNote bossNote, BossNote.Boss boss){
-        for (ServerPlayer player : level.getEntitiesOfClass(ServerPlayer.class, area, player -> !player.isSpectator())){
-            sendBossNote(player, bossNote, boss);
+    public static void sendBossNoteToPlayers(Level level, AABB area, float radius, BossNote bossNote, BossNote.Boss boss){
+        for (ServerPlayer player : FDTargetFinder.getEntitiesInCylinder(ServerPlayer.class, level, area.getBottomCenter(), (float) (area.maxX - area.minX), radius, player -> !player.isSpectator())){
+            if (area.contains(player.position())){
+                sendBossNote(player, bossNote, boss);
+            }
         }
     }
 

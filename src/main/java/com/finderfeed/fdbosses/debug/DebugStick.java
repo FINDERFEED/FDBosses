@@ -37,7 +37,6 @@ public class DebugStick extends Item {
         if (!level.isClientSide){
 //            TrainAttack.summon(level, player.position(), TrainAttackPatterns.TRACK_MANIA_2_PATH_1, 0.75f, 40, 10);
         }else{
-            BossNoteOverlay.show(Component.literal("Crystals are vulnerable to slashes"), BossNote.Boss.MALKUTH);
         }
 
         return super.use(level, player, hand);
