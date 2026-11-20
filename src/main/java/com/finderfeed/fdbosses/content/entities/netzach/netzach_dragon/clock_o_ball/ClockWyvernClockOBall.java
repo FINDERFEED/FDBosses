@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.systems.trails.FDTrailDataGenerator;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -41,8 +42,10 @@ public class ClockWyvernClockOBall extends BossSimpleProjectile {
     }
 
     @Override
-    public void onEntityHit(EntityHitResult entity) {
-        this.explode(entity.getEntity(), entity.getLocation());
+    public void onEntityHit(Entity entity) {
+        if (entity instanceof LivingEntity && entity != this.getOwner()){
+            this.explode(entity, entity.getBoundingBox().getCenter());
+        }
     }
 
     @Override

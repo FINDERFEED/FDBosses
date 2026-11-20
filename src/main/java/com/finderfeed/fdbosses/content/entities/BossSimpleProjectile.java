@@ -1,5 +1,7 @@
 package com.finderfeed.fdbosses.content.entities;
 
+import com.finderfeed.fdbosses.BossUtil;
+import com.finderfeed.fdlib.FDHelpers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -58,14 +60,14 @@ public abstract class BossSimpleProjectile extends FDOwnableEntity {
         if (result.getType() != HitResult.Type.MISS){
             this.onBlockHit(result);
         }else{
-            var eresult = ProjectileUtil.getEntityHitResult(level(), this, start, end, new AABB(start,end), (entity)->true);
-            if (eresult != null){
-                this.onEntityHit(eresult);
+            var res = FDHelpers.traceEntities(level(), start, end, 0, (e) -> e != this);
+            if (!res.isEmpty()){
+                this.onEntityHit(res.getFirst());
             }
         }
     }
 
-    public abstract void onEntityHit(EntityHitResult entity);
+    public abstract void onEntityHit(Entity entity);
     public abstract void onBlockHit(BlockHitResult result);
 
     private int removeTime(){

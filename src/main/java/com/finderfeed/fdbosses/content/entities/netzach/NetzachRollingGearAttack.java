@@ -9,6 +9,7 @@ import com.finderfeed.fdbosses.content.entities.FDOwnableEntity;
 import com.finderfeed.fdbosses.init.BossEntities;
 import com.finderfeed.fdlib.util.FDColor;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -174,7 +175,7 @@ public class NetzachRollingGearAttack extends BossSimpleProjectile {
     }
 
     @Override
-    public void onEntityHit(EntityHitResult entity) {
+    public void onEntityHit(Entity entity) {
 
     }
 

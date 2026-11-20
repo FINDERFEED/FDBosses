@@ -15,6 +15,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
@@ -173,7 +174,7 @@ public class NetzachAerialGearAttack extends BossSimpleProjectile implements Aut
     }
 
     @Override
-    public void onEntityHit(EntityHitResult entity) {
+    public void onEntityHit(Entity entity) {
 
     }
 
