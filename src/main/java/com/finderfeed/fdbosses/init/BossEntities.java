@@ -63,6 +63,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyve
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvernChargingSpot;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_ball.ClockWyvernClockOBall;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQteAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.train_attack.TrainAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.train_attack.DoomTrain;
@@ -435,6 +436,13 @@ public class BossEntities {
 
 
     //NETZACH
+
+    public static final Supplier<EntityType<NetzachQteAttack>> NETZACH_QTE = ENTITIES.register("netzach_qte", () -> EntityType.Builder.of(
+                    NetzachQteAttack::new, MobCategory.MISC
+            )
+            .sized(0.8f, 0.8f)
+            .noSave()
+            .build("netzach_qte"));
 
     public static final Supplier<EntityType<NetzachAerialGearAttack>> NETZACH_AERIAL_GEAR = ENTITIES.register("netzach_aerial_gear",()->EntityType.Builder.of(
                     NetzachAerialGearAttack::new, MobCategory.MISC

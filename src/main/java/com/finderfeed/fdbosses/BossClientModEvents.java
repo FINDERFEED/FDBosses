@@ -88,6 +88,8 @@ import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyve
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvernRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_ball.ClockWyvernClockOBallRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttackRenderer;
+import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQteAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQteRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.train_attack.TrainAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.train_attack.DoomTrain;
@@ -498,6 +500,28 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_CHAIN_TRAP.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_RAY.get(), GeburahCastingCircleRenderer::new);
         event.registerEntityRenderer(BossEntities.GEBURAH_CASTING_CIRCLE_JUDGEMENT_BIRD.get(), GeburahCastingCircleRenderer::new);
+
+        event.registerEntityRenderer(BossEntities.NETZACH_QTE.get(), FDEntityRendererBuilder.<NetzachQteAttack>builder()
+                .addLayer(FDEntityRenderLayerOptions.<NetzachQteAttack>builder()
+                        .model(BossModels.NETZACH)
+                        .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/netzach_ghost.png")))
+                        .color(((netzachQteAttack, v) -> {
+                            float time = Math.clamp(netzachQteAttack.tickCount - BossAnims.NETZACH_QTE.get().getAnimTime() + v, 0, NetzachQteAttack.FADE_OUT_TIME);
+                            float time2 = Math.min(netzachQteAttack.tickCount + v, NetzachQteAttack.FADE_IN_TIME);
+
+                            float fadeOutP = 1 - time / NetzachQteAttack.FADE_OUT_TIME;
+                            float fadeInP = time2 / NetzachQteAttack.FADE_IN_TIME;
+
+                            return new FDColor(1,1,1, fadeInP * fadeOutP);
+                        }))
+                        .light(LightTexture.FULL_BRIGHT)
+                        .build())
+                .shouldRender((attack, frustum, x, y, z) -> {
+                    return attack.getOwner() != null && attack.getOwner() == FDClientHelpers.getClientPlayer();
+                })
+                .freeRender(new NetzachQteRenderer())
+                .build());
+
         event.registerEntityRenderer(BossEntities.NETZACH_GEAR_CRUSH.get(), NetzachGearCrushAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.SECTOR_ATTACK.get(), SectorAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.TRAIN_ATTACK.get(), TrainAttackRenderer::new);

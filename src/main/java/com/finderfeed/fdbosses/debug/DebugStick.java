@@ -2,10 +2,12 @@ package com.finderfeed.fdbosses.debug;
 
 import com.finderfeed.fdbosses.client.overlay.BossNoteOverlay;
 import com.finderfeed.fdbosses.content.boss_notes.BossNote;
+import com.finderfeed.fdbosses.content.entities.debris.DebrisEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.DistortionSphereEffect;
 import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffect;
 import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffectHandler;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_ball.ClockWyvernClockOBall;
+import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQteAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.train_attack.TrainAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.train_attack.TrainAttackPatterns;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -32,15 +34,12 @@ public class DebugStick extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 
-        int attackTime = 100;
-
         if (!level.isClientSide){
-//            TrainAttack.summon(level, player.position(), TrainAttackPatterns.TRACK_MANIA_2_PATH_1, 0.75f, 40, 10);
+            NetzachQteAttack.summon(player, player.getLookAngle().scale(2).add(0,player.getBbHeight() / 2,0));
         }else{
-            BossNoteOverlay.show(Component.literal("A very useful boss hint"), BossNote.Boss.MALKUTH);
         }
 
-        return super.use(level, player, hand);
+        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand), level.isClientSide);
     }
 
 

@@ -298,6 +298,9 @@ public class BossAnims {
 
     //NETZACH
 
+    public static final DeferredHolder<Animation,Animation> NETZACH_QTE = ANIMATIONS.register("netzach_qte",
+            () -> new Animation(FDBosses.location("netzach")));
+
     public static DeferredHolder<Animation,Animation> NETZACH_IDLE = ANIMATIONS.register("netzach_idle", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
     });
