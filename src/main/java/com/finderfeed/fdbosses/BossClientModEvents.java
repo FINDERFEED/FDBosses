@@ -77,6 +77,7 @@ import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_slash.Malku
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.malkuth_warrior.MalkuthWarriorEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachAerialGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEffectOverlay;
+import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQTEOverlay;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.NetzachRollingGearAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEntity;
@@ -458,6 +459,7 @@ public class BossClientModEvents {
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("chesed_item_overlay"),new PhaseSphereOverlay());
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("geburah_sin_overlay"),new GeburahSinsOverlay());
         event.registerBelow(VanillaGuiLayers.HOTBAR,FDBosses.location("netzach_overlay"),new NetzachEffectOverlay());
+        event.registerBelow(VanillaGuiLayers.HOTBAR, FDBosses.location("netzach_qte_warning"), new NetzachQTEOverlay());
         event.registerAbove(FDLib.location("boss_bars"),FDBosses.location("boss_note"),new BossNoteOverlay());
     }
 
