@@ -135,7 +135,7 @@ public class NetzachEffectOverlay implements LayeredDraw.Layer {
                 flashTime = Mth.clamp(flashTime - 1, 0, Integer.MAX_VALUE);
                 effectActiveTime = Mth.clamp(effectActiveTime - 1, 0, Integer.MAX_VALUE);
             }else if (effectActiveTime == 0){
-                BossVignetteHandler.setCurrentVignette(0,2,20,1f,1f,1f,1f);
+                BossVignetteHandler.setCurrentVignette(0,2,10,1f,1f,1f,1f);
                 effectActiveTime = -1;
             }
         }
@@ -176,6 +176,10 @@ public class NetzachEffectOverlay implements LayeredDraw.Layer {
         maxEffectTime = effectTime;
         NetzachEffectOverlay.flashTime = flashTime;
         NetzachEffectOverlay.flashTimeO = flashTime;
+    }
+
+    public static void cancelEffect(){
+        effectActiveTime = 0;
     }
 
 

@@ -28,6 +28,7 @@ import com.finderfeed.fdlib.util.client.particles.ball_particle.BallParticleOpti
 import com.finderfeed.fdlib.util.math.FDMathUtil;
 import com.finderfeed.fdlib.util.rendering.FDEasings;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -243,6 +244,15 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
         return between.normalize().dot(this.getLookAngle().normalize()) > dot;
     }
 
+    public void removeBacktrackEntitiesForTarget(){
+        var target = this.getTarget();
+        if (target == null) return;
+
+        var area = this.getBoundingBox().inflate(40);
+        this.level().getEntitiesOfClass(BacktrackEntity.class, area, backtrack -> backtrack.getOwner() == target)
+                .forEach(Entity::discard);
+    }
+
     private boolean timedRayAttack(AttackInstance inst){
         int stage = inst.stage;
         int tick = inst.tick;
@@ -255,7 +265,24 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
         }
 
         if (chargingSpotAlive == null && stage == 1){
+            ServerLevel level = (ServerLevel) this.level();
+            Vec3 center = this.getBoundingBox().getCenter();
+            BossUtil.gearDebrisBurst(level, center, 30);
+            level.sendParticles(ParticleTypes.EXPLOSION_EMITTER, center.x, center.y, center.z, 1, 0, 0, 0, 0);
+            PositionedScreenShakePacket.send(level, FDShakeData.builder()
+                    .frequency(10)
+                    .amplitude(4f)
+                    .inTime(0)
+                    .stayTime(0)
+                    .outTime(10)
+                    .build(), center, 40);
             this.stunnedTime = 100;
+            if (this.getTarget() instanceof ServerPlayer serverPlayer){
+                BossUtil.cancelNetzachBacktrackEffectFor(serverPlayer);
+            }
+            this.removeBacktrackEntitiesForTarget();
+            level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.HOSTILE, 2f, 0.75f);
+            level.playSound(null, this.getX(), this.getY(), this.getZ(), SoundEvents.MACE_SMASH_GROUND_HEAVY, SoundSource.HOSTILE, 2f, 0.75f);
             return true;
         }
 
@@ -597,7 +624,7 @@ public class ClockWyvern extends FDMob implements AutoSerializable {
         var mainAnimation = this.getAnimationSystem().getTickerAnimation(MAIN);
         if (mainAnimation == BossAnims.CLOCK_WYVERN_IDLE.get() || mainAnimation == BossAnims.CLOCK_WYVERN_CLOCK_O_BALL.get()){
             float rot = yRotO - this.getYRot();
-            float terminalRotation = 1f;
+            float terminalRotation = 0.2f;
             if (rot > terminalRotation){
                 this.getAnimationSystem().startAnimation(TURNING, AnimationTicker.builder(BossAnims.CLOCK_WYVERN_TURN_LEFT)
                         .setLoopMode(Animation.LoopMode.ONCE)

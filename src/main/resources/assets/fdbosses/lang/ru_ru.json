@@ -50,6 +50,7 @@
   "death.attack.electric_sphere": "%s попытался прикоснутся к молнии",
   "death.attack.electric_sphere.player": "%s попытался прикоснутся к молнии",
   "entity.fdbosses.chesed": "Хесед",
+  "entity.fdbosses.debris": "Обломок",
   "entity.fdbosses.ice_malkuth_warrior": "Воин Малхута",
   "entity.fdbosses.fire_malkuth_warrior": "Воин Малхута",
   "entity.fdbosses.chesed_boss_spawner": "Спавнер Хеседа",

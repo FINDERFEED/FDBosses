@@ -57,6 +57,7 @@
   "death.attack.electric_sphere": "%s tried to touch the lightning",
   "death.attack.electric_sphere.player": "%s tried to touch the lightning",
   "entity.fdbosses.chesed": "Chesed",
+  "entity.fdbosses.debris": "Debris",
   "entity.fdbosses.ice_malkuth_warrior": "Malkuth Warrior",
   "entity.fdbosses.fire_malkuth_warrior": "Malkuth Warrior",
   "entity.fdbosses.chesed_boss_spawner": "Chesed Boss Spawner",

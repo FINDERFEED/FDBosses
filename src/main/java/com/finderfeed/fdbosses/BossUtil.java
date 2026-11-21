@@ -1,5 +1,7 @@
 package com.finderfeed.fdbosses;
 
+import com.finderfeed.fdbosses.content.entities.debris.DebrisEntity;
+
 import com.finderfeed.fdbosses.client.particles.smoke_particle.BigSmokeParticleOptions;
 import com.finderfeed.fdbosses.content.boss_notes.BossNote;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
@@ -7,6 +9,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthAttackType;
 import com.finderfeed.fdbosses.content.entities.malkuth_boss.MalkuthEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.BacktrackEffectPacket;
+import com.finderfeed.fdbosses.content.entities.netzach.backtrack_entity.CancelBacktrackEffectPacket;
 import com.finderfeed.fdbosses.init.BossConfigs;
 import com.finderfeed.fdbosses.init.BossRegistries;
 import com.finderfeed.fdbosses.packets.BossNotePacket;
@@ -27,6 +30,7 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.random.WeightedRandomList;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -63,6 +67,7 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class BossUtil {
+
 
     public static final int JUST_ENOUGH_DAMAGE = 9000000;
 
@@ -124,8 +129,29 @@ public class BossUtil {
         posEvent((ServerLevel) level, hitPos, CLOCK_O_BALL_EXPLOSION, 0, 60);
     }
 
+    private static final DebrisEntity.Type[] GEAR_DEBRIS_TYPES = {
+            DebrisEntity.Type.GEAR_DEBRIS_1,
+            DebrisEntity.Type.GEAR_DEBRIS_2,
+            DebrisEntity.Type.GEAR_DEBRIS_3
+    };
+
+    public static void gearDebrisBurst(Level level, Vec3 pos, int count){
+        double startAngle = level.random.nextDouble() * 2 * Math.PI;
+        for (int i = 0; i < count; i++){
+            double angle = startAngle + 2 * Math.PI * i / count;
+            double speed = 0.35 + level.random.nextDouble() * 0.6;
+            Vec3 velocity = new Vec3(Math.cos(angle) * speed, 0.3 + level.random.nextDouble() * 1.5, Math.sin(angle) * speed);
+            var type = GEAR_DEBRIS_TYPES[level.random.nextInt(GEAR_DEBRIS_TYPES.length)];
+            DebrisEntity.summon(level, pos, velocity, type, (float) Player.DEFAULT_BASE_GRAVITY);
+        }
+    }
+
     public static void netzachBacktrackEffectFor(ServerPlayer player, int effectTime, int flashTime){
         PacketDistributor.sendToPlayer(player, new BacktrackEffectPacket(effectTime, flashTime));
+    }
+
+    public static void cancelNetzachBacktrackEffectFor(ServerPlayer player){
+        PacketDistributor.sendToPlayer(player, new CancelBacktrackEffectPacket());
     }
 
     public static void clockWyvernSlam(Level serverLevel, Vec3 pos){
