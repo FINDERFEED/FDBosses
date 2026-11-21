@@ -447,6 +447,9 @@ public class BossClientPackets {
             case BossUtil.DIVINE_GEAR_RAY_PARTICLES -> {
                 divineGearRayParticles(pos,data);
             }
+            case BossUtil.NETZACH_QTE_PARRY -> {
+                netzachQteParry(pos);
+            }
             case BossUtil.NETZACH_GEAR_SLAM -> {
                 netzachGearSlam(pos, data);
             }
@@ -1354,6 +1357,47 @@ public class BossClientPackets {
 
 
     }
+
+    public static void netzachQteParry(Vec3 pos){
+        Level level = FDClientHelpers.getClientLevel();
+        BallParticleOptions flash = BallParticleOptions.builder()
+                .color(1f, 0.8f, 0.2f).scalingOptions(1, 0, 2).brightness(4).size(2f).build();
+        level.addParticle(flash, true, pos.x, pos.y, pos.z, 0, 0, 0);
+
+        for (var dir : new HorizontalCircleRandomDirections(level.random, 16, 0.5f)){
+            ColoredJumpingParticleOptions coloredJumpingParticleOptions = new ColoredJumpingParticleOptions.Builder()
+                    .colorStart(new FDColor(1f, 1f, 1f, 1f))
+                    .colorEnd(new FDColor(1f, 0.8f, 0.3f, 1f))
+                    .maxPointsInTrail(2)
+                    .reflectionStrength(0.33f)
+                    .gravity(1.5f)
+                    .lifetime(10)
+                    .maxJumpAmount(1)
+                    .size(0.03f)
+                    .build();
+
+            float speed = 0.12f + random.nextFloat() * 0.3f;
+            level.addParticle(coloredJumpingParticleOptions, pos.x, pos.y, pos.z, dir.x * speed, 0.16f + random.nextFloat() * 0.25f, dir.z * speed);
+        }
+        
+
+        for (int i = 0; i < 20; i++){
+            Vec3 dir = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize();
+            var spark = SpriteParticleOptions.builder(BossParticles.YELLOW_SPARK)
+                    .size(0.1f + random.nextFloat() * 0.12f)
+                    .lifetime(random.nextInt(20, 30))
+                    .xyzRotation(random.nextFloat() * 90,0,0)
+                    .xyzRotationSpeed(BossUtil.randomPlusMinus() * 20, 0, 0)
+                    .friction(0.9f)
+                    .alphaDecreasing()
+                    .frictionAffectsRotation()
+                    .lightenedUp()
+                    .build();
+            float speed = 0.15f + random.nextFloat() * 0.3f;
+            level.addParticle(spark, pos.x, pos.y, pos.z, dir.x * speed, dir.y * speed, dir.z * speed);
+        }
+    }
+
     public static void geburahRayParticles(Vec3 pos, int data){
 
 

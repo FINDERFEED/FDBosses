@@ -35,7 +35,7 @@ public class DebugStick extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 
         if (!level.isClientSide){
-            NetzachQteAttack.summon(player, player.getLookAngle().scale(2).add(0,player.getBbHeight() / 2,0));
+            NetzachQteAttack.summon(player, player.getLookAngle().multiply(1,0,1).normalize().scale(2).add(0,player.getEyeHeight() - 0.55f,0));
         }else{
         }
 

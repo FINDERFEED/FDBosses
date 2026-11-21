@@ -130,6 +130,7 @@ import com.finderfeed.fdlib.util.rendering.FDRenderUtil;
 import com.finderfeed.fdlib.util.rendering.renderers.QuadRenderer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -504,21 +505,15 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.NETZACH_QTE.get(), FDEntityRendererBuilder.<NetzachQteAttack>builder()
                 .addLayer(FDEntityRenderLayerOptions.<NetzachQteAttack>builder()
                         .model(BossModels.NETZACH)
-                        .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/netzach_ghost.png")))
-                        .color(((netzachQteAttack, v) -> {
-                            float time = Math.clamp(netzachQteAttack.tickCount - BossAnims.NETZACH_QTE.get().getAnimTime() + v, 0, NetzachQteAttack.FADE_OUT_TIME);
-                            float time2 = Math.min(netzachQteAttack.tickCount + v, NetzachQteAttack.FADE_IN_TIME);
-
-                            float fadeOutP = 1 - time / NetzachQteAttack.FADE_OUT_TIME;
-                            float fadeInP = time2 / NetzachQteAttack.FADE_IN_TIME;
-
-                            return new FDColor(1,1,1, fadeInP * fadeOutP);
-                        }))
+                        .renderType((e, p) -> {
+                            return RenderType.EYES.apply(
+                                    FDBosses.location("textures/entities/netzach/netzach_ghost.png"),
+                                    RenderStateShard.LIGHTNING_TRANSPARENCY
+                            );
+                        })
+                        .color((attack, partialTick) -> new FDColor(1, 1, 1, attack.getAlpha(partialTick)))
                         .light(LightTexture.FULL_BRIGHT)
                         .build())
-                .shouldRender((attack, frustum, x, y, z) -> {
-                    return attack.getOwner() != null && attack.getOwner() == FDClientHelpers.getClientPlayer();
-                })
                 .freeRender(new NetzachQteRenderer())
                 .build());
 
