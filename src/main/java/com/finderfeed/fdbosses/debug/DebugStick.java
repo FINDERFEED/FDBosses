@@ -7,6 +7,7 @@ import com.finderfeed.fdbosses.content.entities.geburah.distortion_sphere.Distor
 import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffect;
 import com.finderfeed.fdbosses.content.entities.netzach.distorted_slam.DistortedSlamEffectHandler;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_ball.ClockWyvernClockOBall;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_ghost_crush.NetzachGhostCrush;
 import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQteAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.train_attack.TrainAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.train_attack.TrainAttackPatterns;
@@ -35,7 +36,7 @@ public class DebugStick extends Item {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
 
         if (!level.isClientSide){
-            NetzachQteAttack.summon(player, player.getLookAngle().multiply(1,0,1).normalize().scale(-2).add(0,player.getEyeHeight() - 0.55f,0));
+            NetzachGhostCrush.summon(level, player.position().add(player.getLookAngle().multiply(1,0,1).normalize().scale(4)), player.getLookAngle().reverse(), 40, 4, 1);
         }else{
         }
 

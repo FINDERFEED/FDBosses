@@ -118,7 +118,12 @@ public class NetzachQteAttack extends FDOwnableEntity {
 
     private void shake(){
         DefaultShakePacket.send((ServerLevel) this.level(), this.position(), 5, FDShakeData.builder()
-                .frequency(20f).amplitude(0.5f).inTime(0).stayTime(0).outTime(6).build());
+                .frequency(20f)
+                .amplitude(0.5f)
+                .inTime(0)
+                .stayTime(0)
+                .outTime(6)
+                .build());
     }
 
     public boolean isResolved(){

@@ -89,6 +89,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyve
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvernRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_ball.ClockWyvernClockOBallRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttackRenderer;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_ghost_crush.NetzachGhostCrushRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQteAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQteRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttackRenderer;
@@ -519,6 +520,7 @@ public class BossClientModEvents {
                 .freeRender(new NetzachQteRenderer())
                 .build());
 
+        event.registerEntityRenderer(BossEntities.NETZACH_GHOST_CRUSH.get(), NetzachGhostCrushRenderer::new);
         event.registerEntityRenderer(BossEntities.NETZACH_GEAR_CRUSH.get(), NetzachGearCrushAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.SECTOR_ATTACK.get(), SectorAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.TRAIN_ATTACK.get(), TrainAttackRenderer::new);
