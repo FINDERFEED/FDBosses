@@ -486,9 +486,12 @@ public class BossClientPackets {
         Level level = FDClientHelpers.getClientLevel();
 
         SpriteParticleOptions optionsGear = SpriteParticleOptions.builder(BossParticles.BIG_GEAR)
-                .size(radius)
+                .lifetime(20)
+                .size(radius * 2)
                 .particleLookDirection(0,1,0)
-                .xyzRotationSpeed(0,5,0)
+                .xyzRotationSpeed(0,20,0)
+                .friction(0.9f)
+                .lightenedUp()
                 .frictionAffectsRotation()
                 .quadSizeIncreasing()
                 .quadSizeEaseOut()
@@ -497,12 +500,12 @@ public class BossClientPackets {
                 .build();
 
 
-        level.addParticle(optionsGear, true, pos.x, pos.y + 0.01, pos.z, 0,0,0);
+        level.addParticle(optionsGear, true, pos.x, pos.y + 0.1, pos.z, 0,0,0);
 
         float size = 32;
         var strike = SpriteParticleOptions.builder(BossParticles.CANE_STRIKE)
                 .size(size)
-                .lifetime(10)
+                .lifetime(8)
                 .lookAtCameraY()
                 .lightenedUp()
                 .build();
@@ -554,7 +557,7 @@ public class BossClientPackets {
             return SpriteParticleOptions.builder(BossParticles.YELLOW_SPARK)
                     .size(0.5f)
                     .lifetime(20 + random.nextInt(0,10))
-                    .friction(0.8f)
+                    .friction(0.8f + random.nextFloat() * 0.1f)
                     .frictionAffectsRotation()
                     .xyzRotation(90 * random.nextFloat(),0,0)
                     .xyzRotationSpeed(20 + random.nextFloat() * 10,0,0)

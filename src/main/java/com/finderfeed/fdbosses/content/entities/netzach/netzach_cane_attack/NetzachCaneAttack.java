@@ -98,11 +98,11 @@ public class NetzachCaneAttack extends Entity implements AutoSerializable {
                 this.discard();
             }else if (this.tickCount == FALL_TICKS){
                 PositionedScreenShakePacket.send((ServerLevel) this.level(), FDShakeData.builder()
-                                .frequency(5f)
-                                .amplitude(5)
+                                .frequency(10f)
+                                .amplitude(7)
                                 .inTime(0)
                                 .stayTime(0)
-                                .outTime(5).build(), this.position(),
+                                .outTime(6).build(), this.position(),
                         60);
             }
 
@@ -125,10 +125,10 @@ public class NetzachCaneAttack extends Entity implements AutoSerializable {
         BossUtil.netzachCaneStrike(this.level(), center, this.radius);
         PositionedScreenShakePacket.send((ServerLevel) this.level(), FDShakeData.builder()
                 .frequency(10f)
-                .amplitude(10)
+                .amplitude(15)
                 .inTime(0)
                 .stayTime(0)
-                .outTime(5).build(), center,
+                .outTime(6).build(), center,
                 60);
         this.spawnDebris();
     }
@@ -153,8 +153,9 @@ public class NetzachCaneAttack extends Entity implements AutoSerializable {
             block.lessParticles = true;
             block.softerSound = true;
 
+            float color = random.nextFloat() * 0.1f + 0.2f;
             FDLibCalls.addParticleEmitter(level, 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
-                            .color(0.32f, 0.32f, 0.32f).lifetime(0, 0, 25).size(1.5f).build())
+                            .color(color, color, color).lifetime(0, 0, 25).size(1.5f).build())
                     .lifetime(200).processor(new BoundToEntityProcessor(block.getId(), Vec3.ZERO))
                     .position(this.position()).build());
         }
@@ -185,8 +186,9 @@ public class NetzachCaneAttack extends Entity implements AutoSerializable {
                 block.lessParticles = true;
                 block.softerSound = true;
 
+                float color = random.nextFloat() * 0.1f + 0.2f;
                 FDLibCalls.addParticleEmitter(level, 120, ParticleEmitterData.builder(BigSmokeParticleOptions.builder()
-                                .color(0.32f, 0.32f, 0.32f).lifetime(0, 0, 25).size(1.5f).build())
+                                .color(color, color, color).lifetime(0, 0, 25).size(1.5f).build())
                         .lifetime(200).processor(new BoundToEntityProcessor(block.getId(), Vec3.ZERO))
                         .position(this.position()).build());
             }
