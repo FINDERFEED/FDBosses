@@ -64,6 +64,8 @@ public class BossModels {
     //Netzach
     public static final Supplier<FDModelInfo> NETZACH = INFOS.register("netzach",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"),1.0f));
     public static final Supplier<FDModelInfo> NETZACH_LAYER = INFOS.register("netzach_layer",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"),1.05f));
+    public static final Supplier<FDModelInfo> NETZACH_CANE = INFOS.register("netzach_cane",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach_cane"),1.0f));
+    public static final Supplier<FDModelInfo> NETZACH_CANE_LAYER = INFOS.register("netzach_cane_layer",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach_cane"),1.05f));
     public static final Supplier<FDModelInfo> GEAR_ATTACK = INFOS.register("gear_attack",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"gear_attack"),1.0f));
     public static final Supplier<FDModelInfo> PLAYER_MODEL = INFOS.register("player_model",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"player_model"),1.0f));
     public static final Supplier<FDModelInfo> CLOCK_PENDULUM = INFOS.register("clock_pendulum",()->new FDModelInfo(ResourceLocation.tryBuild(FDBosses.MOD_ID,"clock_pendulum"),1.0f));

@@ -10,6 +10,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -76,7 +77,9 @@ public class NetzachGhostCrushRenderer extends EntityRenderer<NetzachGhostCrush>
         animation.applyAnimation(context, body, frame, 1);
         animation.applyAnimation(context, layer, frame, 1);
 
-        layer.render(matrices, buffers.getBuffer(RenderType.eyes(BODY)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, alpha, alpha, alpha, alpha * alpha);
+        layer.render(matrices, buffers.getBuffer(RenderType.EYES.apply(
+                BODY,
+                RenderStateShard.LIGHTNING_TRANSPARENCY)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, alpha, alpha, alpha, alpha * alpha);
         body.render(matrices, buffers.getBuffer(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/netzach_ghost.png"))), light, OverlayTexture.NO_OVERLAY, 1, 1, 1f, alpha * 0.75f);
 
         matrices.popPose();

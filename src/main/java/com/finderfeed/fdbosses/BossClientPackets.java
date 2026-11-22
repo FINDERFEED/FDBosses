@@ -16,6 +16,7 @@ import com.finderfeed.fdbosses.content.boss_notes.BossNote;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterEntity;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.earthshatter_entity.EarthShatterSettings;
+import com.finderfeed.fdbosses.content.entities.chesed_boss.falling_block.ChesedFallingBlock;
 import com.finderfeed.fdbosses.content.entities.chesed_boss.radial_earthquake.RadialEarthquakeEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahEntity;
 import com.finderfeed.fdbosses.content.entities.geburah.GeburahRenderer;
@@ -39,10 +40,13 @@ import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.ClientMixinHandler;
 import com.finderfeed.fdlib.FDClientHelpers;
+import com.finderfeed.fdlib.FDLibCalls;
 import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.broken_screen_effect.ShatteredScreenEffectHandler;
 import com.finderfeed.fdlib.systems.broken_screen_effect.ShatteredScreenSettings;
 import com.finderfeed.fdlib.systems.particle.CircleParticleProcessor;
+import com.finderfeed.fdlib.systems.particle.particle_emitter.ParticleEmitterData;
+import com.finderfeed.fdlib.systems.particle.particle_emitter.processors.BoundToEntityProcessor;
 import com.finderfeed.fdlib.systems.screen.screen_effect.ScreenEffectOverlay;
 import com.finderfeed.fdlib.systems.screen.screen_particles.FDTexturedSParticle;
 import com.finderfeed.fdlib.systems.shake.DefaultShake;
@@ -68,15 +72,19 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import org.joml.*;
 
 import java.lang.Math;
@@ -456,6 +464,9 @@ public class BossClientPackets {
             case BossUtil.NETZACH_PUSH_AWAY -> {
                 netzachPushAway(pos, data);
             }
+            case BossUtil.NETZACH_CANE_STRIKE -> {
+                netzachCaneStrike(pos, Float.intBitsToFloat(data));
+            }
             case BossUtil.NETZACH_CRUSH -> {
                 netzachCrush(pos, data);
             }
@@ -468,6 +479,96 @@ public class BossClientPackets {
             case BossUtil.CLOCK_O_BALL_EXPLOSION -> {
                 clockOBallExplosion(pos, data);
             }
+        }
+    }
+
+    private static void netzachCaneStrike(Vec3 pos, float radius){
+        Level level = FDClientHelpers.getClientLevel();
+
+        SpriteParticleOptions optionsGear = SpriteParticleOptions.builder(BossParticles.BIG_GEAR)
+                .size(radius)
+                .particleLookDirection(0,1,0)
+                .xyzRotationSpeed(0,5,0)
+                .frictionAffectsRotation()
+                .quadSizeIncreasing()
+                .quadSizeEaseOut()
+                .alphaDecreasing()
+                .lightenedUp()
+                .build();
+
+
+        level.addParticle(optionsGear, true, pos.x, pos.y + 0.01, pos.z, 0,0,0);
+
+        float size = 32;
+        var strike = SpriteParticleOptions.builder(BossParticles.CANE_STRIKE)
+                .size(size)
+                .lifetime(10)
+                .lookAtCameraY()
+                .lightenedUp()
+                .build();
+
+        level.addParticle(strike, true, pos.x, pos.y + size / 2, pos.z, 0, 0, 0);
+
+        var flash = BallParticleOptions.builder()
+                .color(1f, 0.8f, 0.12f).scalingOptions(1, 0, 3).brightness(2).size(radius * 2).build();
+
+        level.addParticle(flash, true, pos.x, pos.y + 0.1, pos.z, 0, 0, 0);
+
+        var random = level.random;
+
+        for (Vec3 direction : new HorizontalCircleRandomDirections(random, 120, 1f)){
+
+            Vec3 ppos = pos.add(direction.scale(2 * random.nextFloat()));
+
+            float horizontal = 0.1f + random.nextFloat() * 0.3f;
+            float vertical = 1f + random.nextFloat() * 1f;
+            Vec3 velocity = direction.scale(horizontal).add(0, vertical, 0).scale(2);
+            level.addParticle(caneStrikeParticleOptions(random), ppos.x, ppos.y, ppos.z, velocity.x, velocity.y, velocity.z);
+
+        }
+
+
+        for (int i = 1; i < radius; i++){
+
+            float p = i / (radius - 1);
+            float md = p * p;
+            int count = (int) Math.ceil(md * FDMathUtil.lerp(radius * 2, radius * 10,1 - md));
+
+            for (var direction : new HorizontalCircleRandomDirections(random, count, 1f)){
+                Vec3 scaledDir = direction.scale(i + random.nextFloat() * 0.5f);
+
+                Vec3 ppos = pos.add(scaledDir);
+
+                float horizontal = 0.1f + random.nextFloat() * FDMathUtil.lerp(0.5f, 0.75f,1 - md);
+                float vertical = 0.05f + random.nextFloat() * FDMathUtil.lerp(0.05f, 1.25f, 1 - md);
+                Vec3 velocity = direction.scale(horizontal).add(0, vertical,0);
+
+                level.addParticle(caneStrikeParticleOptions(random), ppos.x, ppos.y, ppos.z, velocity.x, velocity.y, velocity.z);
+            }
+
+        }
+    }
+
+    private static ParticleOptions caneStrikeParticleOptions(RandomSource random){
+        if (random.nextFloat() < 0.65){
+            return SpriteParticleOptions.builder(BossParticles.YELLOW_SPARK)
+                    .size(0.5f)
+                    .lifetime(20 + random.nextInt(0,10))
+                    .friction(0.8f)
+                    .frictionAffectsRotation()
+                    .xyzRotation(90 * random.nextFloat(),0,0)
+                    .xyzRotationSpeed(20 + random.nextFloat() * 10,0,0)
+                    .alphaDecreasing()
+                    .lightenedUp()
+                    .build();
+        }else{
+            return BallParticleOptions.builder()
+                    .color(1f,0.7f,0.2f)
+                    .size(0.5f)
+                    .brightness(2)
+                    .friction(0.8f)
+                    .scalingOptions(0,0,20 + random.nextInt(0,10))
+                    .build();
         }
     }
 

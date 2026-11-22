@@ -63,6 +63,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyve
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvernChargingSpot;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_ball.ClockWyvernClockOBall;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_cane_attack.NetzachCaneAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_ghost_crush.NetzachGhostCrush;
 import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQteAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.sector_attack.SectorAttack;
@@ -463,6 +464,12 @@ public class BossEntities {
             )
             .sized(0.25F, 0.25F)
             .build("netzach_rolling_gear"));
+
+    public static final Supplier<EntityType<NetzachCaneAttack>> NETZACH_CANE_ATTACK = ENTITIES.register("netzach_cane_attack",()->EntityType.Builder.of(
+                    NetzachCaneAttack::new, MobCategory.MISC
+            )
+            .sized(1.25F, 12F)
+            .build("netzach_cane_attack"));
 
     public static final Supplier<EntityType<NetzachGhostCrush>> NETZACH_GHOST_CRUSH = ENTITIES.register("netzach_ghost_crush",()->EntityType.Builder.of(
                     NetzachGhostCrush::new, MobCategory.MISC

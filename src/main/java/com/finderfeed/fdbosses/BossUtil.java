@@ -106,6 +106,11 @@ public class BossUtil {
     public static final int CLOCK_WYVERN_SLAM = 27;
     public static final int CLOCK_O_BALL_EXPLOSION = 28;
     public static final int NETZACH_QTE_PARRY = 29;
+    public static final int NETZACH_CANE_STRIKE = 30;
+
+    public static void netzachCaneStrike(Level level, Vec3 pos, float radius){
+        posEvent((ServerLevel) level, pos, NETZACH_CANE_STRIKE, Float.floatToIntBits(radius), 120);
+    }
 
     public static void netzachQteParry(Level level, Vec3 pos){
         posEvent((ServerLevel) level, pos, NETZACH_QTE_PARRY, 0, 60);

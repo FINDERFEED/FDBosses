@@ -89,6 +89,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyve
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyvernRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_ball.ClockWyvernClockOBallRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttackRenderer;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_cane_attack.NetzachCaneAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_ghost_crush.NetzachGhostCrushRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQteAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQteRenderer;
@@ -487,6 +488,7 @@ public class BossClientModEvents {
         event.registerSpriteSet(BossParticles.SMALL_GEAR.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.NETZACH_SLASH.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.YELLOW_SPARK.get(), AnimatedSpriteParticle.Factory::new);
+        event.registerSpriteSet(BossParticles.CANE_STRIKE.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.NETZACH_CRUSH.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.NETZACH_POKE_CIRCLE.get(), AnimatedSpriteParticle.Factory::new);
         event.registerSpriteSet(BossParticles.NETZACH_POKE.get(), AnimatedSpriteParticle.Factory::new);
@@ -520,6 +522,7 @@ public class BossClientModEvents {
                 .freeRender(new NetzachQteRenderer())
                 .build());
 
+        event.registerEntityRenderer(BossEntities.NETZACH_CANE_ATTACK.get(), NetzachCaneAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.NETZACH_GHOST_CRUSH.get(), NetzachGhostCrushRenderer::new);
         event.registerEntityRenderer(BossEntities.NETZACH_GEAR_CRUSH.get(), NetzachGearCrushAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.SECTOR_ATTACK.get(), SectorAttackRenderer::new);
