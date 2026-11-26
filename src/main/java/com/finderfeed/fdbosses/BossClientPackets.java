@@ -513,7 +513,7 @@ public class BossClientPackets {
         level.addParticle(strike, true, pos.x, pos.y + size / 2, pos.z, 0, 0, 0);
 
         var flash = BallParticleOptions.builder()
-                .color(1f, 0.8f, 0.12f).scalingOptions(1, 0, 3).brightness(2).size(radius * 2).build();
+                .color(1f, 0.8f, 0.12f).scalingOptions(1, 0, 3).brightness(3).size(radius * 2).build();
 
         level.addParticle(flash, true, pos.x, pos.y + 0.1, pos.z, 0, 0, 0);
 
@@ -556,7 +556,7 @@ public class BossClientPackets {
         if (random.nextFloat() < 0.65){
             return SpriteParticleOptions.builder(BossParticles.YELLOW_SPARK)
                     .size(0.5f)
-                    .lifetime(20 + random.nextInt(0,10))
+                    .lifetime(60 + random.nextInt(0,20))
                     .friction(0.8f + random.nextFloat() * 0.1f)
                     .frictionAffectsRotation()
                     .xyzRotation(90 * random.nextFloat(),0,0)
@@ -570,7 +570,7 @@ public class BossClientPackets {
                     .size(0.5f)
                     .brightness(2)
                     .friction(0.8f)
-                    .scalingOptions(0,0,20 + random.nextInt(0,10))
+                    .scalingOptions(0,0,60 + random.nextInt(0,20))
                     .build();
         }
     }
@@ -873,12 +873,12 @@ public class BossClientPackets {
 
     }
 
-    private static void netzachPushAway(Vec3 pos, int data) {
+    public static void netzachPushAway(Vec3 pos, int data) {
 
         Level level = FDClientHelpers.getClientLevel();
 
         SpriteParticleOptions options = SpriteParticleOptions.builder(BossParticles.BIG_GEAR)
-                .size(16f)
+                .size(data)
                 .particleLookDirection(0,1,0)
                 .xyzRotationSpeed(0,5,0)
                 .frictionAffectsRotation()
@@ -889,7 +889,7 @@ public class BossClientPackets {
                 .build();
 
         SpriteParticleOptions options2 = SpriteParticleOptions.builder(BossParticles.BIG_GEAR)
-                .size(16f)
+                .size(data)
                 .lookAtCameraY()
                 .xyzRotationSpeed(2.5f,0,0)
                 .frictionAffectsRotation()
@@ -903,7 +903,7 @@ public class BossClientPackets {
                 .color(1f,0.8f,0.4f)
                 .scalingOptions(1,0,1)
                 .brightness(2)
-                .size(7f)
+                .size(data / 2f)
                 .build();
 
         level.addParticle(flash,true,pos.x,pos.y,pos.z,0,0,0);
@@ -929,7 +929,7 @@ public class BossClientPackets {
                         Vec3 v = new Vec3(x, y, z).normalize();
                         v = v.yRot(FDMathUtil.FPI / 6 * random.nextFloat());
 
-                        double pspeed = 0.25f + random.nextFloat() * 2f;
+                        double pspeed = 0.25f + random.nextFloat() * (data / 8f);
                         Vec3 speed = v.scale(pspeed);
                         level.addParticle(spriteParticleOptions, true, pos.x, pos.y, pos.z, speed.x, speed.y, speed.z);
 

@@ -736,17 +736,48 @@ public class BossClientModEvents {
                 .build());
 
         event.registerEntityRenderer(BossEntities.NETZACH.get(), FDEntityRendererBuilder.<NetzachEntity>builder()
-                        .addLayer(FDEntityRenderLayerOptions.<NetzachEntity>builder()
-                                .model(BossModels.NETZACH)
-                                .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/netzach.png")))
-                                .color(((netzachEntity, v) -> {
-                                    return new FDColor(1,1,1,netzachEntity.getVisibilityPercent(v));
-                                }))
-                                .renderCondition((netzachEntity -> {
-                                    return netzachEntity.getVisibilityPercent(0) > 0;
-                                }))
-                                .build())
+                    .addLayer(FDEntityRenderLayerOptions.<NetzachEntity>builder()
+                            .model(BossModels.NETZACH_LAYER)
+                            .renderType((e, p) -> {
+                                return RenderType.EYES.apply(
+                                        FDBosses.location("textures/entities/netzach/netzach_ghost_transparent.png"),
+                                        RenderStateShard.LIGHTNING_TRANSPARENCY
+                                );
+                            })
+                            .color(((netzachEntity, v) -> {
+                                var animSystem = netzachEntity.getAnimationSystem();
+                                var ticker = animSystem.getTicker(NetzachEntity.MAIN_LAYER);
+                                if (ticker == null){
+                                    return new FDColor(0,0,0,0);
+                                }
 
+                                float alpha = netzachEntity.getVisibilityPercent(v);
+
+                                if (ticker.getAnimation() == BossAnims.NETZACH_ULTIMATE_CHARGE_UP.get()) {
+                                    float tickerTime = ticker.getTime(v);
+                                    alpha = Math.min(alpha, Math.min(Math.max(0, tickerTime - 20) / 100, 1));
+
+                                    return new FDColor(1,1,1, alpha);
+                                }else{
+                                    return new FDColor(0,0,0,0);
+                                }
+                            }))
+                            .renderCondition((netzachEntity -> {
+                                return netzachEntity.getVisibilityPercent(0) > 0;
+                            }))
+                            .build())
+
+                    .addLayer(FDEntityRenderLayerOptions.<NetzachEntity>builder()
+                            .model(BossModels.NETZACH)
+                            .renderType(RenderType.entityTranslucent(FDBosses.location("textures/entities/netzach/netzach.png")))
+                            .color(((netzachEntity, v) -> {
+                                return new FDColor(1,1,1,netzachEntity.getVisibilityPercent(v));
+                            }))
+                            .renderCondition((netzachEntity -> {
+                                return netzachEntity.getVisibilityPercent(0) > 0;
+                            }))
+                            .build())
+                        .shouldRender((netzachEntity, frustum, v, v1, v2) -> true)
                 .build());
 
         event.registerEntityRenderer(BossEntities.NETZACH_ROLLING_GEAR.get(), FDEntityRendererBuilder.<NetzachRollingGearAttack>builder()

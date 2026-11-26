@@ -200,11 +200,23 @@ void main(){
     sinValue *= radMod;
 
     float distortionAtPoint = (perlinNoise3d(uv.x, uv.y, time * 0.1, 10.0) + 1.0) * 0.5;
-    float strength = effectStrength;
-    vec2 displacement = vec2(sin(distortionAtPoint * PI * 2.0), cos(distortionAtPoint * PI * 2.0)) * sinValue * 0.05 * strength;
-    vec2 samplePosition = clamp(texCoord + displacement, vec2(0.0), vec2(1.0));
+    vec2 displacement = vec2(sin(distortionAtPoint * PI * 2.0), cos(distortionAtPoint * PI * 2.0)) * sinValue * 0.05 * effectStrength;
 
-    vec4 currentColor = texture(DiffuseSampler, samplePosition);
+    float shiftStr = effectStrength * 0.01 * distortionAtPoint * sinValue;
+    vec2 redShift = vec2(0.0, shiftStr);
+    vec2 greenShift = vec2(shiftStr, -shiftStr);
+    vec2 blueShift = vec2(-shiftStr, -shiftStr);
+
+    vec2 samplePositionRed = clamp(texCoord + displacement + redShift, vec2(0.0), vec2(1.0));
+    vec2 samplePositionGreen = clamp(texCoord + displacement + greenShift, vec2(0.0), vec2(1.0));
+    vec2 samplePositionBlue = clamp(texCoord + displacement + blueShift, vec2(0.0), vec2(1.0));
+
+    vec4 currentColor = vec4(
+        texture(DiffuseSampler, samplePositionRed).r,
+        texture(DiffuseSampler, samplePositionGreen).g,
+        texture(DiffuseSampler, samplePositionBlue).b,
+        texture(DiffuseSampler, clamp(texCoord + displacement, vec2(0.0), vec2(1.0))).a
+    );
 
     float pixelizer = 7 / projectionScale;
     vec2 pixeledUV = floor(uv * pixelizer) / pixelizer * (0.05 / projectionScale);

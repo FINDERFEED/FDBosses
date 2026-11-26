@@ -663,8 +663,8 @@ public class BossUtil {
         posEvent(serverLevel, pos, NETZACH_GEAR_SLAM, FDUtil.encodeDirection(direction), radius);
     }
 
-    public static void netzachPushAway(ServerLevel serverLevel, Vec3 pos, double radius){
-        posEvent(serverLevel, pos, NETZACH_PUSH_AWAY, 0, radius);
+    public static void netzachPushAway(ServerLevel serverLevel, Vec3 pos, double radius, int effectSize){
+        posEvent(serverLevel, pos, NETZACH_PUSH_AWAY, effectSize, radius);
     }
 
     public static void netzachCrush(ServerLevel serverLevel, Vec3 pos, double radius){
