@@ -2,24 +2,32 @@ package com.finderfeed.fdbosses.content.entities.netzach;
 
 import com.finderfeed.fdbosses.BossUtil;
 import com.finderfeed.fdbosses.client.BossParticles;
+import com.finderfeed.fdbosses.client.netzach_charging_up.NetzachChargingUpEffectHandler;
 import com.finderfeed.fdbosses.client.particles.entity_ghost.EntityGhostParticleOptions;
 import com.finderfeed.fdbosses.client.particles.square_preparation_particle.RectanglePreparationParticleOptions;
 import com.finderfeed.fdbosses.client.particles.vanilla_like.SpriteParticleOptions;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerContextAssignable;
 import com.finderfeed.fdbosses.content.entities.base.BossSpawnerEntity;
 import com.finderfeed.fdbosses.content.entities.netzach.clock_attack.ClockAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_cane_attack.NetzachCaneAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_cane_attack.NetzachCaneVisualStrike;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_clock_pendulum.NetzachClockPendulum;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttack;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_ghost_crush.NetzachGhostCrush;
+import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQteAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.time_stabilizer.TimeStabilizer;
 import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdbosses.init.BossEntities;
+import com.finderfeed.fdbosses.init.BossModels;
 import com.finderfeed.fdbosses.init.BossSounds;
 import com.finderfeed.fdbosses.packets.SlamParticlesPacket;
 import com.finderfeed.fdlib.FDLibCalls;
+import com.finderfeed.fdlib.FDClientHelpers;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDMob;
+import com.finderfeed.fdlib.systems.bedrock.models.FDModel;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackAction;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackChain;
 import com.finderfeed.fdlib.systems.entity.action_chain.AttackInstance;
@@ -52,8 +60,10 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.joml.Vector3f;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable, AutoSerializable {
 
@@ -77,12 +87,22 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
     public static final String GEAR_CRUSH = "gear_crush";
     public static final String PENDULUMS_STRIKE = "pendulums_strike";
     public static final String CLOCK_ATTACK = "clock_attack";
+    public static final String NETZACH_ULTIMATE = "netzach_ultimate";
     public static final String DISAPPEAR = "disappear";
     public static final String APPEAR = "appear";
 
     private int visibilityTicks = 10;
 
+    private static FDModel model;
+
     public AttackChain attackChain;
+
+    public static FDModel getModel(){
+        if (model == null){
+            model = new FDModel(BossModels.NETZACH.get());
+        }
+        return model;
+    }
 
     @SerializableField
     private Vec3 spawnPos;
@@ -100,10 +120,12 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                 .registerAttack(GEAR_CRUSH, this::gearCrush)
                 .registerAttack(PENDULUMS_STRIKE, this::pendulumsStrike)
                 .registerAttack(CLOCK_ATTACK, this::clockAttack)
+                .registerAttack(NETZACH_ULTIMATE, this::netzachUltimate)
                 .registerAttack(DISAPPEAR, this::disappear)
                 .registerAttack(APPEAR, this::appear)
                 .attackListener(this::attackListener)
                 .addAttack(0, AttackOptions.chainOptionsBuilder()
+                        .addAttack(NETZACH_ULTIMATE)
 //                        .addAttack(ATTACK_SERIES_1)
 //                        .addAttack(BASIC_ATTACK)
 //                        .addAttack(GEAR_CRUSH)
@@ -144,11 +166,40 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
             this.setTarget(this.level().getNearestPlayer(this.getX(),this.getY(),this.getZ(), 120, null));
             this.attackChain.tick();
         }else{
+
+            this.checkChargingUpEffect();
             this.handleVisibility();
             this.handleGhostSpawning();
         }
     }
 
+
+    public Vec3 getBodyPosition(float partialTick){
+        var transform = this.getModelPartTransformation(this, "body", getModel(), partialTick);
+        Vector3f pos = transform.transformPosition(new Vector3f(0,1,0));
+        return this.getPosition(partialTick).add(pos.x, pos.y, pos.z);
+    }
+
+    private void checkChargingUpEffect(){
+        if (this.tickCount % NetzachChargingUpEffectHandler.WATCHDOG_TIMEOUT != 0) return;
+
+        var animation = this.getAnimationSystem().getTicker(MAIN_LAYER);
+        if (animation == null || animation.getAnimation() != BossAnims.NETZACH_ULTIMATE_CHARGE_UP.get()) return;
+        float time = animation.getElapsedTime();
+
+        if (time < 10 || time > 150) return;
+
+        Player player = FDClientHelpers.getClientPlayer();
+
+        if (player == null) return;
+
+        var hit = this.level().clip(new ClipContext(player.getEyePosition(), this.getBodyPosition(0),
+                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+        if (hit.getType() == HitResult.Type.MISS){
+            NetzachChargingUpEffectHandler.kickWatchdog(this);
+        }
+
+    }
 
     private static Vec3[] TIME_STABILIZER_OFFSETS = {
             new Vec3(ARENA_RADIUS, 0,0),
@@ -229,6 +280,92 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
             return AttackAction.WAIT;
         }
         return AttackAction.PROCEED;
+    }
+
+    @SerializableField
+    private int nextUltimateQteTick;
+
+    private boolean netzachUltimate(AttackInstance attackInstance){
+        int tick = attackInstance.tick;
+        int stage = attackInstance.stage;
+
+        if (stage == 0){
+            int chargeTicks = BossAnims.NETZACH_ULTIMATE_CHARGE_UP.get().getAnimTime();
+            if (tick == 0){
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_ULTIMATE_CHARGE_UP)
+                                .setTransitionTime(5)
+                        .important().build());
+            }
+            if (tick == chargeTicks - VISIBILITY_TIME - 1){
+                this.setVisible(false);
+            }
+            if (tick >= chargeTicks - 1){
+                this.nextUltimateQteTick = 0;
+                attackInstance.nextStage();
+            }
+        }else if (stage == 1){
+            this.getAnimationSystem().stopAnimation(MAIN_LAYER);
+            int qteDuration = 140;
+            int initialInterval = 40;
+            int finalInterval = 15;
+            if (tick < qteDuration){
+                if (tick >= this.nextUltimateQteTick){
+                    for (var player : this.getCombatants(true)){
+                        double yaw = Math.toRadians(player.getYRot());
+                        NetzachQteAttack.summon(player, new Vec3(2 * Math.sin(yaw), player.getEyeHeight() - 0.45, -2 * Math.cos(yaw)));
+                    }
+                    float progress = (float) tick / (qteDuration - 1);
+                    this.nextUltimateQteTick = tick + Math.round(Mth.lerp(progress, (float) initialInterval, finalInterval));
+                }
+            }
+            if (tick >= qteDuration + 20){
+                attackInstance.nextStage();
+            }
+        }else if (stage == 2){
+            int ghostDuration = 160;
+            int waveInterval = 40;
+            int waveTick = tick % waveInterval;
+            if (waveTick == 0){
+                for (var player : this.getCombatants(true)){
+                    this.summonUltimateGhost(player.position(), waveInterval);
+                }
+            }else if (waveTick <= 3){
+                double x = (this.random.nextDouble() * 2 - 1) * ARENA_RADIUS;
+                double z = (this.random.nextDouble() * 2 - 1) * ARENA_RADIUS;
+                this.summonUltimateGhost(this.spawnPos.add(x, 1, z), waveInterval);
+            }
+            if (tick >= ghostDuration - 1){
+                attackInstance.nextStage();
+            }
+        }else if (stage == 3){
+            int throwTick = 20;
+            if (tick == 0){
+                this.setVisible(true);
+                this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_ULTIMATE_END)
+                        .important()
+                        .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_IDLE).build())
+                        .build());
+            }else if (tick == throwTick){
+                NetzachCaneVisualStrike.summon(this.level(), this.position().add(0, 100 / 16.0, 0), new Vec3(0, -2, 0), 0, 20, 10);
+            }else if (tick == throwTick + 5){
+                int radius = 12;
+                int delay = 40;
+                for (int x = -ARENA_RADIUS + radius; x < ARENA_RADIUS; x += 2 * radius){
+                    for (int z = -ARENA_RADIUS + radius; z < ARENA_RADIUS; z += 2 * radius){
+                        Vec3 ground = BossUtil.targetGroundPos(this.level(), this.spawnPos.add(x, 1, z), ARENA_HEIGHT);
+                        NetzachCaneAttack.summon(this.level(), ground, this.getLookAngle(), 10, radius, delay - NetzachCaneAttack.FALL_TICKS);
+                    }
+                }
+            }
+            return tick >= BossAnims.NETZACH_ULTIMATE_END.get().getAnimTime() - 1 + 200;
+        }
+        return false;
+    }
+
+    private void summonUltimateGhost(Vec3 position, int duration){
+        Vec3 ground = BossUtil.targetGroundPos(this.level(), position, ARENA_HEIGHT);
+        double angle = this.random.nextDouble() * 2 * Math.PI;
+        NetzachGhostCrush.summon(this.level(), ground, new Vec3(Math.cos(angle), 0, Math.sin(angle)), duration, 4, 10);
     }
 
     private boolean clockAttack(AttackInstance attackInstance) {
@@ -1000,6 +1137,19 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
 
     public void setVisible(boolean visible){
         this.entityData.set(VISIBLE, visible);
+    }
+
+
+    public List<Player> getCombatants(boolean includeCreativeAndSpectator){
+        return this.getCombatants(includeCreativeAndSpectator, 0);
+    }
+
+    public List<Player> getCombatants(boolean includeCreativeAndSpectator,float additionalRadius){
+        float radius = ARENA_RADIUS + additionalRadius;
+        List<Player> combatants = level().getEntitiesOfClass(Player.class,new AABB(-radius,-1,-radius,radius,ARENA_HEIGHT,radius).move(this.position()),(player)->{
+            return includeCreativeAndSpectator || !(player.isCreative() || player.isSpectator()) && player.isAlive();
+        });
+        return combatants;
     }
 
     @Override

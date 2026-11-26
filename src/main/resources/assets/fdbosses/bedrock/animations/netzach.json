@@ -3770,6 +3770,7 @@
 			}
 		},
 		"netzach_ultimate_charge_up": {
+			"loop": "hold_on_last_frame",
 			"animation_length": 9.8333,
 			"bones": {
 				"main": {
@@ -3778,48 +3779,52 @@
 							"post": [0, 0, 0],
 							"lerp_mode": "catmullrom"
 						},
+						"0.5": {
+							"post": [0, 76, 0],
+							"lerp_mode": "catmullrom"
+						},
 						"1.0": {
-							"post": [0, 2, 0],
+							"post": [0, 100, 0],
 							"lerp_mode": "catmullrom"
 						},
 						"2.0": {
-							"post": [0, 0, 0],
+							"post": [0, 95, 0],
 							"lerp_mode": "catmullrom"
 						},
 						"3.0": {
-							"post": [0, 2, 0],
+							"post": [0, 100, 0],
 							"lerp_mode": "catmullrom"
 						},
 						"4.0": {
-							"post": [0, 0, 0],
+							"post": [0, 95, 0],
 							"lerp_mode": "catmullrom"
 						},
 						"5.0": {
-							"post": [0, 2, 0],
+							"post": [0, 100, 0],
 							"lerp_mode": "catmullrom"
 						},
 						"6.0": {
-							"post": [0, 0, 0],
+							"post": [0, 95, 0],
 							"lerp_mode": "catmullrom"
 						},
 						"7.0": {
-							"post": [0, 2, 0],
+							"post": [0, 100, 0],
 							"lerp_mode": "catmullrom"
 						},
 						"8.0": {
-							"post": [0, 0, 0],
+							"post": [0, 95, 0],
 							"lerp_mode": "catmullrom"
 						},
 						"9.5": {
-							"post": [0, -2, -39],
+							"post": [0, 100, -39],
 							"lerp_mode": "catmullrom"
 						},
 						"9.6667": {
-							"post": [0, -2, 47],
+							"post": [0, 100, 47],
 							"lerp_mode": "catmullrom"
 						},
 						"9.8333": {
-							"post": [0, -2, 47],
+							"post": [0, 100, 47],
 							"lerp_mode": "catmullrom"
 						}
 					}

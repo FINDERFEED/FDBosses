@@ -1,6 +1,7 @@
 #version 330
 
 uniform sampler2D DiffuseSampler;
+uniform sampler2D WorldDepth;
 
 uniform mat4 projection;
 uniform mat4 modelView;
@@ -154,6 +155,16 @@ float perlinNoise3d(float x,float y,float z,float sections){
     return final;
 }
 
+vec4 srcOneSrcAlpha(vec4 src, vec4 dest){
+
+    return vec4(
+            src.r + dest.r * src.a,
+            src.g + dest.g * src.a,
+            src.b + dest.b * src.a,
+            src.a + dest.a * src.a
+    );
+}
+
 void main(){
     vec4 effectScreenPos = projection * modelView * vec4(effectRelativePosition, 1.0);
 
@@ -163,7 +174,9 @@ void main(){
 
     effectScreenPos /= effectScreenPos.w;
 
-    if (effectScreenPos.z <= 0){
+    float depth = texture(WorldDepth, texCoord).r;
+
+    if (effectScreenPos.z <= 0 || effectScreenPos.z > depth){
         fragColor = texture(DiffuseSampler, texCoord);
         return;
     }
@@ -179,21 +192,33 @@ void main(){
 
     vec2 uvn = uv / r;
     float radiusAtPoint = (perlinNoise3d(uvn.x, uvn.y, 0.0, 7) + 1.0) * 0.5;
-
     float sinValue = sin(r * 50.0 + radiusAtPoint * 10.0 + time * 10.0) * 0.5 + 0.5;
-
     float noisyRadius =  (radiusOnScreen + radiusOnScreen * 0.1 * perlinNoise3d(uvn.x, uvn.y, 0.0, 10.0));
 
     float radMod = smoothstep(0.0, 1.0, max(0.0, 1.0 - r / noisyRadius)) * smoothstep(0.0, 1.0, min(1.0, r / innerRadiusOnScreen));
 
     sinValue *= radMod;
+
     float distortionAtPoint = (perlinNoise3d(uv.x, uv.y, time * 0.1, 10.0) + 1.0) * 0.5;
-
     float strength = effectStrength;
-
     vec2 displacement = vec2(sin(distortionAtPoint * PI * 2.0), cos(distortionAtPoint * PI * 2.0)) * sinValue * 0.05 * strength;
-
     vec2 samplePosition = clamp(texCoord + displacement, vec2(0.0), vec2(1.0));
 
-    fragColor = texture(DiffuseSampler, samplePosition);
+    vec4 currentColor = texture(DiffuseSampler, samplePosition);
+
+    float pixelizer = 7 / projectionScale;
+    vec2 pixeledUV = floor(uv * pixelizer) / pixelizer * (0.05 / projectionScale);
+
+    float radialNoise = 1 - abs((perlinNoise3d(pixeledUV.x, pixeledUV.y, length(pixeledUV) + time * 0.25, 8)));
+    radialNoise = smoothstep(0, 1, radialNoise);
+    radialNoise *= radMod;
+
+    vec4 glowColor = vec4(1, 0.7, 0.3, 0.75) * radialNoise;
+    glowColor = srcOneSrcAlpha(glowColor, glowColor);
+    glowColor = srcOneSrcAlpha(glowColor, glowColor);
+    glowColor = srcOneSrcAlpha(glowColor, glowColor) * effectStrength;
+
+    currentColor = srcOneSrcAlpha(currentColor, glowColor);
+
+    fragColor = currentColor;
 }

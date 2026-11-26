@@ -39,7 +39,7 @@ public class NetzachCaneAttack extends Entity implements AutoSerializable {
     private static final EntityDataAccessor<Integer> CHARGE_TICKS = SynchedEntityData.defineId(NetzachCaneAttack.class, EntityDataSerializers.INT);
 
     private static final int DEFAULT_CHARGE_TICKS = 40;
-    static final int FALL_TICKS = 5;
+    public static final int FALL_TICKS = 5;
     static final int FADE_TICKS = 20;
 
     private static FDModel caneModel;

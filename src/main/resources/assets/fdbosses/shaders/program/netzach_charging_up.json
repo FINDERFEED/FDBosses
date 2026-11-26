@@ -7,7 +7,10 @@
   "vertex": "blit",
   "fragment": "fdbosses:netzach_charging_up",
   "attributes": [ "Position" ],
-  "samplers": [ { "name": "DiffuseSampler" } ],
+  "samplers": [
+    { "name": "DiffuseSampler" },
+    { "name": "WorldDepth" }
+  ],
   "uniforms": [
     { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] },
     { "name": "projection", "type": "matrix4x4", "count": 16, "values": [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] },
