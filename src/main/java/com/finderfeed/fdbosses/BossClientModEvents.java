@@ -90,6 +90,7 @@ import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.ClockWyve
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_dragon.clock_o_ball.ClockWyvernClockOBallRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_gear_crush.NetzachGearCrushAttackRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_cane_attack.NetzachCaneAttackRenderer;
+import com.finderfeed.fdbosses.content.entities.netzach.netzach_cane_attack.NetzachCaneVisualStrike;
 import com.finderfeed.fdbosses.content.entities.netzach.netzach_ghost_crush.NetzachGhostCrushRenderer;
 import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQteAttack;
 import com.finderfeed.fdbosses.content.entities.netzach.qte.NetzachQteRenderer;
@@ -523,6 +524,35 @@ public class BossClientModEvents {
                 .build());
 
         event.registerEntityRenderer(BossEntities.NETZACH_CANE_ATTACK.get(), NetzachCaneAttackRenderer::new);
+
+        event.registerEntityRenderer(BossEntities.NETZACH_CANE_VISUAL_STRIKE.get(), FDEntityRendererBuilder.<NetzachCaneVisualStrike>builder()
+                .addLayer(FDEntityRenderLayerOptions.<NetzachCaneVisualStrike>builder()
+                        .model(BossModels.NETZACH_CANE)
+                        .renderType(RenderType.lightning())
+                        .transformation((strike, matrices, partialTick) -> {
+                            FDRenderUtil.applyMovementMatrixRotations(matrices, strike.getLastKnownDeltaMovement().reverse());
+                        })
+                        .color((strike, partialTick) -> {
+
+                            float alpha;
+                            if (strike.fadeIn == 0){
+                                alpha = 1;
+                            }else{
+                                alpha = Math.min(1, (strike.tickCount + partialTick) / strike.fadeIn);
+                            }
+
+                            if (strike.hasReachedDestination()){
+                                float fadeOutAge = strike.reachedDestinationTicks - 1 + partialTick - strike.stay;
+                                if (strike.fadeOut > 0 && fadeOutAge >= 0){
+                                    alpha = Math.max(0, 1 - fadeOutAge / strike.fadeOut);
+                                }
+                            }
+
+                            return new FDColor(1f, 0.85f, 0.1f, alpha);
+                        })
+                        .build())
+                .build());
+
         event.registerEntityRenderer(BossEntities.NETZACH_GHOST_CRUSH.get(), NetzachGhostCrushRenderer::new);
         event.registerEntityRenderer(BossEntities.NETZACH_GEAR_CRUSH.get(), NetzachGearCrushAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.SECTOR_ATTACK.get(), SectorAttackRenderer::new);

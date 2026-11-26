@@ -1,0 +1,22 @@
+{
+  "blend": {
+    "func": "add",
+    "srcrgb": "one",
+    "dstrgb": "one"
+  },
+  "vertex": "blit",
+  "fragment": "fdbosses:netzach_charging_up",
+  "attributes": [ "Position" ],
+  "samplers": [ { "name": "DiffuseSampler" } ],
+  "uniforms": [
+    { "name": "ProjMat", "type": "matrix4x4", "count": 16, "values": [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] },
+    { "name": "projection", "type": "matrix4x4", "count": 16, "values": [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] },
+    { "name": "modelView", "type": "matrix4x4", "count": 16, "values": [ 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1 ] },
+    { "name": "OutSize", "type": "float", "count": 2, "values": [ 1, 1 ] },
+    { "name": "effectRelativePosition", "type": "float", "count": 3, "values": [ 0, 0, 0 ] },
+    { "name": "effectRadius", "type": "float", "count": 1, "values": [ 0 ] },
+    { "name": "innerRadius", "type": "float", "count": 1, "values": [ 0 ] },
+    { "name": "time", "type": "float", "count": 1, "values": [ 0 ] },
+    { "name": "effectStrength", "type": "float", "count": 1, "values": [ 1 ] }
+  ]
+}

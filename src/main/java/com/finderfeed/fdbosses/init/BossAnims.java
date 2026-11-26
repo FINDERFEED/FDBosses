@@ -345,6 +345,14 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"netzach"));
     });
 
+    public static final DeferredHolder<Animation,Animation> NETZACH_ULTIMATE_CHARGE_UP = ANIMATIONS.register("netzach_ultimate_charge_up", ()->{
+        return new Animation(FDBosses.location("netzach"));
+    });
+
+    public static final DeferredHolder<Animation,Animation> NETZACH_ULTIMATE_END = ANIMATIONS.register("netzach_ultimate_end", ()->{
+        return new Animation(FDBosses.location("netzach"));
+    });
+
     public static DeferredHolder<Animation,Animation> TIME_STABILIZER_GEARS = ANIMATIONS.register("time_stabilizer_gears_rotate", ()->{
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"time_stabilizer"));
     });
