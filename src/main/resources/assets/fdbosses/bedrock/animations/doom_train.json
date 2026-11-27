@@ -1,0 +1,29 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"doom_train_ride": {
+			"loop": true,
+			"animation_length": 1,
+			"bones": {
+				"back_wheels": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [-720, 0, 0]
+					}
+				},
+				"forward_wheels": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [-720, 0, 0]
+					}
+				},
+				"back_wheels2": {
+					"rotation": {
+						"0.0": [0, 0, 0],
+						"1.0": [-720, 0, 0]
+					}
+				}
+			}
+		}
+	}
+}

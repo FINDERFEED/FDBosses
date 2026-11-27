@@ -437,4 +437,7 @@ public class BossAnims {
         return new Animation(ResourceLocation.tryBuild(FDBosses.MOD_ID,"doom_train_tunnel"));
     });
 
+    public static final DeferredHolder<Animation,Animation> DOOM_TRAIN_RIDE = ANIMATIONS.register("doom_train_ride",
+            ()->new Animation(FDBosses.location("doom_train")));
+
 }

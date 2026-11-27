@@ -558,18 +558,40 @@ public class BossClientModEvents {
         event.registerEntityRenderer(BossEntities.SECTOR_ATTACK.get(), SectorAttackRenderer::new);
         event.registerEntityRenderer(BossEntities.TRAIN_ATTACK.get(), TrainAttackRenderer::new);
 
+        FDEntityTransformation<DoomTrain> trainTransform = (train, poseStack, partialTicks) -> {
+            poseStack.mulPose(Axis.YP.rotationDegrees(-train.getViewYRot(partialTicks)));
+
+            float roll = train.getRoll(partialTicks);
+            float wheelsOffset = 1.5f;
+            if (roll > 0){
+                poseStack.translate(-wheelsOffset,0,0);
+            }else{
+                poseStack.translate(wheelsOffset,0,0);
+            }
+            poseStack.mulPose(Axis.ZP.rotationDegrees(train.getRoll(partialTicks)));
+            if (roll > 0){
+                poseStack.translate(wheelsOffset,0,0);
+            }else{
+                poseStack.translate(-wheelsOffset,0,0);
+            }
+        };
+
         event.registerEntityRenderer(BossEntities.DOOM_TRAIN.get(), FDEntityRendererBuilder.<DoomTrain>builder()
+                .ignoreYaw((train, partialTicks) -> true)
                 .addLayer(FDEntityRenderLayerOptions.<DoomTrain>builder()
                         .model(BossModels.DOOM_TRAIN)
                         .renderType(RenderType.entityCutoutNoCull(FDBosses.location("textures/entities/netzach/doom_train.png")))
+                        .transformation(trainTransform)
                         .renderCondition(train->!train.isWaiting())
                         .build())
                 .build());
 
         event.registerEntityRenderer(BossEntities.DOOM_TRAIN_WAGON.get(), FDEntityRendererBuilder.<DoomTrain>builder()
+                .ignoreYaw((train, partialTicks) -> true)
                 .addLayer(FDEntityRenderLayerOptions.<DoomTrain>builder()
                         .model(BossModels.DOOM_TRAIN_WAGON)
                         .renderType(RenderType.entityCutoutNoCull(FDBosses.location("textures/entities/netzach/doom_train_wagon.png")))
+                        .transformation(trainTransform)
                         .renderCondition(train->!train.isWaiting())
                         .build())
                 .build());

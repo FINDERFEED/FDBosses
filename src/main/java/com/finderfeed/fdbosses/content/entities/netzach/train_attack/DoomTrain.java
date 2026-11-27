@@ -1,7 +1,9 @@
 package com.finderfeed.fdbosses.content.entities.netzach.train_attack;
 
+import com.finderfeed.fdbosses.init.BossAnims;
 import com.finderfeed.fdlib.nbt.AutoSerializable;
 import com.finderfeed.fdlib.nbt.SerializableField;
+import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.AnimationTicker;
 import com.finderfeed.fdlib.systems.bedrock.animations.animation_system.entity.FDEntity;
 import com.finderfeed.fdlib.util.FDTargetFinder;
 import com.finderfeed.fdlib.util.math.FDMathUtil;
@@ -11,6 +13,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -42,6 +45,12 @@ public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWith
     @SerializableField
     private double traveledDistance = 0;
 
+    private boolean oneShotSync = false;
+
+    private float previousRoll;
+    private float roll;
+    private float rollForce;
+
     public DoomTrain(EntityType<?> type, Level level){
         super(type, level);
         this.noPhysics = true;
@@ -67,6 +76,8 @@ public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWith
         super.tick();
 
         if (!this.level().isClientSide){
+            this.getAnimationSystem().startAnimation("MAIN", AnimationTicker.builder(BossAnims.DOOM_TRAIN_RIDE)
+                    .build());
             if (this.departureDelay > 0){
                 this.departureDelay--;
                 this.setDeltaMovement(Vec3.ZERO);
@@ -77,10 +88,12 @@ public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWith
 
         if (!this.isWaiting()){
             TrainAttackPattern pattern = this.getPattern();
+            double pathLength = pattern.getPathLength();
             double previousDistance = this.traveledDistance;
-            this.traveledDistance = Math.min(this.traveledDistance + this.trainSpeed, pattern.getPathLength());
+            this.traveledDistance = Math.min(previousDistance + this.trainSpeed, pathLength);
 
-            Vec3 nextPosition = this.pathOrigin.add(pattern.getPosition(this.getProgress()));
+            Vec3 pathPosition = pattern.getPosition(this.traveledDistance / pathLength);
+            Vec3 nextPosition = this.pathOrigin.add(pathPosition);
             Vec3 movement = nextPosition.subtract(this.position());
             this.setDeltaMovement(movement);
             if (movement.x != 0 || movement.z != 0){
@@ -88,19 +101,61 @@ public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWith
                 this.setYRot(this.yRotO + FDMathUtil.convertMCYRotationToNormal(targetYaw - this.yRotO));
             }
 
-            if (!this.level().isClientSide){
+            if (this.level().isClientSide){
+                double earlierDistance = Math.max(previousDistance - this.trainSpeed, 0);
+
+                Vec3 earlierPathPosition = pattern.getPosition(earlierDistance / pathLength);
+                Vec3 previousPathPosition = pattern.getPosition(previousDistance / pathLength);
+
+                this.tickRoll(previousPathPosition.subtract(earlierPathPosition), pathPosition.subtract(previousPathPosition));
+            }else{
                 this.damageEntities(previousDistance);
             }
             this.setPos(nextPosition);
         }
 
         if (!this.level().isClientSide){
-            this.entityData.set(PATH_DISTANCE, (float)this.traveledDistance);
+            if (!oneShotSync){
+                this.entityData.set(PATH_DISTANCE, (float)this.traveledDistance);
+                oneShotSync = true;
+            }
             if (this.traveledDistance >= this.getPattern().getPathLength()){
                 this.discard();
             }
         }
 
+    }
+
+    private void tickRoll(Vec3 previousMovement, Vec3 movement){
+        float maxRoll = 15f;
+        float terminalRollForce = 5f;
+
+        float rollGravity = 2f / this.trainSpeed;
+        float turnRollForce = 80f * this.trainSpeed;
+
+        this.previousRoll = this.roll;
+
+        float turnDot = (float)(previousMovement.z * movement.x - previousMovement.x * movement.z);
+
+        this.rollForce += turnDot * turnRollForce;
+        if (this.roll != 0){
+            this.rollForce += this.roll > 0 ? -rollGravity : rollGravity;
+        }
+
+        this.rollForce = Mth.clamp(this.rollForce, -maxRoll, maxRoll);
+
+        this.roll = Mth.clamp(this.roll + this.rollForce, -maxRoll, maxRoll);
+
+        if ((this.previousRoll > 0 && this.roll <= 0) || (this.previousRoll < 0 && this.roll >= 0)){
+            this.roll = 0;
+            this.rollForce = Math.abs(this.rollForce) > terminalRollForce ? this.rollForce * 0.25f : 0;
+        }else if (Math.abs(this.roll) == maxRoll){
+            this.rollForce = 0;
+        }
+    }
+
+    public float getRoll(float partialTicks){
+        return Mth.lerp(partialTicks, this.previousRoll, this.roll);
     }
 
     private void damageEntities(double previousDistance){
@@ -170,6 +225,10 @@ public class DoomTrain extends FDEntity implements AutoSerializable, IEntityWith
 
     public double getProgress(){
         return this.traveledDistance / this.getPattern().getPathLength();
+    }
+
+    public double getProgress(float distance){
+        return distance / this.getPattern().getPathLength();
     }
 
     public double getTraveledDistance(){
