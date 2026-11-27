@@ -8,6 +8,7 @@ import com.finderfeed.fdbosses.content.items.chesed.PhaseSphere;
 import com.finderfeed.fdbosses.content.items.geburah.DivineGearItem;
 import com.finderfeed.fdbosses.content.items.malkuth.MalkuthFist;
 import com.finderfeed.fdbosses.debug.DebugStick;
+import com.finderfeed.fdbosses.debug.TrainPathEditor;
 import com.finderfeed.fdbosses.FDBosses;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -25,6 +26,7 @@ public class BossItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.createItems(FDBosses.MOD_ID);
 
     public static final Supplier<Item> DEBUG_STICK = ITEMS.register("debug",()->new DebugStick(new Item.Properties()));
+    public static final Supplier<Item> TRAIN_PATH_EDITOR = ITEMS.register("train_path_editor",()->new TrainPathEditor(new Item.Properties().stacksTo(1)));
 
     public static final Supplier<Item> MALKUTH_CANNON_REPAIR_MATERIAL_ICE = ITEMS.register("malkuth_cannon_repair_material_ice",()->new Item(new Item.Properties()));
     public static final Supplier<Item> MALKUTH_CANNON_REPAIR_MATERIAL_FIRE = ITEMS.register("malkuth_cannon_repair_material_fire",()->new Item(new Item.Properties()));

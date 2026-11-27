@@ -758,6 +758,11 @@ public class BossClientModEvents {
                                     alpha = Math.min(alpha, Math.min(Math.max(0, tickerTime - 20) / 100, 1));
 
                                     return new FDColor(1,1,1, alpha);
+                                }else if (ticker.getAnimation() == BossAnims.NETZACH_ULTIMATE_END.get()){
+                                    float tickerTime = ticker.getTime(v);
+                                    alpha = Math.max(0, 1 - tickerTime / 100f);
+
+                                    return new FDColor(1,1,1, alpha);
                                 }else{
                                     return new FDColor(0,0,0,0);
                                 }

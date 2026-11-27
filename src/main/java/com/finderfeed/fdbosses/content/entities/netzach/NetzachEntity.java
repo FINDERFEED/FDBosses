@@ -392,10 +392,6 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         }else if (stage == 1){
             this.setVisible(false);
             this.getAnimationSystem().stopAnimation(MAIN_LAYER);
-            if (tick > 20){
-                this.setVisible(true);
-                return true;
-            }
             int qteDuration = 160;
             int initialInterval = 40;
             int finalInterval = 15;
@@ -448,6 +444,7 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                 this.setVisible(true);
             }
         }else if (stage == 3){
+            this.setVisible(true);
             int throwTick = 20;
             if (tick == 0){
                 this.getAnimationSystem().startAnimation(MAIN_LAYER, AnimationTicker.builder(BossAnims.NETZACH_ULTIMATE_END)
@@ -456,17 +453,42 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
                                 .setOutFadeTime(5)
                         .nextAnimation(AnimationTicker.builder(BossAnims.NETZACH_IDLE).build())
                         .build());
-            }else if (tick == throwTick){
+            }else if (tick == throwTick) {
                 NetzachCaneVisualStrike.summon(this.level(), this.position().add(0, 100 / 16.0, 0), new Vec3(0, -2, 0), 0, 5, 10);
+            }else if (tick == throwTick + 2) {
+                this.pushAllEntitiesAway(16);
             }else if (tick == throwTick + 5){
-                int radius = 12;
-                int delay = 40;
-                for (int x = -ARENA_RADIUS + radius; x < ARENA_RADIUS; x += 2 * radius){
-                    for (int z = -ARENA_RADIUS + radius; z < ARENA_RADIUS; z += 2 * radius){
-                        Vec3 ground = BossUtil.targetGroundPos(this.level(), this.spawnPos.add(x, 1, z), ARENA_HEIGHT);
-                        NetzachCaneAttack.summon(this.level(), ground, this.getLookAngle(), 10, radius, delay - NetzachCaneAttack.FALL_TICKS);
-                    }
+
+                var combatants = this.getCombatants(true);
+                Vec3 between = new Vec3(1,0,0);
+
+                if (!combatants.isEmpty()){
+                    Player player = combatants.get(random.nextInt(combatants.size()));
+                    Vec3 targetPos = player.position();
+
+                    float offset = 12;
+                    between = targetPos.subtract(this.position())
+                            .add(0.001,0,0)
+                            .multiply(1,0,1)
+                            .normalize()
+                            .scale(offset);
                 }
+
+                int count = 4;
+                float angleC = FDMathUtil.FPI * 2 / count;
+
+                float angleOffsMax = FDMathUtil.FPI / 8;
+                float angleOffset = random.nextFloat() * angleOffsMax * 2 - angleOffsMax;
+
+                for (int i = 0; i < count; i++){
+
+                    float angle = angleC * i;
+                    Vec3 canePos = BossUtil.targetGroundPos(level(), this.position().add(between.yRot(angle + angleOffset)), 6);
+
+                    NetzachCaneAttack.summon(level(), canePos, new Vec3(1,0,0).yRot(FDMathUtil.FPI * 2 * random.nextFloat()), 1, 11, 50);
+
+                }
+
             }
             return tick >= BossAnims.NETZACH_ULTIMATE_END.get().getAnimTime() - 1 + 200;
         }
@@ -889,6 +911,34 @@ public class NetzachEntity extends FDMob implements BossSpawnerContextAssignable
         }
 
         return false;
+    }
+
+    private void pushAllEntitiesAway(float radius){
+        BossUtil.netzachPushAway((ServerLevel) level(), this.position(), 60, (int) Math.ceil(radius * 2));
+
+        var targets = FDTargetFinder.getEntitiesInSphere(LivingEntity.class, level(), this.position(), radius, entity -> {
+            return entity != this;
+        });
+
+        for (var target : targets){
+
+            Vec3 between = target.position().subtract(this.position());
+            float len = (float) between.length();
+
+            Vec3 speed = between.normalize().scale(Math.max(1, radius - len) / 6f);
+
+            if (target.onGround()){
+                speed = speed.add(0,0.5,0);
+            }
+
+            if (target instanceof ServerPlayer serverPlayer){
+                serverPlayer.hasImpulse = true;
+                FDLibCalls.setServerPlayerSpeed(serverPlayer, speed);
+            }else{
+                target.setDeltaMovement(speed);
+            }
+
+        }
     }
 
     private boolean isRollingGearLeftAttack;
